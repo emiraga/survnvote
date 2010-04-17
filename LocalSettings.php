@@ -43,6 +43,7 @@ $wgSitename         = "Votapedia 2.0";
 ## http://www.mediawiki.org/wiki/Manual:Short_URL
 $wgScriptPath       = "/new";
 $wgScriptExtension  = ".php";
+$wgLogo             = $wgScriptPath."/wiki.png";
 
 ## UPO means: this is also a user preference option
 
