@@ -122,7 +122,8 @@ class WaveLover2Template extends QuickTemplate {
 				</p></div> 
 			<div style="float:right;margin-top:15px;margin-right:25px">
 				<p>
-				<a title="Purge current page" href="<?php echo $this->data['content_actions']['nstab-main']['href'].'?action=purge'; ?>">Purge</a>
+				<a title="Purge current page" href="<?php echo $this->data['wgScript'].'/'.$this->data['thispage'].'?action=purge'; ?>">Purge</a>
+				<?php //print_r($this->data) ?>
 				</p>
 			</div>
 			<h1 id="firstHeading" class="firstHeading">

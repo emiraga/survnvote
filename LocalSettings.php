@@ -123,3 +123,9 @@ $wgDiff3 = "";
 # When you make changes to this configuration file, this will make
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
+
+require_once( "$IP/extensions/votapedia/SpecialCreateSurvey.php" );
+require_once( "$IP/extensions/votapedia/SpecialEmirTest.php" );
+
+$wgShowExceptionDetails = true;
+

@@ -80,7 +80,7 @@ class PreferencesForm {
 				$this->mToggles[$tname] = $request->getCheck( "wpOp$tname" ) ? 1 : 0;
 			}
 		}
-
+		
 		$this->mUsedToggles = array();
 
 		# Search namespace options
