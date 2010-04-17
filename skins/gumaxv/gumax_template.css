@@ -1,0 +1,890 @@
+/*
+ * ----------------------------------------------------------------------------
+ * 'GuMaxV' style sheet for CSS2-capable browsers.
+ *	   Loosely based on the monobook style
+ *
+ * @Version 1.0
+ * @Author Paul Y. Gu, <gu.paul@gmail.com>
+ * @Copyright paulgu.com 2006 - http://www.paulgu.com/
+ * @License: GPL (http://www.gnu.org/copyleft/gpl.html)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ * ----------------------------------------------------------------------------
+ */
+
+/* Basic Structure
+-----------------------------------------------------------------------------*/
+#gumax-wrapper
+{
+	width: 970px;  /* page width */
+	margin: 0 auto;
+	font-size: 110%;
+	background: transparent;
+	/* border: 1px solid #000; /**/
+}
+#gumax-content {}
+body
+{
+	font-size: x-small;
+	margin: 0; padding: 0;
+	min-width: 770px;
+	background: #FAFCFD url('images/shadow/gumax-bg.jpg') repeat-x;
+}
+
+body, td, th, input, textarea, pre, h1, h2, h3, h4, h5, h6 { color: #222; }
+body, td, th, input, textarea { font-family: Verdana, Arial, 'Trebuchet MS'; }
+pre { font-family: Monospace, Courier, Arial; }
+
+/* Layout and Color
+-----------------------------------------------------------------------------*/
+#gumax-header { background: transparent; }
+table.gumax-caption, table.gumax-row
+{
+	border-collapse: separate;
+	table-layout: fixed;
+	overflow: hidden;
+}
+
+table.gumax-row td.gumax-row-left, #gumax-p-navigation-wrapper { width: 160px; /* menu width */ }
+#gumax-header, table.gumax-caption, table.gumax-row, #gumax-footer { /* border: 1px solid #0066CC; /**/ }
+table.gumax-row td.gumax-row-left { border-right: 1px solid #EEE; }
+table.gumax-row td.gumax-row-left { background: transparent; /* menu background */ }
+table.gumax-caption	{ background: #F4F9FD; /* top bar color */ }
+table.gumax-caption	{ border-bottom: 1px solid #FFF; }
+#gumax-p-login ul li a { color: #CCC; }
+#gumax-p-login ul li a:hover { color: #999; }
+#gumax-footer { background: #D5DEED; /* bottom bar color */ }
+#gumax-footer { border-top: 1px solid #EEE; }
+#gumax-footer ul li a { color: #999; }
+#gumax-footer ul li a:hover { color: #555; }
+table.gumax-row td.gumax-row-right { background: transparent; }
+
+table.gumax-caption, table.gumax-row { background: transparent; }
+
+#gumax-spacer { height: 1px; }
+
+/* Logo
+-----------------------------------------------------------------------------*/
+#p-logo,
+#p-logo a,
+#p-logo a:hover
+{
+	width:  180px;
+	height: 72px;
+}
+
+#p-logo
+{
+	/* border: 1px solid #CC0033; /* debuging */
+	z-index: 200;
+	position: absolute; /*needed to use z-index */
+	top:  15px;
+	left: 21px; /* left margin of the logo, which is same as content margin */
+	overflow: visible;
+}
+#p-logo h5 { display: none; }
+#p-logo a,
+#p-logo a:hover
+{
+	display: block;
+	background-repeat: no-repeat;
+	background-position: 35% 50% !important;
+	text-decoration: none;
+}
+
+/* Header
+-----------------------------------------------------------------------------*/
+/* gumax-header */
+#gumax-header
+{
+	/* border: 1px solid #CC0033; /* debuging */
+	position: relative;
+	z-index: 100;  /* make logo visible over content*/
+	min-height: 80px;  /* height of header */
+	height: 82px;  /* need for IE */
+	margin: 0 auto;
+	padding: 0;
+}
+
+/* Login
+-----------------------------------------------------------------------------*/
+#gumax-p-login {
+	/* border:  1px solid #000; /* debuging */
+	font-size: 90%;
+	margin: 0 3px;
+	padding: 0;
+	text-align: right;
+}
+
+#gumax-p-login ul {
+	list-style: none;
+}
+
+#gumax-p-login ul li {
+	display: inline;  /* display in line  */
+	margin: 0;
+}
+
+#gumax-p-login ul li a {
+	padding: 2px 5px 3px 5px;
+}
+
+#gumax-pt-login a {
+	font-weight: bold;
+	/* text-transform: uppercase; /* uppercase, capitalize */
+}
+
+#gumax-p-login,
+#gumax-p-login ul li a {
+	text-decoration: none;
+}
+#gumax-p-login ul li a:hover {
+	text-decoration: none;
+}
+
+/* Search
+-----------------------------------------------------------------------------*/
+#gumax-p-search {
+	/* border:  1px solid #FFCC00; /* debuging */
+	position: relative;
+	z-index: 3;
+	padding: 2px 7px;
+}
+
+#gumax-p-search .gumax-pBody,
+#gumax-searchBody {
+	/* border: 1px solid #99FF00;  /* testing */
+	background: none;
+	position: relative;
+	padding: 0;
+	/* white-space: nowrap;  /* for Opera */
+	width: 220px;
+	vertical-align: middle;
+}
+input#searchInput {
+	margin-right: 5px;
+}
+#gumax-p-search form #searchInput {
+	font-size: 100%;
+	width: 110px;   /* text field width */
+	text-align: left;
+	vertical-align: middle;
+	border: 1px solid #6699CC; /* text field border style */
+	background: transparent; /* background color of the text field */
+}
+#gumax-p-search form #searchInput:hover,
+#gumax-p-search form #searchInput:focus {
+	background: #fff;
+	/* width: 160px;  /* text field width when focused */
+}
+
+#gumax-p-search form #searchGoButton,
+#gumax-p-search form #mw-searchButton {
+	font-family: Verdana, Sans-serif, Arial;
+	vertical-align: middle;
+	font-size: 90%;
+	font-weight: normal;
+	color: #777;  /* font color */
+	text-decoration: none;
+	 background: transparent; /* button background */
+	/* border: 1px outset #999; /* border: 1px inset #777; */
+	border-width: 1px;
+	padding: 0 2px;
+}
+
+#searchGoButton:link, #searchGoButton:visited, #searchGoButton:hover, #searchGoButton:active,
+#mw-searchButton:link, #mw-searchButton:visited, #mw-searchButton:hover, #mw-searchButton:active
+{
+	/* background: #FFCC00; */
+	cursor: pointer;
+}
+
+/* dynamic article picture
+-----------------------------------------------------------------------------*/
+#gumax-article-picture {
+	/* background: #fff; */
+	border:  1px solid #eee;
+	background: #fff;
+	text-align: left;
+	padding: 0;
+	margin: 0 10px 2px 10px; /* same margin as content */
+	/* display: none; /* disable gumax-article-picture */
+}
+
+#gumax-article-picture,
+#gumax-article-picture a,
+#gumax-article-picture a:hover {
+	/* border: 3px solid #99FF00;  /* testing */
+	height:	 118px;
+	min-height: 118px; /* height of header */
+	display: block;
+	background-repeat: no-repeat;
+	background-position: center center;
+	text-decoration: none;
+	color: #eee;
+	font-weight: bolder;
+	font-size: 102%;
+}
+
+/* Navigation Menu
+-----------------------------------------------------------------------------*/
+.gumax-portlet h5 { /* menu title */
+	color: #3366CC;
+	/* border-bottom: 1px solid #F4DED3; /* menu title */
+	margin-top: 5px;
+	padding-left: 6px;
+	text-transform: capitalize; /* uppercase, capitalize */
+}
+.gumax-portlet {
+	margin-bottom: 7px;
+}
+#gumax-p-navigation-wrapper
+{
+	/* border: 1px solid red; /* debuging */
+}
+
+#gumax-p-navigation {
+	/* border: 1px solid #000; /* debuging */
+}
+
+#gumax-p-navigation ul {
+	/* border: 1px solid red; /* debuging */
+	line-height: 1.5em;
+	margin: 0;
+	padding: 0;
+	/* list-style-type: square; list-style-image: url(images/gumax-arrow-blue.gif);  /* list style */
+	list-style-type:none;list-style-image: none;  /* no style */
+}
+
+#gumax-p-navigation li {
+	color: #7FBAFF;  /* the font color of '|' */
+}
+
+#gumax-p-navigation ul li a {
+	color: #555;
+	text-decoration: none;
+	padding: 1px 3px 2px 13px; /* padding inside the tab */
+	margin: 0;
+	background: url(images/gumax-arrow-blue.gif) center left no-repeat;
+}
+
+#gumax-p-navigation ul li a:hover {
+	color: #CC6633;
+	text-decoration: underline;
+	background: url(images/gumax-arrow-yellow.gif) center left no-repeat;
+}
+#gumax-p-navigation ul li.active a,
+#gumax-p-navigation ul li.selected a {
+	color: #CC6633;
+	background: url(images/gumax-arrow-yellow.gif) center left no-repeat;
+	text-decoration: none;
+}
+
+/* siteNotice
+-----------------------------------------------------------------------------*/
+#siteNotice
+{
+	border: 1px solid #FF9933;
+	background: #FFFFCC;
+	margin: 0;
+	padding: .9em;
+	font-size: 100%;
+}
+#siteNotice p {
+	margin: 0;
+	padding: 0;
+}
+#siteNotice table {
+	background: transparent;
+	margin: 0;
+	padding: 0;
+}
+
+/* content
+-----------------------------------------------------------------------------*/
+:link { color: #039; }
+:visited { color: #636; }
+:link:hover, :visited:hover { color: #333; }
+:link:active, :link:active { color: #000; }
+
+#jump-to-nav { display: none; }
+
+:link img, :visited img { border: 0; }
+.deepLevel #mainContent :link img,
+.deepLevel #mainContent :visited img {
+	border: medium solid;
+}
+.deepLevel #mainContent #buttons :link img,
+.deepLevel #mainContent #buttons :visited img {
+	border: 0;
+}
+
+/* new link style  */
+a.new,
+#gumax-p-personal a.new {
+	color: #FF0000;
+	text-decoration: none;
+}
+a.new:visited,
+#gumax-p-personal a.new:visited {
+	color: #CC0000;
+	text-decoration: none;
+}
+
+/* internal and external link style */
+a:link,
+a:visited,
+#gumax-content a.external:link,
+#gumax-content a.external:visited {
+	color: #0033CC;
+	text-decoration: none;
+}
+
+/* internal link navigation style */
+a:link:hover,
+a:visited:hover {
+	color: #003366;
+	text-decoration: underline;
+}
+
+/* external link navigation style */
+#gumax-content a.external:hover {
+	color: #0066FF;
+	text-decoration: underline;
+}
+
+/* internal and external active link style */
+a:link:active,
+#gumax-content a.external:active  {
+	color: #FF9900;
+	text-decoration: none;
+}
+
+#gumax-content-body {
+	/* border:  1px solid #CC6600;  /* debuging */
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+
+#content {
+	background: transparent;
+	margin: 0;
+	padding: 1px 10px .5em 10px;  /* content margin */
+	/* position: relative !important;  */
+	position: static; /* need for IE positioning problem */
+	z-index: 2;
+	clear: both;
+	color: black;
+	line-height: 1.4em; /* value other than 'normal' needed for WinIE */
+	overflow-x: visible;	/* need for Firefox, extreme long string :( */
+}
+
+/* content page title */
+.page-Home .firstHeading { display: none; } /* Hide Home Page title */
+
+#content .firstHeading
+{
+	font-size: 150%;
+	color: #CC6633;
+	background: none;
+	font-weight: bold;
+	margin: 0;
+	border: none;
+}
+
+#bodyContent {
+	/* border: 1px solid #ddd;  /* debuging */
+	width: 100%;
+	padding: .1em 0 1.1em 0;
+}
+
+/* AJax search style */
+div#searchTargetContainer {
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	background: white;
+	overflow-x: visible;  /* need for Firefox, extreme long string :( */
+	word-wrap: break-word;  /* need for IE, extreme long string :( */
+}
+
+div#searchTarget {
+	padding:	10px;
+	margin:	 5px;
+	background: #fefefe;
+	border:	 solid 1px #FFCC00;
+}
+
+div#searchTarget h2 {
+	padding-top: 1em;
+	margin-bottom: .5em;
+}
+
+div#searchTarget a {
+	position: relative;
+	z-index: 300; /* fix the hide link button */
+}
+
+/* table of content styles */
+#toc, .toc, .mw-warning {
+	font-size: 100%;
+	border: 1px solid #ddd;
+	background-color: #FAFAFA;
+	padding: .5em;
+	margin-bottom: .9em;
+}
+
+#toc h2, .toc h2 {
+	font-size: 110%;
+	border: none;
+	margin: 0;  /* fix toc top margin */
+	padding-right: .2em;  /* margin between title and hide/show link */
+	display: inline;  /* display the hide/show link after Contents */
+}
+
+#toc #toctitle,
+.toc #toctitle,
+#toc .toctitle,
+.toc .toctitle {
+	text-align: left; /* left adjust of title */
+}
+
+#toc ul, .toc ul {
+	list-style-type: none;
+	list-style-image: none;
+	margin:  0;
+	padding: .3em 0 0 .7em; /* margin of the item list */
+	text-align: left;
+}
+#toc ul ul, .toc ul ul,
+#toc ul ul ul, .toc ul ul ul {
+	margin: 0 0 0 .7em; /* toclevel-2 margin */
+}
+
+#toc .tocindent  { margin-left: 1em; }
+#toc .tocline { margin-bottom: 0; }
+#toc p { margin: 0 }
+#toc .toctoggle { font-size: 90%; }
+
+#toc .editsection {
+	margin-top: .3em;
+	font-size: 90%;
+}
+
+/* content-actions
+-----------------------------------------------------------------------------*/
+#gumax-content-actions
+{
+	/* border:  1px solid #000; /* debuging */
+	text-align: left; /* menu location */
+	/*height: 1.5em;  /* need for IE win */
+	font-size: 102%;
+	white-space: nowrap;
+}
+
+.gumax-content-actions-top {
+	border-top: 5px solid #f7f7f7;
+}
+.gumax-content-actions-bottom {
+	border-bottom: 5px solid #f7f7f7;
+}
+
+#gumax-content-actions ul
+{
+	list-style: none;
+	margin: 0;
+	margin-top: -1px;
+	margin-bottom: -1px;
+}
+#gumax-content-actions ul li
+{
+	display: inline;
+	overflow: visible;
+	/* color: #999;  /* the font color of '|' */
+	margin: 0;
+}
+#gumax-content-actions ul li a
+{
+	padding: .1em .5em .2em .5em;
+	text-decoration: none;
+	/* border: 1px solid #ddd; /* menu border */
+	font-size: 95%;
+}
+
+.gumax-content-actions-top li#ca-edit {
+
+}
+
+#gumax-content-actions ul li a {
+	color: #777;
+	text-decoration: none;
+}
+#gumax-content-actions ul li a:hover,
+#gumax-content-actions ul li.selected a {
+	color: #CC6633;
+	background-color: #f7f7f7;
+	text-decoration: none;
+}
+
+/*
+ * --- body content ---
+ */
+/*
+h1, h2 {
+	padding-top: 1.32em;
+	padding-bottom: .2em;
+	border-bottom: 3px solid #ccc;
+}
+*/
+h1, h2 {
+	margin-top: 1.32em;
+	padding: .35em .1em .3em 0;
+	border-bottom: 3px solid #eee;
+}
+h3, h4, h5, h6 {
+	margin-top: 1em;
+	padding: .2em .1em .3em 0;
+	border-bottom: 1px solid #eee;
+}
+
+ul {
+	margin: .3em 0 0 1.5em;
+	list-style-image: url("arrow.gif");
+}
+li {
+	margin-left: .5em;
+	margin-bottom: .1em;
+	padding: 0; /* margin between bullet and content */
+}
+
+#editform { width: 100%; }  /* prevent overflow in IE when editing */
+
+textarea {
+	font-size: 100%;
+	width: 99%; /* fix the textarea oversize in IE */
+	padding: 2px 0 0 2px;
+	margin: 0;
+	border: 1px solid #3399FF;
+}
+
+/* pre{ */
+/* white-space: pre;			/* CSS2 */
+/* white-space: -moz-pre-wrap;  /* Mozilla */
+/* white-space: -hp-pre-wrap;   /* HP printers */
+/* white-space: -o-pre-wrap;	/* Opera 7 */
+/* white-space: -pre-wrap;	  /* Opera 4-6 */
+/* white-space: pre-wrap;	   /* CSS 2.1 */
+/* white-space: pre-line;	   /* CSS 3 (and 2.1 as well, actually) */
+/* word-wrap: break-word;	   /* IE */
+/* } */
+
+pre {
+	white-space: -moz-pre-wrap;  /* need for Firefox */
+	overflow-x: visible;  /* need for Firefox, extreme long string :( */
+	padding: 1em;
+	border: 1px dashed #2f6fab;
+	color: black;
+	background: #F1FFFF;
+	line-height: 1.2em;
+	margin: 1.1em 0;
+}
+* html pre {
+	word-wrap: break-word;  /* IE */
+}
+.visualClear { clear: both;}
+
+.errorbox, .successbox {
+	margin-top: .2em;
+	margin-bottom: 1em;
+}
+
+#contentSub, #contentSub2 {
+	font-size: 90%;
+	line-height: 1.2em;
+	margin: 0.5em 0 1.4em 0;
+	color: #7d7d7d;
+	width: auto;
+}
+
+/* edit section
+-----------------------------------------------------------------------------*/
+* html div.editsection {
+	font-size: 90%;
+}
+.editsection {
+	font-size: 90%;
+	margin-top: 1px;
+	color: #ddd; /* color for [] */
+}
+.editsection a,
+.editsection a:visited {
+	color: #CC6600;
+}
+.editsection a:hover {
+	color: #FF3300;
+}
+
+/* category
+-----------------------------------------------------------------------------*/
+#catlinks {
+	border: 1px solid #aaa;
+	background-color: #f9f9f9;
+	padding: .3em;
+	margin-top: .9em;
+	clear: both;
+}
+#catlinks p, .catlinks {
+	padding: 0;
+	margin: 0;
+}
+
+/* gumax-footer
+-----------------------------------------------------------------------------*/
+#gumax-footer
+{
+	/* border: 1px solid #003366; /* debuging */
+	font-size: 90%;
+	text-align: right; /* page footer location */
+	padding: 2px 5px 2px 5px;
+}
+
+#gumax-footer ul
+{
+	/* border:  1px solid #000; /* debuging */
+	list-style: none;
+	margin: .2em 0;
+}
+#gumax-footer ul li {
+	display: inline;
+	overflow: visible;
+	color: #bbb; /* the font color of '|' */
+	margin: 0;
+}
+#gumax-footer ul li a {	padding: 2px 5px 2px 5px; }
+#gumax-footer ul li a { text-decoration: none; white-space: nowrap; }
+#gumax-footer ul li a:hover { text-decoration: none; }
+
+
+/* gumax-f-list
+-----------------------------------------------------------------------------*/
+#gumax-f-list {
+	text-align: right;
+	padding-right: 25px;
+	color: #999;
+	font-size: 90%;
+}
+
+#gumax-f-list ul
+{
+	/* border:  1px solid #000; /* debuging */
+	list-style: none;
+	margin: 0 0 .2em 0;
+}
+#gumax-f-list ul li {
+	display: inline;
+	overflow: visible;
+	color: #bbb; /* the font color of '|' */
+	margin: 0;
+}
+#gumax-f-list ul li a { padding: 2px 5px 2px 5px; }
+#gumax-f-list ul li a {
+	color: #999;
+	font-size: 95%;
+	text-decoration: none;
+}
+#gumax-f-list ul li a:hover { text-decoration: none; white-space: nowrap; }
+#gumax-f-list ul li a:hover { color: #333; }
+
+#gumax-f-message {
+	/* border:  1px solid #000; /* debuging */
+	text-align: right;
+	padding-right: 28px;
+	color: #999;
+	font-size: 90%;
+}
+
+
+/* Special:Specialpages
+-----------------------------------------------------------------------------*/
+#allmessagestable { /* system message table fix */
+	table-layout: fixed;
+	width: 100%;
+	max-width: 100%;
+	margin-top: 20px;
+}
+#allmessagestable.left td {
+	width: 30%;
+}
+
+table.imagelist, table.TablePager { /* image list table fix */
+	/* table-layout: fixed; /**/
+	width:	 100%;
+	max-width: 100%;
+	margin-top: 0.3em;
+}
+.TablePager td, .TablePager th {
+	border: 1px solid #777;
+}
+.imagelist td, .imagelist th {
+	white-space: normal;
+}
+/* remove line wrapping for TablePager_col_links */
+.imagelist .TablePager_col_links {
+	white-space: nowrap;
+}
+
+/*
+ * Table pager (e.g. Special:Imagelist)
+ */
+.TablePager_nav a	{ text-decoration: none; }
+
+.TablePager th		{ background-color: #eeeeff; }
+.TablePager td		{ background-color: #ffffff; }
+.TablePager tr:hover td { background-color: #eeeeff; }
+
+
+/* file gallery fix */
+/*
+table.gallery {
+	margin: 2px 0;
+	padding: 2px 0;
+}
+div.gallerybox {
+	margin: 2px 1px;
+	width:  125px;
+}
+div.gallerybox div.thumb {
+	margin: 2px 0;
+}
+*/
+
+/* Random HTML
+-----------------------------------------------------------------------------*/
+hr {
+	height: 1px;
+	color: #aaa;
+	background-color: #aaa;
+	border: 0;
+	margin: .2em 0 .2em 0;
+}
+
+input[type="submit"] { font-weight: bold; }
+
+/* for margin between paragraphs */
+.cc {
+	font-size: 10%;
+	padding: 0.2em 0 0.2em 0;
+	margin: 0;
+}
+/*-------------------------------------
+	<div class="cc">&nbsp;</div>
+-------------------------------------*/
+
+/*
+ * Force Opera / Moz / Netscape
+ * to display an _IN_active vertical scrollbar
+ * (like IE).
+ */
+html {
+	overflow-y: scroll;
+}
+
+/*
+make a few corners round
+only supported by moz/firefox/other gecko browsers for now
+-----------------------------------------------------------
+*/
+div.breadcrumbs {
+	-moz-border-radius-topleft: 0.5em;
+	-moz-border-radius-topright: 0.5em;
+	-moz-border-radius-bottomleft: 0.5em;
+	-moz-border-radius-bottomright: 0.5em;
+}
+
+/* IE/Mac fixes
+-----------------------------------------------------------------------------*/
+/* fix for position of image inside table */
+table {
+	/* position: none !important;  /* positioning, except IE */
+	/* position: relative;		 /* positioning for IE */
+}
+
+/* the positioning of preferences */
+/* float/negative margin brokenness */
+* html #preferences {
+	width: 90%;
+}
+
+/* login form fix */
+div#userloginForm form,
+form#userlogin2 {
+	width: 500px;
+}
+
+
+/* page shadow
+-----------------------------------------------------------------------------*/
+#contentHeadLeft {
+	background: #FAFCFD url(images/shadow/gumax-headleft.jpg) no-repeat;
+	height: 28px;
+	padding-left: 22px;
+}
+#contentHeadCenter {
+	background: url(images/shadow/gumax-headcenter.jpg) repeat-x;
+	height: 100%;
+	margin: 0 6px;
+}
+#contentHeadRight {
+	background: url(images/shadow/gumax-headright.jpg) no-repeat right;
+	height: 100%;
+	padding-right: 22px;
+}
+#contentBodyLeft {
+	background: url(images/shadow/gumax-bodyleft.jpg) repeat-y;
+	padding-left: 22px;
+	clear: both;
+}
+#contentBodyCenter {
+	height: auto;
+	background: url(images/shadow/gumax-bodycenter.jpg);
+}
+#contentBodyRight {
+	padding-right: 22px;
+	background: url(images/shadow/gumax-bodyright.jpg) repeat-y right;
+}
+#contentFootLeft {
+	background: #FAFCFD url(images/shadow/gumax-footleft.jpg) no-repeat;
+	height: 28px;
+	padding-left: 22px;
+	clear: both;
+}
+#contentFootCenter {
+	background: url(images/shadow/gumax-footcenter.jpg) repeat-x;
+	height: 100%;
+	margin: 0 6px;
+}
+#contentFootRight {
+	background: url(images/shadow/gumax-footright.jpg) no-repeat right;
+	height: 100%;
+	padding-right: 22px;
+}
+#contentMain {
+	background: #D5DEED url(images/shadow/gumax-content.jpg) repeat-x;
+	width: auto;
+	margin: 0;
+	padding: 0;
+}

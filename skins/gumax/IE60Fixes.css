@@ -1,0 +1,58 @@
+/* 6.0 - only fixes */
+/* content area */
+/* workaround for various ie float bugs */
+
+/* need for IE to display as block */
+.gumax-portlet ul li a {
+	text-decoration: none;
+}
+
+#content {
+	/* border:  1px solid #FF9900; /**/
+}
+
+#column-content {
+	float: none;
+	margin-left: 0;
+	height: 1%;
+}
+#column-content #content {
+	height: 1%;
+}
+
+
+#bodyContent a.external {
+	background: url(external.png) center right no-repeat;
+	padding-right: 13px;
+}
+
+/* show the hand */
+#p-logo a,
+#p-logo a:hover {
+	cursor: pointer;
+}
+div.visualClear {
+	width:100%;
+	line-height: 0;
+}
+textarea {
+	width: 96%;
+}
+
+div.editsection,
+#catlinks,
+div.tright,
+div.tleft {
+	position: relative;
+}
+/*{ border:1px solid Red !important;}*/
+
+/* bug 12846 */
+body.rtl #preftoc a, body.rtl #preftoc a:active {
+	float: left;
+}
+
+/* need for IE, extreme long string :( */ 
+#searchTargetContainer, pre
+{ word-wrap: break-word; }
+

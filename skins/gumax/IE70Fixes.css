@@ -1,0 +1,41 @@
+/* 7.0 - only fixes */
+/* content area */
+/* workaround for various ie float bugs */
+
+/* This bit is needed to make links clickable... WTF */
+
+
+.gumax-portlet a {
+	display: block;
+}
+#gumax-p-navigation { 
+	height: 25px;
+}
+
+#column-content #content {
+	height: 1%;
+}
+
+
+textarea {
+	width: 96%;
+}
+
+/*
+div.editsection,
+#catlinks,
+div.tright,
+div.tleft {
+	position: relative;
+}
+*/
+
+
+#footer li {
+	/* Work around bug with inline <li> tags with right margins and nowrap */
+	margin-right: 0;
+}
+
+/* need for IE, extreme long string :( */ 
+#searchTargetContainer, pre
+{ word-wrap: break-word; }

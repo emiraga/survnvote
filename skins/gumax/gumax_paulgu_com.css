@@ -1,0 +1,437 @@
+/*
+ * ----------------------------------------------------------------------------
+ * 'gumax' style sheet for CSS2-capable browsers.
+ *   Loosely based on the monobook style
+ *
+ * @Version 3.4.3.3
+ * @Author Paul Y. Gu, <gu.paul@gmail.com>
+ * @Copyright paulgu.com 2006 - http://www.paulgu.com/
+ * @License: GPL (http://www.gnu.org/copyleft/gpl.html)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ * ----------------------------------------------------------------------------
+ */
+
+/* Page title to hide
+-----------------------------------------------------------------------------*/
+.page-Contact_me .gumax-firstHeading,
+.page-Site_support .gumax-firstHeading
+{
+}
+
+
+/* Google AdSense
+-----------------------------------------------------------------------------*/
+.googleAdsCommon {
+	border: 1px solid #eee; /*debug*/
+	padding: 1px;
+	margin: 10px auto; /* centerred on the page  */
+	background: #fff;
+	text-align: center;
+}
+
+/* Google Map
+-----------------------------------------------------------------------------*/
+#google_maps_show_link,
+#google_maps_toggle_link {
+	/* border:  1px solid #CC0033; /* debuging */
+	font-size: 105%;
+	display: inline;
+	float: right;
+	padding: 0 0 2px 0;
+}
+
+/* Simple Security
+-----------------------------------------------------------------------------*/
+#security-info-toggle {
+    background: transparent url(lock_icon_small.gif) no-repeat scroll left center;
+    padding-left: 15px;
+	margin-bottom: 5px;
+}
+#security-info {
+    border: 1px solid #FFCC66;
+    background: #FFFFEE;
+	margin-bottom: 9px;
+}
+
+/* PayPal Donation
+-----------------------------------------------------------------------------*/
+#ppdonation {
+	position: relative;
+	float: left;
+	padding: 5px;
+}
+
+/* SyntaxHighlight GeSHi
+-----------------------------------------------------------------------------*/
+div.mw-geshi {
+	padding: .7em 1em;
+	margin:1em 0;
+	border: 1px dashed #2fab6f;
+}
+
+/* Table
+-----------------------------------------------------------------------------*/
+table.gu-table {
+	margin: .5em .2em;
+	padding: 0;
+}
+
+.gu-table td, .gu-table th {
+	border: 1px solid #A0A0A0;
+	padding: 0 0.15em 0 0.15em;
+}
+.gu-table th {
+	background-color: #F0F0F0;
+	color: black;
+	padding: 0 0.15em 0 0.15em;
+}
+
+table.gu-table-b {
+	border-collapse: collapse;
+	margin: .5em 0;
+	padding: 0;
+}
+
+.gu-table-b td, .gu-table-b th {
+	border: 1px solid #A0A0A0;
+	padding: .15em;
+}
+.gu-table-b th {
+	background-color: #F0F0F0;
+	color: black;
+	padding: .15em;
+}
+
+
+/* paulgu.com templates
+-----------------------------------------------------------------------------*/
+.goto-top {
+	font-size: 90%;
+}
+
+/* <span id="clearer">&nbsp;</span> */
+span#clearer {display:block;clear:both;font-size:0;line-height:0;}
+div.clear { padding: 0.5em; }
+
+div.ycgu-box {
+	position: relative;
+	background-color: #f7f7f7;
+	margin: 0; padding: 0;
+	border: 1px solid #bbb;
+}
+div.ycgu-box-title {
+	font-size: 105%;
+	line-height: 110%;
+	padding: 7px 10px;
+	background: #eee;
+	border-bottom: 2px solid #eaeaea;
+	background: transparent url('images/stripe-grey.gif') left repeat-x;
+}
+div.ycgu-box-content {
+	padding: 7px 10px;
+	background-color: #fff;
+}
+
+div.ycgu-note {
+	border: 1px solid #ccc;
+	margin: 0;
+	padding: 6px 10px;
+	text-align: left;
+	background-color: #ffffcc;
+	color: #333;
+}
+
+.ycgu-table,
+.ycgu-table-1,
+.ycgu-table-2,
+.ycgu-table-3,
+.ycgu-table-2-2,
+.ycgu-table-3-3 {
+	border: 1px solid #bbb;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	width: 100%;
+	border-collapse: collapse; /* Borders are collapsed into a single border when possible */
+}
+.ycgu-table td,
+.ycgu-table-1 td,
+.ycgu-table-2 td,
+.ycgu-table-3 td,
+.ycgu-table-2-2 td,
+.ycgu-table-3-3 td {
+	vertical-align: top;
+	margin: 0; padding: 0;
+	
+}
+div.ycgu-table-title,
+div.ycgu-table-1-title,
+div.ycgu-table-2-title,
+div.ycgu-table-3-title,
+div.ycgu-table-2-2-title,
+div.ycgu-table-3-3-title {
+	font-size: 105%;
+	line-height: 110%;
+	padding: 6px 10px;
+	border-bottom: 2px solid #eaeaea;
+	background: transparent url('images/stripe-grey.gif') left repeat-x;
+}
+div.ycgu-table-content,
+div.ycgu-table-1-content,
+div.ycgu-table-2-content,
+div.ycgu-table-3-content,
+div.ycgu-table-2-2-content,
+div.ycgu-table-3-3-content {
+	vertical-align: top;
+	padding: 7px 10px;
+	background-color: #f7f7f7;
+}
+
+.ycgu-table-2-2 td {
+	width: 50%;
+}
+.ycgu-table-3-3 td {
+	width: 33%;
+}
+
+/* Rounded corners - thin border line
+-----------------------------------------------------------------------------*/
+.rbtop { background: transparent url('images/c1_top.gif') repeat-x; }
+.rbtop div { background: transparent url('images/c1_top_left.gif') no-repeat top left; }
+.rbtop div div { background: transparent url('images/c1_top_right.gif') no-repeat top right; }
+.rbbot { background: transparent url('images/c1_bottom.gif') repeat-x; }
+.rbbot div { background: transparent url('images/c1_bottom_left.gif') no-repeat top left; }
+.rbbot div div { background: transparent url('images/c1_bottom_right.gif') no-repeat top right; }
+.rbcontentwrap { background: #fff url('images/c1_left.gif') repeat-y; } /* content background */
+.rbcontent { background: transparent url('images/c1_right.gif') repeat-y right; }
+
+.rbtop div, .rbtop, .rbbot div, .rbbot {
+	width: 100%;
+	height: 7px;
+	font-size: 1px;
+}
+.rbcontent  {
+	padding: 2px 10px; /* content margin */
+	margin: 0;
+}
+.rbroundbox { margin: 0 auto; padding: 0; }
+
+.rbox {
+	position: relative;
+	width: auto;  /* width of the box */
+}
+/*
+<div class="rbox">
+<div class="rbroundbox"><div class="rbtop"><div><div></div></div></div>
+<div class="rbcontentwrap"><div class="rbcontent">
+Your content
+</div></div>
+<div class="rbbot"><div><div></div></div></div></div>
+</div>
+-----------------------------------------------------------------------------*/
+
+
+/* Rounded corners - gray background
+-----------------------------------------------------------------------------*/
+.gray_box   { background: #ccc; }  /* content background */
+.gray_box .rbtop{ background: transparent url('images/c2_top_right.gif') no-repeat top right; }
+.gray_box .rbtop div{ background: transparent url('images/c2_top_left.gif') no-repeat top left; }
+.gray_box .rbbot{ background: transparent url('images/c2_bottom_right.gif') no-repeat bottom right; }
+.gray_box .rbbot div{ background: transparent url('images/c2_bottom_left.gif') no-repeat bottom left; }
+
+.gray_box .rbtop, .gray_box .rbtop div, .gray_box .rbbot, .gray_box .rbbot div {
+	width: 100%;
+	height: 5px;
+	font-size: 1px;
+}
+.box_centent {
+	margin: 0;
+	padding: 15px 25px; /* content margin */
+}
+
+#gbox {
+	position: relative;
+	background: transparent;
+	padding: 0;
+	width: auto;  /* width of the box */
+}
+
+/*
+<div id="gbox">
+<div class="gray_box"><div class="rbtop"><div></div></div>
+<div class="box_centent">
+<h3>Your Title</h3>
+Your content
+</div>
+<div class="rbbot"><div></div></div></div>
+</div>
+-----------------------------------------------------------------------------*/
+
+/* paulgu.com others
+-----------------------------------------------------------------------------*/
+.gray_border,
+.gray_border td {
+	border: 1px solid #ccc;
+	border-collapse: collapse;
+}
+.gray_border td { padding: 4px 3px 5px 10px; }
+
+
+/* paulgu.com Comments extension
+-----------------------------------------------------------------------------*/
+#commentForm {
+	border: none;
+	background: none;
+	margin: 1em 0;
+}
+div#commentForm:before {
+/* content: "Leave a comment"; */
+}
+#commentForm form #commenterName { width: 200px; }
+#commentForm form #commenterURL { width: 200px; }
+#commentForm form #comment { width: 500px; }
+
+/* protection against embedded higher-level headings in comments */
+.commentBlock h1, .commentBlock h2 { display: none; }
+
+/* YDS (Y Drop Shadow )
+-----------------------------------------------------------------------------*/
+.yds {
+	display: block;
+	position: relative;
+	margin: 4px -4px -4px 4px;
+	background: url('images/shadow-grid.gif') repeat;
+	width: 100%; /* enlarge the shadow to full size */
+}
+/* ie6 ignores this selector */
+html>body .yds {
+	margin: 10px -10px -10px 10px;
+	background: url('images/shadow.png') bottom right no-repeat;
+	width: 100%; /* enlarge the shadow to full size */
+}
+
+/* shadow corners */
+.yds:before,
+.yds:after {
+	content: " ";
+	display: block;
+	width: 10px;
+	height: 10px;
+	background: inherit;
+}
+
+.yds:before {
+	position: relative;
+	top: 0;
+	right: 0;
+	margin: -10px 0 0 auto;
+	background-position: right top;
+}
+
+.yds:after {
+	margin: -10px 0 0 -10px;
+	background-position: left bottom;
+}
+
+.yds .inner {
+	display: block;
+	position: relative;
+	overflow: hidden; /* prevents margin leakage from child elements */
+	left: -4px;
+	top: -4px;
+}
+/* ie6 ignores this selector */
+html>body .yds .inner {
+	left: -10px;
+	top: -10px;
+	margin: 0;
+}
+
+.left {
+	float: left;
+	display: inline; /* fixes ie double margin-left bug */
+}
+
+.right { float: right; }
+
+
+
+/* Customize diferent style
+-----------------------------------------------------------------------------*/
+
+.note {
+	width: auto;
+	border: 1px solid #aaa;
+	padding: 10px;
+	background: #ffc;
+	color: #333;
+}
+/*
+<div class="yds left">
+<div class="inner note">
+<strong>Note:</strong>
+Drop shadows are so beautiful.
+</div></div>
+-----------------------------------------------------------------------------*/
+
+
+.normal {
+	width: auto;
+	border: 1px solid #aaa;
+	padding: 10px;
+	background: #FFF;
+	color: #000;
+	margin:0;
+}
+
+/*
+<div class="yds left">
+<div class="inner normal">
+<strong>Note:</strong>
+Drop shadows are so beautiful.
+</div></div>
+
+<div class="yds right">
+<div class="inner normal">
+<strong>Note:</strong>
+Drop shadows are so beautiful.
+</div></div>
+-----------------------------------------------------------------------------*/
+
+
+
+/*
+html {
+	scrollbar-face-color: #eee;
+	scrollbar-highlight-color: #eee;
+	scrollbar-3dlight-color: #eee;
+	scrollbar-arrow-color: #aaa;
+	scrollbar-track-color: #eee;
+	scrollbar-darkshadow-color: #eee;
+}
+*/
+
+
+.color_minus_3 { color: #E20800; font-size: 180%; }
+.color_minus_2 { color: #FF2E23; font-size: 180%; }
+.color_minus_1 { color: #FF6A5F; font-size: 180%; }
+.color_plus_3 {  color: #298C1B; font-size: 180%; }
+.color_plus_2 {  color: #40D52B; font-size: 180%; }
+.color_plus_1 {  color: #67FB51; font-size: 180%; }
+.color_0 {       color: #000000; font-size: 180%; }
+
+

@@ -1,0 +1,41 @@
+/* 6.0 - only fixes */
+/* content area */
+/* workaround for various ie float bugs */
+
+.gumax-firstHeading {
+	margin-left: 7px;
+}
+#gumax-content-actions ul li a
+{
+	padding-top: .3em;
+}
+
+#portal-personaltools {
+	padding-bottom: 0.1em;
+}
+#bodyContent a.external {
+	background: url(external.png) center right no-repeat;
+	padding-right: 13px;
+}
+
+/* show the hand */
+#p-logo a,
+#p-logo a:hover {
+	cursor: pointer;
+}
+div.visualClear {
+	width:100%;
+	line-height: 0;
+}
+textarea {
+	width: 96%;
+}
+
+div.editsection,
+#catlinks,
+div.tright,
+div.tleft {
+	position: relative;
+}
+/*{ border:1px solid Red !important;}*/
+
