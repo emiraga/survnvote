@@ -600,7 +600,6 @@ class PreferencesForm {
 		if ( !$this->mEmailFlag ) { $emfc = 'checked="checked"'; }
 		else { $emfc = ''; }
 
-
 		if ($wgEmailAuthentication && ($this->mUserEmail != '') ) {
 			if( $wgUser->getEmailAuthenticationTimestamp() ) {
 				// date and time are separate parameters to facilitate localisation.

@@ -942,14 +942,13 @@ li#ca-watch, li#ca-unwatch, li#ca-varlang-0, li#ca-print {
 ** footer
 */
 #footer {
-	background-color: white;
+	/*background-color: white;*/
 	border-top: 1px solid #AAAAAA;
-	margin: 10em 0 0 0;
+	margin: 4em 0 0 0;
 	padding: .4em 0 1.2em 15em;
 	text-align: center;
 	font-size: 90%;
 }
-
 
 #footer li {
 	display: inline;
