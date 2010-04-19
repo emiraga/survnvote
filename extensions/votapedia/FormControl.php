@@ -45,7 +45,7 @@ class FormControl
 		{
 			if(isset($element['valid']))
 				if(! $element['valid']($this->values[ $id ], $element, false))
-					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field '.$this->values[ $id ].'</li>';
+					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field </li>';
 		}
 		return $error;
 	}
@@ -79,8 +79,8 @@ class FormControl
 		{
 			$item = $this->items[$id];
 			
-			if(isset($values[$id]))
-				$value = $values[$id];
+			if(isset($this->values[$id]))
+				$value = $this->values[$id];
 			elseif( isset ($item['default']) )
 				$value = $item['default'];
 			else
@@ -101,7 +101,9 @@ class FormControl
 			}
 			elseif($item['type'] == 'textarea')
 			{
-				$form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
+				//$form_element = '';
+				//die(''.Xml::textarea( $id, $value, 1, 1, array( 'id' => $id ) ));
+				$form_element = "<textarea name='$id' id='$id' cols='5' rows='5'>$value</textarea>";
 			}
 			elseif($item['type'] == 'null')
 			{

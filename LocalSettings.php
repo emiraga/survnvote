@@ -129,4 +129,4 @@ $wgUseAjax = true;
 
 $wgShowExceptionDetails = true;
 
-# $wgDebugLogFile = "{$IP}/debug.log.txt";
+$wgDebugLogFile = "{$IP}/debug.log.txt";

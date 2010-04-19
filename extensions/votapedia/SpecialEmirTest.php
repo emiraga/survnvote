@@ -39,6 +39,13 @@ function wfExtensionSpEmirTest() {
 			$userName=$wgUser->getName();
 			$this->skin = $wgUser->getSkin();
 			
+			
+			for($i=1;$i<=30;$i++)
+			{
+				$article = new Article( Title::newFromText( "Test Question ".$i ) );
+				$article->doDeleteArticle('Not needed');
+			}
+			
 			$wgOut->addHTML('Emir test '.$userName.'<br><div id="response"></div>');
 			$wgOut->addHTML(
 			"<script><!-- 

@@ -139,19 +139,15 @@ function wfExtensionSpCreateSurvey() {
 				),
 			);
 			$this->form = new FormControl($this->formitems);
-		}
-		
-		function SpCreateSurveyPage() {
-			SpecialPage::SpecialPage( 'CreateSurvey' );
 			$this->includable( true ); //we can include this from other pages
 		}
 		
 		function getPageTitle($title)
 		{
 			$title = trim(stripslashes($title));
-			if(strlen($title)>60)
+			if(strlen($title)>50)
 			{
-				$title=substr($title,0,60);
+				$title=substr($title,0,50);
 				$title.='...';
 			}
 			return $title;
@@ -214,6 +210,7 @@ function wfExtensionSpCreateSurvey() {
 		
 		function execute( $par = null )
 		{
+			echo 'execute<br>';
 			global $wgUser, $wgTitle, $wgOut;
 			if ( $wgUser->isAnon() ) {
 				$wgOut->showErrorPage( 'prefsnologin', 'prefsnologintext', array($wgTitle->getPrefixedDBkey()) );
@@ -236,8 +233,12 @@ function wfExtensionSpCreateSurvey() {
 						global $wgOut;
 						$title = $this->getPageTitle($this->form->values[titleorquestion]);
 						$titleObj = Title::newFromText( $title );
-						$wgOut->redirect( $titleObj->getFullURL() );
-						
+
+						$wgOut->addHTML( '<div class="successbox"><strong>New Survey succesfully created ('.$title.')</strong></div>' );
+						$wgOut->addHTML( '<div class="visualClear"></div>' );
+						$wgOut->addReturnTo($titleObj);
+						$wgOut->returnToMain();
+						return;
 					}
 				}
 			}
@@ -250,8 +251,10 @@ function wfExtensionSpCreateSurvey() {
 			global $wgUser, $wgLang;
 			$wgOut->setArticleFlag(false);
 			$wgOut->setPageTitle("Create New Simple Survey");
-			$wgOut->addScriptFile('prefs.js');
-	
+			//$wgOut->addScriptFile('prefs.js');
+			//echo '<pre>';echo htmlspecialchars($wgOut->mScripts); echo '</pre>';
+			$wgOut->addHTML('<script type="text/javascript" src="/new/skins/common/prefs.js"></script>');
+			
 			$userName=$wgUser->getName();
 			$this->skin = $wgUser->getSkin();
 	
@@ -259,8 +262,8 @@ function wfExtensionSpCreateSurvey() {
 			{
 				$wgOut->addWikiText( '<div class="errorbox"><strong><ul>' . $errors . '</ul></strong></div>' );
 			}
-			$titleObj = SpecialPage::getTitleFor( 'CreateSurvey' );
-			$this->form->StartForm( $titleObj->getLocalUrl(), 'mw-preferences-form' );
+			//$titleObj = SpecialPage::getTitleFor( 'CreateSurvey' );
+			$this->form->StartForm( $wgTitle->getLocalUrl(), 'mw-preferences-form' );
 
 			$this->form->AddPage ( 'New Survey', array(titleorquestion,choices,category,label1) );
 			$this->form->AddPage ( 'Timing', array(duration) );
