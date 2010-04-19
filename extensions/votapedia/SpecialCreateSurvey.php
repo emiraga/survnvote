@@ -3,8 +3,9 @@ if (!defined('MEDIAWIKI')) die();
 $wgExtensionFunctions[] = "wfExtensionSpCreateSurvey";
 
 require_once( "$IP/extensions/votapedia/FormControl.php" );
-require_once( "$IP/includes/Article.php" );
 require_once( "$IP/extensions/votapedia/survey/surveyDAO.php" );
+require_once( "$IP/includes/Article.php" );
+require_once( "$IP/includes/Title.php" );
 
 function wfExtensionSpCreateSurvey() {
 	global $IP, $wgMessageCache;
@@ -145,6 +146,17 @@ function wfExtensionSpCreateSurvey() {
 			$this->includable( true ); //we can include this from other pages
 		}
 		
+		function getPageTitle($title)
+		{
+			$title = trim(stripslashes($title));
+			if(strlen($title)>60)
+			{
+				$title=substr($title,0,60);
+				$title.='...';
+			}
+			return $title;
+		}
+		
 		function insertPage($values)
 		{
 			//titleorquestion,choices,category,smsvoting,show_results_end, show_top
@@ -155,11 +167,7 @@ function wfExtensionSpCreateSurvey() {
 			$wikiText='';
 			$title = trim(stripslashes($title));
 			$wikiText.="===$title===\n";
-			if(strlen($title)>60)
-			{
-				$title=substr($title,0,60);
-				$title.='...';
-			}
+			$title = $this->getPageTitle($title);
 			$encodedTitle=urlencode($title);
 
 			$wikiText.= '<choice';
@@ -190,50 +198,18 @@ function wfExtensionSpCreateSurvey() {
 				//Write data into Database
 				$surveyDAO = new SurveyDAO();
 				
-				$databaseWritten= ! $surveyDAO->insertPage($page);
-				if(!$databaseWritten)
+				$databaseWritten= $surveyDAO->insertPage($page);
+				if(! $databaseWritten)
 				{
-					return "<li>Error while writing to voting database, wiki page was already created. Wiki page should be deleted first.</li>";
+					throw new Exception("Error while writing to voting database.");
 				}
 			}
-			catch( Exception $s )
+			catch( Exception $e )
 			{
-				print_r($s);
-				die('');
+				$article->doDeleteArticle('Error while inserting to voting database');
+				return '<li>'.$e->getMessage().'</li>';
 			}
-			/*if($values['phonevoting'] != 'no')
-			{
-				$telephoneVoting='yes';
-			
-				if($values['phonevoting'] == 'yes-local')
-					$allowAnonymousVotes = 'no';
-				else
-					$allowAnonymousVotes = 'yes';
-			}
-			$votesallowed=1;
-			if($values[webvoting] != 'no')
-			{
-				$webVoting='yes';
-			}
-			
-			if($values[show_top])
-				$displaytop = intval($values[show_top]);
-			else
-				$displaytop = 'all';
-			$duration = intval($values[duration])*/
-			/* TODO
-			$mobilePhone = 'null';
-			if(isset($_POST["mobileNumber"]))
-			{
-				$mobilePhone = $_POST["mobileNumber"];
-				setcookie ('mobileNumber', $mobilePhone, time() + (365*60*60*24),'/');
-			}
-			$isSMSRequired = 'no';
-			if(isset($_POST["SMSRequired"]))
-			{
-				if($_POST["SMSRequired"]!='no')
-					$isSMSRequired = 'yes';
-			}*/
+
 		}
 		
 		function execute( $par = null )
@@ -257,7 +233,11 @@ function wfExtensionSpCreateSurvey() {
 					$error = $this->insertPage($this->form->values);
 					if(! $error)
 					{
-						die('success');
+						global $wgOut;
+						$title = $this->getPageTitle($this->form->values[titleorquestion]);
+						$titleObj = Title::newFromText( $title );
+						$wgOut->redirect( $titleObj->getFullURL() );
+						
 					}
 				}
 			}
@@ -292,4 +272,38 @@ function wfExtensionSpCreateSurvey() {
 	}//end class SpCreateSurveyPage
 	SpecialPage::addPage( new SpCreateSurveyPage );
 }
+
+			/*if($values['phonevoting'] != 'no')
+			{
+				$telephoneVoting='yes';
+			
+				if($values['phonevoting'] == 'yes-local')
+					$allowAnonymousVotes = 'no';
+				else
+					$allowAnonymousVotes = 'yes';
+			}
+			$votesallowed=1;
+			if($values[webvoting] != 'no')
+			{
+				$webVoting='yes';
+			}
+			
+			if($values[show_top])
+				$displaytop = intval($values[show_top]);
+			else
+				$displaytop = 'all';
+			$duration = intval($values[duration])*/
+			/* TODO
+			$mobilePhone = 'null';
+			if(isset($_POST["mobileNumber"]))
+			{
+				$mobilePhone = $_POST["mobileNumber"];
+				setcookie ('mobileNumber', $mobilePhone, time() + (365*60*60*24),'/');
+			}
+			$isSMSRequired = 'no';
+			if(isset($_POST["SMSRequired"]))
+			{
+				if($_POST["SMSRequired"]!='no')
+					$isSMSRequired = 'yes';
+			}*/
 ?>

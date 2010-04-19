@@ -11,8 +11,14 @@
 * Please reference PHP Manual
 *
 */
+class SurveyException extends Exception
+{
 
+}
 
+if(0)
+{
+	
 class SurveyException extends Exception
 {
          // public function getFile();
@@ -29,7 +35,7 @@ class SurveyException extends Exception
    
     public function showError()
     {
-    	return;
+    	die('shoerror called');
        $message = "[". date('n/j/Y g:i a') . "] ";
        $message = $this->getMessage() . $this->warning_names[$this->getCode()];
        $position ="[". $this->getFile()." on ". $this->getLine()." ]\n";
@@ -49,7 +55,7 @@ class SurveyException extends Exception
      * @param Array $errorMsgs
      */
     
-    function errorLogger($errorMsgs)
+    /*function errorLogger($errorMsgs)
     {
     	//print_r($errorMsgs);
         //Parsing ErrorMsg
@@ -90,7 +96,7 @@ class SurveyException extends Exception
          writeToScreen($messages);
          writeToLog($messages);
          die();                
-    }
+    }*/
     
 	/**
 	 * Write error message into file
@@ -125,5 +131,6 @@ class SurveyException extends Exception
          	echo $message."<br>";
               
     }
+}
 
 ?>
