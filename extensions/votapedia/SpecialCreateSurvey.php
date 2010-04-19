@@ -116,7 +116,7 @@ function wfExtensionSpCreateSurvey() {
 						  "Enable Web voting (only for registered users)"=>"yes-local",
 						  "Disable Web voting"=>"no",)
 				),
-				'show_results_end' => array(
+				'showresultsend' => array(
 					'type' => 'checkbox',
 					'name' => 'Graph Options',
 					'default' => 'on',
@@ -125,7 +125,7 @@ function wfExtensionSpCreateSurvey() {
 					'explanation' => 'If checked, the survey result will only be shown after the survey finishes. Otherwise, voters will see the partial result after they vote.',
 					//'learn_more' => 'Details_of_Anonymous_Voting',
 				),
-				'show_top' => array(
+				'showtop' => array(
 					'type' => 'input',
 					'name' => 'Show only top',
 					'default' => '',
@@ -142,29 +142,29 @@ function wfExtensionSpCreateSurvey() {
 			$this->includable( true ); //we can include this from other pages
 		}
 		
-		function getPageTitle($title)
+		function getPageTitle($mytitle)
 		{
-			$title = trim(stripslashes($title));
-			if(strlen($title)>50)
+			$mytitle = trim(stripslashes($mytitle));
+			if(strlen($mytitle)>50)
 			{
-				$title=substr($title,0,50);
-				$title.='...';
+				$mytitle=substr($mytitle,0,50);
+				$mytitle.='...';
 			}
-			return $title;
+			return $mytitle;
 		}
 		
 		function insertPage($values)
 		{
-			//titleorquestion,choices,category,smsvoting,show_results_end, show_top
+			//titleorquestion,choices,category,smsvoting,showresultsend, showtop
 			global $wgRequest, $wgUser;
-			$title = $values[titleorquestion];
+			$newtitle = $values[titleorquestion];
 			$author = $wgUser->getName();
 			
 			$wikiText='';
-			$title = trim(stripslashes($title));
-			$wikiText.="===$title===\n";
-			$title = $this->getPageTitle($title);
-			$encodedTitle=urlencode($title);
+			$newtitle = trim(stripslashes($newtitle));
+			$wikiText.="===$newtitle===\n";
+			$newtitle = $this->getPageTitle($newtitle);
+			$encodedTitle=urlencode($newtitle);
 
 			$wikiText.= '<choice';
 			foreach( $values as $id => $value )
@@ -172,13 +172,13 @@ function wfExtensionSpCreateSurvey() {
 				if($id != 'choices')
 					$wikiText.= ' '.$id.'="'.$value.'"';
 			}
-			$wikiText.= '>\n';
+			$wikiText.= ">";
 			
-			echo $choices;
+			echo $values[choices];
 			
-			$wikiText.="\n</choice>\n*Created by ~~~~\n[[Category:Surveys]]\n[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
+			$wikiText.="\r\n</choice>\n*Created by ~~~~\n[[Category:Surveys]]\n[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
 
-			$article = new Article( Title::newFromText( $title ) );
+			$article = new Article( Title::newFromText( $newtitle ) );
 			$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
 			if($status->hasMessage('edit-already-exists'))
 				return '<li>Article Already exists</li>';
@@ -210,7 +210,6 @@ function wfExtensionSpCreateSurvey() {
 		
 		function execute( $par = null )
 		{
-			echo 'execute<br>';
 			global $wgUser, $wgTitle, $wgOut;
 			if ( $wgUser->isAnon() ) {
 				$wgOut->showErrorPage( 'prefsnologin', 'prefsnologintext', array($wgTitle->getPrefixedDBkey()) );
@@ -223,7 +222,6 @@ function wfExtensionSpCreateSurvey() {
 					die('Something is wrong, please try again.');
 				}
 				$this->form->getValuesFromRequest();
-				
 				$error = $this->form->Validate();
 				if(! $error)
 				{
@@ -231,10 +229,10 @@ function wfExtensionSpCreateSurvey() {
 					if(! $error)
 					{
 						global $wgOut;
-						$title = $this->getPageTitle($this->form->values[titleorquestion]);
-						$titleObj = Title::newFromText( $title );
+						$mytitle = $this->getPageTitle($this->form->values[titleorquestion]);
+						$titleObj = Title::newFromText( $mytitle );
 
-						$wgOut->addHTML( '<div class="successbox"><strong>New Survey succesfully created ('.$title.')</strong></div>' );
+						$wgOut->addHTML( '<div class="successbox"><strong>New Survey succesfully created ('.$mytitle.')</strong></div>' );
 						$wgOut->addHTML( '<div class="visualClear"></div>' );
 						$wgOut->addReturnTo($titleObj);
 						$wgOut->returnToMain();
@@ -268,9 +266,9 @@ function wfExtensionSpCreateSurvey() {
 			$this->form->AddPage ( 'New Survey', array(titleorquestion,choices,category,label1) );
 			$this->form->AddPage ( 'Timing', array(duration) );
 			$this->form->AddPage ( 'Voting', array(phonevoting,smsvoting,webvoting) );
-			$this->form->AddPage ( 'Graphing', array(show_results_end, show_top) );
+			$this->form->AddPage ( 'Graphing', array(showresultsend, showtop) );
 
-			$this->form->EndForm('Create Survey');
+			$this->form->EndForm('Create Survey a');
 		}//end function execute
 	}//end class SpCreateSurveyPage
 	SpecialPage::addPage( new SpCreateSurveyPage );
@@ -291,8 +289,8 @@ function wfExtensionSpCreateSurvey() {
 				$webVoting='yes';
 			}
 			
-			if($values[show_top])
-				$displaytop = intval($values[show_top]);
+			if($values[showtop])
+				$displaytop = intval($values[showtop]);
 			else
 				$displaytop = 'all';
 			$duration = intval($values[duration])*/

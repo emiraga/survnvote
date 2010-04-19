@@ -32,13 +32,17 @@ function wfExtensionSpEmirTest() {
 				$wgOut->showErrorPage( 'prefsnologin', 'prefsnologintext', array($wgTitle->getPrefixedDBkey()) );
 				return;
 			}
+			global $wgHooks;
+			
+			echo '<pre>';
+			var_dump($wgHooks);exit;
+			
 			global $wgRequest;
 			$wgOut->setArticleFlag(false);
 			$wgOut->setPageTitle("Emir Test");
 
 			$userName=$wgUser->getName();
 			$this->skin = $wgUser->getSkin();
-			
 			
 			for($i=1;$i<=30;$i++)
 			{

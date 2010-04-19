@@ -85,7 +85,8 @@ class FormControl
 				$value = $item['default'];
 			else
 				$value = '';
-			
+
+			$value = htmlspecialchars($value);
 			if($item['type'] == 'input')
 			{
 				if(!isset($item['width']))
@@ -101,9 +102,9 @@ class FormControl
 			}
 			elseif($item['type'] == 'textarea')
 			{
-				//$form_element = '';
-				//die(''.Xml::textarea( $id, $value, 1, 1, array( 'id' => $id ) ));
-				$form_element = "<textarea name='$id' id='$id' cols='5' rows='5'>$value</textarea>";
+				$value = str_replace("\r", "\n", $value);
+				$value = str_replace("\n\n", "\r", $value);
+				$form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
 			}
 			elseif($item['type'] == 'null')
 			{

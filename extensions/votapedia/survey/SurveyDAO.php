@@ -173,7 +173,6 @@ class SurveyDAO
 	 */
 	public function insertPage(PageVO $pageVO)
 	{
-
 		try{
 			$cn = connectDatabase();
 
@@ -223,7 +222,7 @@ class SurveyDAO
 		 			$this->insertSurvey($cn,$survey);
 		 		}
 		 	}
-		 	 
+		 	
 		 	$cn->CompleteTrans();
 		 	if ($cn->HasFailedTrans()) {
 		 		// Something went wrong

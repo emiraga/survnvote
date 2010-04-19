@@ -23,19 +23,6 @@ function wfChoiceTagExtension() {
 	$wgParser->disableCache();
 }
 
-function getline( $fp, $delim )
-{
-   $result = "";
-   while( !feof( $fp ) )
-   {
-       $tmp = fgetc( $fp );
-       if( $tmp == $delim )
-           return $result;
-       $result .= $tmp;
-   }
-   return $result;
-}
-
 # The callback function for converting the input text to HTML output
 function renderChoice( $input, $argv ) {
     # $argv is an array containing any arguments passed to the
@@ -49,6 +36,11 @@ function renderChoice( $input, $argv ) {
 	global $vpScriptPath;
 	$output='';
 
+	/*echo '<pre>';
+	print_r($argv);
+	print_r($input);
+	die('');*/
+	
 	$wgParser->disableCache();//disable cache because mobile and desktop skin requires different ways to render the barchart.
 
 	//get the title of the page
@@ -144,6 +136,7 @@ function renderChoice( $input, $argv ) {
 	{
 		if(!isset($_GET['purgecache']) && $wgUser->isLoggedIn())
 		{
+			/*
 			$author=$wgUser->getName();
 			$insertSQL="INSERT INTO page (title,author,startTime,endTime,createTime,duration) VALUES ('$encodedTitle','$author','$initDate','$initDate','$now',1)";
 			odbc_do($connectionstring, $insertSQL);
@@ -169,6 +162,7 @@ function renderChoice( $input, $argv ) {
 				$teleVoteAllowed = odbc_result($queryexe2, 'teleVoteAllowed');
 				$anonymousVoteAllowed = odbc_result($queryexe2, 'anonymousAllowed');
 			}
+			*/
 		}
 	}
 
@@ -183,6 +177,7 @@ function renderChoice( $input, $argv ) {
 			$surveyID = odbc_result($queryexe, 'surveyID');
 		}
 	}
+	
 	//determine whether the current user is the creator of the survey.
 	$userName=$wgUser->getName();
 	if($wgUser->isLoggedIn())
@@ -290,8 +285,7 @@ function renderChoice( $input, $argv ) {
 		//add choices
 		foreach ($content as $choiceWiki)
 		{
-
-			$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->mParserOptions, false ,false);
+			$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->parserOptions(), false ,false);
 			$choice=$parsedChoice->getText();
 			if($choice!=""){
 				$i++;
