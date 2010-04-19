@@ -124,9 +124,9 @@ $wgDiff3 = "";
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
 
-require_once( "$IP/extensions/votapedia/SpecialCreateSurvey.php" );
-require_once( "$IP/extensions/votapedia/SpecialEmirTest.php" );
+require_once( "$IP/extensions/votapedia/votapedia.php" );
+$wgUseAjax = true;
 
 $wgShowExceptionDetails = true;
 
-$wgDebugLogFile = "{$IP}/debug.log.txt";
+#$wgDebugLogFile = "{$IP}/debug.log.txt";
