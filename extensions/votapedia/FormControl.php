@@ -1,8 +1,7 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
-
-class FormGenerator
+class FormControl
 {
 	/**
 	 * Helper function for user information panel
@@ -11,9 +10,10 @@ class FormGenerator
 	 * @param $td3 optional help or null
 	 * @return xhtml block
 	 */
-	public function __construct($pages)
+	public function __construct($items)
 	{
-		$this->pages = $pages;
+		$this->items = $items;
+		$this->values = array();
 	}
 	
 	private static function TableRow( $td1, $td2 = null, $td3 = null ) {
@@ -36,66 +36,46 @@ class FormGenerator
 
 		return Xml::tags( 'tr', null, $td1 . $td2 ). $td3 . "\n";
 	}
-	public function AddPages($form_pages)
-	{
-		foreach($this->pages as $page)
-			$this->AddPage($page[1], $page[0]);
-	}
-	
-	private function CalcID(&$element)
-	{
-		if(!isset($element['id']))
-			$element['id'] = ereg_replace("[^A-Za-z0-9]", "", $element['name']);
-	}
 	
 	public function Validate()
 	{
 		global $wgRequest;
 		$error = '';
-		foreach($this->pages as &$page)
+		foreach($this->items as $id => &$element)
 		{
-			foreach($page[1] as &$element)
-			{
-				$this->CalcID($element);
-				if($wgRequest->getVal($element['id']))
-					$value = $wgRequest->getVal($element['id']);
-				else
-					$value = '';
-				
-				if(isset($element['process']))
-					$value = $element['process']( $value );
-				
-				if(isset($element['valid']))
-					if(! $element['valid']($value, false))
-						$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field</li>';
-				//echo $element['name'].' = '.$value.'<br />';
-			}
+			if($wgRequest->getVal( $id ))
+				$value = $wgRequest->getVal($element['id']);
+			else
+				$value = '';
+			
+			if(isset($element['process']))
+				$value = $element['process']( $value );
+			
+			if(isset($element['valid']))
+				if(! $element['valid']($value, $element, false))
+					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field</li>';
 		}
 		return $error;
 	}
-
-	public function getDefaultsFromRequest()
+	
+	public function getValuesFromRequest()
 	{
 		global $wgRequest;
-		foreach($this->pages as &$page)
+		$values = array();
+		foreach($this->items as $id => &$element)
 		{
-			foreach($page[1] as &$element)
-			{
-				$this->CalcID($element);
-				#if(!isset($element['id']))
-				#	$element['id'] = ereg_replace("[^A-Za-z0-9]", "", $element['name']);
-				if($wgRequest->getVal($element['id']))
-					$element['default'] = $wgRequest->getVal($element['id']);
-				else
-					$element['default'] = '';
-				#process
-				if(isset($item['process']))
-					$item['default'] = $item['process']( $item['default'] );
-			}
+			if($wgRequest->getVal($id]))
+				$this->values[ $id ] = $wgRequest->getVal($id);
+			else
+				$this->values[ $id ] = '';
+			
+			if(isset($item['process']))
+				$this->values[ $id ] = $item['process']( $this->values[ $id ] );
 		}
+		return $values;
 	}
 	
-	public function AddPage(&$page, $title)
+	public function AddPage($title, $add_items)
 	{
 		global $wgOut;
 
@@ -106,12 +86,8 @@ class FormGenerator
 				// . vpFormFunc::TableRow( Xml::element( 'h2', null, $page['title'] ) )
 		);
 		
-		foreach($page as $item)
+		foreach($add_items as $id)
 		{
-			//add form item
-			$this->CalcID($item);
-			#if(!isset($item['id']))
-			#	$item['id'] = ereg_replace("[^A-Za-z0-9]", "", $item['name']);
 			if(!isset($item['default']))
 				$item['default'] = '';
 			
@@ -216,11 +192,6 @@ class FormGenerator
 	{
 		$invalidChars  = array('&','#','+','<','>','[',']','|','{','}','/');
 		return trim(str_replace($invalidChars, " ", $str));
-	}
-	
-	public static function ConvertToInt($str)
-	{
-		return intval($str);
 	}
 }
 ?>

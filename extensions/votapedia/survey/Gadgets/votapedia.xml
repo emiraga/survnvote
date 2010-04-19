@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+<ModulePrefs 
+     title="VotApedia"
+     title_url="http://www.votapedia.com/"
+     author="Qifeng Bai" 
+     author_email="qifeng.bai+ARS@csiro.au" 
+     description="This gadget is designed to read the current survey on VotApedia  [Project run by Ken Taylor CSIRO ICT Centre, Australia]"
+     thumbnail="http://www.votapedia.com/survey/Gadgets/images/gadget_thumbnail.png"
+     screenshot="http://www.votapedia.com/survey/Gadgets/images/gadget_screenshot.png"
+     author_location="Canberra, Australia"
+     scaling="true"
+     scrolling="true"/>
+<UserPref 
+     name="numOfSurvey" 
+     display_name="How many surveys on show" 
+     default_value="3"/>
+<UserPref 
+     name="refreshRate" 
+     display_name="Refresh rate" 
+     datatype="enum"
+       default_value="3">
+    <EnumValue value="3" display_value="3 minutes"/>
+    <EnumValue value="5" display_value="5 minutes"/>
+    <EnumValue value="10" display_value="10 minutes"/>
+    <EnumValue value="30" display_value="30 minutes"/>
+    <EnumValue value="60" display_value="60 minutes"/>
+</UserPref>
+ <Content type="html">
+ <![CDATA[ 
+ 
+ <script type="text/javascript"> 
+    var xmlResponse; //XMLResponse got from Votapedia
+    var t;  //Timer
+    var clickedID=0; //current expended survey id
+    var reload=0; //is used to provent Gadget cache this result.(Different URL will not be cached)
+         
+   function showTitle__MODULE_ID__() { 
+    var prefs = new _IG_Prefs(__MODULE_ID__);
+    var numOfSurvey = prefs.getInt("numOfSurvey");
+    var refreshRate = prefs.getInt("refreshRate");
+    
+    if(clickedID == 0) //means we need refrest the result
+    {
+    	var userTime = new Date();
+ 		reload = userTime.getTime();
+    }
+    
+    var url = "http://www.votapedia.com/survey/gadgets/currentsurveys.php?num="+numOfSurvey+"&time="+reload; 
+
+       _IG_FetchXmlContent(url, function (response) {
+           
+           if (response == null || typeof(response) != "object" || 
+                      response.firstChild == null) {
+              _gel("content__MODULE_ID__").innerHTML = "<i>Invalid data.</i>";
+              return;
+           }
+       xmlResponse = response;
+	   
+       var html="";
+       var surveys = response.getElementsByTagName("survey");
+
+		for(var i=0;i<surveys.length;i++)
+		{
+ 	   
+           var surveyNode= surveys.item(i);
+		   //var question = surveyNode.childNodes.item(1).firstChild.nodeValue; //Why need add firstChild ?????
+		   var id = surveyNode.childNodes.item(0).firstChild.nodeValue; // Get ID
+		   var question = surveyNode.childNodes.item(1).firstChild.nodeValue; //Or, we could use .text to get it;
+		   var votesAllowed = surveyNode.childNodes.item(2).firstChild.nodeValue;
+		   
+
+		   if ((i%2)==0)
+		   		html +="<table width=\"96%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#cccccc\">";
+		   else
+		   	   html +="<table width=\"96%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\">";
+		  
+		   html +="<tr><td colspan=\"4\">";
+		   html+="<a href=\"javascript:showSurvey__MODULE_ID__("+id+")\">"+ question + "</a><br/>";
+		   html+="</td></tr>";
+		   
+ 		   if (id == clickedID) //If this survey needs to be expaned
+		   {
+			 	 var itemList = surveyNode.getElementsByTagName("choices").item(0);
+                 var nodeList = itemList.childNodes;
+			 
+			     for(var j=0;j<nodeList.length;j++)
+		     	 {
+			       //Get each choice
+			        var choice = nodeList.item(j);
+			    
+			        var choiceContent = choice.childNodes;
+			       //Get contents of each choice
+			        for(var k=0;k<choiceContent.length;k++)
+			    	{
+			    		if (choiceContent.item(k).nodeName =="value")
+			        	   var	value = choiceContent.item(k).childNodes[0].nodeValue;
+			        	
+			        	if (choiceContent.item(k).nodeName =="receiver" && choiceContent.item(k).hasChildNodes())
+			        		var receiver = choiceContent.item(k).childNodes[0].nodeValue;
+			        	else if (choiceContent.item(k).nodeName =="receiver" && !choiceContent.item(k).hasChildNodes())	
+			           		var receiver = null;
+			            if (choiceContent.item(k).nodeName =="vote")
+			        		var vote = choiceContent.item(k).childNodes[0].nodeValue;
+			        			         
+			           }//end for
+				  
+				  
+				  html +="<tr><td width=\"10\"><b>"+(j+1)+"</b>.</td>";
+			      html+="<td colspan=\"3\">"+value+"</td>";	
+			      html+="</tr>";
+			      html+="<tr><td width=\"10\">&nbsp;</td><td width=\"10\">&nbsp;</td>";
+			    
+			      if (vote !=0)
+			    	var votebar="<table height=\"10\" width=\"100%\" border=\"0\" cellspacing=\"0\ cellpadding=\"0\"><tr><td width=\""+vote*100+"%\"><hr color=#ffff00 size=5/></td><td>"+parseInt(vote*100)+"%</td></table>";
+			     else
+			    		var votebar="";	
+			     			    
+			    	if (receiver !=null)
+			    	{
+			    		if (receiver.length==4)
+			    			receiver="6216"+receiver;
+			    		html+="<td width=\"100\" valign=\"middle\"><img src=\"http://www.votapedia.com/survey/gadgets/images/telephone.gif\" />  "+receiver+"</td><td align=\"right\" >"+votebar+"</td>";
+					}			    
+			    	else
+			    			html+="<td align=\"right\" width=\"200\" colspan=\"2\">"+votebar+"</td>";
+			       }//End for	
+				
+				html+="</td></tr>";
+				html+="<tr><td align='right' colspan='4'>>>><em class=link>See more details in <a class=link href='http://www.votapedia.com/survey/gadgets/go.php?id="+id+"'>survey page </a></em></td></tr>";
+				html+="</table>";
+				html+="</td><tr>";
+			 } // end if  (id == clickedID)
+			 
+		    html+="</table>";
+          }
+          
+         _gel('content__MODULE_ID__').innerHTML = html; 
+    });
+
+    t = setTimeout("showTitle__MODULE_ID__()",refreshRate*60*1000);
+    } 
+    
+    function showSurvey__MODULE_ID__(id) {
+             if(id == clickedID)
+                clickedID =0;
+             else 
+                clickedID = id;   
+             clearTimeout(t);
+             showTitle__MODULE_ID__(reload); 
+            
+    }
+    
+    
+  function getCookie__MODULE_ID__(c_name)
+ {
+	if (document.cookie.length>0)
+  	{
+  	c_start=document.cookie.indexOf(c_name + "=");
+  	if (c_start!=-1)
+    { 
+    	c_start=c_start + c_name.length+1 ;
+    	c_end=document.cookie.indexOf(";",c_start);
+    	if (c_end==-1) c_end=document.cookie.length;
+    	return unescape(document.cookie.substring(c_start,c_end));
+    } 
+  }
+return null;
+}
+
+   function setCookie__MODULE_ID__(c_name,value,expiredays)
+  {
+	var exdate=new Date();
+	exdate.setDate(exdate.getDate()+expiredays);
+	document.cookie=c_name+ "=" +escape(value)+((expiredays==null) ? "" : ";expires="+exdate);
+   }
+              
+ 
+ _IG_RegisterOnloadHandler(showTitle__MODULE_ID__(0)); 
+ </script>
+ 
+ <html>
+ <head>
+ <style>
+<!--
+body {
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+}
+table{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+}
+
+tr{
+height:20;
+}
+
+.link{
+	color: #FF0000;
+}
+-->
+</style>
+ </head>
+ <body>
+ <div id="content__MODULE_ID__"></div>
+ <a href="http://www.votapedia.com/index.php?title=Special:CurrentSurveys">More surveys >></a>
+ </body>
+ </html>
+ ]]> 
+ </Content>
+ </Module>
