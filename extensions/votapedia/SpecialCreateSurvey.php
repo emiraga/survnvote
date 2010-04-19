@@ -214,7 +214,7 @@ function wfExtensionSpCreateSurvey() {
 		
 		function execute( $par = null )
 		{
-			global $wgUser;
+			global $wgUser, $wgTitle, $wgOut;
 			if ( $wgUser->isAnon() ) {
 				$wgOut->showErrorPage( 'prefsnologin', 'prefsnologintext', array($wgTitle->getPrefixedDBkey()) );
 				return;
