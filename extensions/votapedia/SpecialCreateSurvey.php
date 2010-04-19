@@ -2,6 +2,9 @@
 if (!defined('MEDIAWIKI')) die();
 $wgExtensionFunctions[] = "wfExtensionSpCreateSurvey";
 
+require_once( "$IP/extensions/votapedia/FormControl.php" );
+require_once( "$IP/includes/Article.php" );
+require_once( "$IP/extensions/votapedia/survey/surveyDAO.php" );
 
 function wfExtensionSpCreateSurvey() {
 	global $IP, $wgMessageCache;
@@ -16,14 +19,15 @@ function wfExtensionSpCreateSurvey() {
 
 	class SpCreateSurveyPage extends SpecialPage {
 	
-		public function __construct() {
+		public function __construct()
+		{
 			parent::__construct( 'CreateSurvey' );
 			$this->formitems = array (
-				'title' => array(
+				'titleorquestion' => array(
 					'type' => 'input',
 					'name' => 'Title or question',
 					'default' => '',
-					'valid' => function($v,$i,$js){ if($js) return "alert(document.location);"; return strlen($v) > 1; },
+					'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
 					'explanation' => 'e.g. "What is the capital of Australia?". This will be the title of your survey page.'
 					.'The following characters are not allowed in the title: #, +, &, <, >, [, ], {, }, |, / .',
 					'learn_more' => 'Details_of_Title_or_Survey_Question',
@@ -33,7 +37,7 @@ function wfExtensionSpCreateSurvey() {
 					'type' => 'textarea',
 					'name' => 'Choices',
 					'textbefore' => 'Type choices here, one per line.<br />',
-					'valid' => function($v,$i,$js){ if($js) return "alert(document.location);"; return strlen($v) > 1; },
+					'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
 					'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later in the survey page.',
 					'learn_more' => 'Details_of_Editing_Surveys',
 				),
@@ -41,7 +45,7 @@ function wfExtensionSpCreateSurvey() {
 					'type' => 'select',
 					'name' => 'Category',
 					'default' => 'General',
-					'valid' => function($v,$i,$js){ if($js) return "alert(document.location);"; return in_array( $v, $i['options'] ); },
+					'valid' => function($v,$i,$js){ if($js) return ""; return in_array( $v, $i['options'] ); },
 					'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
 					'learn_more' => 'Details_of_Survey_Category',
 					'options' => array(
@@ -62,11 +66,19 @@ function wfExtensionSpCreateSurvey() {
 					'default' => '1',
 					'width' => '10',
 					'textafter' => ' hours.',
-					'valid' => function($v,$i,$js){ if($js) return "alert(document.location);"; $v=intval($v); return $v > 0 && $v < 11; },
+					'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11; },
 					'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
 					'learn_more' => 'Details_of_Duration',
 					'process' => function($v) { return intval($v); },
-				)
+				),
+				/*'AllowInvalidVotes' => array(
+					'type' => 'checkbox',
+					'name' => 'Voter identity',
+					'default' => 'on',
+					'checklabel' => 'Enable unidentified voters. Compulsory for phone surveys from outside Australia.',
+					'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
+					'learn_more' => 'Details_of_Multiple_Voting',
+				),*/
 				'phonevoting' => array(
 					'type' => 'select',
 					'name' => 'Phone voting',
@@ -119,7 +131,7 @@ function wfExtensionSpCreateSurvey() {
 					'width' => '10',
 					'textbefore' => 'Show only top ',
 					'textafter' => ' choices on the graph.',
-					'valid' => function($v,$i,$js){ if($js) return "alert(document.location);"; $v=intval($v); return $v >= 0 and $v < 1000; },
+					'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v >= 0 and $v < 1000; },
 					'explanation' => 'If a number is specified, the graph will only display the top few choices on the graph. Otherwise, voters will see all the choices no matter how many votes they have got.',
 					//'learn_more' => 'Details_of_Duration',
 					'process' => function($v) { return intval($v); },
@@ -135,21 +147,13 @@ function wfExtensionSpCreateSurvey() {
 		
 		function insertPage($values)
 		{
-			global $wgRequest;
-			global $wgUser;
+			//titleorquestion,choices,category,smsvoting,show_results_end, show_top
+			global $wgRequest, $wgUser;
+			$title = $values[titleorquestion];
+			$author = $wgUser->getName();
 			
-			$title =  $values['Titleorquestion'];
-			$Category = $values['Category'];
-			$Choices = $values['Choices'];
-			$Duration = $values['Duration'];
-			$Phonevoting = $values['Phonevoting'];
-			$SMSvoting = $values['SMSvoting'];
-			$Webvoting = $values['Webvoting'];
-			$GraphOptions = $values['GraphOptions'];
-			$Showonlytop = $values['Showonlytop'];
-	
 			$wikiText='';
-			$title = stripslashes($title);
+			$title = trim(stripslashes($title));
 			$wikiText.="===$title===\n";
 			if(strlen($title)>60)
 			{
@@ -157,7 +161,66 @@ function wfExtensionSpCreateSurvey() {
 				$title.='...';
 			}
 			$encodedTitle=urlencode($title);
+
+			$wikiText.= '<choice';
+			foreach( $values as $id => $value )
+			{
+				if($id != 'choices')
+					$wikiText.= ' '.$id.'="'.$value.'"';
+			}
+			$wikiText.= '>\n';
 			
+			echo $choices;
+			
+			$wikiText.="\n</choice>\n*Created by ~~~~\n[[Category:Surveys]]\n[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
+
+			$article = new Article( Title::newFromText( $title ) );
+			$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
+			if($status->hasMessage('edit-already-exists'))
+				return '<li>Article Already exists</li>';
+			if(!$status->isGood())
+				return '<li>Error has occured while creating a new page</li>';
+			
+			//create a new Page
+			try
+			{
+				$page = new PageVO();
+				$page->setTitle($encodedTitle);
+				$page->setAuthor($author);
+				//Write data into Database
+				$surveyDAO = new SurveyDAO();
+				
+				$databaseWritten= ! $surveyDAO->insertPage($page);
+				if(!$databaseWritten)
+				{
+					return "<li>Error while writing to voting database, wiki page was already created. Wiki page should be deleted first.</li>";
+				}
+			}
+			catch( Exception $s )
+			{
+				print_r($s);
+				die('');
+			}
+			/*if($values['phonevoting'] != 'no')
+			{
+				$telephoneVoting='yes';
+			
+				if($values['phonevoting'] == 'yes-local')
+					$allowAnonymousVotes = 'no';
+				else
+					$allowAnonymousVotes = 'yes';
+			}
+			$votesallowed=1;
+			if($values[webvoting] != 'no')
+			{
+				$webVoting='yes';
+			}
+			
+			if($values[show_top])
+				$displaytop = intval($values[show_top]);
+			else
+				$displaytop = 'all';
+			$duration = intval($values[duration])*/
 			/* TODO
 			$mobilePhone = 'null';
 			if(isset($_POST["mobileNumber"]))
@@ -165,37 +228,12 @@ function wfExtensionSpCreateSurvey() {
 				$mobilePhone = $_POST["mobileNumber"];
 				setcookie ('mobileNumber', $mobilePhone, time() + (365*60*60*24),'/');
 			}
-	
 			$isSMSRequired = 'no';
 			if(isset($_POST["SMSRequired"]))
 			{
 				if($_POST["SMSRequired"]!='no')
 					$isSMSRequired = 'yes';
 			}*/
-			$author = $wgUser->getName();
-			
-			/*$article = new Article( Title::newFromText( 'Test' ) );
-			$status = $article->doEdit("new text\n== title ==\nha ha ha? ~~~~",'from the extension',EDIT_NEW);
-			echo '<pre>';
-			if($status->hasMessage('edit-already-exists'))
-				return 'Article Already exists';
-			if(!$status->isGood())
-				return 'Error has occured while creating a new page';
-			*/
-			//create a new Page
-			$page = new PageVO();
-			$page->setTitle($encodedTitle);
-			$page->setAuthor($author);
-			//Write data into Database
-			$surveyDAO = new SurveyDAO();
-			$databaseWritten=true;
-			if(!$surveyDAO->insertPage($page))
-			{   $databaseWritten=false;
-			}
-			echo $databaseWritten;
-			print '<pre>';
-				print_r($page);
-				die('');
 		}
 		
 		function execute( $par = null )
@@ -222,7 +260,6 @@ function wfExtensionSpCreateSurvey() {
 						die('success');
 					}
 				}
-				$this->form->getDefaultsFromRequest();
 			}
 			$this->drawForm($error);
 		}
@@ -245,10 +282,10 @@ function wfExtensionSpCreateSurvey() {
 			$titleObj = SpecialPage::getTitleFor( 'CreateSurvey' );
 			$this->form->StartForm( $titleObj->getLocalUrl(), 'mw-preferences-form' );
 
-			$this->form->AddPage ( 'New Survey', array() );
-			$this->form->AddPage ( 'Timing', array() );
-			$this->form->AddPage ( 'Voting', array() );
-			$this->form->AddPage ( 'Graphing', array() );
+			$this->form->AddPage ( 'New Survey', array(titleorquestion,choices,category,label1) );
+			$this->form->AddPage ( 'Timing', array(duration) );
+			$this->form->AddPage ( 'Voting', array(phonevoting,smsvoting,webvoting) );
+			$this->form->AddPage ( 'Graphing', array(show_results_end, show_top) );
 
 			$this->form->EndForm('Create Survey');
 		}//end function execute

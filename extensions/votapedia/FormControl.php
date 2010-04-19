@@ -16,7 +16,7 @@ class FormControl
 		$this->values = array();
 	}
 	
-	private static function TableRow( $td1, $td2 = null, $td3 = null ) {
+	private function TableRow( $td1, $td2 = null, $td3 = null ) {
 
 		if ( is_null( $td3 ) ) {
 			$td3 = '';
@@ -43,17 +43,9 @@ class FormControl
 		$error = '';
 		foreach($this->items as $id => &$element)
 		{
-			if($wgRequest->getVal( $id ))
-				$value = $wgRequest->getVal($element['id']);
-			else
-				$value = '';
-			
-			if(isset($element['process']))
-				$value = $element['process']( $value );
-			
 			if(isset($element['valid']))
-				if(! $element['valid']($value, $element, false))
-					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field</li>';
+				if(! $element['valid']($this->values[ $id ], $element, false))
+					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field '.$this->values[ $id ].'</li>';
 		}
 		return $error;
 	}
@@ -61,18 +53,15 @@ class FormControl
 	public function getValuesFromRequest()
 	{
 		global $wgRequest;
-		$values = array();
 		foreach($this->items as $id => &$element)
 		{
-			if($wgRequest->getVal($id]))
+			if($wgRequest->getCheck($id))
+			{
 				$this->values[ $id ] = $wgRequest->getVal($id);
-			else
-				$this->values[ $id ] = '';
-			
-			if(isset($item['process']))
-				$this->values[ $id ] = $item['process']( $this->values[ $id ] );
+				if(isset($item['process']))
+					$this->values[ $id ] = $item['process']( $this->values[ $id ] );
+			}
 		}
-		return $values;
 	}
 	
 	public function AddPage($title, $add_items)
@@ -88,40 +77,43 @@ class FormControl
 		
 		foreach($add_items as $id)
 		{
-			if(!isset($item['default']))
-				$item['default'] = '';
+			$item = $this->items[$id];
 			
-			if(isset($item['process']))
-				$item['default'] = $item['process']( $item['default'] );
-
+			if(isset($values[$id]))
+				$value = $values[$id];
+			elseif( isset ($item['default']) )
+				$value = $item['default'];
+			else
+				$value = '';
+			
 			if($item['type'] == 'input')
 			{
 				if(!isset($item['width']))
 					$item['width'] = 70;
-				$form_element = Xml::input( $item['id'], $item['width'], $item['default'] , array( 'id' => $item['id'] ) );
+				$form_element = Xml::input( $id, $item['width'], $value , array( 'id' => $id) );
 			}
 			elseif($item['type'] == 'select')
 			{
-				$select = new XMLSelect( $item['id'], $item['id'], $item['default'] );
-				foreach($item['options'] as $name => $value )
-					$select->addOption( $name, $value );
+				$select = new XMLSelect( $id, $id, $value );
+				foreach($item['options'] as $name => $optval )
+					$select->addOption( $name, $optval );
 				$form_element = $select->getHTML();
 			}
 			elseif($item['type'] == 'textarea')
 			{
-				$form_element = Xml::textarea( $item['id'], $item['default'], 5, 5, array( 'id' => $item['id'] ) );
+				$form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
 			}
 			elseif($item['type'] == 'null')
 			{
 				$form_element = '';
-				$item['name'] = $item['id'] = '';
+				$item['name'] = $id = '';
 			}
 			elseif($item['type'] == 'checkbox')
 			{
 				if(isset($item['checklabel']))
-					$form_element = Xml::checkLabel( $item['checklabel'] , $item['id'], $item['id'], $item['default'] );
+					$form_element = Xml::checkLabel( $item['checklabel'] , $id, $id, $value );
 				else
-					$form_element = Xml::check( $item['id'], $item['default'] );
+					$form_element = Xml::check( $id, $value );
 			}
 			else
 			{
@@ -136,8 +128,8 @@ class FormControl
 			if($item['name'])
 				$item['name'] .= ':';
 			$wgOut->addHTML(
-				FormGenerator::TableRow(
-					Xml::label( $item['name'], $item['id'] ),
+				$this->TableRow(
+					Xml::label( $item['name'], $id ),
 					$form_element,
 					Xml::tags('div', array( 'class' => 'prefsectiontip' ),
 						$item['explanation'] . 

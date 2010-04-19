@@ -27,21 +27,19 @@ class SurveyException extends Exception
                        E_CORE_WARNING=>'E_CORE_WARNING',
                        E_USER_ERROR=>'E_USER_ERROR');
    
-
-
-
     public function showError()
     {
+    	return;
        $message = "[". date('n/j/Y g:i a') . "] ";
        $message = $this->getMessage() . $this->warning_names[$this->getCode()];
        $position ="[". $this->getFile()." on ". $this->getLine()." ]\n";
 
        $errorCode = $this->getCode();
        $title = "Error_Code_$errorCode";
-       header("Location: http://$site_location/index.php?title=$title");
-       exit;
+	   echo $errorCode.'<br>';
+	   echo $message;
+       //header("Location: http://$site_location/index.php?title=$title");
      }
-
 }
 
    

@@ -129,3 +129,4 @@ require_once( "$IP/extensions/votapedia/SpecialEmirTest.php" );
 
 $wgShowExceptionDetails = true;
 
+$wgDebugLogFile = "{$IP}/debug.log.txt";
