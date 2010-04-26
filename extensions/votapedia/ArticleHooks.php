@@ -80,7 +80,10 @@ function vpOnResetPreferences($prefsform, $wgUser )
 $wgHooks['UserCreateForm'][] = 'vpOnUserCreateForm';
 function vpOnUserCreateForm(&$template)
 {
-	$template->set('extraInput', array( array('msg' => "Mobile phone:", 'type' => 'text', 'name'=> 'phonenumber' ) ) );
+	global $wgMessageCache;
+	$wgMessageCache->addMessages(array( 'mobile-phone' => 'Mobile Phone:' ));
+
+	$template->set('extraInput', array( array('msg' => 'mobile-phone', 'type' => 'text', 'name'=> 'phonenumber' ) ) );
 	return true;
 }
 
