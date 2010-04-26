@@ -77,6 +77,30 @@ function vpOnResetPreferences($prefsform, $wgUser )
 }
 
 /* User register form */
-//wfRunHooks( 'UserCreateForm', array( &$template ) );
+$wgHooks['UserCreateForm'][] = 'vpOnUserCreateForm';
+function vpOnUserCreateForm(&$template)
+{
+	$template->set('extraInput', array( array('msg' => "Mobile phone:", 'type' => 'text', 'name'=> 'phonenumber' ) ) );
+	return true;
+}
 
+$wgHooks['AddNewAccount'][] = 'vpOnAddNewAccount';
+function vpOnAddNewAccount($user, $b = true)
+{
+	global $wgUser;
+	$mobilenumber = $_POST['phonenumber'];
+	if(preg_match("/^[0-9\\+\\-\\/]+$/", $mobilenumber))
+	{
+		$wgUser->setOption( 'mobilephone', $mobilenumber );
+		$wgUser->saveSettings();
+	}
+	return true;
+}
+
+/*
+	echo "<pre>";
+	print_r($user);
+	debug_print_backtrace();
+	die('df');
+*/
 ?>
