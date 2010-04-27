@@ -100,10 +100,4 @@ function vpOnAddNewAccount($user, $b = true)
 	return true;
 }
 
-/*
-	echo "<pre>";
-	print_r($user);
-	debug_print_backtrace();
-	die('df');
-*/
 ?>

@@ -212,7 +212,7 @@ function wfExtensionSpCreateSurvey() {
 		{
 			global $wgUser, $wgTitle, $wgOut;
 			if ( $wgUser->isAnon() ) {
-				$wgOut->showErrorPage( 'prefsnologin', 'prefsnologintext', array($wgTitle->getPrefixedDBkey()) );
+				$wgOut->showErrorPage( 'movenologin', 'You must be [[Special:UserLogin|logged in]] to a create survey', array($wgTitle->getPrefixedDBkey()) );
 				return;
 			}
 			global $wgRequest;
