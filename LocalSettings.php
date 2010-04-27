@@ -45,6 +45,9 @@ $wgScriptPath       = "/new";
 $wgScriptExtension  = ".php";
 $wgLogo             = $wgScriptPath."/wiki.png";
 
+$wgArticlePath = "/wiki/$1";  # short urls
+$wgUsePathInfo = true;        # short urls
+
 ## UPO means: this is also a user preference option
 
 $wgEnableEmail      = false;
