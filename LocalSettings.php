@@ -131,5 +131,6 @@ require_once( "$IP/extensions/votapedia/votapedia.php" );
 $wgUseAjax = true;
 
 $wgShowExceptionDetails = true;
-
+$wgDisableCounters = true;
 $wgDebugLogFile = "{$IP}/debug.log.txt";
+$wgEnableSidebarCache = true;
