@@ -128,6 +128,8 @@ $wgDiff3 = "";
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
 
 require_once( "$IP/extensions/votapedia/votapedia.php" );
+require_once("$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php"); 
+
 $wgUseAjax = true;
 
 $wgShowExceptionDetails = true;
