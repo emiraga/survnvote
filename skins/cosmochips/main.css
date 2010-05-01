@@ -1,0 +1,803 @@
+/*
+** cosmochips.net/mediawiki
+** main.css adapted from http://www.mono-project.com
+*/
+
+body {
+    background-color: #fff;
+    color: #333;
+    font-family: lucida grande, myriad, andale sans, luxi sans, arial, tahoma, toga sans, helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 11pt;
+}
+
+html>body {
+    font-size: 0.8em;
+}
+
+a:link {
+    font-weight: bold;
+		color: #060;
+    text-decoration: none;
+}
+
+a:visited {
+    font-weight: bold;
+    text-decoration: none;
+		color: #393;
+}
+
+a:hover {
+    font-weight: bold;
+		color: #000;
+		text-decoration: none;
+}
+
+a:active {
+}
+
+a.new, #p-personal a.new {
+		color: #900;
+}
+
+.image img, a img {
+		border: none;
+}
+
+.thumb {
+    margin: 1em;
+    padding: 1em;
+    color: #999;
+}
+
+h1, h2, h3, h4, h5, h6 {
+		color: #141;
+    font-family: vag rounded, vag round, arial mt rounded, arial rounded, lucida grande, myriad, andale sans, luxi sans, bitstream vera sans, tahoma, toga sans, helvetica, arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-size: 20pt;
+}
+
+h2 {
+    font-size: 16pt;
+    margin-top: 15px;
+}
+
+h3 {
+    font-size: 12pt;
+}
+
+h4 {
+		margin-left: 1em;
+		margin-top: 5px;
+    font-size: 10pt;
+}
+
+h5, h6 {
+    font-size: 10pt;
+}
+
+hr {
+		color: #141;
+		background-color: #141;
+		height: 1px;
+		margin-top: 2em;
+		margin-bottom: 2em;
+}
+
+dl {
+		margin: 5px;
+}
+
+a + h2 + p {
+		margin-bottom: 2em;
+}
+
+/*** id (should only occur once in a page) ***/
+#globalWrapper {
+		background: #fff url(http://cosmochips.net/resources/images/skins/cosmochips/head_background.png) no-repeat top left;
+}
+
+html>body #globalWrapper {
+    border: 0;
+}
+
+#bigWrapper {
+    position: relative;
+    max-width: 80em;
+    margin: 0 auto;
+    text-align: left;
+}
+
+#column-content {
+    /* Content wrapper */
+	  padding: 160px 5em 30px 5em;
+}
+
+#content {
+    /* Content area */
+    text-align: justify;
+}
+
+#contentTop {
+    /* Something at the top of the content? */ 
+}
+
+#bodyContent {
+    /* Content under the header */
+}
+
+#siteSub {
+    /* Sub-heading*/
+    display: none;
+}
+
+#contentSub {
+    /* Under the sub-heading */
+}
+
+#column-one {
+    /* Utility-bar */
+    display: block;
+		border: 1px solid #060;
+    padding: 0.75em 1em;
+    position: relative;
+    line-height: 1.3em;
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/body_toolbox.png) no-repeat left;
+    padding-left: 90px;
+}
+
+#column-one li {
+    display: inline;
+}
+
+#column-one a {
+    text-decoration: none;
+    padding: 0 3pt;
+}
+
+#column-one a:hover {
+		text-decoration: none;
+}
+
+#column-one ul {
+    margin: 0;
+    padding: 0;
+    display: inline;
+	  list-style: none;
+}
+
+#p-cactions {
+    /* sidebar - "Views" */
+}
+
+#ca-nstab-main {
+    /* sidebar - views:article */
+}
+
+#ca-history {
+    /* sidebar - views:history */
+}
+
+#p-personal {
+    /* sidebar - "Personal" */
+    text-align: center;
+}
+
+#pt-login {
+    /* sidebar - personal:login */
+}
+
+#pt-logout {
+}
+
+#p-logo {
+    /* Wiki logo (replace with graphic via CSS) */
+    position: absolute;
+    top: 8px;
+    left: 20px;
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/head_paquetchips.png) no-repeat center;
+    /* IE stuff */
+    _background:none;
+}
+
+#p-logo a {
+    /* Wiki logo, part 2 */
+    display: block;
+    width: 100px;
+    height: 150px;
+    /* IE stuff, part 2 */
+    _cursor: pointer;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://cosmochips.net/resources/images/skins/cosmochips/head_paquetchips', sizingMethod='crop');
+}
+
+#p-nav {
+    /* sidebar - "Navigation" */
+    position: absolute;
+    top: 30px;
+    left: 140px;
+		background-color: transparent;
+    font-size: 18pt;
+    font-family: vag rounded, vag round, arial mt rounded, arial rounded, verdana, bitstream vera sans, lucida sans, sans-serif;
+    font-weight: bold;
+}
+
+#p-nav h5 {
+    display: none;
+}
+
+#p-nav ul {
+    margin: 0;
+    padding: 0;
+    margin: 5px;
+    list-style: none;
+    display: inline;
+    display: block;
+}
+
+#p-nav li {
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+#p-nav li a {
+    padding: 0.5em;
+    text-decoration: none;
+		color: #fff;
+}
+
+#p-nav li + li:before {
+    content: " :: ";
+    color: #999;
+}
+
+#p-nav li a:hover {
+		background-color: transparent;
+}
+
+#n-mainpage {
+}
+
+#n-downloads {
+}
+
+#n-screenshots {
+}
+
+#n-plans {
+}
+
+#n-contact {
+}
+
+#n-recentchanges {
+}
+
+#n-blogs {
+}
+
+#p-search {
+    /* sidebar - "Search" */
+    margin: 0 auto 1em;
+    text-align: center;
+}
+
+#searchform {
+    margin: 0 auto;
+}
+
+#searchInput {
+}
+
+#p-tb {
+    /* sidebar - "Toolbox" */
+}
+
+#t-whatlinkshere {
+}
+
+#t-recentchangeslinked {
+}
+
+#t-specialpages {
+}
+
+#footer {
+    /* Footer */
+    clear: both;
+    padding: 2em 0;
+    margin: 3em auto 2em;
+    text-align: center;
+}
+
+#f-poweredbyico {
+    margin: 1em auto; 
+}
+
+#f-poweredbyico a {
+    text-decoration: none;
+    font-size: 9pt;
+    border: 1px solid #141;
+    text-align: center;
+    padding: 1px 4px;
+    background-color: #fff;
+    color: #060;
+}
+
+#f-poweredbyico a:hover {
+    background-color: #efe;
+    color: #000;
+}
+
+#f-poweredbyico img {
+    border: none;
+    vertical-align: middle;
+    margin: 0 0.4em 3px 0;
+}
+
+#f-list {
+		list-style: none;
+		text-align: center;
+}
+
+#f-lastmod {
+}
+
+#f-viewcount {
+}
+
+#f-about {
+}
+
+#f-disclaimer {
+}
+
+#toc {
+    border: 1px solid #aaa;
+    background-color: #f6f6f6;
+    padding: 8pt;
+    font-size: 95%;
+    float: right;
+    margin: 0 0 1em 2em;
+    width: 24em;
+}
+
+#toc .tocindent {
+		margin: 0 0 1em 1em;
+}
+
+#toc .tocline {
+		margin-bottom: 0px;
+}
+
+#toc p {
+		margin: 0
+}
+
+#toc .toctoggle {
+		font-size: 94%;
+}
+
+#toc .editsection {
+    margin-top: 0.7em;
+    font-size: 94%;
+}
+
+#toc .tocline a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#toc .tocindent a {
+    text-decoration: none;
+}
+
+#toc a:hover {
+    text-decoration: underline;
+}
+
+/*** class (may occur multiple times in a page) ***/
+.ns-0 {
+    /* Seems to be the main page */
+}
+
+.firstHeading,
+#page-MainPage h1 {
+    /* This is the first H1 */
+    margin-top: 0;
+}
+
+.external {
+    /* External links */
+}
+
+.urlexpansion {
+    /* Printer-friendly URL expansions (should be hidden when viewed on screen) */
+    display: none;
+}
+
+.MainPageBG {
+    /* UNSURE */
+}
+
+.printfooter {
+    /* Printer-friendly display of the current URL (should be off in screen media) */
+    display: none;
+}
+
+.visualClear {
+    /* Clears floating elements */
+    clear: both;
+}
+
+.portlet {
+    /* Sidebar sections */
+    text-align: left;
+}
+
+.portlet li {
+		padding-left: 5px;
+		padding-right: 5px;
+		list-style: none;
+		display: inline;
+}
+
+.selected {
+    /* UNKNOWN - currently selected page? */
+}
+
+.pBody {
+    /* "portlet" bodies, for most portlets */
+}
+
+.searchButton {
+    /* Style applied to the "Go" and "Search" buttons */
+}
+
+:target + h1, :target + h2, :target + h3, :target + h4 {
+    background-color: #dfd;
+}
+
+/*
+** keep the whitespace in front of the ^=, hides rule from konqueror
+** this is css3, the validator doesn't like it when validating as css2
+*/
+#bodyContent a[href ^="http://"], #bodyContent a[href ^="gopher://"] {
+/*    background: url(external.png) center right no-repeat;
+ *   padding-right: 13px; */
+}
+
+#bodyContent a[href ^="https://"], .link-https {
+/*    background: url("lock_icon.gif") center right no-repeat;
+ *   padding-right: 16px; */
+}
+
+#bodyContent a[href ^="mailto:"], .link-mailto {
+/*    background: url("mail_icon.gif") center right no-repeat;
+ *   padding-right: 18px; */
+}
+
+#bodyContent a[href ^="news://"] {
+    background: url("news_icon.png") center right no-repeat;
+    padding-right: 18px;
+}
+
+#bodyContent a[href ^="ftp://"], .link-ftp {
+    background: url("file_icon.gif") center right no-repeat;
+    padding-right: 18px;
+}
+
+#bodyContent a[href ^="irc://"], .link-irc {
+    background: url("discussionitem_icon.gif")  center right no-repeat;
+    padding-right: 18px;
+}
+
+#page-MainPage .rssfeed {
+}
+
+#page-MainPage .rssfeed dd+dt+dd {
+    display: none;
+}
+
+#page-MainPage .rssfeed dd {
+    padding: 0 1em 1em;
+}
+
+.rssfeed dl {
+    margin: 0;
+    padding: 1em 0 0;
+}
+
+.rssfeed dt {
+}
+
+.rssfeed dd {
+    margin: 0;
+    padding: 0;
+}
+
+#page-MainPage .rssfeed a {
+    text-decoration: none;
+}
+
+#page-MainPage .rssfeed a:hover {
+    text-decoration: underline;
+}
+
+#page-MainPage .rssfeed h2 {
+    margin-top: 0;
+}
+
+#page-MainPage .rssfeed h2 a, #page-MainPage .rssfeed dt a {
+    background: none;
+    padding-right: 0;
+}
+
+.rssfeed .rssmore {
+    background: none !important;
+    padding: 0 1em !important;
+    display: block;
+    margin-top: 0.25em;
+}
+
+#quicklinks {
+		background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_box.png) no-repeat;
+    width: 250px;
+    height: 150px;
+    position: absolute;
+    top: 14px;
+    right: 40px;
+}
+
+#quicklinks h3 {
+    display: none;
+}
+
+#quicklinks ul, #quicklinks li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#quicklinks ul {
+    margin: 9px 16px;
+}
+
+#quicklinks li {
+    float: left;
+    display: block;
+}
+
+#quicklinks li a {
+    width: 74px;
+    height: 42px;
+    border: 0;
+    display: block;
+    text-decoration: none;
+    text-indent: -1000em;
+    border: 1px solid transparent;
+    padding: 9px 16px;
+}
+
+#q-gallery a {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_gallery.png) no-repeat center;
+}
+
+#q-gallery a:hover {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_gallery_selected.png) no-repeat center;
+}
+
+#q-resources a {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_resources.png) no-repeat center;
+}
+
+#q-resources a:hover {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_resources_selected.png) no-repeat center;
+}
+
+#q-blog a {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_blog.png) no-repeat center;
+}
+
+#q-blog a:hover {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_blog_selected.png) no-repeat center;
+}
+
+#q-mono a {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_mono.png) no-repeat center;
+}
+
+#q-mono a:hover {
+    background: transparent url(http://cosmochips.net/resources/images/skins/cosmochips/quicklinks_mono_selected.png) no-repeat center;
+}
+
+#quicklinks li a:hover {
+    background-color: transparent;
+}
+
+.split-half {
+    float: left;
+    width: 42%;
+    margin: 0 4% 0 0;
+}
+
+.split-half + .split-half {
+    margin: 0 0 0 4%;
+}
+
+#f-login {
+    margin: 1em auto;
+}
+
+table { 
+    border-collapse: collapse;
+}
+
+table tr, table td {
+    padding: 0.5em 1em;
+}
+
+#page-Downloads table {
+    border-collapse: collapse:
+}
+
+#page-Downloads .download-table td, #page-Downloads .download-table th {
+    border: 1px solid #ccc;
+    border-width: 1px 0;
+    padding: 2em 1em;
+}
+
+#page-Downloads .download-table th {
+    border-right: 1px dotted #ccc;
+}
+
+#page-Downloads .download-table table td, #page-Downloads .download-table table th {
+    border: none;
+    padding: 0 0.5em;
+}
+
+#page-Downloads table th, #page-Downloads table td {
+    vertical-align: top;
+}
+
+#page-Downloads img {
+    vertical-align: middle;
+}
+
+#page-FAQGeneral h1 {
+}
+
+#page-FAQGeneral h2 {
+    border-bottom: 2px solid #ccc;
+    font-size: 1.75em;
+    margin-top: 2em;
+    margin-left: -0.5em;
+    padding: 0 0.5em 0.25em;
+}
+
+#page-FAQGeneral h3 {
+}
+
+#page-FAQGeneral h4 {
+    font-size: 1.4em;
+    margin-top: 1.75em;
+}
+
+#page-FAQGeneral h4:before {
+}
+
+#page-FAQGeneral h4 + p:before {
+}
+
+#page-FAQGeneral h2:before {
+}
+
+pre, tt {
+    font-size: 1em;
+    font-family: bitstream vera sans mono,luxi mono,monospace;
+}
+
+pre {
+    padding: 6pt;
+    background-color: #f6f6f6;
+    border: 1px solid #ddd;
+}
+
+/* images */
+div.floatright, table.floatright {
+    clear: right;
+    float: right;
+    position: relative;
+    margin: 0 0 0.5em 0.5em;
+    border: 0
+}
+
+div.floatright p {
+		font-style: italic;
+}
+
+div.floatleft, table.floatleft {
+    float: left;
+    position: relative;
+    margin: 0 0.5em 0.5em 0;
+    border: 0
+}
+
+div.floatleft p {
+		font-style: italic;
+}
+
+/* thumbnails */
+div.thumb {
+    margin-bottom: 0.5em;
+    border-style: solid; border-color: White;
+    width: auto;
+}
+
+div.thumb div {
+    border:1px solid #cccccc;
+    padding: 3px !important;
+    background-color:#f9f9f9;
+    font-size: 94%;
+    text-align: center;
+    overflow: hidden;
+}
+
+div.thumb div a img {
+    border:1px solid #cccccc;
+}
+
+div.thumb div div.thumbcaption {
+    border: none;
+    text-align: left;
+    line-height: 1.4em;
+    padding: 0.3em 0 0.1em 0;
+}
+
+div.magnify {
+    float: right;
+    border: none !important;
+    background: none !important;
+}
+
+div.magnify a, div.magnify img {
+    display: block;
+    border: none !important;
+    background: none !important;
+}
+
+div.tright {
+    clear: right;
+    float: right;
+    border-width: 0.5em 0 0.8em 1.4em;
+}
+
+div.tleft {
+    float: left;
+    margin-right:0.5em;
+    border-width: 0.5em 1.4em 0.8em 0;
+}
+
+
+/*
+** IpbWiki - Extra styles for MediaWiki 1.9+ - edit section
+*/
+h1 .editsection { font-size: 53%; }
+h2 .editsection { font-size: 67%; }
+h3 .editsection { font-size: 76%; font-weight: normal; }
+h4 .editsection { font-size: 86%; font-weight: normal; }
+h5 .editsection { font-weight: normal; }
+h6 .editsection { font-size: 125%; font-weight: normal; }
+.editsection {
+	float: right;
+	margin-left: 5px;
+}
+/* IE fix */
+* html div.editsection { font-size: smaller; }
+
