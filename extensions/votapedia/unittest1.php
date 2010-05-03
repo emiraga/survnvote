@@ -178,7 +178,7 @@
 		assert( $page->getStartTime() == '2000-01-01 00:00:00' );
 		assert( $page->getDuration() == 60 );
 		assert( $page->getEndTime() == '2000-01-01 01:00:00' );
-		assert( ! $page->getCreateTime() );
+		// assert( ! $page->getCreateTime() );
 		assert( $page->isInvalidAllowed() == '1' );
 		assert( $page->isSMSRequired() == '0' );
 		assert( $page->getTeleVoteAllowed() == '1' );

@@ -15,14 +15,16 @@ $gvNumberUserPass = '81161899';
 $gvNumberPBX = '8116';
 $gvCountry = 'Malaysia';
 
-########################################################
-
 if(defined('VOTAPEDIA_TEST')) //used for unit testing
-{
 	$gvDataSourceName = "unittest";
-}
 
-global $gvPath;
+/**
+ * Remove prefixes and suffixes in Category listing
+ */
+$gvCatRemovePrefix = array('Surveys in ', 'Quizes in ');
+$gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
+
+#global $gvPath;
 $gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
 require_once( "$gvPath/survey/connection.php" );
 require_once( "$gvPath/survey/error.php" );

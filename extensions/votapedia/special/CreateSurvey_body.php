@@ -12,6 +12,9 @@ require_once("$gvPath/survey/SurveyDAO.php");
  * @author Emir Habul
  */
 class CreateSurvey extends SpecialPage {
+	/**
+	 * Constructor for CreateSurvey
+	 */
 	function __construct() {
 		parent::__construct('CreateSurvey');
 		wfLoadExtensionMessages('CreateSurvey');
@@ -144,48 +147,20 @@ class CreateSurvey extends SpecialPage {
 				'explanation' => 'If unchecked, only registered votApedia users will be allowed to vote on the survey page.',
 				'learn_more' => 'Details of Anonymous Voting',
 			),
-		);
-
-		//get a list of categories
-		$params = new FauxRequest(array (
-			'cmtitle' => 'Category:Survey Categories',
-			'action' => 'query',
-			'list' => 'categorymembers',
-			'cmprop' => 'title',
-		));
-
-		$api = new ApiMain($params);
-		$api->execute();
-		$data = & $api->getResultData();
-		$subcat = $data['query']['categorymembers'];
+		);		
+		$subcat = $this->getSubcategories();
+		$subcat = $this->removePrefSufCategories($subcat);
+		$this->formitems['category']['options'] = $subcat;
 		
-		$remove_prefix = array('Category:Surveys in ', 'Category:Surveys ', 'Category:Quizes in ', 'Category:Quiz ', 'Category:');
-		$remove_suffix = array(' Surveys', ' Survey');
-		
-		foreach($subcat as $cat)
-		{
-			$name = $cat['title'];
-			foreach($remove_prefix as $prefix)
-			{
-				if(strcasecmp(substr($name,0,strlen($prefix)),$prefix) == 0)
-				{
-					$name = substr($name, strlen($prefix));
-				}
-			}
-			
-			foreach($remove_suffix as $suffix)
-			{
-				if(strcasecmp(substr($name,strlen($name) - strlen($suffix)),$suffix) == 0)
-				{
-					$name = substr($name, 0, strlen($name) - strlen($suffix));
-				}
-			}
-			$this->formitems['category']['options'][$name] = $cat['title'];
-		}
 		$this->form = new FormControl($this->formitems);
 		$this->includable( true ); //we can include this from other pages
 	}
-	function getPageTitle($mytitle)
+	/**
+	 * Convert page title into a friendly form, shorter and trimmed
+	 * 
+	 * @param $mytitle
+	 */
+	private function getPageTitle($mytitle)
 	{
 		$mytitle = trim(stripslashes($mytitle));
 		if(strlen($mytitle)>50)
@@ -195,9 +170,70 @@ class CreateSurvey extends SpecialPage {
 		}
 		return $mytitle;
 	}
+	/**
+	 * Get a list of categories
+	 * 
+	 * @param $category Name of a category
+	 * @return array with a list of categories
+	 */
+	function getSubcategories($category = 'Survey Categories')
+	{
+		$params = new FauxRequest(array(
+			'cmtitle' => 'Category:'.$category,
+			'action' => 'query',
+			'list' => 'categorymembers',
+			'cmprop' => 'title',
+			//'cmsort' => 'timestamp',
+		));
+		$api = new ApiMain($params);
+		$api->execute();
+		$data = & $api->getResultData();
+		$result = array();
+		foreach($data['query']['categorymembers'] as $subcat)
+		{
+			$subcat = $subcat['title'];
+			
+			if( substr($subcat,0,9) == 'Category:' )
+				$result[] = substr($subcat,9);
+			else
+				$result[] = $subcat;
+		}
+		return $result;
+	}
+	/**
+	 * Remove prefix and suffix from category list
+	 * 
+	 * @param $cats array of category names
+	 * @return array without prefixes and suffixes
+	 */
+	function removePrefSufCategories($cats)
+	{
+		global $gvCatRemovePrefix;
+		global $gvCatRemoveSuffix;
+		
+		$result = array();
+		foreach($cats as $cat)
+		{
+			$name = $cat;
+			foreach($gvCatRemovePrefix as $prefix)
+				if(strcasecmp(substr($name,0,strlen($prefix)),$prefix) == 0)
+					$name = substr($name, strlen($prefix));
+
+			foreach($gvCatRemoveSuffix as $suffix)
+				if(strcasecmp(substr($name,strlen($name) - strlen($suffix)),$suffix) == 0)
+					$name = substr($name, 0, strlen($name) - strlen($suffix));
+
+			$result[$name] = $cat;
+		}
+		return $result;
+	}
+	/**
+	 * Insert new page in mediawiki and votapedia database
+	 * 
+	 * @param $values associative array with values from form
+	 */
 	function insertPage($values)
 	{
-		//titleorquestion,choices,category,smsvoting,showresultsend, showtop
 		global $wgRequest, $wgUser;
 		$newtitle = $values[titleorquestion];
 		$author = $wgUser->getName();
@@ -219,7 +255,7 @@ class CreateSurvey extends SpecialPage {
 		$wikiText .= trim($values['choices']);
 		
 		$wikiText.="\r\n</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
-		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
+		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";
 
 		$article = new Article( Title::newFromText( $newtitle ) );
 		$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
@@ -228,13 +264,17 @@ class CreateSurvey extends SpecialPage {
 		if(!$status->isGood())
 			return '<li>Error has occured while creating a new page</li>';
 		
-		//create a new Page
 		try
 		{
 			$page = new PageVO();
 			$page->setTitle($encodedTitle);
 			$page->setAuthor($author);
-			//$page->set
+			$page->setInvalidAllowed( (bool) $values['voteridentity'] );
+			$page->setAnonymousAllowed( (bool) $values['anonymousweb'] );
+			$page->setDisplayTop($values['showtop']);
+			$page->setShowGraph(! (bool) $values['showresultsend']);
+			$page->setDuration( $values['duration'] );
+			
 			//Write data into Database
 			$surveyDAO = new SurveyDAO();
 			
@@ -249,9 +289,12 @@ class CreateSurvey extends SpecialPage {
 			$article->doDeleteArticle('Error while inserting to voting database');
 			return '<li>'.$e->getMessage().'</li>';
 		}
-
 	}
-	
+	/**
+	 * Mandatory execute function for a Special Page
+	 * 
+	 * @param $par
+	 */
 	function execute( $par = null )
 	{
 		global $wgUser, $wgTitle, $wgOut;
@@ -288,7 +331,11 @@ class CreateSurvey extends SpecialPage {
 		}
 		$this->drawForm($error);
 	}
-	
+	/**
+	 * Draw form using FormControl
+	 * 
+	 * @param $errors string containing potential errors
+	 */
 	function drawForm( $errors=null )
 	{
 		global $wgOut, $wgTitle, $wgUser, $wgLang, $wgScriptPath;

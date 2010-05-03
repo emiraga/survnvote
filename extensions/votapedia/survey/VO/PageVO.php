@@ -40,8 +40,8 @@ class PageVO
 	function __construct()
 	{
 		$this->endTime = $this->renewEndTime();
+		$this->setCreateTime(date("Y-m-d H:i:s"));
 	}
-
 	/**
 	 * Set an ID of this survey
 	 * @param $id
