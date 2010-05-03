@@ -3,6 +3,12 @@ if (!defined('MEDIAWIKI')) die();
 
 class FormGenerator
 {
+
+	public function __construct($pages)
+	{
+		$this->pages = $pages;
+	}
+	
 	/**
 	 * Helper function for user information panel
 	 * @param $td1 label for an item
@@ -10,11 +16,6 @@ class FormGenerator
 	 * @param $td3 optional help or null
 	 * @return xhtml block
 	 */
-	public function __construct($pages)
-	{
-		$this->pages = $pages;
-	}
-	
 	private static function TableRow( $td1, $td2 = null, $td3 = null ) {
 
 		if ( is_null( $td3 ) ) {

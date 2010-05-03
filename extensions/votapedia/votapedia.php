@@ -13,6 +13,7 @@ date_default_timezone_set('Asia/Kuala_Lumpur');
 $gvNumberCallerID = '82315772';
 $gvNumberUserPass = '81161899';
 $gvNumberPBX = '8116';
+$gvCountry = 'Malaysia';
 
 ########################################################
 
@@ -21,6 +22,7 @@ if(defined('VOTAPEDIA_TEST')) //used for unit testing
 	$gvDataSourceName = "unittest";
 }
 
+global $gvPath;
 $gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
 require_once( "$gvPath/survey/connection.php" );
 require_once( "$gvPath/survey/error.php" );

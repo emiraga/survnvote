@@ -3,6 +3,12 @@ if (!defined('MEDIAWIKI')) die();
 
 class FormControl
 {
+	public function __construct($items)
+	{
+		$this->items = $items;
+		$this->values = array();
+	}
+	
 	/**
 	 * Helper function for user information panel
 	 * @param $td1 label for an item
@@ -10,12 +16,6 @@ class FormControl
 	 * @param $td3 optional help or null
 	 * @return xhtml block
 	 */
-	public function __construct($items)
-	{
-		$this->items = $items;
-		$this->values = array();
-	}
-	
 	private function TableRow( $td1, $td2 = null, $td3 = null ) {
 
 		if ( is_null( $td3 ) ) {
