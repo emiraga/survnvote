@@ -1,6 +1,5 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
-//$gvPath
 
 $gvDBserver              = "localhost";
 $gvWikiDBname            = "wikidb";
@@ -28,6 +27,6 @@ require_once( "$gvPath/survey/error.php" );
 require_once( "$gvPath/SpecialCreateSurvey.php" );
 require_once( "$gvPath/ChoiceTagExtension.php" );
 require_once( "$gvPath/SpecialEmirTest.php" );
-require_once( "$gvPath/ArticleHooks.php" );
+require_once( "$gvPath/UserHooks.php" );
 
 ?>

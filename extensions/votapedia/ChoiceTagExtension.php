@@ -1,4 +1,5 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 /**
  * 
  * Choice Tag WikiMedia extension
@@ -10,7 +11,6 @@
  * Note: iText but directly
  *       included in the HTML output. So WikiThe output is not interpreted as Wik markup is not supported.
  */
-if (!defined('MEDIAWIKI')) die();
 
 $wgExtensionFunctions[] = "wfChoiceTagExtension";
 

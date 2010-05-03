@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 $tables = array(
 	'csiro_number',
 	'incomingcall',
