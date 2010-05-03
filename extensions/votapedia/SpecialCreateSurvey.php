@@ -28,7 +28,7 @@ function wfExtensionSpCreateSurvey() {
 					'type' => 'input',
 					'name' => 'Title or question',
 					'default' => '',
-					'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
+					'valid' => function ($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
 					'explanation' => 'e.g. "What is the capital of Malaysia?". This will be the title of your survey page.'
 					.'The following characters are not allowed in the title: #, +, &, <, >, [, ], {, }, |, / .',
 					'learn_more' => 'Details_of_Title_or_Survey_Question',
