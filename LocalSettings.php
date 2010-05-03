@@ -114,12 +114,12 @@ $wgDefaultSkin = 'wavelover2';
 ## For attaching licensing metadata to pages, and displaying an
 ## appropriate copyright notice / icon. GNU Free Documentation
 ## License and Creative Commons licenses are supported so far.
-$wgEnableCreativeCommonsRdf = true;
-$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
-$wgRightsUrl = "http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt";
-$wgRightsText = "GNU Free Documentation License 1.2";
-$wgRightsIcon = "${wgScriptPath}/skins/common/images/gnu-fdl.png";
-# $wgRightsCode = "gfdl1_2"; # Not yet used
+#$wgEnableCreativeCommonsRdf = true;
+#$wgRightsPage = ""; # Set to the title of a wiki page that describes your license/copyright
+#$wgRightsUrl = "http://www.gnu.org/licenses/old-licenses/fdl-1.2.txt";
+#$wgRightsText = "GNU Free Documentation License 1.2";
+#$wgRightsIcon = "${wgScriptPath}/skins/common/images/gnu-fdl.png";
+#$wgRightsCode = "gfdl1_2"; # Not yet used
 
 $wgDiff3 = "";
 
