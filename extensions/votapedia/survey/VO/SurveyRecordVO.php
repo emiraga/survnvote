@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * A value object of a voting record of surveys which follows PHP MVC suggestion.
  * @package ValueObject of survey

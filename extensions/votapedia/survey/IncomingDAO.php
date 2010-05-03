@@ -1,4 +1,5 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 
 /**
  * Abstract class for IncomingCALL and IncomingSMS

@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * This page includes class TeleNumber which is in care of
  * allocating available telephones to surveys based on
@@ -7,9 +9,7 @@
  * @package DAO of Survey
  */
 
-require_once("error.php");
-require_once("connection.php");
-require_once("VO/SurveyVO.php");
+require_once("$gvPath/survey/VO/SurveyVO.php");
 /**
  * Blocks are groups of phones,
  * dynamic block is a separate group

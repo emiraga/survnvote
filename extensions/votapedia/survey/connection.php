@@ -1,9 +1,11 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 /**
  * This page is used to connect database.
  *
  * @package DAO of Survey
  */
+
 include_once("adodb/adodb.inc.php");
 include_once("adodb/adodb-exceptions.inc.php");
 /**

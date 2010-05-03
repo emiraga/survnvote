@@ -1,10 +1,10 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 /**
  * This page is used to error handle function.
  *
  * @package DAO of Survey
  */
-
 
 /**
  * Must return true, or system will halt it automatically.

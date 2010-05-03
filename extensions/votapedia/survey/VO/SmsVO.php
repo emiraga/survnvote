@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * A value object of SMS.
  * 

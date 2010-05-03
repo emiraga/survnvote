@@ -1,4 +1,5 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 /**
  * SurveyRecordDAO includes functions which can access
  * voting records of surveys from database system.
@@ -8,6 +9,7 @@
  * @author Emir Habul
  * @version 1.1
  */
+
 class SurveyRecordDAO
 {
 	/**

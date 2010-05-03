@@ -1,4 +1,5 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
 /**
  * This page includes class SurveyDAO which is used to
  * save/retreive data of a Survey. It contains Read/Create/Update/Delete
@@ -7,10 +8,8 @@
  * @package DAO of Survey
  */
 
-require_once("./connection.php");
-require_once("./error.php");
-require_once("./Telephone.php");
-require_once("./VO/PageVO.php");
+require_once("$vpPath/Telephone.php");
+require_once("$vpPath/VO/PageVO.php");
 /**
  * SurveyDAO includes functions which can access and set
  * (a) Survey(s)' info into or from database system.
@@ -193,7 +192,8 @@ class SurveyDAO
 	 	//@todo some fields here are missing
 	 	$gDB->Execute($resPage,$param);
 
- 		foreach ($pageVO->getSurveys() as &$survey)
+	 	$refsurveys =& $pageVO->getSurveys();
+ 		foreach ($refsurveys as &$survey)
  		{
  			$survey->setPageID($pageVO->getPageID());
  			$this->insertSurvey($survey);
@@ -211,7 +211,7 @@ class SurveyDAO
 	 * @param $sql select SQL statement 
 	 * @param $params arrays of parameters to SQL statement
 	 */
-	private function getSurveys($sql, $params)
+	private function getSurveysSQL($sql, $params)
 	{
 		global $gDB;
 		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
@@ -252,7 +252,7 @@ class SurveyDAO
 	 */
 	function findSurveyByID($id)
 	{
-		$surveys = getSurveys("select * from survey where surveyID = ?", array($surveyID));
+		$surveys = getSurveysSQL("select * from survey where surveyID = ?", array($surveyID));
 		if(count($surveys) == 0)
 			throw new SurveyException("Survey not found", 400);
 		return $surveys[0];
@@ -287,7 +287,7 @@ class SurveyDAO
 		$surveys = array();
 		foreach($surveyIDs as $id)
 		{
-			$survey = $this->getSurveys("select * from survey where pageID = ?", $id);
+			$survey = $this->getSurveysSQL("select * from survey where pageID = ?", $id);
 			if(count($survey) == 0)
 				throw new SurveyException("findCurrentSurveys, survey not found.");
 			$surveys[] = $survey[0] ;

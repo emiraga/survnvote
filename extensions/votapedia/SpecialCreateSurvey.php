@@ -1,9 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+
 $wgExtensionFunctions[] = "wfExtensionSpCreateSurvey";
 
-require_once( "$IP/extensions/votapedia/FormControl.php" );
-require_once( "$IP/extensions/votapedia/survey/surveyDAO.php" );
+require_once( "$gvPath/FormControl.php" );
+require_once( "$gvPath/survey/surveyDAO.php" );
 require_once( "$IP/includes/Article.php" );
 require_once( "$IP/includes/Title.php" );
 

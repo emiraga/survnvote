@@ -1,16 +1,18 @@
 <?php
-# Choice Tag WikiMedia extension
-# with WikiMedia's extension mechanism it is possible to define
-# a Choice Tag of this form
-# <CHOICE> some text </CHOICE>
-# the function registered by the extension gets the text between the
-# tags as input and can transform it into a voting page (HTML code).
-# Note: iText but directly
-#       included in the HTML output. So WikiThe output is not interpreted as Wik markup is not supported.
+/**
+ * 
+ * Choice Tag WikiMedia extension
+ * with WikiMedia's extension mechanism it is possible to define
+ * a Choice Tag of this form
+ * <CHOICE> some text </CHOICE>
+ * the function registered by the extension gets the text between the
+ * tags as input and can transform it into a voting page (HTML code).
+ * Note: iText but directly
+ *       included in the HTML output. So WikiThe output is not interpreted as Wik markup is not supported.
+ */
+if (!defined('MEDIAWIKI')) die();
 
 $wgExtensionFunctions[] = "wfChoiceTagExtension";
-
-require_once("$IP/extensions/votapedia/VotapediaSettings.php");
 
 function wfChoiceTagExtension() {
     global $wgParser;

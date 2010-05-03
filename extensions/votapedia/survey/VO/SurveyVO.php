@@ -1,10 +1,12 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * This package contains all value objects.
  * Basically, it contains Call,Page,Survey,Choice,Presentation and SurveyRecord
  * @package ValueObject of survey
  */
-require_once("ChoiceVO.php");
+require_once("$vpPath/ChoiceVO.php");
 
 /**
  * An value object of a survey.

@@ -1,12 +1,15 @@
 <?php
-
+	$IP = '/xampp/htdocs/new';
+	define('MEDIAWIKI', true);
+	define('VOTAPEDIA_TEST', true);
+	
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
-	require_once("./VotapediaSettings.php");
-	require_once("./survey/connection.php");
-	require_once('./empty_database.php');
+	require_once("./votapedia.php");
+	require_once("$gvPath/empty_database.php");
 
 	if(true) /* Test choiceVO */
 	{
+		echo '.';
 		require_once("./survey/VO/ChoiceVO.php");
 		$choice = new ChoiceVO();
 		
@@ -37,6 +40,7 @@
 	}
 	if(true) /* test PresentationVO */
 	{
+		echo '.';
 		require_once("./survey/VO/PresentationVO.php");
 		$present = new PresentationVO();
 		
@@ -61,15 +65,10 @@
 		$present->setActive(false);
 		assert( $present->getActive() == '0' );
 	}
-	
-	if(true) /* test CallVO */
-	{
-		require_once('./survey/VO/CallVO.php');
-		/* deprecated */
-	}
-	
+
 	if(true) /* test VoteVO */
 	{
+		echo '.';
 		require_once('./survey/VO/VoteVO.php');
 		$vote = new VoteVO();
 		assert( ! $vote->getChoiceID() );
@@ -115,6 +114,7 @@
 	
 	if(true) /* test SurveyVO */
 	{
+		echo '.';
 		require_once('./survey/VO/surveyVO.php');
 		$survey = new SurveyVO();
 		assert( 0 == $survey->getActivePresentationID() );
@@ -168,6 +168,7 @@
 	
 	if( true ) /* test PageVO */
 	{
+		echo '.';
 		require_once('./survey/VO/PageVO.php');
 		$page = new PageVO();
 		assert( ! $page->getPageID() );
@@ -231,6 +232,7 @@
 		
 	if( true ) /* testing SurveyRecordVO */
 	{
+		echo '.';
 		require_once('./survey/VO/SurveyRecordVO.php');
 		$sr = new SurveyRecordVO();
 		assert( ! $sr->getChoiceID() );
@@ -261,6 +263,7 @@
 	
 	if( true ) /* testing SurveyRecordDAO */
 	{
+		echo '.';
 		require_once('./survey/SurveyRecordDAO.php');
 		$srdao = new SurveyRecordDAO();
 
@@ -278,6 +281,7 @@
 	
 	if( true ) /* testing CallVO */
 	{
+		echo '.';
 		require_once('./survey/VO/CallVO.php');
 		$call = new CallVO();
 		assert( !$call->getCallID() );
@@ -301,6 +305,7 @@
 	
 	if( true ) /* testing SmsVO */
 	{
+		echo '.';
 		require_once('./survey/VO/SmsVO.php');
 		$sms = new SmsVO();
 		assert(! $sms->getDate() );
@@ -324,6 +329,7 @@
 	
 	if( true ) /* testing Telephone */
 	{
+		echo '.';
 		require_once('./survey/Telephone.php');
 		$t = new Telephone();
 		assert( count($t->getAvailablePhones()) == count($t->getAllPhones()) );
@@ -362,6 +368,7 @@
 	
 	if( false ) /* testing Usr */
 	{
+		echo '.';
 		require_once("./survey/Usr.php");
 		$user = new Usr('TestUser');
 	}

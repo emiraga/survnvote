@@ -1,5 +1,7 @@
 <?php
- /**
+if (!defined('MEDIAWIKI')) die();
+
+/**
   * Value Object of Presentation
   *
   * @package ValueObject of survey

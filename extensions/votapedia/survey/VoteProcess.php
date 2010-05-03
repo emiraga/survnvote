@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 missing_function();
 	//Need to be INCLUDED, not REQUIRED
 	echo $vote->voteType . $vote->voterID . $vote->surveyID . $vote->choiceID;

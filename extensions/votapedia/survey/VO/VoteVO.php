@@ -1,11 +1,11 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * Vote value object
  * @package ValueObject of survey
  *
  */
-require_once("./survey/error.php");
-
 class VoteVO
 {
 	private $surveyID;

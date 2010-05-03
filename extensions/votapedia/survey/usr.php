@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI')) die();
+
 /**
  * This page includes class USR, SurveyRecordDAO and SurveyRecordVO which are used to
  * vote for a Survey.
@@ -6,10 +8,8 @@
  * @package DAO of Survey
  */
 
-require_once("./connection.php");
-//require_once("error.php");
-require_once("./VO/CallVO.php");
-require_once("./VoteDAO.php");
+require_once("$gvPath/VO/CallVO.php");
+require_once("$gvPath/VoteDAO.php");
 
 /**
  * Class Usr includes functions which can vote surveys so far
