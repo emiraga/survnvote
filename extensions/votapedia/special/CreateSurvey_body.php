@@ -3,6 +3,8 @@ if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
 require_once("$gvPath/FormControl.php");
+require_once("$gvPath/survey/VO/PageVO.php");
+require_once("$gvPath/survey/SurveyDAO.php");
 
 /**
  * Special page Create Survey
@@ -23,7 +25,7 @@ class CreateSurvey extends SpecialPage {
 				'valid' => function ($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
 				'explanation' => 'e.g. "What is the capital of '.$gvCountry.'?". This will be the title of your survey page.'
 				.'The following characters are not allowed in the title: #, +, &, <, >, [, ], {, }, |, / .',
-				'learn_more' => 'Details_of_Title_or_Survey_Question',
+				'learn_more' => 'Details of Title or Survey Question',
 				'process' => function($v) { return FormControl::RemoveSpecialChars($v); },
 			),
 			'choices' => array(
@@ -32,7 +34,7 @@ class CreateSurvey extends SpecialPage {
 				'textbefore' => 'Type choices here, one per line.<br />',
 				'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
 				'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later in the survey page.',
-				'learn_more' => 'Details_of_Editing_Surveys',
+				'learn_more' => 'Details of Editing Surveys',
 			),
 			'category' => array(
 				'type' => 'select',
@@ -40,18 +42,13 @@ class CreateSurvey extends SpecialPage {
 				'default' => 'General',
 				'valid' => function($v,$i,$js){ if($js) return ""; return in_array( $v, $i['options'] ); },
 				'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
-				'learn_more' => 'Details_of_Survey_Category',
-				'options' => array(
-					  "General"=>"General",  "Engineering"=>"Engineering",
-					  "Science"=>"Science",  "Health"=>"Health",
-					  "Environment"=>"Environment",  "Politics"=>"Politics",
-					  "Economy"=>"Economy",  "Art"=>"Art",
-					  "Sport" => "Sport", )
+				'learn_more' => 'Details of Survey Category',
+				'options' => array()
 			),
 			'label-details' => array(
 				'type' => 'null',
 				'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audiences can ring this number, send SMS or visit the survey page to enter their vote.',
-				'learn_more' => 'Details_of_Survey_Procedure',
+				'learn_more' => 'Details of Survey Procedure',
 			),
 			'duration' => array(
 				'type' => 'input',
@@ -61,7 +58,7 @@ class CreateSurvey extends SpecialPage {
 				'textafter' => ' hours.',
 				'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11; },
 				'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
-				'learn_more' => 'Details_of_Duration',
+				'learn_more' => 'Details of Duration',
 				'process' => function($v) { return intval($v); },
 			),
 			/*'AllowInvalidVotes' => array(
@@ -76,9 +73,9 @@ class CreateSurvey extends SpecialPage {
 				'type' => 'select',
 				'name' => 'Phone voting',
 				'default' => 'Enable anonymous phone voting',
-				'valid' => function($v,$i,$js){ if($js) return ""; return $v == "yes-anon" or $v == "yes-local" or $v == "no"; },
+				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => '',
-				'learn_more' => 'Details_of_Phone_Voting',
+				'learn_more' => 'Details of Phone Voting',
 				'options' => array(
 					  "Enable anonymous phone voting"=>"yes-anon",
 					  "Enable phone voting (only local callers)"=>"yes-local",
@@ -88,9 +85,9 @@ class CreateSurvey extends SpecialPage {
 				'type' => 'select',
 				'name' => 'SMS voting',
 				'default' => 'Enable anonymous SMS voting',
-				'valid' => function($v,$i,$js){ if($js) return ""; return $v == "yes-anon" or $v == "yes-local" or $v == "no"; },
+				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => '',
-				'learn_more' => 'Details_of_SMS_Voting',
+				'learn_more' => 'Details of SMS Voting',
 				'options' => array(
 					  "Enable anonymous SMS voting"=>"yes-anon",
 					  "Enable SMS voting (only local callers)"=>"yes-local",
@@ -100,9 +97,9 @@ class CreateSurvey extends SpecialPage {
 				'type' => 'select',
 				'name' => 'Web voting',
 				'default' => 'Enable anonymous WEB voting',
-				'valid' => function($v,$i,$js){ if($js) return ""; return $v == "yes-anon" or $v == "yes-local" or $v == "no"; },
+				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => '',
-				'learn_more' => 'Details_of_Web_Voting',
+				'learn_more' => 'Details of Web Voting',
 				'options' => array(
 					  "Enable anonymous Web voting"=>"yes-anon",
 					  "Enable Web voting (only for registered users)"=>"yes-local",
@@ -136,7 +133,7 @@ class CreateSurvey extends SpecialPage {
 				'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$gvCountry.'.',
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
-				'learn_more' => 'Details_of_Multiple_Voting',
+				'learn_more' => 'Details of Multiple Voting',
 			),
 			'anonymousweb' => array(
 				'type' => 'checkbox',
@@ -145,13 +142,49 @@ class CreateSurvey extends SpecialPage {
 				'checklabel' => ' Enable anonymous web voting.',
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => 'If unchecked, only registered votApedia users will be allowed to vote on the survey page.',
-				'learn_more' => 'Details_of_Anonymous_Voting',
+				'learn_more' => 'Details of Anonymous Voting',
 			),
 		);
+
+		//get a list of categories
+		$params = new FauxRequest(array (
+			'cmtitle' => 'Category:Survey Categories',
+			'action' => 'query',
+			'list' => 'categorymembers',
+			'cmprop' => 'title',
+		));
+
+		$api = new ApiMain($params);
+		$api->execute();
+		$data = & $api->getResultData();
+		$subcat = $data['query']['categorymembers'];
+		
+		$remove_prefix = array('Category:Surveys in ', 'Category:Surveys ', 'Category:Quizes in ', 'Category:Quiz ', 'Category:');
+		$remove_suffix = array(' Surveys', ' Survey');
+		
+		foreach($subcat as $cat)
+		{
+			$name = $cat['title'];
+			foreach($remove_prefix as $prefix)
+			{
+				if(strcasecmp(substr($name,0,strlen($prefix)),$prefix) == 0)
+				{
+					$name = substr($name, strlen($prefix));
+				}
+			}
+			
+			foreach($remove_suffix as $suffix)
+			{
+				if(strcasecmp(substr($name,strlen($name) - strlen($suffix)),$suffix) == 0)
+				{
+					$name = substr($name, 0, strlen($name) - strlen($suffix));
+				}
+			}
+			$this->formitems['category']['options'][$name] = $cat['title'];
+		}
 		$this->form = new FormControl($this->formitems);
 		$this->includable( true ); //we can include this from other pages
 	}
-	
 	function getPageTitle($mytitle)
 	{
 		$mytitle = trim(stripslashes($mytitle));
@@ -162,7 +195,6 @@ class CreateSurvey extends SpecialPage {
 		}
 		return $mytitle;
 	}
-	
 	function insertPage($values)
 	{
 		//titleorquestion,choices,category,smsvoting,showresultsend, showtop
@@ -176,17 +208,18 @@ class CreateSurvey extends SpecialPage {
 		$newtitle = $this->getPageTitle($newtitle);
 		$encodedTitle=urlencode($newtitle);
 
-		$wikiText.= '<choice';
+		$wikiText.= '<SurveyChoices type="simple"';
 		foreach( $values as $id => $value )
 		{
 			if($id != 'choices')
 				$wikiText.= ' '.$id.'="'.$value.'"';
 		}
-		$wikiText.= ">";
+		$wikiText.= ">\n";
 		
-		echo $values[choices];
+		$wikiText .= trim($values['choices']);
 		
-		$wikiText.="\r\n</choice>\n*Created by ~~~~\n[[Category:Surveys]]\n[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
+		$wikiText.="\r\n</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
+		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Surveys in $values[category]]]\n[[Category:Simple Surveys]]";
 
 		$article = new Article( Title::newFromText( $newtitle ) );
 		$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
@@ -201,6 +234,7 @@ class CreateSurvey extends SpecialPage {
 			$page = new PageVO();
 			$page->setTitle($encodedTitle);
 			$page->setAuthor($author);
+			//$page->set
 			//Write data into Database
 			$surveyDAO = new SurveyDAO();
 			
