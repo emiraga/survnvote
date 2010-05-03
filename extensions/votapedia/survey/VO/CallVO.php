@@ -1,71 +1,95 @@
 <?php
 /**
-* This package contains all value objects. 
-* Basically, it contains Call,Page,Survey,Choice,Presentation and SurveyRecord
-* @package ValueObject of survey
-*/
+ * Call value object.
+ * 
+ * @package ValueObject of survey
+ */
+
 /**
  *  A value object of a call
  */
 class CallVO
 {
-	public $id;
-	public $from;
-	public $to;
-	public $dt;
-	public $errorCode;
+	private $callid;
+	private $from;
+	private $to;
+	private $date;
+	private $errorCode;
 	
-	function __construct($id,$from,$to,$dt,$errorCode=NULL)
+	/**
+	 * Set call ID
+	 * @param $callid
+	 */
+	function setCallID($callid)
 	{
-		$this->id = $id;
+		$this->callid = $callid;
+	}
+	/**
+	 * Set from
+	 * @param $from
+	 */
+	function setFrom($from)
+	{
 		$this->from = $from;
+	}
+	/**
+	 * Set to
+	 * @param $to
+	 */
+	function setTo($to)
+	{
 		$this->to = $to;
-		$this->dt = $dt;
-		$this->errorCode = (is_null($errorCode)? 0:$errorCode);
 	}
-	
-}
-
-class SMSVO
-{
-	public $id;
-	public $from;
-	public $text;
-	public $dt;
-	public $errorCode;
-	
-	function __construct($id,$from,$text,$dt,$errorCode=NULL)
+	/**
+	 * Set date
+	 * @param $date
+	 */
+	function setDate($date)
 	{
-		$this->id = $id;
-		$this->from = $from;
-		$this->text = $text;
-		$this->dt = $dt;
-		$this->errorCode = (is_null($errorCode)? 0:$errorCode);
+		$this->date = $date;
 	}
-	
-}
-
-class VoteVO
-{
-     public $surveyID;
-   	 public $choiceID;
-     public $presentationID = 0;
-     public $voterID;
-     public $voteDate;
-     public $voteType;
-     public $invalidAllowed;
-     public $votesAllowed=1;
-     
-	function __construct($surveyID,$choiceID,$presentationID,$voterID,$voteDate,$voteType,$invalidAllowed=NULL,$votesAllowed=NULL)
+	/**
+	 * Set error code
+	 * @param $errorCode
+	 */
+	function setErrorCode($errorCode)
 	{
-		$this->surveyID = $surveyID;
-		$this->choiceID = $choiceID;
-		$this->presentationID = $presentationID;
-		$this->voterID = $voterID;
-		$this->voteDate = $voteDate;
-		$this->voteType = $voteType;
-		$this->invalidAllowed = (is_null($invalidAllowed)? 0:$invalidAllowed);
-		$this->votesAllowed=(is_null($votesAllowed)? 1:$votesAllowed);
+		$this->errorCode = $errorCode;
+	}
+	/**
+	 * @return callid
+	 */
+	public function getCallID()
+	{
+		return $this->callid;
+	}
+	/**
+	 * @return from which phone call originates
+	 */
+	public function getFrom()
+	{ 
+		return $this->from; 
+	}
+	/**
+	 * @return to which number is SMS directed to
+	 */
+	public function getTo() 
+	{ 
+		return $this->to; 
+	}
+	/**
+	 * @return date of the call
+	 */
+	public function getDate() 
+	{ 
+		return $this->date; 
+	}
+	/**
+	 * @return get the error code
+	 */
+	public function getErrorCode() 
+	{ 
+		return $this->errorCode;
 	}
 }
 

@@ -21,4 +21,4 @@ if(sizeof($surveys)>0)
 	$xml = $xml."</surveys>";
 	echo $xml;
 }
-?>	
+?>

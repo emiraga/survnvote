@@ -1,30 +1,26 @@
 <?php
 /**
-* This page is used to connect database.
-*
-* @package DAO of Survey 
-*/
-    include("adodb/adodb-exceptions.inc.php");
-    include_once('adodb/adodb.inc.php');
-	#require_once("../SurveySettings.php");
-    /**
-    * Connect database without parameters
-    * return ADOConnection $cn 
-    */
-    function connectDatabase()
-    {
-      $cn = &ADONewConnection('mysql');
-	  global $gDBUserName;
-		global $gDBUserPassword;
-		global $gDataSourceName;
-      //if ($cn->Connect($gDBserver,$gDBUserName,$gDBUserPassword,$gVotingDBname))
-	  if ($cn->Connect('localhost','root','','Voting'))
-         return $cn;
-      else
-      {
-         throw new SurveyException("Could not connect database",400);
-         return false;
-      }
-    }
- 
+ * This page is used to connect database.
+ *
+ * @package DAO of Survey
+ */
+include_once("adodb/adodb.inc.php");
+include_once("adodb/adodb-exceptions.inc.php");
+/**
+ * Connect database without parameters
+ * @return $cn ADOConnection
+ */
+function connectDatabase()
+{
+	global $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDataSourceName;
+
+	$cn = &ADONewConnection('mysqli');
+	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDataSourceName))
+		throw new SurveyException("Could not connect database",400);
+	return $cn;
+}
+
+$gDB = connectDatabase();
+#$gDB->debug=true;
+
 ?>
