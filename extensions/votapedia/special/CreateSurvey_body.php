@@ -252,7 +252,7 @@ class CreateSurvey extends SpecialPage {
 		}
 		$wikiText.= ">\n";
 		
-		$wikiText .= trim($values['choices']);
+		$wikiText .= htmlspecialchars( trim($values['choices']) );
 		
 		$wikiText.="\r\n</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";

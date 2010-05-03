@@ -29,6 +29,7 @@ $gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
 require_once( "$gvPath/survey/connection.php" );
 require_once( "$gvPath/survey/error.php" );
 require_once( "$gvPath/special/CreateSurvey.php" );
+require_once( "$gvPath/tag/SurveyChoices.php" );
 
 require_once( "$gvPath/UserHooks.php" );
 
