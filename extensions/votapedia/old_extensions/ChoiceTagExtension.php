@@ -1,66 +1,113 @@
 <?php
-if (!defined('MEDIAWIKI')) die();
+old_stuff();
+require_once( 'filerepo/Image.php' );
+require_once("./SurveySettings.php");
 
-$wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
-$wgExtensionMessagesFiles['SurveyChoices'] = "$gvPath/tag/SurveyChoices.i18n.php";
-
-require_once("$gvPath/Common.php");
-require_once("$gvPath/survey/SurveyDAO.php");
-
-/**
- * Install SurveyChoice tag.
- * @param $parser
- */
-function vfSurveyChoicesInit( &$parser )
-{
-	$parser->setHook( 'SurveyChoices', 'vfSurveyChoices' );
-	return true;
-}
-/**
- * SurveyChoice tag handler, draws HTML in place of <SurveyChoice> tag
- * 
- * @param $input
- * @param $args
- * @param $parser
- * @param $frame
- */
-function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
-{
-	wfLoadExtensionMessages('SurveyChoices');
-	$parser->disableCache();
-	$output = '';
-	//
-	// We don't trust the Title of a wiki page, instead we trust to the
-	// question which has been written in the page text.
-	//
-	$title = vfGetPageTitle($args['titleorquestion']);
-	
-	$surveydao = new SurveyDAO();
-	try{
-		$page = $surveydao->findByPage( urlencode($title) );
-	}
-	catch(SurveyException $e)
-	{
-		return vfErrorBox( wfMsg('not-found', htmlspecialchars(urldecode($title))) );
-	}
-
+# The callback function for converting the input text to HTML output
+function renderChoice( $input, $argv ) {
+    # $argv is an array containing any arguments passed to the
+    # extension like <choice argument="foo" bar>..
+    # Put this on the sandbox page:  (works in MediaWiki 1.5.5)
+    #   <choice argument="foo" argument2="bar">Testing text **example** in between the new tags</choice>
 	global $wgRequest, $wgUser, $wgParser, $wgTitle, $wgOut;
-	
-	$action=$wgRequest->getVal( "action" );
-	if($action != 'submit')
+	global $gDataSourceName;
+	global $gDBUserName;
+	global $gDBUserPassword;
+	$output='';
+
+	$wgParser->disableCache();//disable cache because mobile and desktop skin requires different ways to render the barchart.
+
+	//get the title of the page
+	$pageTitle=$wgRequest->getVal( "title" ); //$wgTitle->getText(); doesn't work here because the special page is included in a normal wiki page.
+	//get rid of the underbars in the pageTitle
+	$trans = array("_" => " ");//, "hi" => "hello");
+	$pageTitle=strtr($pageTitle, $trans);
+	$encodedTitle=urlencode($pageTitle);
+
+	//Give a warning message when there are more than one choice tag in the page.
+	$detectSecondChoiceTag=md5($pageTitle).time();
+	$detectSecondChoiceTag2=md5($pageTitle).(time()-1);
+	if(isset($_SESSION[$detectSecondChoiceTag]) || isset($_SESSION[$detectSecondChoiceTag2]))
 	{
-		;
+		return "<strong>Warning:</strong> A survey page can only have one &lt;choice&gt; tag. Please <a href=\"index.php?title=$encodedTitle&action=edit\">edit</a> this page and put all your choices in ONE &lt;choice&gt; tag. If you need more than one set of choices, create another survey instead of using multiple &lt;choice&gt; tags.<br />";
+		exit;
 	}
+	$action=$wgRequest->getVal( "action" );
+	//if($action != 'submit' && $_GET['purgecache']!='true')//the session variable should not be set when submitting the page.
+	if($action != 'submit')
+		if(isset($_GET['purgecache']))
+			if($_GET['purgecache']!='true')
+				$_SESSION[$detectSecondChoiceTag]='1';
 
-	if ($startTime == $initDate)
-		$surveyStatus = 'ready';
-	else if ($endTime>$now)
-		$surveyStatus = 'active';
-	else if ($endTime< $now)
-		$surveyStatus = 'ended';
+	$background='null';
+	if(isset($argv['background']))
+	{
+		$imagelink=$argv['background'];
+		$pos=false;
+		$pos=stripos($imagelink,'[Image:');
+		if($pos!=false)//the image is specified as an internal link
+		{
+			$pos2=stripos($imagelink,']]');
+			$length=$pos2-$pos+1;
+			$imagename=substr($imagelink,$pos+7,$length-8);
+			$title = Title::makeTitleSafe( NS_IMAGE, $imagename );
+			$img = new Image( $title );
+			if($img->exists())
+			{
+				$siteName=$_SERVER['HTTP_HOST'];
+				$background=urlencode("http://".$siteName.$img->getURL());
+			}
+		}
+		else//the image is specified as an external link
+		{
+			$background=urlencode($imagelink);
+		}
+	}
+	$connectionstring = odbc_connect($gDataSourceName, $gDBUserName, $gDBUserPassword);
 
-	////////////
+	//SQL query
+	$Query = "SELECT * FROM page WHERE title = '$encodedTitle'";
 
+	//execute query
+	$queryexe = odbc_do($connectionstring, $Query);
+
+	//query database
+	$resultIsNull=TRUE;
+	$surveyStatus='ended';
+	$startTime='';
+	$endTime='';
+	$now='';
+	$pageID='';
+	$author='';
+	$teleVoteAllowed=1;
+	$anonymousVoteAllowed=true;
+	$votesAllowed=1;
+	$now=date("Y-m-d H:i:s");
+	$initDate= date("Y-m-d H:i:s", mktime(0, 0, 0, 1, 1, 2000));
+	$outsideAustralia=true;
+	//echo $encodedTitle;
+	if(odbc_fetch_row($queryexe))
+	{
+		$resultIsNull=FALSE;
+		//collect results
+		$author = odbc_result($queryexe, 'author');
+		$startTime = odbc_result($queryexe, 'startTime');
+		$endTime = odbc_result($queryexe, 'endTime');
+		$pageID = odbc_result($queryexe, 'pageID');
+		$votesAllowed = odbc_result($queryexe, 'votesAllowed');
+		$outsideAustralia = odbc_result($queryexe, 'invalidAllowed');
+
+		if ($startTime - $initDate==0)
+			$surveyStatus = 'ready';
+		else if ($endTime>$now)
+			$surveyStatus = 'active';
+		else if ($endTime< $now)
+			$surveyStatus = 'ended';
+		$teleVoteAllowed = odbc_result($queryexe, 'teleVoteAllowed');
+		$anonymousVoteAllowed = odbc_result($queryexe, 'anonymousAllowed');
+	}
+	else
+	{
 		if(!isset($_GET['purgecache']) && $wgUser->isLoggedIn())
 		{
 			$author=$wgUser->getName();
@@ -89,6 +136,7 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 				$anonymousVoteAllowed = odbc_result($queryexe2, 'anonymousAllowed');
 			}
 		}
+	}
 
 	//find the surveyID
 	$surveyID=0;
@@ -561,42 +609,9 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	//$output .="StartTime=$startTime<br />";
 	//$output .="EndTime=$endTime<br />";
 
-	$output .= $parser->recursiveTagParse('=Debug contents=');
-	foreach( $args as $name => $value )
-	{
-		$output .= '<strong>' . htmlspecialchars( $name ) . '</strong> = ' . htmlspecialchars( $value ). '<br />';
-	}
-	$output .= "\n\n" . nl2br(htmlspecialchars( $input ));
-	return $output;
+	//disconnect from database
+	odbc_close($connectionstring);
+
+    return $output;
 }
-
-	/*
-	$background='null';
-	if(isset($argv['background']))
-	{
-		$imagelink=$argv['background'];
-		$pos=false;
-		$pos=stripos($imagelink,'[Image:');
-		if($pos!=false)//the image is specified as an internal link
-		{
-			$pos2=stripos($imagelink,']]');
-			$length=$pos2-$pos+1;
-			$imagename=substr($imagelink,$pos+7,$length-8);
-			$title = Title::makeTitleSafe( NS_IMAGE, $imagename );
-			$img = new Image( $title );
-			if($img->exists())
-			{
-				$siteName=$_SERVER['HTTP_HOST'];
-				$background=urlencode("http://".$siteName.$img->getURL());
-			}
-		}
-		else//the image is specified as an external link
-		{
-			$background=urlencode($imagelink);
-		}
-	}
-	*/
-	//////////
-
-
 ?>

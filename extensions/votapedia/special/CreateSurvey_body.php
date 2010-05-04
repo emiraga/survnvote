@@ -2,6 +2,7 @@
 if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
+require_once("$gvPath/Common.php");
 require_once("$gvPath/FormControl.php");
 require_once("$gvPath/survey/VO/PageVO.php");
 require_once("$gvPath/survey/SurveyDAO.php");
@@ -156,21 +157,6 @@ class CreateSurvey extends SpecialPage {
 		$this->includable( true ); //we can include this from other pages
 	}
 	/**
-	 * Convert page title into a friendly form, shorter and trimmed
-	 * 
-	 * @param $mytitle
-	 */
-	private function getPageTitle($mytitle)
-	{
-		$mytitle = trim(stripslashes($mytitle));
-		if(strlen($mytitle)>50)
-		{
-			$mytitle=substr($mytitle,0,50);
-			$mytitle.='...';
-		}
-		return $mytitle;
-	}
-	/**
 	 * Get a list of categories
 	 * 
 	 * @param $category Name of a category
@@ -235,35 +221,14 @@ class CreateSurvey extends SpecialPage {
 	function insertPage($values)
 	{
 		global $wgRequest, $wgUser;
-		$newtitle = $values[titleorquestion];
+		$newtitle = $values['titleorquestion'];
 		$author = $wgUser->getName();
 		
 		$wikiText='';
-		$newtitle = trim(stripslashes($newtitle));
-		$wikiText.="===$newtitle===\n";
-		$newtitle = $this->getPageTitle($newtitle);
+		$wikiText.="===".trim(stripslashes($newtitle))."===\n";
+		$newtitle = $this->vfGetPageTitle($newtitle);
 		$encodedTitle=urlencode($newtitle);
 
-		$wikiText.= '<SurveyChoices type="simple"';
-		foreach( $values as $id => $value )
-		{
-			if($id != 'choices')
-				$wikiText.= ' '.$id.'="'.$value.'"';
-		}
-		$wikiText.= ">\n";
-		
-		$wikiText .= htmlspecialchars( trim($values['choices']) );
-		
-		$wikiText.="\r\n</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
-		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";
-
-		$article = new Article( Title::newFromText( $newtitle ) );
-		$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
-		if($status->hasMessage('edit-already-exists'))
-			return '<li>Article Already exists</li>';
-		if(!$status->isGood())
-			return '<li>Error has occured while creating a new page</li>';
-		
 		try
 		{
 			$page = new PageVO();
@@ -289,6 +254,17 @@ class CreateSurvey extends SpecialPage {
 			$article->doDeleteArticle('Error while inserting to voting database');
 			return '<li>'.$e->getMessage().'</li>';
 		}
+		
+		$wikiText.='<SurveyChoices type="simple" page_id="'+ $page->getPageID() +'" >';
+		$wikiText.="</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
+		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";
+		
+		$article = new Article( Title::newFromText( $newtitle ) );
+		$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
+		if($status->hasMessage('edit-already-exists'))
+			return '<li>Article Already exists</li>';
+		if(!$status->isGood())
+			return '<li>Error has occured while creating a new page</li>';
 	}
 	/**
 	 * Mandatory execute function for a Special Page
@@ -318,7 +294,7 @@ class CreateSurvey extends SpecialPage {
 				if(! $error)
 				{
 					global $wgOut;
-					$mytitle = $this->getPageTitle($this->form->values[titleorquestion]);
+					$mytitle = $this->vfGetPageTitle($this->form->values[titleorquestion]);
 					$titleObj = Title::newFromText( $mytitle );
 
 					$wgOut->addHTML( '<div class="successbox"><strong>'.wfMsg('survey-created', $mytitle).'</strong></div>' );
@@ -351,7 +327,7 @@ class CreateSurvey extends SpecialPage {
 
 		if($errors)
 		{
-			$wgOut->addWikiText( '<div class="errorbox"><strong><ul>'.$errors.'</ul></strong></div>' );
+			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 		}
 		$this->form->StartForm( $wgTitle->escapeLocalURL(), 'mw-preferences-form' );
 

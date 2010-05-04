@@ -97,7 +97,7 @@ class SurveyDAO
 	 * @param $pageVO PageVO
 	 * @param $insertSurveys should surveys be inserted as well
 	 */
-	public function insertPage(PageVO $pageVO, $insertSurveys = false)
+	public function insertPage(PageVO &$pageVO, $insertSurveys = false)
 	{
 		global $gDB;
 

@@ -141,3 +141,5 @@ include("extensions/Gnuplot/Gnuplot.php");
 $wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
 
 require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
+
+// votapedia.webhop.org
