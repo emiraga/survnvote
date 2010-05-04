@@ -134,5 +134,10 @@ $wgUseAjax = true;
 
 $wgShowExceptionDetails = true;
 $wgDisableCounters = true;
-$wgDebugLogFile = "{$IP}/debug.log.txt";
+#$wgDebugLogFile = "{$IP}/debug.log.txt";
 $wgEnableSidebarCache = true;
+
+include("extensions/Gnuplot/Gnuplot.php");
+$wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
+
+require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
