@@ -1,325 +1,1 @@
-<?php
-/**
- * Contain everything related to <math> </math> parsing
- * @file
- * @ingroup Parser
- */
-
-/**
- * Takes LaTeX fragments, sends them to a helper program (texvc) for rendering
- * to rasterized PNG and HTML and MathML approximations. An appropriate
- * rendering form is picked and returned.
- *
- * @author Tomasz Wegrzanowski, with additions by Brion Vibber (2003, 2004)
- * @ingroup Parser
- */
-class MathRenderer {
-	var $mode = MW_MATH_MODERN;
-	var $tex = '';
-	var $inputhash = '';
-	var $hash = '';
-	var $html = '';
-	var $mathml = '';
-	var $conservativeness = 0;
-
-	function __construct( $tex, $params=array() ) {
-		$this->tex = $tex;
-		$this->params = $params;
- 	}
-
-	function setOutputMode( $mode ) {
-		$this->mode = $mode;
-	}
-
-	function render() {
-		global $wgTmpDirectory, $wgInputEncoding;
-		global $wgTexvc;
-		$fname = 'MathRenderer::render';
-
-		if( $this->mode == MW_MATH_SOURCE ) {
-			# No need to render or parse anything more!
-			return ('$ '.htmlspecialchars( $this->tex ).' $');
-		}
-		if( $this->tex == '' ) {
-			return; # bug 8372
-		}
-
-		if( !$this->_recall() ) {
-			# Ensure that the temp and output directories are available before continuing...
-			if( !file_exists( $wgTmpDirectory ) ) {
-				if( !wfMkdirParents( $wgTmpDirectory ) ) {
-					return $this->_error( 'math_bad_tmpdir' );
-				}
-			} elseif( !is_dir( $wgTmpDirectory ) || !is_writable( $wgTmpDirectory ) ) {
-				return $this->_error( 'math_bad_tmpdir' );
-			}
-
-			if( function_exists( 'is_executable' ) && !is_executable( $wgTexvc ) ) {
-				return $this->_error( 'math_notexvc' );
-			}
-			$cmd = $wgTexvc . ' ' .
-					escapeshellarg( $wgTmpDirectory ).' '.
-					escapeshellarg( $wgTmpDirectory ).' '.
-					escapeshellarg( $this->tex ).' '.
-					escapeshellarg( $wgInputEncoding );
-
-			if ( wfIsWindows() ) {
-				# Invoke it within cygwin sh, because texvc expects sh features in its default shell
-				$cmd = 'sh -c ' . wfEscapeShellArg( $cmd );
-			}
-
-			wfDebug( "TeX: $cmd\n" );
-			$contents = `$cmd`;
-			wfDebug( "TeX output:\n $contents\n---\n" );
-
-			if (strlen($contents) == 0) {
-				return $this->_error( 'math_unknown_error' );
-			}
-
-			$retval = substr ($contents, 0, 1);
-			$errmsg = '';
-			if (($retval == 'C') || ($retval == 'M') || ($retval == 'L')) {
-				if ($retval == 'C') {
-					$this->conservativeness = 2;
-				} else if ($retval == 'M') {
-					$this->conservativeness = 1;
-				} else {
-					$this->conservativeness = 0;
-				}
-				$outdata = substr ($contents, 33);
-
-				$i = strpos($outdata, "\000");
-
-				$this->html = substr($outdata, 0, $i);
-				$this->mathml = substr($outdata, $i+1);
-			} else if (($retval == 'c') || ($retval == 'm') || ($retval == 'l'))  {
-				$this->html = substr ($contents, 33);
-				if ($retval == 'c') {
-					$this->conservativeness = 2;
-				} else if ($retval == 'm') {
-					$this->conservativeness = 1;
-				} else {
-					$this->conservativeness = 0;
-				}
-				$this->mathml = NULL;
-			} else if ($retval == 'X') {
-				$this->html = NULL;
-				$this->mathml = substr ($contents, 33);
-				$this->conservativeness = 0;
-			} else if ($retval == '+') {
-				$this->html = NULL;
-				$this->mathml = NULL;
-				$this->conservativeness = 0;
-			} else {
-				$errbit = htmlspecialchars( substr($contents, 1) );
-				switch( $retval ) {
-					case 'E':
-						$errmsg = $this->_error( 'math_lexing_error', $errbit );
-						break;
-					case 'S':
-						$errmsg = $this->_error( 'math_syntax_error', $errbit );
-						break;
-					case 'F':
-						$errmsg = $this->_error( 'math_unknown_function', $errbit );
-						break;
-					default:
-						$errmsg = $this->_error( 'math_unknown_error', $errbit );
-				}
-			}
-
-			if ( !$errmsg ) {
-				 $this->hash = substr ($contents, 1, 32);
-			}
-
-			wfRunHooks( 'MathAfterTexvc', array( &$this, &$errmsg ) );
-
-			if ( $errmsg ) {
-				 return $errmsg;
-			}
-
-			if (!preg_match("/^[a-f0-9]{32}$/", $this->hash)) {
-				return $this->_error( 'math_unknown_error' );
-			}
-
-			if( !file_exists( "$wgTmpDirectory/{$this->hash}.png" ) ) {
-				return $this->_error( 'math_image_error' );
-			}
-
-			if( filesize( "$wgTmpDirectory/{$this->hash}.png" ) == 0 ) {
-				return $this->_error( 'math_image_error' );
-			}
-
-			$hashpath = $this->_getHashPath();
-			if( !file_exists( $hashpath ) ) {
-				if( !@wfMkdirParents( $hashpath, 0755 ) ) {
-					return $this->_error( 'math_bad_output' );
-				}
-			} elseif( !is_dir( $hashpath ) || !is_writable( $hashpath ) ) {
-				return $this->_error( 'math_bad_output' );
-			}
-
-			if( !rename( "$wgTmpDirectory/{$this->hash}.png", "$hashpath/{$this->hash}.png" ) ) {
-				return $this->_error( 'math_output_error' );
-			}
-
-			# Now save it back to the DB:
-			if ( !wfReadOnly() ) {
-				$outmd5_sql = pack('H32', $this->hash);
-
-				$md5_sql = pack('H32', $this->md5); # Binary packed, not hex
-
-				$dbw = wfGetDB( DB_MASTER );
-				$dbw->replace( 'math', array( 'math_inputhash' ),
-				  array(
-					'math_inputhash' => $dbw->encodeBlob($md5_sql),
-					'math_outputhash' => $dbw->encodeBlob($outmd5_sql),
-					'math_html_conservativeness' => $this->conservativeness,
-					'math_html' => $this->html,
-					'math_mathml' => $this->mathml,
-				  ), $fname
-				);
-			}
-			
-			// If we're replacing an older version of the image, make sure it's current.
-			global $wgUseSquid;
-			if ( $wgUseSquid ) {
-				$urls = array( $this->_mathImageUrl() );
-				$u = new SquidUpdate( $urls );
-				$u->doUpdate();
-			}
-		}
-
-		return $this->_doRender();
-	}
-
-	function _error( $msg, $append = '' ) {
-		$mf   = htmlspecialchars( wfMsg( 'math_failure' ) );
-		$errmsg = htmlspecialchars( wfMsg( $msg ) );
-		$source = htmlspecialchars( str_replace( "\n", ' ', $this->tex ) );
-		return "<strong class='error'>$mf ($errmsg$append): $source</strong>\n";
-	}
-
-	function _recall() {
-		global $wgMathDirectory;
-		$fname = 'MathRenderer::_recall';
-
-		$this->md5 = md5( $this->tex );
-		$dbr = wfGetDB( DB_SLAVE );
-		$rpage = $dbr->selectRow( 'math',
-			array( 'math_outputhash','math_html_conservativeness','math_html','math_mathml' ),
-			array( 'math_inputhash' => $dbr->encodeBlob(pack("H32", $this->md5))), # Binary packed, not hex
-			$fname
-		);
-
-		if( $rpage !== false ) {
-			# Tailing 0x20s can get dropped by the database, add it back on if necessary:
-			$xhash = unpack( 'H32md5', $dbr->decodeBlob($rpage->math_outputhash) . "                " );
-			$this->hash = $xhash ['md5'];
-
-			$this->conservativeness = $rpage->math_html_conservativeness;
-			$this->html = $rpage->math_html;
-			$this->mathml = $rpage->math_mathml;
-
-			$filename = $this->_getHashPath() . "/{$this->hash}.png";
-			if( file_exists( $filename ) ) {
-				if( filesize( $filename ) == 0 ) {
-					// Some horrible error corrupted stuff :(
-					@unlink( $filename );
-				} else {
-					return true;
-				}
-			}
-
-			if( file_exists( $wgMathDirectory . "/{$this->hash}.png" ) ) {
-				$hashpath = $this->_getHashPath();
-
-				if( !file_exists( $hashpath ) ) {
-					if( !@wfMkdirParents( $hashpath, 0755 ) ) {
-						return false;
-					}
-				} elseif( !is_dir( $hashpath ) || !is_writable( $hashpath ) ) {
-					return false;
-				}
-				if ( function_exists( "link" ) ) {
-					return link ( $wgMathDirectory . "/{$this->hash}.png",
-							$hashpath . "/{$this->hash}.png" );
-				} else {
-					return rename ( $wgMathDirectory . "/{$this->hash}.png",
-							$hashpath . "/{$this->hash}.png" );
-				}
-			}
-
-		}
-
-		# Missing from the database and/or the render cache
-		return false;
-	}
-
-	/**
-	 * Select among PNG, HTML, or MathML output depending on
-	 */
-	function _doRender() {
-		if( $this->mode == MW_MATH_MATHML && $this->mathml != '' ) {
-			return Xml::tags( 'math',
-				$this->_attribs( 'math',
-					array( 'xmlns' => 'http://www.w3.org/1998/Math/MathML' ) ),
-				$this->mathml );
-		}
-		if (($this->mode == MW_MATH_PNG) || ($this->html == '') ||
-		   (($this->mode == MW_MATH_SIMPLE) && ($this->conservativeness != 2)) ||
-		   (($this->mode == MW_MATH_MODERN || $this->mode == MW_MATH_MATHML) && ($this->conservativeness == 0))) {
-			return $this->_linkToMathImage();
-		} else {
-			return Xml::tags( 'span',
-				$this->_attribs( 'span',
-					array( 'class' => 'texhtml' ) ),
-				$this->html );
-		}
-	}
-
-	function _attribs( $tag, $defaults=array(), $overrides=array() ) {
-		$attribs = Sanitizer::validateTagAttributes( $this->params, $tag );
-		$attribs = Sanitizer::mergeAttributes( $defaults, $attribs );
-		$attribs = Sanitizer::mergeAttributes( $attribs, $overrides );
-		return $attribs;
-	}
-
-	function _linkToMathImage() {
-		$url = $this->_mathImageUrl();
-
-		return Xml::element( 'img',
-			$this->_attribs(
-				'img',
-				array(
-					'class' => 'tex',
-					'alt' => $this->tex ),
-				array(
-					'src' => $url ) ) );
-	}
-
-	function _mathImageUrl() {
-		global $wgMathPath;
-		$dir = $this->_getHashSubPath();
-		return "$wgMathPath/$dir/{$this->hash}.png";
-	}
-	
-	function _getHashPath() {
-		global $wgMathDirectory;
-		$path = $wgMathDirectory .'/' . $this->_getHashSubPath();
-		wfDebug( "TeX: getHashPath, hash is: $this->hash, path is: $path\n" );
-		return $path;
-	}
-	
-	function _getHashSubPath() {
-		return substr($this->hash, 0, 1)
-					.'/'. substr($this->hash, 1, 1)
-					.'/'. substr($this->hash, 2, 1);
-	}
-
-	public static function renderMath( $tex, $params=array() ) {
-		global $wgUser;
-		$math = new MathRenderer( $tex, $params );
-		$math->setOutputMode( $wgUser->getOption('math'));
-		return $math->render();
-	}
-}
+<?php/** * LaTeX Rendering Class * Copyright (C) 2003  Benjamin Zeiss <zeiss@math.uni-goettingen.de> * * This library is free software; you can redistribute it and/or * modify it under the terms of the GNU Lesser General Public * License as published by the Free Software Foundation; either * version 2.1 of the License, or (at your option) any later version. * * This library is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU * Lesser General Public License for more details. * * You should have received a copy of the GNU Lesser General Public * License along with this library; if not, write to the Free Software * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA * -------------------------------------------------------------------- * @author Benjamin Zeiss <zeiss@math.uni-goettingen.de> * @version v0.8 * @package latexrender * */ /** * Error code: * 1. Too long formulas * 2. formula contains tags in the blacklist * 3. formula incorrect, can't be render * 4. can't exec tex command *    maybe directory unwritable,can't create temporary files * 5. formula image too big * 6. can't copy image file to cahed formula directory *    maybe ImageMagick fail */  class LatexRender {     // ====================================================================================    // Variable Definitions    // ====================================================================================    var $_picture_path = "";    var $_picture_path_httpd = "";    var $_tmp_dir = "";    // i was too lazy to write mutator functions for every single program used    // just access it outside the class or change it here if nescessary    var $_latex_path    = 'latex.exe';    var $_dvips_path    = 'dvips.exe';    var $_convert_path  = 'convert.exe';    var $_identify_path = 'identify.exe';     var $_formula_density = 120;    var $_xsize_limit = 700;    var $_ysize_limit = 700;    var $_string_length_limit = 800;    var $_font_size = 10;    var $_latexclass = "article"; //install extarticle class if you wish to have smaller font sizes    var $_tmp_filename;        var $_image_format = "png"; //change to gif if you prefer but it's not clear    // this most certainly needs to be extended. in the long term it is planned to use    // a positive list for more security. this is hopefully enough for now. i'd be glad    // to receive more bad tags !    var $_latex_tags_blacklist = array(        "include","def","command","loop","repeat","open","toks","output","input",        "catcode","name","^^",        "\\every","\\errhelp","\\errorstopmode","\\scrollmode","\\nonstopmode","\\batchmode",        "\\read","\\write","csname","\\newhelp","\\uppercase", "\\lowercase","\\relax","\\aftergroup",        "\\afterassignment","\\expandafter","\\noexpand","\\special"        );    var $_errorcode = 0;        var $_errorextra = "";      // ====================================================================================    // constructor    // ====================================================================================     /**     * Initializes the class     *     * @param string path where the rendered pictures should be stored     * @param string same path, but from the httpd chroot     */    function LatexRender($picture_path,$picture_path_httpd,$tmp_dir) {        $this->_picture_path = $picture_path;        $this->_picture_path_httpd = $picture_path_httpd;        $this->_tmp_dir = $tmp_dir;        $this->_tmp_filename = md5(rand());    }     // ====================================================================================    // public functions    // ====================================================================================     /**     * Picture path Mutator function     *     * @param string sets the current picture path to a new location     */    function setPicturePath($name) {        $this->_picture_path = $name;    }     /**     * Picture path Mutator function     *     * @returns the current picture path     */    function getPicturePath() {        return $this->_picture_path;    }     /**     * Picture path HTTPD Mutator function     *     * @param string sets the current httpd picture path to a new location     */    function setPicturePathHTTPD($name) {        $this->_picture_path_httpd = $name;    }     /**     * Picture path HTTPD Mutator function     *     * @returns the current picture path     */    function getPicturePathHTTPD() {        return $this->_picture_path_httpd;    }     /**     * Tries to match the LaTeX Formula given as argument against the     * formula cache. If the picture has not been rendered before, it'll     * try to render the formula and drop it in the picture cache directory.     *     * @param string formula in LaTeX format     * @returns the webserver based URL to a picture which contains the     * requested LaTeX formula. If anything fails, the resultvalue is false.     */    function getFormulaURL($latex_formula) {        // circumvent certain security functions of web-software which        // is pretty pointless right here         $latex_formula = preg_replace("/>/i", ">", $latex_formula);        $latex_formula = preg_replace("/</i", "<", $latex_formula);         $formula_hash = md5($latex_formula);         $filename = 'math-' . $formula_hash.".".$this->_image_format;        $full_path_filename = $this->getPicturePath()."/".$filename;         if (is_file($full_path_filename)) {            return $this->getPicturePathHTTPD()."/".$filename;        } else {            // security filter: reject too long formulas            if (strlen($latex_formula) > $this->_string_length_limit) {                $this->_errorcode = 1;                return false;            }             // security filter: try to match against LaTeX-Tags Blacklist            for ($i=0;$i<sizeof($this->_latex_tags_blacklist);$i++) {                if (stristr($latex_formula,$this->_latex_tags_blacklist[$i])) {                        $this->_errorcode = 2;                    return false;                }            }             // security checks assume correct formula, let's render it            if ($this->renderLatex($latex_formula)) {               return $this->getPicturePathHTTPD()."/".$filename;            } else {                $this->_errorcode = 3;                return false;            }        }    }     // ====================================================================================    // private functions    // ====================================================================================     /**     * wraps a minimalistic LaTeX document around the formula and returns a string     * containing the whole document as string. Customize if you want other fonts for     * example.     *     * @param string formula in LaTeX format     * @returns minimalistic LaTeX document containing the given formula     */    function wrap_formula($latex_formula) {#        $string  = "\documentclass[".$this->_font_size."pt]{".$this->_latexclass."}\n";#        $string .= "\usepackage[latin1]{inputenc}\n";        $string  = "\documentclass{".$this->_latexclass."}\n";        $string .= "\usepackage{amsmath}\n";        $string .= "\usepackage{amsfonts}\n";        $string .= "\usepackage{amssymb}\n";        $string .= "\pagestyle{empty}\n";        $string .= "\begin{document}\n";        $string .= "$".$latex_formula."$\n";        $string .= "\end{document}\n";         return $string;    }     /**     * returns the dimensions of a picture file using 'identify' of the     * imagemagick tools. The resulting array can be adressed with either     * $dim[0] / $dim[1] or $dim["x"] / $dim["y"]     *     * @param string path to a picture     * @returns array containing the picture dimensions     */    function getDimensions($filename) {        $output=exec($this->_identify_path." ".$filename);              //For some reason this didn't work for me, I used              //$commander = "identify ".$filename;              //$output=exec($commander);              //instead. This should work if Identify works on the commandline        $result=explode(" ",$output);        $dim=explode("x",$result[2]);        $dim["x"] = $dim[0];        $dim["y"] = $dim[1];         return $dim;    }     /**     * Renders a LaTeX formula by the using the following method:     *  - write the formula into a wrapped tex-file in a temporary directory     *    and change to it     *  - Create a DVI file using latex (tetex)     *  - Convert DVI file to Postscript (PS) using dvips (tetex)     *  - convert, trim and add transparancy by using 'convert' from the     *    imagemagick package.     *  - Save the resulting image to the picture cache directory using an     *    md5 hash as filename. Already rendered formulas can be found directly     *    this way.     *     * @param string LaTeX formula     * @returns true if the picture has been successfully saved to the picture     *          cache directory     */    function renderLatex($latex_formula) {        $latex_document = $this->wrap_formula($latex_formula);         $current_dir = getcwd();         chdir($this->_tmp_dir);         // create temporary latex file        $fp = fopen($this->_tmp_dir."/".$this->_tmp_filename.".tex","a+");        fputs($fp,$latex_document);        fclose($fp);         // create temporary dvi file        // The \"'s are used in case the path has spaces in it (same as below for dvi)        $command = "\"".$this->_latex_path."\" --interaction=nonstopmode ".$this->_tmp_filename.".tex";            //In my case this didn't output in the right directory (amongst other things)            //so I hardcoded everything in (If you use this, adjust it to your directories)            //$command = "\"C:\Program Files\MiKTeX\miktex\bin\latex\" --output-directory=D:\Wiki\www\images\\tmp\\ --interaction=nonstopmode D:\Wiki\www\images\\tmp\\".$this->_tmp_filename.".tex";         $status_code = exec($command);         if (!$status_code) {                 $this->cleanTemporaryDirectory();                 chdir($current_dir);                 $this->_errorcode = 4;                 return false;         }         // convert dvi file to postscript using dvips        $command = "\"".$this->_dvips_path."\" -q -E ".$this->_tmp_filename.".dvi"." -o ".$this->_tmp_filename.".ps";        $status_code = exec($command);         // imagemagick convert ps to image and trim picture        $command = $this->_convert_path." -density ".$this->_formula_density.                    " -trim -transparent \"#FFFFFF\" ".$this->_tmp_filename.".ps ".                    $this->_tmp_filename.".".$this->_image_format;         $status_code = exec($command);         // test picture for correct dimensions        $dim = $this->getDimensions($this->_tmp_filename.".".$this->_image_format);         if ( ($dim["x"] > $this->_xsize_limit) or ($dim["y"] > $this->_ysize_limit)) {            $this->cleanTemporaryDirectory();            chdir($current_dir);            $this->_errorcode = 5;            $this->_errorextra = ": " . $dim["x"] . "x" . number_format($dim["y"],0,"","");            return false;        }         // copy temporary formula file to cached formula directory        $latex_hash = md5($latex_formula);        $filename = $this->getPicturePath()."/math-".$latex_hash.".".$this->_image_format;         $status_code = copy($this->_tmp_filename.".".$this->_image_format,$filename);         $this->cleanTemporaryDirectory();         if (!$status_code) {                 chdir($current_dir);                 $this->_errorcode = 6;                 return false;         }        chdir($current_dir);         return true;    }     /**     * Cleans the temporary directory     */    function cleanTemporaryDirectory() {         $current_dir = getcwd();        chdir($this->_tmp_dir);         unlink($this->_tmp_dir."/".$this->_tmp_filename.".tex");        unlink($this->_tmp_dir."/".$this->_tmp_filename.".aux");        unlink($this->_tmp_dir."/".$this->_tmp_filename.".log");        unlink($this->_tmp_dir."/".$this->_tmp_filename.".dvi");        unlink($this->_tmp_dir."/".$this->_tmp_filename.".ps");        unlink($this->_tmp_dir."/".$this->_tmp_filename.".".$this->_image_format);         chdir($current_dir);    } }/** * LaTeX Rendering Class - Calling function * Copyright (C) 2003  Benjamin Zeiss <zeiss@math.uni-goettingen.de> * * This library is free software; you can redistribute it and/or * modify it under the terms of the GNU Lesser General Public * License as published by the Free Software Foundation; either * version 2.1 of the License, or (at your option) any later version. * * This library is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU * Lesser General Public License for more details. * * You should have received a copy of the GNU Lesser General Public * License along with this library; if not, write to the Free Software * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA * -------------------------------------------------------------------- * @author Benjamin Zeiss <zeiss@math.uni-goettingen.de> * @version v0.8 * @package latexrender * Revised by Steve Mayer * This file can be included in many PHP programs by using something like (see example.php to see how it can be used) *              include_once('/full_path_here_to/latexrender/latex.php'); *              $text_to_be_converted=latex_content($text_to_be_converted); * $text_to_be_converted will then contain the link to the appropriate image * or an error code as follows (the 500 values can be altered in class.latexrender.php): *      0 OK *      1 Formula longer than 500 characters *      2 Includes a blacklisted tag *      3 (Not used) Latex rendering failed *      4 Cannot create DVI file *      5 Picture larger than 500 x 500 followed by x x y dimensions *      6 Cannot copy image to pictures directory */class MathRenderer { function renderMath($latex_formula) {         global $wgMathDirectory, $wgMathPath, $wgTmpDirectory,                        $wgLaTexCommand,                         $wgDvipsCommand,                        $wgImageMagickConvertCommand,                         $wgImageMagickIdentifyCommand;         $latex_formula = '\displaystyle ' . $latex_formula;        $latex = new LatexRender ($wgMathDirectory, $wgMathPath, $wgTmpDirectory);         #check Math dir        if(!file_exists($wgMathDirectory)) @mkdir($wgMathDirectory);        if(!file_exists($wgTmpDirectory)) @mkdir($wgTmpDirectory);          $latex->_latex_path          = $wgLaTexCommand;        $latex->_dvips_path          = $wgDvipsCommand;        $latex->_convert_path        = $wgImageMagickConvertCommand;        $latex->_identify_path       = $wgImageMagickIdentifyCommand;         $url = $latex->getFormulaURL($latex_formula);         $alt_latex_formula = htmlentities($latex_formula, ENT_QUOTES);        $alt_latex_formula = str_replace("\r","",$alt_latex_formula);        $alt_latex_formula = str_replace("\n","",$alt_latex_formula);        $alt_latex_formula = str_replace('\displaystyle ','',$alt_latex_formula);     if ($url != false)        $text = "<img src='$url' title='$alt_latex_formula' alt='$alt_latex_formula' class=\"tex\" />";    else        $text = "[Unparseable or potentially dangerous latex formula. Error $latex->_errorcode $latex->_errorextra]";     return $text; }}?>

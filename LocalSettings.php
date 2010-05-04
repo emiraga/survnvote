@@ -99,7 +99,12 @@ $wgEnableUploads       = true;
 
 ## If you have the appropriate support software installed
 ## you can enable inline LaTeX equations:
-$wgUseTeX           = false;
+$wgUseTeX           = true;
+
+$wgImageMagickConvertCommand    = 'C:\bin\ImageMagick\convert.exe';
+$wgImageMagickIdentifyCommand   = 'C:\bin\ImageMagick\identify.exe';
+$wgLaTexCommand                 = 'C:\bin\miktex\miktex\bin\latex.exe';
+$wgDvipsCommand                 = 'C:\bin\miktex\miktex\bin\dvips.exe';
 
 $wgLocalInterwiki   = strtolower( $wgSitename );
 
@@ -141,4 +146,5 @@ include("extensions/Gnuplot/Gnuplot.php");
 $wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
 
 require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
-// votapedia.webhop.org
+// Host: votapedia.webhop.org
+
