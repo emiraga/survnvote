@@ -23,23 +23,29 @@ $gvNumberPBX = '8116';
 $gvCountry = 'Malaysia';
 
 /**
- * Use different database for unit testing
- */
-if(defined('VOTAPEDIA_TEST')) //used for unit testing
-	$gvDataSourceName = "unittest";
-
-/**
  * Remove prefixes and suffixes in Category listing
  */
 $gvCatRemovePrefix = array('Surveys in ', 'Quizes in ');
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 
+
+/******************************************************************/
+/*** Do not edit items below unless you know what you are doing ***/
+/******************************************************************/
+
 /**
- * Votapedia script path, and extensions
+ * Use different database for unit testing. Do not edit.
+ */
+if(defined('VOTAPEDIA_TEST')) //used for unit testing
+	$gvDataSourceName = "unittest";
+
+/**
+ * Votapedia script path, and extensions. Do not edit.
  */
 $gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
-require_once( "$gvPath/survey/connection.php" );
-require_once( "$gvPath/survey/error.php" );
+$gvScript = "$wgScriptPath/extensions/votapedia";
+
+require_once( "$gvPath/Common.php" );
 require_once( "$gvPath/special/CreateSurvey.php" );
 require_once( "$gvPath/tag/SurveyChoices.php" );
 
@@ -48,5 +54,14 @@ require_once( "$gvPath/UserHooks.php" );
 #require_once( "$gvPath/special/CreateSurvey.php" );
 #require_once( "$gvPath/ChoiceTagExtension.php" );
 #require_once( "$gvPath/SpecialEmirTest.php" );
+
+/**
+ * Types of surveys, do not edit.
+ */
+define('vSIMPLE_SURVEY',1);
+define('vQUIZ',2);
+define('vRANK_EXPOSITIONS',3);
+define('vQUESTIONNAIRE', 4);
+define('vTEXT_RESPONSE', 5);
 
 ?>

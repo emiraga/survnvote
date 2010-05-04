@@ -37,7 +37,6 @@ class SurveyVO
 	{
 		$this->pageID = $id;
 	}
-
 	/**
 	 * Set an ID of this survey
 	 * @param $id
@@ -87,7 +86,6 @@ class SurveyVO
 		else
 			throw new SurveyException("Points of a question must be an Integer!",101);
 	}
-
 	/**
 	 * Set mulit choices of this survey
 	 * @param $choices
@@ -96,18 +94,40 @@ class SurveyVO
 	{
 		$this->choices = $choices;
 	}
-
 	/**
-	 * Set mulit presentation of this survey
+	 * Generate choices from the array of strings
+	 * 
+	 * @param $values array of strings
+	 */
+	function generateChoices(array $values)
+	{
+		$choices = array();
+		foreach($values as $value)
+		{
+			$value = trim($value);
+			if(strlen($value)<1)
+				continue;
+			$choice = new ChoiceVO();
+			$choice->setSurveyID( $this->getSurveyID() );
+			$choice->setChoice($value);
+			$choice->setVote(0);
+			$choice->setPoints(0);
+			$choices[] = $choice;
+		}
+		$this->setChoices($choices);
+	}
+	/**
+	 * Set multiple presentations of this survey
+	 * 
 	 * @param $presentations
 	 */
 	function setPresentations(array $presentations)
 	{
 		$this->presentations = $presentations;
 	}
-
 	/**
-	 * set type of Survey
+	 * Set type of Survey
+	 * 
 	 * @param $surveyType
 	 */
 	function setType($surveyType)
@@ -122,7 +142,6 @@ class SurveyVO
 	{
 		$this->invalidAllowed = $invalidAllowed;
 	}
-
 	/**
 	 * Set number of votes allowed per one user
 	 * 
@@ -132,7 +151,6 @@ class SurveyVO
 	{
 		$this->votesAllowed = $votesAllowed;
 	}
-
 	/**
 	 * get page ID
 	 * @return Integer $pageID
@@ -141,7 +159,6 @@ class SurveyVO
 	{
 		return $this->pageID;
 	}
-
 	/**
 	 * get survey ID of this survey
 	 * @return integer ID of the survey which contains this choice
@@ -184,7 +201,6 @@ class SurveyVO
 	{
 		return $this->surveyType;
 	}
-
 	/**
 	 * Check wether the survey allows invalid calls (-1) to vote
 	 * @return allow as 1, forbid as 0
@@ -332,8 +348,5 @@ class SurveyVO
 		return $xml;
 	}
 }
-
-
-
 
 ?>

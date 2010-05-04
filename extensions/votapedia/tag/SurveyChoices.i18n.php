@@ -4,6 +4,6 @@ if (!defined('MEDIAWIKI')) die();
 $messages = array();
  
 $messages['en'] = array( 
-	'not-found' => 'Page "$1" not found.',
+	'id-not-found' => 'Page identifier "$1" was not found.',
 );
 ?>

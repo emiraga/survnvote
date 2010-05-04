@@ -24,6 +24,7 @@ if (!defined('MEDIAWIKI')) die();
 	 
 	 /**
 	 * Get the choice content of this choice
+	 * 
 	 * @return string choice content of this coice
 	 */
  	 public function getChoice()

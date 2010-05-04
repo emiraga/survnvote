@@ -1,4 +1,6 @@
 <?php
+old_stuff();
+
 if (!defined('MEDIAWIKI')) die();
 /**
  * This page is used to error handle function.

@@ -4,7 +4,6 @@ if (!defined('MEDIAWIKI')) die();
 $wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
 $wgExtensionMessagesFiles['SurveyChoices'] = "$gvPath/tag/SurveyChoices.i18n.php";
 
-require_once("$gvPath/Common.php");
 require_once("$gvPath/survey/SurveyDAO.php");
 
 /**
@@ -29,166 +28,124 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	wfLoadExtensionMessages('SurveyChoices');
 	$parser->disableCache();
 	$output = '';
-	//
-	// We don't trust the Title of a wiki page, instead we trust to the
-	// question which has been written in the page text.
-	//
-	$title = vfGetPageTitle($args['titleorquestion']);
-	
+	$page_id = $args['pageid'];
 	$surveydao = new SurveyDAO();
-	try{
-		$page = $surveydao->findByPage( urlencode($title) );
+	
+	try {
+		$page = $surveydao->findByPageID( $page_id );
 	}
-	catch(SurveyException $e)
-	{
-		return vfErrorBox( wfMsg('not-found', htmlspecialchars(urldecode($title))) );
+	catch(SurveyException $e) {
+		return vfErrorBox( wfMsg('id-not-found', htmlspecialchars($page_id)) );
 	}
+
+	$title = htmlspecialchars( $page->getTitle() );
 
 	global $wgRequest, $wgUser, $wgParser, $wgTitle, $wgOut;
-	
-	$action=$wgRequest->getVal( "action" );
-	if($action != 'submit')
-	{
-		;
-	}
 
-	if ($startTime == $initDate)
+	$starttime = mktime($page->getStartTime());
+	$endtime = mktime($page->getEndTime());
+	$now = time();
+
+	$surveyStatus = 'ready';
+	if ($starttime == $endtime)
 		$surveyStatus = 'ready';
-	else if ($endTime>$now)
+	else if ($starttime <= $now && $now <= $endtime)
 		$surveyStatus = 'active';
-	else if ($endTime< $now)
+	else if ($endtime < $now)
 		$surveyStatus = 'ended';
 
-	////////////
+	$userName = $wgUser->getName();
 
-		if(!isset($_GET['purgecache']) && $wgUser->isLoggedIn())
-		{
-			$author=$wgUser->getName();
-			$insertSQL="INSERT INTO page (title,author,startTime,endTime,createTime,duration) VALUES ('$encodedTitle','$author','$initDate','$initDate','$now',1)";
-			odbc_do($connectionstring, $insertSQL);
-			//execute query
-			$queryexe2 = odbc_do($connectionstring, $Query);
+	$timeleft = $endtime - $starttime;
 
-			//query database
-			if(odbc_fetch_row($queryexe2))
-			{
-				//collect results
-				$author = odbc_result($queryexe2, 'author');
-				$startTime = odbc_result($queryexe2, 'startTime');
-				$endTime = odbc_result($queryexe2, 'endTime');
-				$pageID = odbc_result($queryexe2, 'pageID');
+	$action=$wgRequest->getVal( "action" );
+	
+	$output.='<form action="./database/processSurvey.php" method="post"><table cellspacing="0" style="font-size:large">';
+	$output .= '<tr><td valign="top"><img src="./database/spacer.gif" />';
+	// put an 250*1 spacer image above the choices so that the text doesn't get 
+	// squashed by the graph when browser is less than full screen.
 
+	$survey = $page->getSurveys();
+	$choices = $survey[0]->getChoices();
 
-				if ($startTime - $initDate==0)
-					$surveyStatus = 'ready';
-				else if ($endTime>$now)
-					$surveyStatus = 'active';
-				else if ($endTime< $now)
-					$surveyStatus = 'ended';
-				$teleVoteAllowed = odbc_result($queryexe2, 'teleVoteAllowed');
-				$anonymousVoteAllowed = odbc_result($queryexe2, 'anonymousAllowed');
-			}
-		}
-
-	//find the surveyID
-	$surveyID=0;
-	if($surveyStatus=='active' || $surveyStatus=='ended')
-	{
-		$Query2 = "SELECT * FROM survey WHERE pageID = '$pageID'";
-		$queryexe = odbc_do($connectionstring, $Query2);
-		if(odbc_fetch_row($queryexe))
-		{
-			$surveyID = odbc_result($queryexe, 'surveyID');
-		}
-	}
-	//determine whether the current user is the creator of the survey.
-	$userName=$wgUser->getName();
-	if($wgUser->isLoggedIn())
-		$wgUser->setCookies();
-	$currTimeStamp=time();
-	$startTimeStamp=strtotime($startTime);
-	$endTimeStamp=strtotime($endTime);
-	$timeleft=$endTimeStamp-$currTimeStamp;
-
-	//add instructions
 	if($surveyStatus=='ready')
 	{
-		if($userName==$author)
+		$output.='<ul>';
+		//get choices from wiki text
+		$i=0;
+		foreach ($choices as $choice)
 		{
-			$output.="<div><a href=\"index.php?title=$encodedTitle&action=edit\">Edit</a> this page to add your question and survey information here and <a href=\"index.php?title=$encodedTitle&action=edit\">edit</a> the choices below. You can also add more choices.</div>";
+			$choiceWiki = $choice->getChoice();
+			
+			$parsedChoice=$wgParser->parse($choiceWiki, $wgTitle, $wgOut->parserOptions(), false ,false);
+			$choice=$parsedChoice->getText();
+
+			if($choice!="")
+			{
+                $choiceContent=strip_tags($choice);
+				$choiceWiki=urlencode($choiceWiki);
+				$i++;
+				$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().")\"><label id=\"q$i\">$i. $choice</label></li>";
+			}
+		}
+		$output.='</ul>';
+		if($userName == $page -> getAuthor() )
+		{
+			$output.='<p style="margin:10px 10px 10px 10px"><input type="submit" name="Submit" value="Start survey" /></p></td>';
+			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px"><img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" alt="sample graph" /></div></td></tr>';
 		}
 		else
 		{
-			$output.="<div>This survey is created by $author and still under construction, you can <a href=\"index.php?title=$encodedTitle&action=edit\">edit</a> this page if you have permission form $author.</div>";
+			$output.='</ul></td></tr>';
 		}
 	}
-	$output.='<form action="./database/processSurvey.php?" method="post"><table cellspacing="0" style="font-size:large">';
-	$encodedTitle=urlencode($pageTitle);
-	$output.="<INPUT TYPE=\"Hidden\" NAME=\"title\" VALUE=\"$encodedTitle\" />";
-	
-	//* Added by INTEG
-	if (substr($input,0,1) == "\n")
-		$input=substr($input,1,strlen($input));
-	if (substr($input,strlen($input)-1,1) == "\n")
-		$input=substr($input,0,strlen($input)-1);	
-	// Added by INTEG *//
-	
-	$content=explode("\n",$input);
-	$i=0;
-	$output .= '<tr><td valign="top"><img src="./database/spacer.gif" /><ul>';//put an 250*1 spacer image above the choices so that the text doesn't get squashed by the graph when browser is less than full screen.
-	if($surveyStatus=='ready' || $surveyStatus=='ended')
+	elseif($surveyStatus=='ended')
 	{
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"title\" VALUE=\"$encodedTitle\" />";
-
-		$multipleVoteAllowed='no';
-		if(isset($argv["multiplevoting"]))
-			$multipleVoteAllowed=$argv["multiplevoting"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"multiplevoting\" VALUE=\"$multipleVoteAllowed\" />";
-
-		$anonymousVoteAllowed='yes';
-		if(isset($argv["anonymous"]))
-			$anonymousVoteAllowed=$argv["anonymous"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"anonymous\" VALUE=\"$anonymousVoteAllowed\" />";
-
-		$duration='1';
-		if(isset($argv["duration"]))
-			$duration=$argv["duration"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"duration\" VALUE=\"$duration\" />";
-
-		$SMSreply='no';
-		if(isset($argv["smsreply"]))
-			$SMSreply=$argv["smsreply"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"smsreply\" VALUE=\"$SMSreply\" />";
-
-		$telephoneVoting='yes';
-		if(isset($argv["telephonevoting"]))
-			$telephoneVoting=$argv["telephonevoting"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"telephonevoting\" VALUE=\"$telephoneVoting\" />";
-
-		$webVoting='yes';
-		if(isset($argv["webvoting"]))
-			$webVoting=$argv["webvoting"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"webvoting\" VALUE=\"$webVoting\" />";
-		
-		$phone=$wgUser->getMobilePhone();
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"phone\" VALUE=\"$phone\" />";
-
-		$resultsAtEnd='no';
-		if(isset($argv["resultsatend"]))
-			$resultsAtEnd=$argv["resultsatend"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"resultsatend\" VALUE=\"$resultsAtEnd\" />";
-
-		$displaytop='0';
-		if(isset($argv["displaytop"]))
-			$displaytop=$argv["displaytop"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"displaytop\" VALUE=\"$displaytop\" />";
-
-		$votesallowed='1';
-		if(isset($argv["votesallowed"]))
-			$votesallowed=$argv["votesallowed"];
-		$output.="<INPUT TYPE=\"Hidden\" NAME=\"votesallowed\" VALUE=\"$votesallowed\" />";
+		;
+	}elseif($surveyStatus == 'active')
+	{
+		;
+	}
+	
+	//add sms voting label
+	if($surveyStatus == 'active' && $teleVoteAllowed!=0 && $userName==$author)
+	{
+		$output.='<tr><td colspan=2>';
+		if($wgRequest->getVal('useskin')!='mobileskin')
+		{
+			$output.='<img src="sms.gif" />';
+		}
+		else
+		{
+			$output.='<img src="smss.gif" />';
+		}
+		$output.= 'To vote; ring a number above';
+		if($teleVoteAllowed!=2)
+			$output.=', use a web browser to visit this page';
+		$countryCode="";
+		if($outsideAustralia)
+			$countryCode=" +61";
+		$output.=' or SMS the <span style="color:#FF0000">red</span> digits corresponding to your choice to'.$countryCode.' 416906973.</td></tr>';
 	}
 
+	if($surveyStatus == 'ready')
+		$output .= '</table></form>';
+	else
+		$output .= '</table></form><p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
+	
+	return $output;
+	
+	#####################################
+	#####################################
+		#####################################
+		#####################################
+		#####################################
+		#####################################
+		#####################################
+		#####################################
+		#####################################
+		#####################################
+	
 	if($surveyStatus=='ended')
 	{
 		$receiver = array();
@@ -215,12 +172,11 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 		//add choices
 		foreach ($content as $choiceWiki)
 		{
-
-			//$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->mParserOptions, false ,false);
 			$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->ParserOptions(), false ,false);
 			
 			$choice=$parsedChoice->getText();
-			if($choice!=""){
+			if($choice!="")
+			{
 				$i++;
 				$colorIndex=fmod($i,50);//only 50 different colors are available
 				if($wgRequest->getVal('useskin')!='mobileskin')
@@ -280,8 +236,7 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 		//get choices from wiki text
 		foreach ($content as $choiceWiki)
 		{
-			//$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->mParserOptions, false ,false);
-			$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->parserOptions(), false ,false);
+			$parsedChoice=$wgParser->parse($choiceWiki, $wgTitle, $wgOut->parserOptions(), false ,false);
 			$choice=$parsedChoice->getText();
 
 			if($choice!="")
@@ -549,19 +504,14 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 			$countryCode=" +61";
 		$output.=' or SMS the <span style="color:#FF0000">red</span> digits corresponding to your choice to'.$countryCode.' 416906973.</td></tr>';
 	}
-	/*
-	$background=urldecode($background);
-	$startDate=date("d/m/Y H:i", $startTimeStamp);
-	$endDate=date("d/m/Y H:i", $endTimeStamp);*/
+
 	if($surveyStatus == 'ready')
 		$output .= '</table></form>';
 	else
 		$output .= '</table></form><p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
-	//$output .= "background:$background";
-	//$output .="StartTime=$startTime<br />";
-	//$output .="EndTime=$endTime<br />";
 
-	$output .= $parser->recursiveTagParse('=Debug contents=');
+	//DEBUG info
+	$output .= $parser->recursiveTagParse('=Voting Page contents=');
 	foreach( $args as $name => $value )
 	{
 		$output .= '<strong>' . htmlspecialchars( $name ) . '</strong> = ' . htmlspecialchars( $value ). '<br />';

@@ -82,7 +82,7 @@ $wgMemCachedServers = array();
 
 ## To enable image uploads, make sure the 'images' directory
 ## is writable, then set this to true:
-$wgEnableUploads       = false;
+$wgEnableUploads       = true;
 # $wgUseImageMagick = true;
 # $wgImageMagickConvertCommand = "/usr/bin/convert";
 
@@ -141,5 +141,4 @@ include("extensions/Gnuplot/Gnuplot.php");
 $wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
 
 require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
-
 // votapedia.webhop.org

@@ -2,7 +2,6 @@
 if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
-require_once("$gvPath/Common.php");
 require_once("$gvPath/FormControl.php");
 require_once("$gvPath/survey/VO/PageVO.php");
 require_once("$gvPath/survey/SurveyDAO.php");
@@ -157,7 +156,7 @@ class CreateSurvey extends SpecialPage {
 		$this->includable( true ); //we can include this from other pages
 	}
 	/**
-	 * Get a list of categories
+	 * Get a list of subcategories of a category
 	 * 
 	 * @param $category Name of a category
 	 * @return array with a list of categories
@@ -188,14 +187,14 @@ class CreateSurvey extends SpecialPage {
 	}
 	/**
 	 * Remove prefix and suffix from category list
+	 * $gvCatRemovePrefix, $gvCatRemoveSuffix
 	 * 
 	 * @param $cats array of category names
 	 * @return array without prefixes and suffixes
 	 */
 	function removePrefSufCategories($cats)
 	{
-		global $gvCatRemovePrefix;
-		global $gvCatRemoveSuffix;
+		global $gvCatRemovePrefix, $gvCatRemoveSuffix;
 		
 		$result = array();
 		foreach($cats as $cat)
@@ -224,26 +223,38 @@ class CreateSurvey extends SpecialPage {
 		$newtitle = $values['titleorquestion'];
 		$author = $wgUser->getName();
 		
-		$wikiText='';
-		$wikiText.="===".trim(stripslashes($newtitle))."===\n";
-		$newtitle = $this->vfGetPageTitle($newtitle);
-		$encodedTitle=urlencode($newtitle);
+		$wikiText ="===".trim(stripslashes($newtitle))."===\n";
+		
+		$newtitle = vfGetPageTitle($newtitle);
 
 		try
 		{
 			$page = new PageVO();
-			$page->setTitle($encodedTitle);
+			$page->setType(vSIMPLE_SURVEY);
+			$page->setTitle($newtitle);
 			$page->setAuthor($author);
 			$page->setInvalidAllowed( (bool) $values['voteridentity'] );
 			$page->setAnonymousAllowed( (bool) $values['anonymousweb'] );
 			$page->setDisplayTop($values['showtop']);
 			$page->setShowGraph(! (bool) $values['showresultsend']);
 			$page->setDuration( $values['duration'] );
+			$page->setTeleVoteAllowed(true);
+			$page->setVotesAllowed(1);
+			$page->setSMSRequired(false); //@todo SMS sending to the users
 			
+			$surveyVO = new SurveyVO();
+			$surveyVO->generateChoices( split("\n", $values['choices']) );
+			$surveyVO->setQuestion('#see page title');
+			$surveyVO->setInvalidAllowed( (bool) $values['voteridentity'] );
+			$surveyVO->setType(vSIMPLE_SURVEY);
+			$surveyVO->setVotesAllowed(1);
+			$surveyVO->setPoints(0);
+			
+			$page->setSurveys(array($surveyVO));
 			//Write data into Database
 			$surveyDAO = new SurveyDAO();
 			
-			$databaseWritten= $surveyDAO->insertPage($page);
+			$databaseWritten= $surveyDAO->insertPage($page, true);
 			if(! $databaseWritten)
 			{
 				throw new Exception("Error while writing to voting database.");
@@ -251,20 +262,50 @@ class CreateSurvey extends SpecialPage {
 		}
 		catch( Exception $e )
 		{
-			$article->doDeleteArticle('Error while inserting to voting database');
 			return '<li>'.$e->getMessage().'</li>';
 		}
 		
-		$wikiText.='<SurveyChoices type="simple" page_id="'+ $page->getPageID() +'" >';
-		$wikiText.="</SurveyChoices>\n*Created by ~~~~\n[[Category:Surveys]]\n";
+		$wikiText.='<SurveyChoices pageid="'. $page->getPageID() .'" />';
+		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";
+		
+		$this->insertWikiPage($newtitle, $wikiText, true);
+	}
+	/**
+	 * Insert wiki page, optionaly resolve duplicates
+	 * also sets value CreateSurvey::wikiPageTitle
+	 * 
+	 * @param $newtitle Title of wiki page
+	 * @param $wikiText text which will be written to wiki page
+	 * @param $resolveDuplicates Should script rename page if it already exists
+	 * @return error string if there are duplicates
+	 */
+	function insertWikiPage($newtitle, $wikiText, $resolveDuplicates = false)
+	{
+		if($resolveDuplicates)
+		{
+			$i = 1;
+			$this->wikiPageTitle = $newtitle;
+			$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
+			while($error)
+			{
+				$i++;
+				$this->wikiPageTitle = $newtitle." ($i)";
+				$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
+			}
+			return;
+		}
 		
 		$article = new Article( Title::newFromText( $newtitle ) );
 		$status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
 		if($status->hasMessage('edit-already-exists'))
-			return '<li>Article Already exists</li>';
+		{
+			return '<li>Wiki page / Article already exists</li>';
+		}
 		if(!$status->isGood())
-			return '<li>Error has occured while creating a new page</li>';
+		{
+			throw new Exception('Error has occured while creating a new page');
+		}
 	}
 	/**
 	 * Mandatory execute function for a Special Page
@@ -280,7 +321,7 @@ class CreateSurvey extends SpecialPage {
 			return;
 		}
 
-		global $wgRequest;
+		global $wgRequest, $wgParser;
 		if($wgRequest->getVal('wpSubmit'))
 		{
 		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
@@ -294,11 +335,9 @@ class CreateSurvey extends SpecialPage {
 				if(! $error)
 				{
 					global $wgOut;
-					$mytitle = $this->vfGetPageTitle($this->form->values[titleorquestion]);
-					$titleObj = Title::newFromText( $mytitle );
+					$titleObj = Title::newFromText( $this->wikiPageTitle );
 
-					$wgOut->addHTML( '<div class="successbox"><strong>'.wfMsg('survey-created', $mytitle).'</strong></div>' );
-					$wgOut->addHTML( '<div class="visualClear"></div>' );
+					$wgOut->addHTML( vfSuccessBox( wfMsg('survey-created', $this->wikiPageTitle )) );
 					$wgOut->addReturnTo($titleObj);
 					$wgOut->returnToMain();
 					return;
@@ -333,10 +372,7 @@ class CreateSurvey extends SpecialPage {
 
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
 		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
-		
-		#$this->form->AddPage ( 'Timing',     array(duration) );
-		#$this->form->AddPage ( 'Voting',     array(phonevoting, smsvoting, webvoting) );
-		$this->form->AddPage ( 'Graphing',   array('showresultsend', 'showtop') );
+		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 
 		$this->form->EndForm('Create Survey');
 	}

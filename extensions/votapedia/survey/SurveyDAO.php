@@ -58,7 +58,7 @@ class SurveyDAO
 		$page->setPhone( $rs->fields['phone'] );
 		$page->setSMSRequired( $rs->fields['smsRequired'] );
 		$rs->Close();
-		$page->setSurveys($this->getSurveys($page));
+		$page->setSurveys($this->loadSurveys($page));
 		return $page;
 	}
 
@@ -91,27 +91,20 @@ class SurveyDAO
 		return $page;
 	}
 	/**
-	 * Insert Page into database, which does not include
-	 * survey /surveys, which survey type is Quiz),
-	 * choices,and presentations(if survey type is Presentation)
+	 * Insert Page into database, optionally it includes
+	 * survey /surveys, choices,and presentations (if survey type is Presentation)
+	 * 
 	 * @param $pageVO PageVO
 	 * @param $insertSurveys should surveys be inserted as well
 	 */
 	public function insertPage(PageVO &$pageVO, $insertSurveys = false)
 	{
 		global $gDB;
-
-		// Check wether the page exists
-		$sql="select count(*) as num  from page where title ='".$pageVO->getTitle()."'";
-		$rs= $gDB->Execute($sql);
-		if ($rs->fields[0] > 0)
-			throw new SurveyException("This page already exists.",202);
-
 		$gDB->StartTrans();
 
 		$sql = "insert into page(title,author,phone,startTime,duration,endTime,invalidAllowed,smsRequired,teleVoteAllowed,
                        anonymousAllowed,showGraph,surveyType,displayTop,subtractWrong) ";
-		//@todo some fields are missing
+		//@todo some fields from page are missing
 		$sql = $sql."values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		$resPage = $gDB->Prepare($sql);
 		$param = array( $pageVO->getTitle(),
@@ -154,7 +147,7 @@ class SurveyDAO
 	 * choices,and presentations(if survey type is Presentation)
 	 * @param $pageVO PageVO
 	 */
-	public function updatePage(PageVO $pageVO)
+	public function updatePage(PageVO &$pageVO)
 	{
 		global $gDB;
 		// Check wether the page exists
@@ -456,10 +449,10 @@ class SurveyDAO
 	 * @return Array $surveys
 	 * @version 2.0
 	 */
-	private function getSurveys($page)
+	private function loadSurveys($page)
 	{
 		global $gDB;
-		$sql = "select * from survey where pageID=? order by surveyID";
+		$sql = "select * from survey where pageID = ? order by surveyID";
 		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
 		$rsSurveys = &$gDB->Execute($sql, array($page->getPageID()));
 			
