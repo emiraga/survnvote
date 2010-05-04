@@ -66,8 +66,8 @@ class FormControl
 	
 	public function AddPage($title, $add_items)
 	{
-		global $wgOut;
-
+		global $wgOut, $gvScript, $wgScriptPath;
+		
 		//opentab tab
 		$wgOut->addHTML(
 			Xml::fieldset( $title ) .
@@ -128,6 +128,13 @@ class FormControl
 			if(isset($item['textafter']))
 				$form_element .= $item['textafter'];
 
+			$learnmore='';
+			if($item['learn_more'])
+			{
+				$morepage = Title::newFromText($item['learn_more']);
+				$learnmore=' &nbsp; <span><a href="'.$morepage->escapeLocalURL()
+					.'"><img src="'.$gvScript.'/images/info.gif">Learn more</a></span>';
+			}
 			if($item['name'])
 				$item['name'] .= ':';
 			$wgOut->addHTML(
@@ -135,12 +142,7 @@ class FormControl
 					Xml::label( $item['name'], $id ),
 					$form_element,
 					Xml::tags('div', array( 'class' => 'prefsectiontip' ),
-						$item['explanation'] . 
-							(isset($item['learn_more']) ?
-							' &nbsp; <span><a href="'.$GLOBALS['wgScriptPath'].'/index.php?title='.$item['learn_more']
-							.'"><img src="'.$GLOBALS['wgScriptPath'].'/extensions/votapedia/images/info.gif">Learn more</a></span>'
-							: '')
-					)
+						$item['explanation'] . $learnmore )
 				)
 			);
 		}

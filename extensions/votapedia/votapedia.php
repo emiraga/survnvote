@@ -64,4 +64,16 @@ define('vRANK_EXPOSITIONS',3);
 define('vQUESTIONNAIRE', 4);
 define('vTEXT_RESPONSE', 5);
 
+$wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
+$wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
+
+$wgExtensionCredits['other'][] = array(
+	'name' => 'Votapedia',
+	'author' => 'Emir Habul',
+	'url' => 'http://votapedia.webhop.org/',
+	'description' => 'Votapedia - Audience Response System',
+	'descriptionmsg' => 'votapedia-desc',
+	'version' => '1.0.0',
+);
+
 ?>

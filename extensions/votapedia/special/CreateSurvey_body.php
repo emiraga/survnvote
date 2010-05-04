@@ -17,7 +17,7 @@ class CreateSurvey extends SpecialPage {
 	 */
 	function __construct() {
 		parent::__construct('CreateSurvey');
-		wfLoadExtensionMessages('CreateSurvey');
+		wfLoadExtensionMessages('Votapedia');
 
 		global $gvCountry;
 		$this->formitems = array (

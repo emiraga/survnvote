@@ -2,7 +2,6 @@
 if (!defined('MEDIAWIKI')) die();
 
 $wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
-$wgExtensionMessagesFiles['SurveyChoices'] = "$gvPath/tag/SurveyChoices.i18n.php";
 
 require_once("$gvPath/survey/SurveyDAO.php");
 
@@ -25,7 +24,7 @@ function vfSurveyChoicesInit( &$parser )
  */
 function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 {
-	wfLoadExtensionMessages('SurveyChoices');
+	wfLoadExtensionMessages('Votapedia');
 	$parser->disableCache();
 	$output = '';
 	$page_id = $args['pageid'];
@@ -60,20 +59,21 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 
 	$action=$wgRequest->getVal( "action" );
 	
-	global $gvScript;
-	$output.='<form action="'.$wgTitle->escapeLocalURL().'" method="post">';
+	$prosurv = Title::newFromText('Special:ProcessSurvey');
+	$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">';
+	$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
 	$output.='<table cellspacing="0" style="font-size:large">';
+	global $gvScript;
 	$output.= '<tr><td valign="top"><img src="'.$gvScript.'/images/spacer.gif" />';
 	// put an 250*1 spacer image above the choices so that the text doesn't get 
 	// squashed by the graph when browser is less than full screen.
 	
 	$survey = $page->getSurveys();
 	$choices = $survey[0]->getChoices();
-
+	
 	if($surveyStatus=='ready')
 	{
 		$output.='<ul>';
-		//get choices from wiki text
 		$i=0;
 		foreach ($choices as $choice)
 		{
@@ -93,15 +93,13 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
 			#alt="sample graph" /></div></td></tr>';
 		}
-		else
-		{
-			$output.='</ul></td></tr>';
-		}
+		$output.='</td></tr>';
 	}
-	elseif($surveyStatus=='ended')
+	elseif($surveyStatus == 'active')
 	{
 		;
-	}elseif($surveyStatus == 'active')
+	}
+	elseif($surveyStatus == 'ended')
 	{
 		;
 	}
@@ -126,11 +124,11 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 			$countryCode=" +61";
 		$output.=' or SMS the <span style="color:#FF0000">red</span> digits corresponding to your choice to'.$countryCode.' 416906973.</td></tr>';
 	}
+	$output .= '</table></form>';
 	
-	if($surveyStatus == 'ready')
-		$output .= '</table></form>';
-	else
-		$output .= '</table></form><p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
+	if($surveyStatus == 'active')
+		$output .= '<p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';
+	//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
 	
 	return $output;
 	
@@ -229,45 +227,6 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	}
 	else if($surveyStatus=='ready')
 	{
-		//get choices from wiki text
-		foreach ($content as $choiceWiki)
-		{
-			$parsedChoice=$wgParser->parse($choiceWiki, $wgTitle, $wgOut->parserOptions(), false ,false);
-			$choice=$parsedChoice->getText();
-
-			if($choice!="")
-			{
-                $choiceContent=strip_tags($choice);
-				$choiceWiki=urlencode($choiceWiki);
-			    $output.="<INPUT TYPE=\"Hidden\" NAME=\"choice[]\" VALUE=\"$choiceWiki\" />";
-				$i++;
-				$colorIndex=fmod($i,50);//only 50 different colors are available
-				if($wgRequest->getVal('useskin')!='mobileskin')
-				{
-					$output.="<li STYLE=\"list-style-image: url(./utkgraph/ChoiceColor/Choice$colorIndex.jpg)\"><label id=\"q$i\">$i. $choice</label></li>";
-				}
-				else //mobile skin uses horizontal bars
-				{
-					$percent=rand(30,100);
-					$output.="<li><label id=\"q$i\">$i. $choice</label><p><img src=\"./utkgraph/ChoiceColor/Choice$colorIndex.jpg\" width=\"$percent%\" height=\"10\" border=\"1\" align=\"top\"/></p></li>";
-				}
-			}
-		}
-		if($userName==$author)
-		{
-			if($wgRequest->getVal('useskin')!='mobileskin')
-			{
-				$output.='</ul><p style="margin:10px 10px 10px 10px"><input type="submit" name="Submit" value="Start survey" /></p></td><td valign="top"><div style="margin:0px 0px 0px 40px"><img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" alt="sample graph" /></div></td></tr>';
-			}
-			else//mobile skin
-			{
-				$output.='</ul><p><input type="submit" name="Submit" value="Start survey" /></p></td></tr>';
-			}
-		}
-		else
-		{
-			$output.='</ul></td></tr>';
-		}
 	}
 	else if($surveyStatus=='active')
 	{

@@ -5,5 +5,4 @@ $aliases = array();
 $aliases['en'] = array(
     'CreateSurvey' => array( 'CreateSurvey' ),
 );
-
 ?>
