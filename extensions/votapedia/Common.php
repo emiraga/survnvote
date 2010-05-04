@@ -21,7 +21,7 @@ function vfGetPageTitle($mytitle)
  */
 function vfErrorBox($message)
 {
-	return '<div class="errorbox"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
+	return '<div class="errorbox" style="margin-bottom: 0.5em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
 }
 /**
  * Return a message in error box, will show as red in HTML
@@ -57,7 +57,7 @@ function vfConnectDatabase()
 
 	$cn = &ADONewConnection('mysqli');
 	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDataSourceName))
-		throw new SurveyException("Could not connect database",400);
+		throw new SurveyException("Could not connect database", 400);
 	return $cn;
 }
 /**

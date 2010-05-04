@@ -223,7 +223,7 @@ class CreateSurvey extends SpecialPage {
 		$newtitle = $values['titleorquestion'];
 		$author = $wgUser->getName();
 		
-		$wikiText ="===".trim(stripslashes($newtitle))."===\n";
+		$wikiText ="<h2>".trim(stripslashes($newtitle))."</h2>\n";
 		
 		$newtitle = vfGetPageTitle($newtitle);
 
@@ -334,12 +334,9 @@ class CreateSurvey extends SpecialPage {
 				$error = $this->insertPage($this->form->values);
 				if(! $error)
 				{
-					global $wgOut;
 					$titleObj = Title::newFromText( $this->wikiPageTitle );
-
-					$wgOut->addHTML( vfSuccessBox( wfMsg('survey-created', $this->wikiPageTitle )) );
-					$wgOut->addReturnTo($titleObj);
-					$wgOut->returnToMain();
+					
+					$wgOut->redirect($titleObj->getLocalURL(), 302);
 					return;
 				}
 			}
@@ -357,9 +354,7 @@ class CreateSurvey extends SpecialPage {
 		
 		$wgOut->setArticleFlag(false);
 		$wgOut->setPageTitle("Create New Simple Survey");
-		$wgOut->addScriptFile('prefs.js');
 		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
-		//$wgOut->addScriptFile( 'ajax.js' );
 		
 		$userName=$wgUser->getName();
 		$this->skin = $wgUser->getSkin();
@@ -368,8 +363,8 @@ class CreateSurvey extends SpecialPage {
 		{
 			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 		}
-		$this->form->StartForm( $wgTitle->escapeLocalURL(), 'mw-preferences-form' );
-
+		$crform = Title::newFromText('Special:CreateSurvey');
+		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
 		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );

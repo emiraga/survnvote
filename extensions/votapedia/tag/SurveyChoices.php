@@ -60,11 +60,13 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 
 	$action=$wgRequest->getVal( "action" );
 	
-	$output.='<form action="./database/processSurvey.php" method="post"><table cellspacing="0" style="font-size:large">';
-	$output .= '<tr><td valign="top"><img src="./database/spacer.gif" />';
+	global $gvScript;
+	$output.='<form action="'.$wgTitle->escapeLocalURL().'" method="post">';
+	$output.='<table cellspacing="0" style="font-size:large">';
+	$output.= '<tr><td valign="top"><img src="'.$gvScript.'/images/spacer.gif" />';
 	// put an 250*1 spacer image above the choices so that the text doesn't get 
 	// squashed by the graph when browser is less than full screen.
-
+	
 	$survey = $page->getSurveys();
 	$choices = $survey[0]->getChoices();
 
@@ -75,24 +77,21 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 		$i=0;
 		foreach ($choices as $choice)
 		{
-			$choiceWiki = $choice->getChoice();
-			
-			$parsedChoice=$wgParser->parse($choiceWiki, $wgTitle, $wgOut->parserOptions(), false ,false);
-			$choice=$parsedChoice->getText();
-
-			if($choice!="")
+			$i++;
+			$choice = $parser->recursiveTagParse($choice->getChoice());
+			if($choice)
 			{
-                $choiceContent=strip_tags($choice);
-				$choiceWiki=urlencode($choiceWiki);
-				$i++;
-				$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().")\"><label id=\"q$i\">$i. $choice</label></li>";
+				$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
+					")\"><label id=\"q$i\">$i. $choice</label></li>";
 			}
 		}
 		$output.='</ul>';
 		if($userName == $page -> getAuthor() )
 		{
 			$output.='<p style="margin:10px 10px 10px 10px"><input type="submit" name="Submit" value="Start survey" /></p></td>';
-			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px"><img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" alt="sample graph" /></div></td></tr>';
+			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
+			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
+			#alt="sample graph" /></div></td></tr>';
 		}
 		else
 		{
@@ -108,7 +107,7 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	}
 	
 	//add sms voting label
-	if($surveyStatus == 'active' && $teleVoteAllowed!=0 && $userName==$author)
+	if($surveyStatus == 'active' && $page->getTeleVoteAllowed() && $userName == $page->getAuthor())
 	{
 		$output.='<tr><td colspan=2>';
 		if($wgRequest->getVal('useskin')!='mobileskin')
@@ -127,7 +126,7 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 			$countryCode=" +61";
 		$output.=' or SMS the <span style="color:#FF0000">red</span> digits corresponding to your choice to'.$countryCode.' 416906973.</td></tr>';
 	}
-
+	
 	if($surveyStatus == 'ready')
 		$output .= '</table></form>';
 	else
@@ -137,15 +136,12 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	
 	#####################################
 	#####################################
-		#####################################
-		#####################################
-		#####################################
-		#####################################
-		#####################################
-		#####################################
-		#####################################
-		#####################################
-	
+	#####################################
+	#####################################
+	#####################################
+	#####################################
+	#####################################
+
 	if($surveyStatus=='ended')
 	{
 		$receiver = array();
@@ -510,14 +506,6 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	else
 		$output .= '</table></form><p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
 
-	//DEBUG info
-	$output .= $parser->recursiveTagParse('=Voting Page contents=');
-	foreach( $args as $name => $value )
-	{
-		$output .= '<strong>' . htmlspecialchars( $name ) . '</strong> = ' . htmlspecialchars( $value ). '<br />';
-	}
-	$output .= "\n\n" . nl2br(htmlspecialchars( $input ));
-	return $output;
 }
 
 	/*
