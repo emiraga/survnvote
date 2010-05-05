@@ -7,7 +7,6 @@ $gvDBserver              = "localhost";
 $gvDataSourceName        = "voting";
 $gvDBUserName            = "root";
 $gvDBUserPassword        = "";
-#$gvWikiDBname            = "wikidb";
 
 /**
  * Set Timezone -- check the manual http://php.net/manual/en/timezones.php
@@ -23,49 +22,39 @@ $gvNumberPBX = '8116';
 $gvCountry = 'Malaysia';
 
 /**
- * Remove prefixes and suffixes in Category listing
+ * Remove prefixes and suffixes in "Survey Category" listing
  */
 $gvCatRemovePrefix = array('Surveys in ', 'Quizes in ');
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 
+/**
+ * Votapedia script path, and extensions.
+ */
+$gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
+$gvScript = "$wgScriptPath/extensions/votapedia";
+
+/**
+ * Use different database for unit testing.
+ */
+if(defined('VOTAPEDIA_TEST')) //used for unit testing
+	$gvDataSourceName = "unittest";
 
 /******************************************************************/
 /*** Do not edit items below unless you know what you are doing ***/
 /******************************************************************/
 
-/**
- * Use different database for unit testing. Do not edit.
- */
-if(defined('VOTAPEDIA_TEST')) //used for unit testing
-	$gvDataSourceName = "unittest";
-
-/**
- * Votapedia script path, and extensions. Do not edit.
- */
-$gvPath = "$IP/extensions/votapedia"; //path to votapedia extension
-$gvScript = "$wgScriptPath/extensions/votapedia";
-
 require_once( "$gvPath/Common.php" );
-require_once( "$gvPath/special/CreateSurvey.php" );
+require_once( "$gvPath/UserHooks.php" );
 require_once( "$gvPath/tag/SurveyChoices.php" );
 
-require_once( "$gvPath/UserHooks.php" );
-
-#require_once( "$gvPath/special/CreateSurvey.php" );
-#require_once( "$gvPath/ChoiceTagExtension.php" );
-#require_once( "$gvPath/SpecialEmirTest.php" );
-
-/**
- * Types of surveys, do not edit.
- */
-define('vSIMPLE_SURVEY',1);
-define('vQUIZ',2);
-define('vRANK_EXPOSITIONS',3);
-define('vQUESTIONNAIRE', 4);
-define('vTEXT_RESPONSE', 5);
+#debug script
+require_once( "$gvPath/SpecialEmirTest.php" );
 
 $wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
 $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
+
+$wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
+$wgSpecialPages['CreateSurvey'] = 'CreateSurvey';
 
 $wgExtensionCredits['other'][] = array(
 	'name' => 'Votapedia',

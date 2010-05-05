@@ -1,5 +1,13 @@
 <?php
 /**
+ * Types of surveys.
+ */
+define('vSIMPLE_SURVEY',   1);
+define('vQUIZ',            2);
+define('vRANK_EXPOSITIONS',3);
+define('vQUESTIONNAIRE',   4);
+define('vTEXT_RESPONSE',   5);
+/**
  * Convert page title into a friendly form, shorter and trimmed
  * 
  * @param $mytitle
