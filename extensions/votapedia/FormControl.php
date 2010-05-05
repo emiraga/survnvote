@@ -1,11 +1,25 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
+/**
+ * Class used for drawing tabbed form similar to "Preferences" form in MediaWiki
+ * 
+ * @author Emir Habul
+ *
+ */
 class FormControl
 {
-	public function __construct($items)
+	private $values;
+	private $items;
+	
+	/**
+	 * Constructor of FormControl
+	 * 
+	 * @param $items associative array of form items
+	 */
+	public function __construct(&$items)
 	{
-		$this->items = $items;
+		$this->items = &$items;
 		$this->values = array();
 	}
 	
@@ -36,7 +50,11 @@ class FormControl
 
 		return Xml::tags( 'tr', null, $td1 . $td2 ). $td3 . "\n";
 	}
-	
+	/**
+	 * Check whether values in form pass the tests.
+	 * 
+	 * @return error string if any error
+	 */
 	public function Validate()
 	{
 		global $wgRequest;
@@ -49,21 +67,55 @@ class FormControl
 		}
 		return $error;
 	}
-	
-	public function getValuesFromRequest()
+	/**
+	 * From $wgRequest read the values of form
+	 */
+	public function loadValuesFromRequest()
 	{
 		global $wgRequest;
 		foreach($this->items as $id => &$element)
 		{
 			if($wgRequest->getCheck($id))
 			{
-				$this->values[ $id ] = $wgRequest->getVal($id);
+				$this->setValue( $id, $wgRequest->getVal($id) );
 				if(isset($item['process']))
-					$this->values[ $id ] = $item['process']( $this->values[ $id ] );
+					$this->setValue( $id , $item['process']( $this->values[ $id ] ));
 			}
 		}
 	}
-	
+	/**
+	 * Set the value in form with given key(name)
+	 * @param $name the key
+	 * @param $value
+	 */
+	public function setValue($name, $value)
+	{
+		$this->values[$name] = $value;
+	}
+	/**
+	 * Read the value of form with given key(name)
+	 * 
+	 * @param $name the key
+	 * @return values[$name]
+	 */
+	public function getValue($name)
+	{
+		return $this->values[$name];
+	}
+	/**
+	 * Returns an entire associative array of form values
+	 * @return array
+	 */
+	public function getValuesArray()
+	{
+		return $this->values;
+	}
+	/**
+	 * Adds a new tab to the output form
+	 * 
+	 * @param $title tab name
+	 * @param $add_items names of form items to be shown in this tab
+	 */
 	public function AddPage($title, $add_items)
 	{
 		global $wgOut, $gvScript, $wgScriptPath;
@@ -104,9 +156,15 @@ class FormControl
 			{
 				$value = str_replace("\r", "\n", $value);
 				$value = str_replace("\n\n", "\r", $value);
+				$value = htmlspecialchars_decode($value);
 				$form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
 			}
 			elseif($item['type'] == 'null')
+			{
+				$form_element = '';
+				$item['name'] = $id = '';
+			}
+			elseif($item['type'] == 'infobox')
 			{
 				$form_element = '';
 				$item['name'] = $id = '';
@@ -120,7 +178,7 @@ class FormControl
 			}
 			else
 			{
-				die('error');
+				die('error in FormControl::AddPage');
 			}
 			if(isset($item['textbefore']))
 				$form_element = $item['textbefore'] . $form_element;
@@ -128,13 +186,16 @@ class FormControl
 			if(isset($item['textafter']))
 				$form_element .= $item['textafter'];
 
-			$learnmore='';
 			if($item['learn_more'])
 			{
 				$morepage = Title::newFromText($item['learn_more']);
-				$learnmore=' &nbsp; <span><a href="'.$morepage->escapeLocalURL()
+				$item['explanation'] .=' &nbsp; <span><a href="'.$morepage->escapeLocalURL()
 					.'"><img src="'.$gvScript.'/images/info.gif">Learn more</a></span>';
 			}
+			
+			if($item['type'] == 'infobox')
+				$item['explanation'] = vfSuccessBox($item['explanation']);
+			
 			if($item['name'])
 				$item['name'] .= ':';
 			$wgOut->addHTML(
@@ -142,7 +203,7 @@ class FormControl
 					Xml::label( $item['name'], $id ),
 					$form_element,
 					Xml::tags('div', array( 'class' => 'prefsectiontip' ),
-						$item['explanation'] . $learnmore )
+						$item['explanation'] )
 				)
 			);
 		}
@@ -158,7 +219,12 @@ class FormControl
 		//close tab
 		$wgOut->addHTML( Xml::closeElement( 'fieldset' ) );
 	}
-	
+	/**
+	 * Start drawing the form
+	 * 
+	 * @param $action target of a HTML form
+	 * @param $id id inside HTML of form
+	 */
 	public function StartForm($action, $id='')
 	{
 		global $wgOut;
@@ -171,6 +237,11 @@ class FormControl
 			Xml::openElement( 'div', array( 'id' => 'preferences' ) )
 		);
 	}
+	/**
+	 * End drawing the form
+	 * 
+	 * @param $submit value of submit button in the form
+	 */
 	public function EndForm($submit)
 	{
 		global $wgOut,$wgUser;
@@ -185,6 +256,12 @@ class FormControl
 		$wgOut->addHTML('</div></form>');
 	}
 	
+	/**
+	 * Remove Special Character from a string
+	 * 
+	 * @param $str
+	 * @return string
+	 */
 	public static function RemoveSpecialChars($str)
 	{
 		$invalidChars  = array('&','#','+','<','>','[',']','|','{','}','/');

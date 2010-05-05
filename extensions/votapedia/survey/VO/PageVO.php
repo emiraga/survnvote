@@ -62,7 +62,7 @@ class PageVO
 		if ($title)
 			$this->title = $title;
 		else
-			throw new SurveyException("Question cannot be a empty!",102);
+			throw new SurveyException("PageVO: Question cannot be a empty!",102);
 	}
 	/**
 	 * Set start time of this survey, must match the required date format

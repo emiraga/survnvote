@@ -43,7 +43,7 @@ class CreateSurvey extends SpecialPage {
 				'type' => 'select',
 				'name' => 'Category',
 				'default' => 'General',
-				'valid' => function($v,$i,$js){ if($js) return ""; return in_array( $v, $i['options'] ); },
+				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
 				'learn_more' => 'Details of Survey Category',
 				'options' => array()
@@ -147,7 +147,12 @@ class CreateSurvey extends SpecialPage {
 				'explanation' => 'If unchecked, only registered votApedia users will be allowed to vote on the survey page.',
 				'learn_more' => 'Details of Anonymous Voting',
 			),
-		);		
+			'titlewarning' => array(
+				'type' => 'infobox',
+				'explanation' => 'If you decide to change the Title or question of a survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
+				'learn_more' => 'Changing Title of a survey',
+			),
+		);
 		$subcat = $this->getSubcategories();
 		$subcat = $this->removePrefSufCategories($subcat);
 		$this->formitems['category']['options'] = $subcat;
@@ -213,6 +218,40 @@ class CreateSurvey extends SpecialPage {
 		return $result;
 	}
 	/**
+	 * Generate PageVO object from the values
+	 * 
+	 * @param associative array with values
+	 */
+	private function generatePageVO($values)
+	{
+		global $wgUser;
+		$author = $wgUser->getName();
+
+		$page = new PageVO();
+		$page->setType(vSIMPLE_SURVEY);
+		$page->setTitle($values['titleorquestion']);
+		$page->setAuthor($author);
+		$page->setInvalidAllowed( (bool) $values['voteridentity'] );
+		$page->setAnonymousAllowed( (bool) $values['anonymousweb'] );
+		$page->setDisplayTop($values['showtop']);
+		$page->setShowGraph(! (bool) $values['showresultsend']);
+		$page->setDuration( $values['duration'] );
+		$page->setTeleVoteAllowed(true);
+		$page->setVotesAllowed(1);
+		$page->setSMSRequired(false); //@todo SMS sending to the users
+		
+		$surveyVO = new SurveyVO();
+		$surveyVO->generateChoices( split("\n", $values['choices']) );
+		$surveyVO->setQuestion('#see page title');
+		$surveyVO->setInvalidAllowed( (bool) $values['voteridentity'] );
+		$surveyVO->setType(vSIMPLE_SURVEY);
+		$surveyVO->setVotesAllowed(1);
+		$surveyVO->setPoints(0);
+		
+		$page->setSurveys(array($surveyVO));
+		return $page;
+	}
+	/**
 	 * Insert new page in mediawiki and votapedia database
 	 * 
 	 * @param $values associative array with values from form
@@ -220,56 +259,30 @@ class CreateSurvey extends SpecialPage {
 	function insertPage($values)
 	{
 		global $wgRequest, $wgUser;
-		$newtitle = $values['titleorquestion'];
 		$author = $wgUser->getName();
-		
-		$wikiText ="<h2>".trim(stripslashes($newtitle))."</h2>\n";
-		
-		$newtitle = vfGetPageTitle($newtitle);
+		$wikititle = vfGetPageTitle($values['titleorquestion']);
 
 		try
 		{
-			$page = new PageVO();
-			$page->setType(vSIMPLE_SURVEY);
-			$page->setTitle($newtitle);
-			$page->setAuthor($author);
-			$page->setInvalidAllowed( (bool) $values['voteridentity'] );
-			$page->setAnonymousAllowed( (bool) $values['anonymousweb'] );
-			$page->setDisplayTop($values['showtop']);
-			$page->setShowGraph(! (bool) $values['showresultsend']);
-			$page->setDuration( $values['duration'] );
-			$page->setTeleVoteAllowed(true);
-			$page->setVotesAllowed(1);
-			$page->setSMSRequired(false); //@todo SMS sending to the users
-			
-			$surveyVO = new SurveyVO();
-			$surveyVO->generateChoices( split("\n", $values['choices']) );
-			$surveyVO->setQuestion('#see page title');
-			$surveyVO->setInvalidAllowed( (bool) $values['voteridentity'] );
-			$surveyVO->setType(vSIMPLE_SURVEY);
-			$surveyVO->setVotesAllowed(1);
-			$surveyVO->setPoints(0);
-			
-			$page->setSurveys(array($surveyVO));
-			//Write data into Database
 			$surveyDAO = new SurveyDAO();
-			
+			$page = $this->generatePageVO($values);
 			$databaseWritten= $surveyDAO->insertPage($page, true);
 			if(! $databaseWritten)
-			{
 				throw new Exception("Error while writing to voting database.");
-			}
 		}
 		catch( Exception $e )
 		{
 			return '<li>'.$e->getMessage().'</li>';
 		}
 		
-		$wikiText.='<SurveyChoices pageid="'. $page->getPageID() .'" />';
+		$wikiText.='<Survey pageid="'. $page->getPageID() .'" />';
 		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
-		$wikiText.="[[Category:Surveys by $author]]\n[[Category:$values[category]]]\n[[Category:Simple Surveys]]";
+		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 		
-		$this->insertWikiPage($newtitle, $wikiText, true);
+		if(strlen($values[category]) > 5)
+			$wikiText.="[[Category:$values[category]]]\n";
+		
+		$this->insertWikiPage($wikititle, $wikiText, true);
 	}
 	/**
 	 * Insert wiki page, optionaly resolve duplicates
@@ -322,16 +335,17 @@ class CreateSurvey extends SpecialPage {
 		}
 
 		global $wgRequest, $wgParser;
-		if($wgRequest->getVal('wpSubmit'))
+		if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
 		{
+			//user has submitted to add new page or edit existing one
 		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
 				die('Something is wrong, please try again.');
 			}
-			$this->form->getValuesFromRequest();
+			$this->form->loadValuesFromRequest();
 			$error = $this->form->Validate();
 			if(! $error)
 			{
-				$error = $this->insertPage($this->form->values);
+				$error = $this->insertPage($this->form->getValuesArray());
 				if(! $error)
 				{
 					$titleObj = Title::newFromText( $this->wikiPageTitle );
@@ -340,36 +354,136 @@ class CreateSurvey extends SpecialPage {
 					return;
 				}
 			}
+			$this->drawFormNew($error);
 		}
-		$this->drawForm($error);
+		else if( $wgRequest->getVal('wpEditButton') == wfMsg('edit-survey'))
+		{
+			//user wants to edit the existing survey
+			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
+				die('Something is wrong, please try again.');
+			
+			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
+				
+			$surveydao = new SurveyDAO();
+			$page_id = intval($wgRequest->getVal('pageid'));
+			try
+			{
+				$page = $surveydao->findByPageID( $page_id );
+			}
+			catch(SurveyException $e)
+			{
+				$wgOut->addWikiText( vfErrorBox( 'No such page identifier (pageid)') );
+				return;
+			}
+			$this->form->setValue('titleorquestion', $page->getTitle());
+			$survey = $page->getSurveys();
+			$surchoice = $survey[0]->getChoices();
+			$choices='';
+			foreach($surchoice as $ch)
+			{
+				if($choices) $choices .= "\r";
+				$choices .= $ch->getChoice();
+			}
+			$this->form->setValue('choices', $choices);
+			$this->form->setValue('duration', $page->getDuration());
+			$this->form->setValue('voteridentity', $page->isInvalidAllowed());
+			$this->form->setValue('anonymousweb', $page->isAnonymousAllowed());
+			$this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
+			$this->form->setValue('showtop', $page->getDisplayTop());
+			
+			$this->drawFormEdit($page_id, $error);
+		}
+		else if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
+		{
+			//user has submitted to add new page or edit existing one
+		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
+				die('Something is wrong, please try again.');
+			}
+			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
+			$page_id = intval($wgRequest->getVal('pageid'));
+			
+			$this->form->loadValuesFromRequest();
+			
+			$error = $this->form->Validate();
+			if(! $error)
+			{
+				$page = $this->generatePageVO($this->form->getValuesArray());
+				$page->setPageID($page_id);
+				
+				try{
+					$surveydao = new SurveyDAO();
+					$surveydao->updatePage($page);
+				}
+				catch(SurveyException $e)
+				{
+					$wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
+					return;
+				}
+				
+				$title = Title::newFromText($this->returnTo);
+				vfPurgePage($title->getDBkey());
+				$wgOut->redirect($title->escapeLocalURL(), 302);
+				return;
+			}
+			$this->drawFormEdit($page_id, $error);
+		}
+		else
+		{
+			//fresh new form
+			$this->drawFormNew();
+		}
 	}
 	/**
-	 * Draw form using FormControl
+	 * Draw form for new survey using FormControl
 	 * 
 	 * @param $errors string containing potential errors
 	 */
-	function drawForm( $errors=null )
+	function drawFormNew( $errors=null )
 	{
-		global $wgOut, $wgTitle, $wgUser, $wgLang, $wgScriptPath;
+		global $wgOut, $wgUser, $wgScriptPath;
 		
 		$wgOut->setArticleFlag(false);
 		$wgOut->setPageTitle("Create New Simple Survey");
 		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
 		
-		$userName=$wgUser->getName();
-		$this->skin = $wgUser->getSkin();
+		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 
-		if($errors)
-		{
-			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-		}
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
 		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
+		$this->form->EndForm(wfMsg('create-survey'));
+	}
+	/**
+	 * Draw form for editing surveys using FormControl
+	 * 
+	 * @param $page_id
+	 * @param $errors string containing potential errors
+	 */
+	function drawFormEdit( $page_id, $errors=null )
+	{
+		$this->formitems['titleorquestion']['explanation'] = '';
+		$this->formitems['titleorquestion']['learn_more'] = '';
 
-		$this->form->EndForm('Create Survey');
+		global $wgOut, $wgUser, $wgScriptPath;
+		$wgOut->setArticleFlag(false);
+		$wgOut->setPageTitle("Edit a Survey");
+		
+		$returnto = Title::newFromText($this->returnTo);
+		$wgOut->addReturnTo($returnto);
+		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
+		
+		if($errors) $wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
+
+		$crform = Title::newFromText('Special:CreateSurvey');
+		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
+		$wgOut->addHTML('<input type="hidden" name="pageid" value="'.$page_id.'">');
+		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
+		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
+		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
+		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
+		$this->form->EndForm(wfMsg('edit-survey'));
 	}
 }// End of class CreateSurvey
 ?>

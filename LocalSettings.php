@@ -132,7 +132,8 @@ $wgDiff3 = "";
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
 
-require_once( "$IP/extensions/votapedia/votapedia.php" );
+$wgEnableWriteAPI=true; # required for votapedia
+require_once("$IP/extensions/votapedia/votapedia.php");
 require_once("$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php"); 
 
 $wgUseAjax = true;

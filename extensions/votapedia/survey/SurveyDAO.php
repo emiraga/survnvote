@@ -145,30 +145,25 @@ class SurveyDAO
 	 * Insert survey(s) into database, which includes
 	 * survey /surveys, which survey type is Quiz),
 	 * choices,and presentations(if survey type is Presentation)
+	 * 
 	 * @param $pageVO PageVO
 	 */
 	public function updatePage(PageVO &$pageVO)
 	{
 		global $gDB;
 		// Check wether the page exists
-		$sql="select pageID from page where title = ?";
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs = $gDB->Execute($sql, array($pageVO->getTitle()));
+	 	$pageID = $pageVO->getPageID();
+		assert($pageID > 0);
 
-		if ($rs->RecordCount() == 0)
-	 		throw new SurveyException("This page does not exist.",201);
-
-	 	$pageID = $rs->fields["pageID"];
-	 	$pageVO->setPageID($pageID);
-
-	 	$gDB->StartTrans();
-
-	 	$sql = "update page set startTime=?,duration=?,endTime=?,"
+		$gDB->StartTrans();
+	 	$sql = "update page set title=?,startTime=?,duration=?,endTime=?,"
 		 	. "invalidAllowed=?,smsRequired=?,teleVoteAllowed=?,"
 		 	. " anonymousAllowed=?,showGraph=?,surveyType=?,displayTop=?,votesallowed=?,subtractWrong=? "
 		 	. "where pageID = ?";
 	 	$resPage = $gDB->Prepare($sql);
-	 	$param = array( $pageVO->getStartTime(),
+	 	$param = array(
+	 		$pageVO->getTitle(),
+	 		$pageVO->getStartTime(),
 		 	$pageVO->getDuration(),
 		 	$pageVO->getEndTime(),
 		 	$pageVO->isInvalidAllowed(),
@@ -184,7 +179,9 @@ class SurveyDAO
 	 	);
 	 	//@todo some fields here are missing
 	 	$gDB->Execute($resPage,$param);
-
+		
+	 	$this->deleteSurveys($pageID);
+	 	
 	 	$refsurveys =& $pageVO->getSurveys();
  		foreach ($refsurveys as &$survey)
  		{
@@ -310,7 +307,6 @@ class SurveyDAO
 		}
 		return true;
 	}
-
 	/**
 	 * Reset a survey.
 	 * Votes on choices,marks on presentation will be set to 0
@@ -391,28 +387,30 @@ class SurveyDAO
 	/**
 	 * Delete a page which includes tables of page,
 	 * Survey,SuveyChoice,Presentation,SurveyRecord.
-	 * @param $title title of a wiki page
+	 * 
+	 * @param $id id of a page
 	 * @version 2.0
 	 */
-	function deletePage($title)
+	function deletePage($id)
 	{
-		$this->deleteSurvey($title);
+		$this->deleteSurvey($id);
 		global $gDB;
-		$gDB->Execute("delete from page where title = ?",array($title));
+		$gDB->Execute("delete from page where pageID = ?",array($id));
 		return true;
 	}
 	/**
 	 * Delete suveys in a page which includes the data items in
 	 * Survey,SuveyChoice,Presentation,SurveyRecord.
 	 * Page table would still be saved.
-	 * @param $title title of a wiki page
+	 * 
+	 * @param $is id of a wiki page
 	 * @version 2.0
 	 */
-	function deleteSurvey($title)
+	function deleteSurveys($id)
 	{
 		global $gDB;
-		$sql = "select pageID from page where title = ?";
-		$rs = $gDB->Execute ($sql, array($title));
+		$sql = "select pageID from page where pageID = ?";
+		$rs = $gDB->Execute ($sql, array($id));
 		if ($rs->RecordCount() == 0)
 			throw new SurveyException("No survey matches this question!",201);
 		$gDB->StartTrans();
@@ -433,8 +431,7 @@ class SurveyDAO
 		}
 		$sql = "delete from survey where pageID = ?";
 		$gDB->Execute($sql, array($id));
-		//$sql = "delete from page where pageID =".$id;
-		//$gDB->Execute($sql);
+
 		$gDB->CompleteTrans();
 		if ($gDB->HasFailedTrans()) {
 			$message = $gDB->ErrorMsg();
@@ -482,7 +479,7 @@ class SurveyDAO
 		}
 		$rsSurveys->Close();
 	
-		return $surveys	;
+		return $surveys;
 	}
 	/**
 	 * private functin. Get choices of a survey

@@ -75,6 +75,7 @@ function vfConnectDatabase()
 $gDB = vfConnectDatabase();
 /**
  * Rotates color images for a choice.
+ * 
  * @return a path to image
  */
 function vfGetColorImage()
@@ -83,5 +84,19 @@ function vfGetColorImage()
 	$c = ($c + 1) % 50;
 	global $gvScript;
 	return "$gvScript/images/colors/Choice$c.jpg";
+}
+/**
+ * Purge the cache of a page with a given title
+ * 
+ * @param $title Title object from Mediawiki
+ */
+function vfPurgePage($title)
+{
+	$params = new FauxRequest(array('action' => 'purge','titles' => $title));
+	$api = new ApiMain($params, true);
+	$api->execute();
+	$data = & $api->getResultData();
+	if(!isset($data['purge'][0]['purged']))
+		throw new Exception('Page purging has failed');
 }
 ?>

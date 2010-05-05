@@ -55,7 +55,7 @@ class SurveyVO
 		if ($question)
 			$this->question = $question;
 		else
-			throw new SurveyException("Question cannot be a empty!",102);
+			throw new SurveyException("SurveyVO: Question cannot be a empty!",102);
 	}
 	/**
 	 * set the answer of survey
@@ -69,7 +69,7 @@ class SurveyVO
 		}
 		else
 		{
-			throw new SurveyException("Answer of a question must be an Integer!",101);
+			throw new SurveyException("SurveyVO: Answer of a question must be an Integer!",101);
 		}
 	}
 	/**
@@ -84,7 +84,7 @@ class SurveyVO
 			$this->points = $points;
 		}
 		else
-			throw new SurveyException("Points of a question must be an Integer!",101);
+			throw new SurveyException("SurveyVO: Points of a question must be an Integer!",101);
 	}
 	/**
 	 * Set mulit choices of this survey

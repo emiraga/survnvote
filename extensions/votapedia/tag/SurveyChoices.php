@@ -11,11 +11,11 @@ require_once("$gvPath/survey/SurveyDAO.php");
  */
 function vfSurveyChoicesInit( &$parser )
 {
-	$parser->setHook( 'SurveyChoices', 'vfSurveyChoices' );
+	$parser->setHook( 'Survey', 'vfSurveyChoices' );
 	return true;
 }
 /**
- * SurveyChoice tag handler, draws HTML in place of <SurveyChoice> tag
+ * SurveyChoice tag handler, draws HTML in place of SurveyChoice tag
  * 
  * @param $input
  * @param $args
@@ -54,17 +54,15 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 		$surveyStatus = 'ended';
 
 	$userName = $wgUser->getName();
-
 	$timeleft = $endtime - $starttime;
-
-	$action=$wgRequest->getVal( "action" );
+	
+	$output.= wfMsgWikiHtml( 'survey-question', htmlspecialchars( $page->getTitle() ) ) ;
+	$output.='<table cellspacing="0" style="font-size:large">';
 	
 	$prosurv = Title::newFromText('Special:ProcessSurvey');
-	$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">';
-	$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
-	$output.='<table cellspacing="0" style="font-size:large">';
+	$cresurv = Title::newFromText('Special:CreateSurvey');
 	global $gvScript;
-	$output.= '<tr><td valign="top"><img src="'.$gvScript.'/images/spacer.gif" />';
+	$output.= '<tr><td valign="top" colspan="2"><img src="'.$gvScript.'/images/spacer.gif" />';
 	// put an 250*1 spacer image above the choices so that the text doesn't get 
 	// squashed by the graph when browser is less than full screen.
 	
@@ -73,12 +71,13 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 	
 	if($surveyStatus=='ready')
 	{
+		$output.='<tr><td colspan="2">';
 		$output.='<ul>';
 		$i=0;
 		foreach ($choices as $choice)
 		{
 			$i++;
-			$choice = $parser->recursiveTagParse($choice->getChoice());
+			$choice = $parser->recursiveTagParse( strip_tags( $choice->getChoice(), '<math>' ));
 			if($choice)
 			{
 				$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
@@ -88,12 +87,28 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 		$output.='</ul>';
 		if($userName == $page -> getAuthor() )
 		{
-			$output.='<p style="margin:10px 10px 10px 10px"><input type="submit" name="Submit" value="Start survey" /></p></td>';
+			$output.='<tr><td>';
+			//start button
+			$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">';
+			$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
+			$output.='<input type="submit" name="Submit" value="Start survey" />';
+			$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
+			$output.='</form>';
+
+			global $wgTitle;
+			$output.='<td>';
+			//edit button
+			$output.='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">';
+			$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
+			$output.='<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">';
+			$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
+			$output.='<input type="hidden" name="returnto" value="'.htmlspecialchars( $wgTitle->getDBkey() ).'" />';
+			$output.='</form>';
+			
 			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
 			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
 			#alt="sample graph" /></div></td></tr>';
 		}
-		$output.='</td></tr>';
 	}
 	elseif($surveyStatus == 'active')
 	{
@@ -124,12 +139,19 @@ function vfSurveyChoices( $input, $args, $parser, $frame = NULL )
 			$countryCode=" +61";
 		$output.=' or SMS the <span style="color:#FF0000">red</span> digits corresponding to your choice to'.$countryCode.' 416906973.</td></tr>';
 	}
-	$output .= '</table></form>';
+	$output .= '</form>';
 	
 	if($surveyStatus == 'active')
 		$output .= '<p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';
 	//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
 	
+	/*
+	 * Edit survey button
+	 */
+	if($surveyStatus == 'ready')
+	{
+	}
+	$output .= '</table>';
 	return $output;
 	
 	#####################################
