@@ -62,6 +62,7 @@ class tagSurveyChoices
 		$survey = $page->getSurveys();
 		$choices = $survey[0]->getChoices();
 		
+		global $gvAllowedTags;
 		if($surveyStatus=='ready')
 		{
 			$output.='<tr><td colspan="2">';
@@ -70,7 +71,7 @@ class tagSurveyChoices
 			foreach ($choices as $choice)
 			{
 				$i++;
-				$choice = $parser->recursiveTagParse( strip_tags( $choice->getChoice(), '<math>' ));
+				$choice = $parser->recursiveTagParse( strip_tags( $choice->getChoice(), $gvAllowedTags));
 				if($choice)
 				{
 					$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
