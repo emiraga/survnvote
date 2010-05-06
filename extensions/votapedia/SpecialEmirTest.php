@@ -44,8 +44,12 @@ function wfExtensionSpEmirTest() {
 			"<script><!-- 
 			sajax_do_call( 'vp_Test1', ['jedan', 'dva'], function(o) { document.getElementById('response').innerHTML = o.responseText; } );
 			//--></script>");
+			
+			$article = new Article( Title::newFromText( "Sandbox" ) );
+			$editor = new EditPage( $article );
+			#$wgOut->addHTML('<script type="text/javascript" src="/new/skins/common/edit.js?207"></script>');
+			#$editor->showEditForm();
 		}
-
 	}//end class SpEmirTestPage
 
 	SpecialPage::addPage( new SpEmirTestPage );

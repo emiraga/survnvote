@@ -43,19 +43,25 @@ if(defined('VOTAPEDIA_TEST')) //used for unit testing
 /*** Do not edit items below unless you know what you are doing ***/
 /******************************************************************/
 
-require_once( "$gvPath/Common.php" );
-require_once( "$gvPath/UserHooks.php" );
-require_once( "$gvPath/tag/SurveyChoices.php" );
-
 #debug script
-require_once( "$gvPath/SpecialEmirTest.php" );
+require_once( "$gvPath/SpecialEmirTest.php" ); //@todo remove this
+require_once( "$gvPath/UserHooks.php" );
 
+//International Text and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
 $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
 
+//Special page CreateSurvey
 $wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
 $wgSpecialPages['CreateSurvey'] = 'CreateSurvey';
 
+//Tag <Survey />
+$wgAutoloadClasses['tagSurveyChoices'] = "$gvPath/tag/SurveyChoices.php";
+$wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
+function vfSurveyChoicesInit( &$parser )
+{ $parser->setHook( 'Survey', 'tagSurveyChoices::execute' ); return true; }
+
+//Credits
 $wgExtensionCredits['other'][] = array(
 	'name' => 'Votapedia',
 	'author' => 'Emir Habul',

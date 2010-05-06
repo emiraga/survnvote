@@ -2,6 +2,7 @@
 if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
+require_once( "$gvPath/Common.php" );
 require_once("$gvPath/FormControl.php");
 require_once("$gvPath/survey/VO/PageVO.php");
 require_once("$gvPath/survey/SurveyDAO.php");

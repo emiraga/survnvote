@@ -42,8 +42,6 @@ function vfSuccessBox($message)
 }
 /**
  * Custom Exception class for surveys
- * 
- * @author Emir Habul
  *
  */
 class SurveyException extends Exception
@@ -72,6 +70,7 @@ function vfConnectDatabase()
  * Global variable - ADOdb
  * @var $gDB global variable ADOdb connection
  */
+global $gDB; 
 $gDB = vfConnectDatabase();
 /**
  * Rotates color images for a choice.
