@@ -33,12 +33,12 @@ class Telephone
 	 */
 	function __construct()
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		
-		$sql = "select telenumber from telenumber order by telenumber";
+		$sql = "select telenumber from {$gvDBPrefix}telenumber order by telenumber";
 		// Force indexing by name not number
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs= &$gDB->Execute($sql);
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rs= &$gvDB->Execute($sql);
 
 		$this->allPhones = array();
 		if ($rs->RecordCount()>0)
@@ -81,7 +81,7 @@ class Telephone
 	 */
 	function getAvailablePhones()
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 
 		/* CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER 
 		 * VIEW `view_available_telephone` AS select sql_no_cache  `telenumber`.`telenumber` AS `telenumber` from  `telenumber` 
@@ -134,10 +134,10 @@ class Telephone
 		 */
 		
 		// Get available phones directly from view_available_telephone
-		$sql = "select telenumber from view_available_telephone order by telenumber";
+		$sql = "select telenumber from {$gvDBPrefix}view_available_telephone order by telenumber";
 		// Force indexing by name not number
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs= &$gDB->Execute($sql);
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rs= &$gvDB->Execute($sql);
 
 		$telephones = array();
 		if ($rs->RecordCount()>0)
@@ -206,13 +206,13 @@ class Telephone
 	 */
 	function getBlockHistory()
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		
-		$sql="select receiver, count(receiver) as number from surveychoice";
+		$sql="select receiver, count(receiver) as number from {$gvDBPrefix}surveychoice";
 		$sql.=" group by receiver order by number desc, receiver ";
 
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs= &$gDB->Execute($sql);
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rs= &$gvDB->Execute($sql);
 
 		$usedBlocks = array();
 		while(!$rs->EOF)
@@ -236,15 +236,15 @@ class Telephone
 	 */
 	public function getUsedPhonesByUser($username)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 
-		$sql  = "SELECT surveychoice.receiver, count(surveychoice.receiver) as number ";
-		$sql .= "FROM page INNER JOIN survey ON page.pageID = survey.pageID INNER JOIN ";
-		$sql .= "surveychoice ON survey.surveyID = surveychoice.surveyID WHERE ";
-		$sql .= "(page.author = ?) group by surveychoice.receiver order by number desc";
+		$sql  = "SELECT {$gvDBPrefix}surveychoice.receiver, count({$gvDBPrefix}surveychoice.receiver) as number ";
+		$sql .= "FROM {$gvDBPrefix}page INNER JOIN {$gvDBPrefix}survey ON page.pageID = {$gvDBPrefix}survey.pageID INNER JOIN ";
+		$sql .= "{$gvDBPrefix}surveychoice ON {$gvDBPrefix}survey.surveyID = {$gvDBPrefix}surveychoice.surveyID WHERE ";
+		$sql .= "({$gvDBPrefix}page.author = ?) group by {$gvDBPrefix}surveychoice.receiver order by number desc";
 		
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs= &$gDB->Execute($sql,array( $username ));
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rs= &$gvDB->Execute($sql,array( $username ));
 		$usedPhones = array();
 		while(!$rs->EOF)
 		{
@@ -512,7 +512,7 @@ class Telephone
 	 */
 	function setupReceivers(PageVO &$page)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		
 		$listedPhones = $this->getUsedPhonesByUser($page->getAuthor());
 		//Set up Blocks, which telephone numbers are read directly from database
@@ -520,7 +520,7 @@ class Telephone
 
 		$surveys = &$page->getSurveys();
 		
-		$gDB->Execute("LOCK TABLES view_available_telephone READ, page WRITE");
+		$gvDB->Execute("LOCK TABLES {$gvDBPrefix}view_available_telephone READ, {$gvDBPrefix}page WRITE");
 		$availablePhones = $this->getAvailablePhones();
 		foreach($surveys as &$survey)
 		{
@@ -530,7 +530,7 @@ class Telephone
 			$number = $survey->getNumOfChoices();
 			if (count($results)< $number)
 			{
-				$gDB->Execute("UNLOCK TABLES");
+				$gvDB->Execute("UNLOCK TABLES");
 				throw new SurveyException("No available phones!",203);
 			}
 			else
@@ -546,15 +546,15 @@ class Telephone
 		}
 
 		//update startTime and EndTime
-		$sql = "update page set startTime = ?, endTime = ? where pageID = ?";
-		$res = $gDB->Prepare($sql);
-		$gDB->Execute($res,array( $page->getStartTime(), $page->getEndTime(), $page->getPageID() ));
+		$sql = "update {$gvDBPrefix}page set startTime = ?, endTime = ? where pageID = ?";
+		$res = $gvDB->Prepare($sql);
+		$gvDB->Execute($res,array( $page->getStartTime(), $page->getEndTime(), $page->getPageID() ));
 
-		$gDB->Execute("UNLOCK TABLES");
+		$gvDB->Execute("UNLOCK TABLES");
 		
 		//Update the receivers
-		$sqlChoice = "update surveychoice set receiver = ?, sms = ? where surveyID = ? and choiceID = ?";
-		$resChoice = $gDB->Prepare($sqlChoice);
+		$sqlChoice = "update {$gvDBPrefix}surveychoice set receiver = ?, sms = ? where surveyID = ? and choiceID = ?";
+		$resChoice = $gvDB->Prepare($sqlChoice);
 		foreach($surveys as &$survey)
 		{
 			$surveyChoices = $survey->getChoices();
@@ -568,7 +568,7 @@ class Telephone
 					$surveyChoice->getSurveyID(),
 					$num
 				);
-				$gDB->Execute($resChoice, $param);
+				$gvDB->Execute($resChoice, $param);
 			}
 		}
 	}

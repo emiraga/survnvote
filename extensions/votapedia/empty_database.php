@@ -16,13 +16,13 @@ $tables = array(
 	'textresponsesms',
 );
 
-global $gDB;
+global $gvDB, $gvDBPrefix;
 
 foreach($tables as $name)
 {
 	$sql ="TRUNCATE ".$name;
-	$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-	assert( $rs = &$gDB->Execute($sql) );
+	$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+	assert( $rs = &$gvDB->Execute($sql) );
 	$rs->Close();
 }
 ?>

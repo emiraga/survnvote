@@ -22,13 +22,13 @@ class SurveyRecordDAO
 	 */
 	function isFirstVoting($voterID)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		
-		$num= $gDB->GetOne("select count(*) as num from incomingcall where caller = ?", array($voterID));
+		$num= $gvDB->GetOne("select count(*) as num from {$gvDBPrefix}incomingcall where caller = ?", array($voterID));
 		if ($num > 0)
 			return false;
 
-		$num= $gDB->GetOne("select count(*) as num from incomingsms where sender = ?", array($voterID));
+		$num= $gvDB->GetOne("select count(*) as num from {$gvDBPrefix}incomingsms where sender = ?", array($voterID));
 		if ($num > 0)
 			return false;
 
@@ -44,9 +44,9 @@ class SurveyRecordDAO
 	 */
 	function isMultipleVote($surveyID, $username)
 	{
-		global $gDB;
-		$sql="select count(surveyID) as num from surveyrecord where surveyID= ? and voterID = ? ";
-		$num= $gDB->GetOne($sql,array( $surveyID, $username ));
+		global $gvDB, $gvDBPrefix;
+		$sql="select count(surveyID) as num from {$gvDBPrefix}surveyrecord where surveyID = ? and voterID = ?";
+		$num= $gvDB->GetOne($sql,array( $surveyID, $username ));
 		return ($num != 0);
 	}
 	/**
@@ -59,21 +59,21 @@ class SurveyRecordDAO
 	 */
 	function insertRecord(SurveyRecordVO &$surveyRecordVO)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 
-		$sql = "insert into surveyRecord (surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?)";
+		$sql = "insert into {$gvDBPrefix}surveyRecord (surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?)";
 		
 		$params = array(
 			$surveyRecordVO->getSurveyID(),$surveyRecordVO->getChoiceID(),$surveyRecordVO->getPresentationID(),
 			$surveyRecordVO->getVoterID(),$surveyRecordVO->getVoteDate(), $surveyRecordVO->getVoteType(),
 		);
-		$gDB->Execute($sql,$params);
+		$gvDB->Execute($sql,$params);
 
-		$sql = "update surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?";
+		$sql = "update {$gvDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?";
 		$params = array(
 			$surveyRecordVO->getSurveyID(), $surveyRecordVO->getChoiceID()
 		);
-		$gDB->Execute($sql,$params);
+		$gvDB->Execute($sql,$params);
 	}
 }
 

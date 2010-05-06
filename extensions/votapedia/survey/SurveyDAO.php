@@ -28,11 +28,11 @@ class SurveyDAO
 	 */
 	private function getOnePage($where, $param)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$sql ="select * from page ".$where;
-		$rs= &$gDB->Execute($sql, $param);
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$sql ="select * from {$gvDBPrefix}page $where";
+		$rs= &$gvDB->Execute($sql, $param);
 		$page = new PageVO();
 
 		if ($rs->RecordCount()==0)
@@ -99,14 +99,14 @@ class SurveyDAO
 	 */
 	public function insertPage(PageVO &$pageVO, $insertSurveys = false)
 	{
-		global $gDB;
-		$gDB->StartTrans();
+		global $gvDB, $gvDBPrefix;
+		$gvDB->StartTrans();
 
-		$sql = "insert into page(title,author,phone,startTime,duration,endTime,invalidAllowed,smsRequired,teleVoteAllowed,
+		$sql = "insert into {$gvDBPrefix}page (title,author,phone,startTime,duration,endTime,invalidAllowed,smsRequired,teleVoteAllowed,
                        anonymousAllowed,showGraph,surveyType,displayTop,subtractWrong) ";
 		//@todo some fields from page are missing
 		$sql = $sql."values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-		$resPage = $gDB->Prepare($sql);
+		$resPage = $gvDB->Prepare($sql);
 		$param = array( $pageVO->getTitle(),
 			$pageVO->getAuthor(),
 			$pageVO->getPhone(),
@@ -122,8 +122,8 @@ class SurveyDAO
 			$pageVO->getDisplayTop(),
 			$pageVO->isSubtractWrong()
 		);
-		$gDB->Execute($resPage,$param);
-		$pageVO->setPageID($gDB->Insert_ID());
+		$gvDB->Execute($resPage,$param);
+		$pageVO->setPageID($gvDB->Insert_ID());
 
 		if($insertSurveys)
 		{
@@ -134,9 +134,9 @@ class SurveyDAO
 				$this->insertSurvey($survey);
 			}
 		}
-		$gDB->CompleteTrans();
-		if ($gDB->HasFailedTrans()) {
-			throw new SurveyException("Erro while inserting a page: ".$gDB->ErrorMsg(), 400);
+		$gvDB->CompleteTrans();
+		if ($gvDB->HasFailedTrans()) {
+			throw new SurveyException("Erro while inserting a page: ".$gvDB->ErrorMsg(), 400);
 		}
 		return true;
 	}
@@ -150,17 +150,17 @@ class SurveyDAO
 	 */
 	public function updatePage(PageVO &$pageVO)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		// Check wether the page exists
 	 	$pageID = $pageVO->getPageID();
 		assert($pageID > 0);
 
-		$gDB->StartTrans();
-	 	$sql = "update page set title=?,startTime=?,duration=?,endTime=?,"
+		$gvDB->StartTrans();
+	 	$sql = "update {$gvDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
 		 	. "invalidAllowed=?,smsRequired=?,teleVoteAllowed=?,"
 		 	. " anonymousAllowed=?,showGraph=?,surveyType=?,displayTop=?,votesallowed=?,subtractWrong=? "
 		 	. "where pageID = ?";
-	 	$resPage = $gDB->Prepare($sql);
+	 	$resPage = $gvDB->Prepare($sql);
 	 	$param = array(
 	 		$pageVO->getTitle(),
 	 		$pageVO->getStartTime(),
@@ -178,7 +178,7 @@ class SurveyDAO
 		 	$pageID
 	 	);
 	 	//@todo some fields here are missing
-	 	$gDB->Execute($resPage,$param);
+	 	$gvDB->Execute($resPage,$param);
 		
 	 	$this->deleteSurveys($pageID);
 	 	
@@ -189,9 +189,9 @@ class SurveyDAO
  			$this->insertSurvey($survey);
  		}
 
- 		$gDB->CompleteTrans();
-	 	if ($gDB->HasFailedTrans()) {
-	 		throw new SurveyException("ODBC Commit error: ".$gDB->ErrorMsg(),400);
+ 		$gvDB->CompleteTrans();
+	 	if ($gvDB->HasFailedTrans()) {
+	 		throw new SurveyException("ODBC Commit error: ".$gvDB->ErrorMsg(),400);
 	 	}
  		return true;
 	}
@@ -203,9 +203,9 @@ class SurveyDAO
 	 */
 	private function getSurveysSQL($sql, $params)
 	{
-		global $gDB;
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rsSurveys = &$gDB->Execute($sql, $params);
+		global $gvDB, $gvDBPrefix;
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rsSurveys = &$gvDB->Execute($sql, $params);
 			
 		$surveys = array();
 		while(!$rsSurveys->EOF)
@@ -242,7 +242,7 @@ class SurveyDAO
 	 */
 	function findSurveyByID($id)
 	{
-		$surveys = getSurveysSQL("select * from survey where surveyID = ?", array($surveyID));
+		$surveys = getSurveysSQL("select * from {$gvDBPrefix}survey where surveyID = ?", array($surveyID));
 		if(count($surveys) == 0)
 			throw new SurveyException("Survey not found", 400);
 		return $surveys[0];
@@ -254,16 +254,16 @@ class SurveyDAO
 	 */
 	function findCurrentSurveys($num = NULL)
 	{
-		global $gDB;
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$sql = "select pageID from page where starttime <= now() and endtime >= now() and surveytype = 1 order by starttime desc";
+		global $gvDB, $gvDBPrefix;
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$sql = "select pageID from {$gvDBPrefix}page where starttime <= now() and endtime >= now() and surveytype = 1 order by starttime desc";
 		$param = array();
 		if($num)
 		{
 			$sql .= " limit ?";
 			$param = array($num);
 		}
-		$rs = &$gDB->Execute($sql, $param);
+		$rs = &$gvDB->Execute($sql, $param);
 		$surveyIDs = array();
 		$votesAllowed = array();
 
@@ -277,7 +277,7 @@ class SurveyDAO
 		$surveys = array();
 		foreach($surveyIDs as $id)
 		{
-			$survey = $this->getSurveysSQL("select * from survey where pageID = ?", $id);
+			$survey = $this->getSurveysSQL("select * from {$gvDBPrefix}survey where pageID = ?", $id);
 			if(count($survey) == 0)
 				throw new SurveyException("findCurrentSurveys, survey not found.");
 			$surveys[] = $survey[0] ;
@@ -295,15 +295,15 @@ class SurveyDAO
 	function resetSurveys(PageVO $pageVO)
 	{
 		$surveys = $pageVO->getSurveys();
-		global $gDB;
-		$res1= $gDB->Prepare("delete from surveyRecord where surveyID = ?");
-		$res2= $gDB->Prepare("update surveyChoice set vote = 0 where surveyID = ?");
+		global $gvDB, $gvDBPrefix;
+		$res1= $gvDB->Prepare("delete from {$gvDBPrefix}surveyRecord where surveyID = ?");
+		$res2= $gvDB->Prepare("update {$gvDBPrefix}surveyChoice set vote = 0 where surveyID = ?");
 		
 		foreach($surveys as $survey)
 		{
 			$surveyID = $survey->getSurveyID();
-			$gDB->Execute($res1,array($surveyID));
-			$gDB->Execute($res2,array($surveyID));
+			$gvDB->Execute($res1,array($surveyID));
+			$gvDB->Execute($res2,array($surveyID));
 		}
 		return true;
 	}
@@ -318,9 +318,9 @@ class SurveyDAO
 	function resetSurvey(SurveyVO $surveyVO)
 	{
 		$surveyID = $survey->getSurveyID();
-		global $gDB;
-		$gDB->Execute("delete from surveyRecord where surveyID = ?", array($surveyID));
-		$gDB->Execute("update surveyChoice set vote = 0 where surveyID = ?", array($surveyID));
+		global $gvDB, $gvDBPrefix;
+		$gvDB->Execute("delete from {$gvDBPrefix}surveyRecord where surveyID = ?", array($surveyID));
+		$gvDB->Execute("update {$gvDBPrefix}surveyChoice set vote = 0 where surveyID = ?", array($surveyID));
 		return true;
 	}
 	/**
@@ -330,27 +330,27 @@ class SurveyDAO
 	 */
 	private function insertSurvey(SurveyVO $survey)
 	{
-		global $gDB;
-		$sql="insert into survey(pageID,question,answer,points) values (?,?,?,?)";
-		$res=$gDB->Prepare($sql);
+		global $gvDB, $gvDBPrefix;
+		$sql="insert into {$gvDBPrefix}survey (pageID,question,answer,points) values (?,?,?,?)";
+		$res=$gvDB->Prepare($sql);
 		$paramSurvey = array(
 			$survey->getPageID(),
 			$survey->getQuestion(),
 			$survey->getAnswer(),
 			$survey->getPoints()
 		);
-		$gDB->Execute($res,$paramSurvey);
+		$gvDB->Execute($res,$paramSurvey);
 
 		if ($survey->getNumOfChoices()>0)
 		{
 			// Get SurveyID from database.
-			$sql = "select surveyID from survey where question = ? and pageID = ? order by surveyid desc";
-			$rsSurveyID = $gDB->Execute($sql, array($survey->getQuestion(), $survey->getPageID()));
+			$sql = "select surveyID from {$gvDBPrefix}survey where question = ? and pageID = ? order by surveyid desc";
+			$rsSurveyID = $gvDB->Execute($sql, array($survey->getQuestion(), $survey->getPageID()));
 			$survey->setSurveyID($rsSurveyID->fields["surveyID"]);
 			$rsSurveyID->Close();
 			//Insert Choices begin
-			$sql = "insert into surveyChoice(surveyID, choiceID, choice, points) values (?,?,?,?)";
-			$resChoice = $gDB->Prepare($sql);
+			$sql = "insert into {$gvDBPrefix}surveyChoice (surveyID, choiceID, choice, points) values (?,?,?,?)";
+			$resChoice = $gvDB->Prepare($sql);
 			$choiceID = 0;
 			foreach($survey->getChoices() as $surveyChoice)
 			{
@@ -361,19 +361,19 @@ class SurveyDAO
 					$surveyChoice->getChoice(),
 					$this->evaluatePoints($choiceID,$survey->getNumOfChoices())
 				);
-				$gDB->Execute($resChoice,$param);
+				$gvDB->Execute($resChoice,$param);
 			}
 		}
 		if ($survey->getNumOfPresentations()>0)
 		{
 			//Insert presentations begin
-			$sql = "insert into presentation (surveyID,presentationID,presentation,active)";
+			$sql = "insert into {$gvDBPrefix}presentation (surveyID,presentationID,presentation,active)";
 			$sql = $sql."values(?,?,?,?)";
-			$resPre = $gDB->Prepare($sql);
+			$resPre = $gvDB->Prepare($sql);
 			$presentationID = 1;
 			foreach($survey->getPresentations()as $presentation)
 			{
-				$gDB->Execute($resPre,array(
+				$gvDB->Execute($resPre,array(
 					$survey->getSurveyID(),
 					$presentationID,
 					$presentation->getPresentation(),
@@ -394,8 +394,8 @@ class SurveyDAO
 	function deletePage($id)
 	{
 		$this->deleteSurvey($id);
-		global $gDB;
-		$gDB->Execute("delete from page where pageID = ?",array($id));
+		global $gvDB, $gvDBPrefix;
+		$gvDB->Execute("delete from {$gvDBPrefix}page where pageID = ?",array($id));
 		return true;
 	}
 	/**
@@ -408,33 +408,33 @@ class SurveyDAO
 	 */
 	function deleteSurveys($id)
 	{
-		global $gDB;
-		$sql = "select pageID from page where pageID = ?";
-		$rs = $gDB->Execute ($sql, array($id));
+		global $gvDB, $gvDBPrefix;
+		$sql = "select pageID from {$gvDBPrefix}page where pageID = ?";
+		$rs = $gvDB->Execute ($sql, array($id));
 		if ($rs->RecordCount() == 0)
 			throw new SurveyException("No survey matches this question!",201);
-		$gDB->StartTrans();
+		$gvDB->StartTrans();
 		$id = $rs->fields[0];
 		$rs->Close();
-		$sql = "select surveyID from survey where pageID = ?";
-		$rs = $gDB->Execute($sql, array($id));
+		$sql = "select surveyID from {$gvDBPrefix}survey where pageID = ?";
+		$rs = $gvDB->Execute($sql, array($id));
 		while (!$rs->EOF)
 		{
 			$surveyID = $rs->fields[0];
-			$sql = "delete from presentation where surveyID = ?";
-			$gDB->Execute($sql, array($surveyID));
-			$sql = "delete from surveychoice where surveyID = ?";
-			$gDB->Execute($sql, array($surveyID));
-			$sql = "delete from surveyrecord where surveyID = ?";
-			$gDB->Execute($sql, array($surveyID));
+			$sql = "delete from {$gvDBPrefix}presentation where surveyID = ?";
+			$gvDB->Execute($sql, array($surveyID));
+			$sql = "delete from {$gvDBPrefix}surveychoice where surveyID = ?";
+			$gvDB->Execute($sql, array($surveyID));
+			$sql = "delete from {$gvDBPrefix}surveyrecord where surveyID = ?";
+			$gvDB->Execute($sql, array($surveyID));
 			$rs->MoveNext();
 		}
-		$sql = "delete from survey where pageID = ?";
-		$gDB->Execute($sql, array($id));
+		$sql = "delete from {$gvDBPrefix}survey where pageID = ?";
+		$gvDB->Execute($sql, array($id));
 
-		$gDB->CompleteTrans();
-		if ($gDB->HasFailedTrans()) {
-			$message = $gDB->ErrorMsg();
+		$gvDB->CompleteTrans();
+		if ($gvDB->HasFailedTrans()) {
+			$message = $gvDB->ErrorMsg();
 			throw new Exception("ODBC Commit error:.$message");
 		}
 		return true;
@@ -448,10 +448,10 @@ class SurveyDAO
 	 */
 	private function loadSurveys($page)
 	{
-		global $gDB;
-		$sql = "select * from survey where pageID = ? order by surveyID";
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rsSurveys = &$gDB->Execute($sql, array($page->getPageID()));
+		global $gvDB, $gvDBPrefix;
+		$sql = "select * from {$gvDBPrefix}survey where pageID = ? order by surveyID";
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rsSurveys = &$gvDB->Execute($sql, array($page->getPageID()));
 			
 		$surveys = array();
 		while(!$rsSurveys->EOF)
@@ -490,10 +490,10 @@ class SurveyDAO
 	 */
 	private function getChoices($surveyID)
 	{
-		global $gDB;
-		$sql = "select * from surveyChoice where surveyID=? order by choiceID";
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rsChoice = &$gDB->Execute($sql, array($surveyID));
+		global $gvDB, $gvDBPrefix;
+		$sql = "select * from {$gvDBPrefix}surveyChoice where surveyID=? order by choiceID";
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rsChoice = &$gvDB->Execute($sql, array($surveyID));
 		
 		$choices = array();
 		while(!$rsChoice->EOF)
@@ -545,10 +545,10 @@ class SurveyDAO
 			) AS stat
 			GROUP BY presentationid"; */
 		//Collect vote data,complicated SQL
-		global $gDB;
-		$sqlRecord = "select * from view_presentation_survey_mark where surveyid = ?";
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rsVote=&$gDB->Execute($sqlRecord, array($surveyID));
+		global $gvDB, $gvDBPrefix;
+		$sqlRecord = "select * from {$gvDBPrefix}view_presentation_survey_mark where surveyid = ?";
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rsVote=&$gvDB->Execute($sqlRecord, array($surveyID));
 		$marks = array();
 		while(!$rsVote->EOF)
 		{
@@ -556,9 +556,9 @@ class SurveyDAO
 			$rsVote->MoveNext();
 		}
 
-		$gDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$sql = "select * from presentation where surveyID = ? order by presentationID";
-		$rsPresentation = &$gDB->Execute($sql, array($surveyID));
+		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$sql = "select * from {$gvDBPrefix}presentation where surveyID = ? order by presentationID";
+		$rsPresentation = &$gvDB->Execute($sql, array($surveyID));
 		
 		$presentations = array();
 
@@ -602,16 +602,16 @@ class SurveyDAO
 	 */
 	function activatePresentation($surveyID,$presentationID)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 
-		$gDB->StartTrans();
+		$gvDB->StartTrans();
 
-		$sql = "update presentation set active = 0 where surveyID = ?";
-		$gDB->Execute($sql, array($surveyID));
-		$sql = "update presentation set active = 1 where surveyID = ? and presentationID = ?";
-		$gDB->Execute($sql, array($surveyID, $presentationID));
+		$sql = "update {$gvDBPrefix}presentation set active = 0 where surveyID = ?";
+		$gvDB->Execute($sql, array($surveyID));
+		$sql = "update {$gvDBPrefix}presentation set active = 1 where surveyID = ? and presentationID = ?";
+		$gvDB->Execute($sql, array($surveyID, $presentationID));
 
-		$gDB->CompleteTrans();
+		$gvDB->CompleteTrans();
 
 		return true;
 	}
@@ -624,12 +624,12 @@ class SurveyDAO
 	 */
 	function startSurvey(PageVO $pageVO)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		$startDate = date("Y-m-d H:i:s");
 		$pageVO->setStartTime($startDate);
 
-		$sql = "update page set starttime = ?, endtime=? where pageID = ?";
-		$gDB->Execute($sql, array($pageVO->getStartTime(), $pageVO->getEndTime(), $pageVO->getPageID()));
+		$sql = "update {$gvDBPrefix}page set starttime = ?, endtime=? where pageID = ?";
+		$gvDB->Execute($sql, array($pageVO->getStartTime(), $pageVO->getEndTime(), $pageVO->getPageID()));
 
 		return true;
 	}
@@ -641,14 +641,14 @@ class SurveyDAO
 	 */
 	function continueSurvey(PageVO $pageVO)
 	{
-		global $gDB; //@todo perhaps reduce the duration
+		global $gvDB, $gvDBPrefix; //@todo perhaps reduce the duration
 		$duration= $pageVO->getDuration();
 		$endTime=time()+$duration*60;
 		$endDate = date("Y-m-d H:i:s",$endTime);
 		$pageVO->setEndTime($endDate);
 
-		$sql = "update page set endtime = ? where pageID = ?";
-		$gDB->Execute($sql, array($pageVO->getEndTime(),$pageVO->getPageID()));
+		$sql = "update {$gvDBPrefix}page set endtime = ? where pageID = ?";
+		$gvDB->Execute($sql, array($pageVO->getEndTime(),$pageVO->getPageID()));
 		return true;
 	}
 	/**
@@ -660,10 +660,10 @@ class SurveyDAO
 	 */
 	function finishSurvey(PageVO $pageVO)
 	{
-		global $gDB;
+		global $gvDB, $gvDBPrefix;
 		$expiredDate = date("Y-m-d H:i:s");
-		$sqlChoice = "update page set endtime = ? where pageID = ?";
-		$gDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
+		$sqlChoice = "update {$gvDBPrefix}page set endtime = ? where pageID = ?";
+		$gvDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
 		return true;
 	}
 	/**

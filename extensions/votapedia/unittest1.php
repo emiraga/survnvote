@@ -4,7 +4,9 @@
 	define('VOTAPEDIA_TEST', true);
 	
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
+	
 	require_once("./votapedia.php");
+	require_once("$gvPath/Common.php");
 	require_once("$gvPath/empty_database.php");
 
 	if(true) /* Test choiceVO */

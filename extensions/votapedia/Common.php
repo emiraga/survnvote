@@ -59,19 +59,19 @@ include_once("adodb/adodb-exceptions.inc.php");
  */
 function vfConnectDatabase()
 {
-	global $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDataSourceName;
+	global $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName;
 
 	$cn = &ADONewConnection('mysqli');
-	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDataSourceName))
-		throw new SurveyException("Could not connect database", 400);
+	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName))
+		throw new SurveyException("Could not connect to database", 400);
 	return $cn;
 }
 /**
  * Global variable - ADOdb
- * @var $gDB global variable ADOdb connection
+ * @var $gvDB global variable ADOdb connection
  */
-global $gDB; 
-$gDB = vfConnectDatabase();
+global $gvDB;
+$gvDB = vfConnectDatabase();
 /**
  * Rotates color images for a choice.
  * 
@@ -87,7 +87,7 @@ function vfGetColorImage()
 /**
  * Purge the cache of a page with a given title
  * 
- * @param $title Title object from Mediawiki
+ * @param $title string title of wiki page
  */
 function vfPurgePage($title)
 {
