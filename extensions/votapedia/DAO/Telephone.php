@@ -8,8 +8,8 @@ if (!defined('MEDIAWIKI')) die();
  * 
  * @package DAO of Survey
  */
-
-require_once("$gvPath/survey/VO/SurveyVO.php");
+global $gvPath;
+require_once("$gvPath/VO/SurveyVO.php");
 /**
  * Blocks are groups of phones,
  * dynamic block is a separate group

@@ -9,7 +9,7 @@ if (!defined('MEDIAWIKI')) die();
  */
 
 require_once("$gvPath/VO/CallVO.php");
-require_once("$gvPath/VoteDAO.php");
+require_once("$gvPath/DAO/VoteDAO.php");
 
 /**
  * Class Usr includes functions which can vote surveys so far

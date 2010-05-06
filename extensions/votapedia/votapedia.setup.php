@@ -17,8 +17,8 @@ $sql = <<<END_SQL
 --
 -- Table structure for table page
 --
-DROP TABLE IF EXISTS %PREFIX%page;
-CREATE TABLE IF NOT EXISTS %PREFIX%page (
+DROP TABLE IF EXISTS {$gvDBPrefix}page;
+CREATE TABLE IF NOT EXISTS {$gvDBPrefix}page (
   pageID int(11) unsigned NOT NULL AUTO_INCREMENT,
   title varchar(512) NOT NULL,
   startTime datetime NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS %PREFIX%page (
 -- Table structure for table presentation
 --
 
-DROP TABLE IF EXISTS %PREFIX%presentation;
-CREATE TABLE IF NOT EXISTS %PREFIX%presentation (
+DROP TABLE IF EXISTS {$gvDBPrefix}presentation;
+CREATE TABLE IF NOT EXISTS {$gvDBPrefix}presentation (
   surveyID int(10) unsigned NOT NULL,
   presentationID tinyint(10) unsigned NOT NULL,
   presentation varchar(1000) NOT NULL,
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS %PREFIX%presentation (
 -- Table structure for table survey
 --
 
-DROP TABLE IF EXISTS %PREFIX%survey;
-CREATE TABLE IF NOT EXISTS %PREFIX%survey (
+DROP TABLE IF EXISTS {$gvDBPrefix}survey;
+CREATE TABLE IF NOT EXISTS {$gvDBPrefix}survey (
   pageID int(11) NOT NULL,
   surveyID int(11) unsigned NOT NULL AUTO_INCREMENT,
   question varchar(4000) NOT NULL,
@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS %PREFIX%survey (
 -- Table structure for table surveychoice
 --
 
-DROP TABLE IF EXISTS %PREFIX%surveychoice;
-CREATE TABLE IF NOT EXISTS %PREFIX%surveychoice (
+DROP TABLE IF EXISTS {$gvDBPrefix}surveychoice;
+CREATE TABLE IF NOT EXISTS {$gvDBPrefix}surveychoice (
   surveyID int(11) NOT NULL,
   choiceID tinyint(4) unsigned NOT NULL DEFAULT '1',
   choice varchar(400) NOT NULL,
@@ -97,8 +97,8 @@ CREATE TABLE IF NOT EXISTS %PREFIX%surveychoice (
 -- Table structure for table surveyrecord
 --
 
-DROP TABLE IF EXISTS %PREFIX%surveyrecord;
-CREATE TABLE IF NOT EXISTS %PREFIX%surveyrecord (
+DROP TABLE IF EXISTS {$gvDBPrefix}surveyrecord;
+CREATE TABLE IF NOT EXISTS {$gvDBPrefix}surveyrecord (
   ID int(11) unsigned NOT NULL AUTO_INCREMENT,
   voterID varchar(50) NOT NULL DEFAULT 'unknown',
   surveyID int(11) NOT NULL,
@@ -111,7 +111,6 @@ CREATE TABLE IF NOT EXISTS %PREFIX%surveyrecord (
 );
 END_SQL;
 
-	$sql = str_replace('%PREFIX%',$gvDBPrefix, $sql);
 	$commands = split(';', $sql);
 	foreach($commands as $sql)
 	{

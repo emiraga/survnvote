@@ -4,7 +4,7 @@ if (!defined('MEDIAWIKI')) die();
 $wgExtensionFunctions[] = "wfExtensionSpEmirTest";
 require_once( "$IP/extensions/votapedia/FormGenerator.php" );
 require_once( "$IP/includes/Article.php" );
-require_once( "$IP/extensions/votapedia/survey/surveyDAO.php" );
+require_once( "$IP/extensions/votapedia/DAO/surveyDAO.php" );
 
 function wfExtensionSpEmirTest() {
 	global $IP, $wgMessageCache;

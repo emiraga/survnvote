@@ -7,9 +7,9 @@ if (!defined('MEDIAWIKI')) die();
  *
  * @package DAO of Survey
  */
-
-require_once("$vpPath/Telephone.php");
-require_once("$vpPath/VO/PageVO.php");
+global $gvPath;
+require_once("$gvPath/DAO/Telephone.php");
+require_once("$gvPath/VO/PageVO.php");
 /**
  * SurveyDAO includes functions which can access and set
  * (a) Survey(s)' info into or from database system.

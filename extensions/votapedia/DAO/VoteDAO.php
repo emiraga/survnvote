@@ -7,8 +7,8 @@ if (!defined('MEDIAWIKI')) die();
  * @author Emir Habul
  * @package DAO of Survey
  */
-require_once("connection.php");
-require_once("VO/VoteVO.php");
+global $gvPath;
+require_once("$gvPath/VO/VoteVO.php");
 
 class VoteDAO
 {
