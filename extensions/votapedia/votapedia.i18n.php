@@ -13,5 +13,7 @@ $messages['en'] = array(
 	'create-survey' => 'Create Survey',
 	'edit-survey' => 'Edit Survey',
 	'survey-question' => '== Question: $1 ==',
+	'processsurvey' => 'Process Survey',
+	'start-survey' => 'Start Survey',
 );
 ?>

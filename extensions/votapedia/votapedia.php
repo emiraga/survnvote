@@ -43,7 +43,7 @@ $gvScript = "$wgScriptPath/extensions/votapedia";
  * Use different database for unit testing.
  */
 if(defined('VOTAPEDIA_TEST')) //used for unit testing
-	$gvDataSourceName = "unittest";
+	$gvDBName = "unittest";
 
 /******************************************************************/
 /*** Do not edit items below unless you know what you are doing ***/
@@ -60,6 +60,10 @@ $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
 //Special page CreateSurvey
 $wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
 $wgSpecialPages['CreateSurvey'] = 'CreateSurvey';
+
+//Special page ProcessSurvey
+$wgAutoloadClasses['ProcessSurvey'] = "$gvPath/special/ProcessSurvey.php";
+$wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 
 //Tag <Survey />
 $wgAutoloadClasses['tagSurveyChoices'] = "$gvPath/tag/SurveyChoices.php";

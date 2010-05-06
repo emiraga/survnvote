@@ -6,13 +6,17 @@
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 	
 	require_once("./votapedia.php");
+	$gvDBUserName       = 'root';
+	$gvDBUserPassword   = '';
+	$gvDBPrefix = '';
+	
 	require_once("$gvPath/Common.php");
 	require_once("$gvPath/empty_database.php");
 
 	if(true) /* Test choiceVO */
 	{
 		echo '.';
-		require_once("./survey/VO/ChoiceVO.php");
+		require_once("./VO/ChoiceVO.php");
 		$choice = new ChoiceVO();
 		
 		assert(! $choice->getChoiceID() );
@@ -43,7 +47,7 @@
 	if(true) /* test PresentationVO */
 	{
 		echo '.';
-		require_once("./survey/VO/PresentationVO.php");
+		require_once("./VO/PresentationVO.php");
 		$present = new PresentationVO();
 		
 		assert(! $present->getSurveyID() );
@@ -71,7 +75,7 @@
 	if(true) /* test VoteVO */
 	{
 		echo '.';
-		require_once('./survey/VO/VoteVO.php');
+		require_once('./VO/VoteVO.php');
 		$vote = new VoteVO();
 		assert( ! $vote->getChoiceID() );
 		assert( ! $vote->getInvalidAllowed() );
@@ -117,7 +121,7 @@
 	if(true) /* test SurveyVO */
 	{
 		echo '.';
-		require_once('./survey/VO/surveyVO.php');
+		require_once('./VO/surveyVO.php');
 		$survey = new SurveyVO();
 		assert( 0 == $survey->getActivePresentationID() );
 		assert( 0 ==  $survey->getAnswer() );
@@ -171,7 +175,7 @@
 	if( true ) /* test PageVO */
 	{
 		echo '.';
-		require_once('./survey/VO/PageVO.php');
+		require_once('./VO/PageVO.php');
 		$page = new PageVO();
 		assert( ! $page->getPageID() );
 		assert( ! $page->getTitle() );
@@ -235,7 +239,7 @@
 	if( true ) /* testing SurveyRecordVO */
 	{
 		echo '.';
-		require_once('./survey/VO/SurveyRecordVO.php');
+		require_once('./VO/SurveyRecordVO.php');
 		$sr = new SurveyRecordVO();
 		assert( ! $sr->getChoiceID() );
 		assert( $sr->getPresentationID() == 1 );
@@ -266,7 +270,7 @@
 	if( true ) /* testing SurveyRecordDAO */
 	{
 		echo '.';
-		require_once('./survey/SurveyRecordDAO.php');
+		require_once('./DAO/SurveyRecordDAO.php');
 		$srdao = new SurveyRecordDAO();
 
 		$sr = new SurveyRecordVO();
@@ -284,7 +288,7 @@
 	if( true ) /* testing CallVO */
 	{
 		echo '.';
-		require_once('./survey/VO/CallVO.php');
+		require_once('./VO/CallVO.php');
 		$call = new CallVO();
 		assert( !$call->getCallID() );
 		assert( !$call->getDate() );
@@ -308,7 +312,7 @@
 	if( true ) /* testing SmsVO */
 	{
 		echo '.';
-		require_once('./survey/VO/SmsVO.php');
+		require_once('./VO/SmsVO.php');
 		$sms = new SmsVO();
 		assert(! $sms->getDate() );
 		assert(! $sms->getErrorCode() );
@@ -332,7 +336,7 @@
 	if( true ) /* testing Telephone */
 	{
 		echo '.';
-		require_once('./survey/Telephone.php');
+		require_once('./DAO/Telephone.php');
 		$t = new Telephone();
 		assert( count($t->getAvailablePhones()) == count($t->getAllPhones()) );
 
@@ -371,7 +375,7 @@
 	if( false ) /* testing Usr */
 	{
 		echo '.';
-		require_once("./survey/Usr.php");
+		require_once("./DAO/Usr.php");
 		$user = new Usr('TestUser');
 	}
 	

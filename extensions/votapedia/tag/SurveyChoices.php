@@ -62,6 +62,19 @@ class tagSurveyChoices
 		$survey = $page->getSurveys();
 		$choices = $survey[0]->getChoices();
 		
+		// Get the page on which this survey is located.
+		$wikititle = $wgTitle;
+		if( $wikititle->getDBkey() == 'CreateSurvey')
+		{
+			//Specialpage:CreateSurvey may automatically call the renderer of a page
+			//we are trying to get this global variable for actual generated wiki page
+			global $gvWikiPageTitle;
+			if(! isset($gvWikiPageTitle))
+				throw new Exception('global variable $gvWikiPageTitle was not found');
+
+			$wikititle = Title::newFromText( $gvWikiPageTitle );
+		}
+		
 		global $gvAllowedTags;
 		if($surveyStatus=='ready')
 		{
@@ -85,20 +98,19 @@ class tagSurveyChoices
 				//start button
 				$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">';
 				$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
-				$output.='<input type="submit" name="Submit" value="Start survey" />';
+				$output.='<input type="submit" name="wpSubmit" value="Start survey" />';
 				$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
 				$output.='</form>';
 	
-				global $wgTitle;
 				$output.='<td>';
 				//edit button
 				$output.='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">';
 				$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
 				$output.='<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">';
 				$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
-				$output.='<input type="hidden" name="returnto" value="'.htmlspecialchars( $wgTitle->getDBkey() ).'" />';
+				$output.='<input type="hidden" name="returnto" value="'.htmlspecialchars( $wikititle->getDBkey() ).'" />';
 				$output.='</form>';
-				
+
 				#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
 				#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
 				#alt="sample graph" /></div></td></tr>';

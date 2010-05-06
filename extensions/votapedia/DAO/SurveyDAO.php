@@ -545,6 +545,7 @@ class SurveyDAO
 			) AS stat
 			GROUP BY presentationid"; */
 		//Collect vote data,complicated SQL
+		return array(); //@todo implement this
 		global $gvDB, $gvDBPrefix;
 		$sqlRecord = "select * from {$gvDBPrefix}view_presentation_survey_mark where surveyid = ?";
 		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);

@@ -287,7 +287,7 @@ class CreateSurvey extends SpecialPage {
 	}
 	/**
 	 * Insert wiki page, optionaly resolve duplicates
-	 * also sets value CreateSurvey::wikiPageTitle
+	 * also sets value global $gvWikiPageTitle
 	 * 
 	 * @param $newtitle Title of wiki page
 	 * @param $wikiText text which will be written to wiki page
@@ -299,13 +299,14 @@ class CreateSurvey extends SpecialPage {
 		if($resolveDuplicates)
 		{
 			$i = 1;
-			$this->wikiPageTitle = $newtitle;
-			$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
+			global $gvWikiPageTitle;
+			$gvWikiPageTitle = $newtitle;
+			$error = $this->insertWikiPage($gvWikiPageTitle, $wikiText, false);
 			while($error)
 			{
-				$i++;
-				$this->wikiPageTitle = $newtitle." ($i)";
-				$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
+				$i++; //$this->wikiPageTitle 
+				$gvWikiPageTitle = $newtitle." ($i)";
+				$error = $this->insertWikiPage($gvWikiPageTitle, $wikiText, false);
 			}
 			return;
 		}
@@ -349,7 +350,8 @@ class CreateSurvey extends SpecialPage {
 				$error = $this->insertPage($this->form->getValuesArray());
 				if(! $error)
 				{
-					$titleObj = Title::newFromText( $this->wikiPageTitle );
+					global $gvWikiPageTitle;
+					$titleObj = Title::newFromText( $gvWikiPageTitle );
 					
 					$wgOut->redirect($titleObj->getLocalURL(), 302);
 					return;
