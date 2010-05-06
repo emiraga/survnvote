@@ -3,12 +3,12 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * Votapedia database connection
  */
-$gvDBserver         = "localhost";
-$gvDBName           = "voting";
-$gvDBUserName       = "root";
-$gvDBUserPassword   = "";
+$gvDBserver         = $wgDBserver ; //"localhost";
+$gvDBName           = $wgDBname ; //"voting";
+$gvDBUserName       = $wgDBuser; //"root";
+$gvDBUserPassword   = $wgDBpassword; //"";
 $gvDBPrefix         = "v_";
-
+$gvDBType           = 'mysql';
 /**
  * Set Timezone -- check the manual http://php.net/manual/en/timezones.php
  */

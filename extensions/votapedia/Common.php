@@ -59,9 +59,9 @@ include_once("adodb/adodb-exceptions.inc.php");
  */
 function vfConnectDatabase()
 {
-	global $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName;
+	global $gvDBType, $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName;
 
-	$cn = &ADONewConnection('mysqli');
+	$cn = &ADONewConnection($gvDBType);
 	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName))
 		throw new SurveyException("Could not connect to database", 400);
 	return $cn;
