@@ -276,7 +276,7 @@ class CreateSurvey extends SpecialPage {
 			return '<li>'.$e->getMessage().'</li>';
 		}
 		
-		$wikiText.='<Survey pageid="'. $page->getPageID() .'" />';
+		$wikiText.='{{Survey|'. $page->getPageID() .'}}';
 		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 		
@@ -284,6 +284,10 @@ class CreateSurvey extends SpecialPage {
 			$wikiText.="[[Category:$values[category]]]\n";
 		
 		$this->insertWikiPage($wikititle, $wikiText, true);
+		
+		//Add an appropriate hidden category, don't show in recent changes
+		$category = new CategoryPage( Title::newFromText(wfMsg('cat-survey-name', $page->getPageID())));
+		$category->doEdit('__HIDDENCAT__','Creating a new hidden category.', EDIT_NEW | EDIT_SUPPRESS_RC);
 	}
 	/**
 	 * Insert wiki page, optionaly resolve duplicates
@@ -351,8 +355,7 @@ class CreateSurvey extends SpecialPage {
 				if(! $error)
 				{
 					global $gvWikiPageTitle;
-					$titleObj = Title::newFromText( $gvWikiPageTitle );
-					
+					$titleObj = Title::newFromText( $gvWikiPageTitle );					
 					$wgOut->redirect($titleObj->getLocalURL(), 302);
 					return;
 				}
@@ -368,14 +371,14 @@ class CreateSurvey extends SpecialPage {
 			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
 				
 			$surveydao = new SurveyDAO();
-			$page_id = intval($wgRequest->getVal('pageid'));
+			$page_id = intval($wgRequest->getVal('id'));
 			try
 			{
 				$page = $surveydao->findByPageID( $page_id );
 			}
 			catch(SurveyException $e)
 			{
-				$wgOut->addWikiText( vfErrorBox( 'No such page identifier (pageid)') );
+				$wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
 				return;
 			}
 			$this->form->setValue('titleorquestion', $page->getTitle());
@@ -403,7 +406,7 @@ class CreateSurvey extends SpecialPage {
 				die('Something is wrong, please try again.');
 			}
 			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-			$page_id = intval($wgRequest->getVal('pageid'));
+			$page_id = intval($wgRequest->getVal('id'));
 			
 			$this->form->loadValuesFromRequest();
 			
@@ -481,7 +484,7 @@ class CreateSurvey extends SpecialPage {
 
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
-		$wgOut->addHTML('<input type="hidden" name="pageid" value="'.$page_id.'">');
+		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
 		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
 		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );

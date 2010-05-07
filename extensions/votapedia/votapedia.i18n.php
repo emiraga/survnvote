@@ -15,5 +15,6 @@ $messages['en'] = array(
 	'survey-question' => '== Question: $1 ==',
 	'processsurvey' => 'Process Survey',
 	'start-survey' => 'Start Survey',
+	'cat-survey-name' => 'Category:Pages with survey id $1',
 );
 ?>

@@ -20,9 +20,11 @@ class tagSurveyChoices
 		wfLoadExtensionMessages('Votapedia');
 		$parser->disableCache();
 		$output = '';
-		$page_id = $args['pageid'];
+		$page_id = intval(trim($input));
 		$surveydao = new SurveyDAO();
-		
+
+		if(! $page_id)
+			return vfErrorBox( wfMsg('id-not-found', htmlspecialchars($page_id)) );
 		try {
 			$page = $surveydao->findByPageID( $page_id );
 		}
@@ -32,7 +34,7 @@ class tagSurveyChoices
 	
 		$title = htmlspecialchars( $page->getTitle() );
 	
-		global $wgRequest, $wgUser, $wgParser, $wgTitle, $wgOut;
+		global $wgRequest, $wgUser, $wgTitle, $wgOut;
 	
 		$starttime = mktime($page->getStartTime());
 		$endtime = mktime($page->getEndTime());
@@ -92,29 +94,27 @@ class tagSurveyChoices
 				}
 			}
 			$output.='</ul>';
-			if($userName == $page -> getAuthor() )
-			{
-				$output.='<tr><td>';
-				//start button
-				$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">';
-				$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
-				$output.='<input type="submit" name="wpSubmit" value="Start survey" />';
-				$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
-				$output.='</form>';
-	
-				$output.='<td>';
-				//edit button
-				$output.='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">';
-				$output.='<input type="hidden" name="pageid" value="'.$page_id.'">';
-				$output.='<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">';
-				$output.='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />';
-				$output.='<input type="hidden" name="returnto" value="'.htmlspecialchars( $wikititle->getDBkey() ).'" />';
-				$output.='</form>';
 
-				#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
-				#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
-				#alt="sample graph" /></div></td></tr>';
-			}
+			$output.='<tr><td>';
+			//start button
+			$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
+			.'<input type="hidden" name="id" value="'.$page_id.'">'
+			.'<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />'
+			.'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />'
+			.'</form>';
+
+			$output.='<td>';
+			//edit button
+			$output.='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+			.'<input type="hidden" name="id" value="'.$page_id.'">'
+			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
+			.'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />'
+			.'<input type="hidden" name="returnto" value="'.htmlspecialchars( $wikititle->getDBkey() ).'" />'
+			.'</form>';
+
+			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
+			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
+			#alt="sample graph" /></div></td></tr>';
 		}
 		elseif($surveyStatus == 'active')
 		{
@@ -194,7 +194,7 @@ class tagSurveyChoices
 			//add choices
 			foreach ($content as $choiceWiki)
 			{
-				$parsedChoice=$wgParser->parse($choiceWiki,$wgTitle, $wgOut->ParserOptions(), false ,false);
+				$parsedChoice=$parser->parse($choiceWiki,$wgTitle, $wgOut->ParserOptions(), false ,false);
 				
 				$choice=$parsedChoice->getText();
 				if($choice!="")
@@ -325,7 +325,7 @@ class tagSurveyChoices
 			{
 				$c=urldecode($c);
 				//$parsedChoice=$wgParser->parse($c,$wgTitle, $wgOut->mParserOptions, false ,false);
-				$parsedChoice=$wgParser->parse($c,$wgTitle, $wgOut->parserOptions(), false ,false);
+				$parsedChoice=$parser->parse($c,$wgTitle, $wgOut->parserOptions(), false ,false);
 				$c=$parsedChoice->getText();
 				$r=$receiver[$i];
 				$len=strlen($r);

@@ -29,15 +29,16 @@ class ProcessSurvey extends SpecialPage {
 	function execute( $par = null )
 	{
 		global $wgUser, $wgTitle, $wgOut, $wgRequest;
+		$wgOut->setArticleFlag(false);
 		if ( $wgUser->isAnon() ) {
 			$wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
 			return;
 		}
 		$action = $wgRequest->getVal( 'wpSubmit' );
-		echo $action;
 		if($action == wfMsg('start-survey'))
 		{
 			$wgOut->addHTML('start survey<br>');
 		}
+		
 	}
 }

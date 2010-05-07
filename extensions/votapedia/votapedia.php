@@ -52,6 +52,7 @@ if(defined('VOTAPEDIA_TEST')) //used for unit testing
 #debug script
 require_once( "$gvPath/SpecialEmirTest.php" ); //@todo remove this
 require_once( "$gvPath/UserHooks.php" );
+require_once( "$gvPath/ArticleHooks.php" );
 
 //International Text and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
@@ -69,7 +70,7 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 $wgAutoloadClasses['tagSurveyChoices'] = "$gvPath/tag/SurveyChoices.php";
 $wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
 function vfSurveyChoicesInit( &$parser )
-{ $parser->setHook( 'Survey', 'tagSurveyChoices::execute' ); return true; }
+{ $parser->setHook( 'SurveyChoice', 'tagSurveyChoices::execute' ); return true; }
 
 //Credits
 $wgExtensionCredits['other'][] = array(
