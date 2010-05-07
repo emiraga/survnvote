@@ -12,7 +12,7 @@ $messages['en'] = array(
 	'votapedia-desc' => 'Votapedia - Audience Response System. This extension includes special pages, tags, etc.',
 	'create-survey' => 'Create Survey',
 	'edit-survey' => 'Edit Survey',
-	'survey-question' => '== Question: $1 ==',
+	'survey-question' => 'Question: $1',
 	'processsurvey' => 'Process Survey',
 	'start-survey' => 'Start Survey',
 	'cat-survey-name' => 'Category:Pages with survey id $1',

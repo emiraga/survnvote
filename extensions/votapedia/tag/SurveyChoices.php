@@ -18,7 +18,7 @@ class tagSurveyChoices
 	static function execute( $input, $args, $parser, $frame = NULL )
 	{
 		wfLoadExtensionMessages('Votapedia');
-		$parser->disableCache();
+		#$parser->disableCache();
 		$output = '';
 		$page_id = intval(trim($input));
 		$surveydao = new SurveyDAO();
@@ -31,7 +31,7 @@ class tagSurveyChoices
 		catch(SurveyException $e) {
 			return vfErrorBox( wfMsg('id-not-found', htmlspecialchars($page_id)) );
 		}
-	
+
 		$title = htmlspecialchars( $page->getTitle() );
 	
 		global $wgRequest, $wgUser, $wgTitle, $wgOut;
@@ -50,8 +50,9 @@ class tagSurveyChoices
 	
 		$userName = $wgUser->getName();
 		$timeleft = $endtime - $starttime;
+
 		
-		$output.= wfMsgWikiHtml( 'survey-question', htmlspecialchars( $page->getTitle() ) ) ;
+		$output.= '<h2>'.wfMsg('survey-question', htmlspecialchars($page->getTitle())).'</h2>';
 		$output.='<table cellspacing="0" style="font-size:large">';
 		
 		$prosurv = Title::newFromText('Special:ProcessSurvey');

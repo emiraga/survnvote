@@ -6,6 +6,7 @@
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 	
 	require_once("./votapedia.php");
+	$gvDBName = "unittest";
 	$gvDBUserName       = 'root';
 	$gvDBUserPassword   = '';
 	$gvDBPrefix = '';

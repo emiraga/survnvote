@@ -167,10 +167,10 @@ class CreateSurvey extends SpecialPage {
 	 * @param $category Name of a category
 	 * @return array with a list of categories
 	 */
-	function getSubcategories($category = 'Survey Categories')
+	function getSubcategories($category = 'Category:Survey Categories')
 	{
 		$params = new FauxRequest(array(
-			'cmtitle' => 'Category:'.$category,
+			'cmtitle' => $category,
 			'action' => 'query',
 			'list' => 'categorymembers',
 			'cmprop' => 'title',
@@ -276,7 +276,8 @@ class CreateSurvey extends SpecialPage {
 			return '<li>'.$e->getMessage().'</li>';
 		}
 		
-		$wikiText.='{{Survey|'. $page->getPageID() .'}}';
+		global $gvSurveyTemplate;
+		$wikiText.='{{'.$gvSurveyTemplate.'|'. $page->getPageID() .'}}';
 		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 		
@@ -287,7 +288,7 @@ class CreateSurvey extends SpecialPage {
 		
 		//Add an appropriate hidden category, don't show in recent changes
 		$category = new CategoryPage( Title::newFromText(wfMsg('cat-survey-name', $page->getPageID())));
-		$category->doEdit('__HIDDENCAT__','Creating a new hidden category.', EDIT_NEW | EDIT_SUPPRESS_RC);
+		$category->doEdit('__HIDDENCAT__','Hidden category.', EDIT_NEW | EDIT_SUPPRESS_RC);
 	}
 	/**
 	 * Insert wiki page, optionaly resolve duplicates
@@ -426,8 +427,12 @@ class CreateSurvey extends SpecialPage {
 					return;
 				}
 				
+				//Purge all pages that have this survey included.
+				$surcats = $this->getSubcategories( wfMsg('cat-survey-name', $page_id) );
+				foreach($surcats as $cat)
+					vfPurgePage(Title::newFromText( $cat )->getDBkey());
+
 				$title = Title::newFromText($this->returnTo);
-				vfPurgePage($title->getDBkey());
 				$wgOut->redirect($title->escapeLocalURL(), 302);
 				return;
 			}

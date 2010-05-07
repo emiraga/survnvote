@@ -120,4 +120,5 @@ END_SQL;
 			$gvDB->Execute($sql);
 		}
 	}
+	//@todo add Template:$gvSurveyTemplate
 ?>
