@@ -76,8 +76,8 @@ class SmsDAO extends IncomingDAO
 	 */
 	public function updateError($value)
 	{
-		global $gvDB, $gvDBPrefix;
-		$gvDB->Execute("update {$gvDBPrefix}incomingsms set Errorcode = ? where ID = ?", array($value, $this->getID()));
+		global $vgDB, $vgDBPrefix;
+		$vgDB->Execute("update {$vgDBPrefix}incomingsms set Errorcode = ? where ID = ?", array($value, $this->getID()));
 	}
 	
 }
@@ -93,8 +93,8 @@ class CallDAO extends IncomingDAO
 	 */
 	public function updateError($value)
 	{
-		global $gvDB, $gvDBPrefix;
-		$gvDB->Execute("update {$gvDBPrefix}incomingcall set Errorcode = ? where ID = ?", array($value, $this->getID()));
+		global $vgDB, $vgDBPrefix;
+		$vgDB->Execute("update {$vgDBPrefix}incomingcall set Errorcode = ? where ID = ?", array($value, $this->getID()));
 	}
 }
 

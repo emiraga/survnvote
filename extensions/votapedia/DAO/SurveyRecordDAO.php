@@ -22,13 +22,13 @@ class SurveyRecordDAO
 	 */
 	function isFirstVoting($voterID)
 	{
-		global $gvDB, $gvDBPrefix;
+		global $vgDB, $vgDBPrefix;
 		
-		$num= $gvDB->GetOne("select count(*) as num from {$gvDBPrefix}incomingcall where caller = ?", array($voterID));
+		$num= $vgDB->GetOne("select count(*) as num from {$vgDBPrefix}incomingcall where caller = ?", array($voterID));
 		if ($num > 0)
 			return false;
 
-		$num= $gvDB->GetOne("select count(*) as num from {$gvDBPrefix}incomingsms where sender = ?", array($voterID));
+		$num= $vgDB->GetOne("select count(*) as num from {$vgDBPrefix}incomingsms where sender = ?", array($voterID));
 		if ($num > 0)
 			return false;
 
@@ -44,9 +44,9 @@ class SurveyRecordDAO
 	 */
 	function isMultipleVote($surveyID, $username)
 	{
-		global $gvDB, $gvDBPrefix;
-		$sql="select count(surveyID) as num from {$gvDBPrefix}surveyrecord where surveyID = ? and voterID = ?";
-		$num= $gvDB->GetOne($sql,array( $surveyID, $username ));
+		global $vgDB, $vgDBPrefix;
+		$sql="select count(surveyID) as num from {$vgDBPrefix}surveyrecord where surveyID = ? and voterID = ?";
+		$num= $vgDB->GetOne($sql,array( $surveyID, $username ));
 		return ($num != 0);
 	}
 	/**
@@ -59,21 +59,21 @@ class SurveyRecordDAO
 	 */
 	function insertRecord(SurveyRecordVO &$surveyRecordVO)
 	{
-		global $gvDB, $gvDBPrefix;
+		global $vgDB, $vgDBPrefix;
 
-		$sql = "insert into {$gvDBPrefix}surveyRecord (surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?)";
+		$sql = "insert into {$vgDBPrefix}surveyRecord (surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?)";
 		
 		$params = array(
 			$surveyRecordVO->getSurveyID(),$surveyRecordVO->getChoiceID(),$surveyRecordVO->getPresentationID(),
 			$surveyRecordVO->getVoterID(),$surveyRecordVO->getVoteDate(), $surveyRecordVO->getVoteType(),
 		);
-		$gvDB->Execute($sql,$params);
+		$vgDB->Execute($sql,$params);
 
-		$sql = "update {$gvDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?";
+		$sql = "update {$vgDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?";
 		$params = array(
 			$surveyRecordVO->getSurveyID(), $surveyRecordVO->getChoiceID()
 		);
-		$gvDB->Execute($sql,$params);
+		$vgDB->Execute($sql,$params);
 	}
 }
 

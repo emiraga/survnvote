@@ -24,11 +24,11 @@ class VoteDAO
 	 */
 	static function newFromCurrentSurvey($type, $username, $surveyID, $choiceID, $presentationID = 0)
 	{
-		global $gvDB, $gvDBPrefix;
+		global $vgDB, $vgDBPrefix;
 		$sql = "select invalidAllowed, votesAllowed ".
-			"from {$gvDBPrefix}view_current_survey where surveyID = ? and choiceID = ? and presentationID = ?";
-		$gvDB->SetFetchMode(ADODB_FETCH_ASSOC);
-		$rs = &$gvDB->Execute($sql,array($surveyID, $choiceID, $presentationID));
+			"from {$vgDBPrefix}view_current_survey where surveyID = ? and choiceID = ? and presentationID = ?";
+		$vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
+		$rs = &$vgDB->Execute($sql,array($surveyID, $choiceID, $presentationID));
 
 		if($rs->RecordCount() <= 0)
 		{
@@ -58,8 +58,8 @@ class VoteDAO
 	{
 		assert($vote->getVoteType() == $incoming->getType());
 		
-		global $gvDB, $gvDBPrefix;
-		$gvDB->StartTrans();
+		global $vgDB, $vgDBPrefix;
+		$vgDB->StartTrans();
 
 		if ($vote->getInvalidAllowed() == 0 && $vote->getVoterID() == '') //if multi-vote is not allowed
 		{
@@ -67,8 +67,8 @@ class VoteDAO
 			return false;
 		}
 		// Check whether voted before
-		$sql ="select * from {$gvDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
-		$rs = $gvDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
+		$sql ="select * from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
+		$rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 		
 		if ($rs->RecordCount() > $vote->getVotesAllowed() )
 		{
@@ -76,28 +76,28 @@ class VoteDAO
 			$IDbyOldVote = $rs->fields['ID'];
 			$choiceIDbyOldVote = $rs->fields['choiceID'];
 			
-			$gvDB->Execute("update {$gvDBPrefix}surveyrecord set choiceID = ? , voteDate = ? where ID = ?",
+			$vgDB->Execute("update {$vgDBPrefix}surveyrecord set choiceID = ? , voteDate = ? where ID = ?",
 				array($vote->getChoiceID(), $vote->getVoteDate(), $IDbyOldVote));
 			
-			$gvDB->Execute("update {$gvDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?",
+			$vgDB->Execute("update {$vgDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?",
 				array($vote->getSurveyID(), $vote->getChoiceID()));
 			
-			$gvDB->Execute("update {$gvDBPrefix}surveyChoice set vote=vote-1 where surveyID = ? and choiceID = ?",
+			$vgDB->Execute("update {$vgDBPrefix}surveyChoice set vote=vote-1 where surveyID = ? and choiceID = ?",
 				array($vote->getSurveyID(), $choiceIDbyOldVote));
 
 			$incoming->updateError(4); //Repeated voting
 		}
 		else
 		{
-			$gvDB->Execute("insert into {$gvDBPrefix}surveyRecord (voterID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?)",
+			$vgDB->Execute("insert into {$vgDBPrefix}surveyRecord (voterID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?)",
 				array($vote->getVoterID(), $vote->getSurveyID(), $vote->getChoiceID(), 
 					$vote->getPresentationID(), $vote->getVoteDate(), $vote->getVoteType()));
 
-			$gvDB->Execute("update {$gvDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?", array($surveyID, $choiceID));
+			$vgDB->Execute("update {$vgDBPrefix}surveyChoice set vote=vote+1 where surveyID = ? and choiceID = ?", array($surveyID, $choiceID));
 		}
-		$gvDB->CompleteTrans();
-		if ($gvDB->HasFailedTrans()) {
-			throw new Exception("Process Vote database error: ".$gvDB->ErrorMsg(), 400);
+		$vgDB->CompleteTrans();
+		if ($vgDB->HasFailedTrans()) {
+			throw new Exception("Process Vote database error: ".$vgDB->ErrorMsg(), 400);
 		}
 		return true;
 	}

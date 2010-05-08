@@ -2,12 +2,12 @@
 if (!defined('MEDIAWIKI')) die();
 
 /* Votapedia database connection */
-$gvDBserver         = $wgDBserver;
-$gvDBName           = $wgDBname;
-$gvDBUserName       = $wgDBuser;
-$gvDBUserPassword   = $wgDBpassword;
-$gvDBPrefix         = "v_";
-$gvDBType           = 'mysql';
+$vgDBserver         = $wgDBserver;
+$vgDBName           = $wgDBname;
+$vgDBUserName       = $wgDBuser;
+$vgDBUserPassword   = $wgDBpassword;
+$vgDBPrefix         = "v_";
+$vgDBType           = 'mysql';
 
 /* Set Timezone -- check the manual http://php.net/manual/en/timezones.php */
 date_default_timezone_set('Asia/Kuala_Lumpur');

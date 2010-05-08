@@ -8,8 +8,8 @@ require_once('../../LocalSettings.php');
  * Enter user/pass of a admin account for mysql that
  * has priviledges for CREATE and DELETE of tables.
  */ 
-$gvDBUserName       = 'root';
-$gvDBUserPassword   = '';
+$vgDBUserName       = 'root';
+$vgDBUserPassword   = '';
 
 require_once("$gvPath/Common.php");
 
@@ -17,8 +17,8 @@ $sql = <<<END_SQL
 --
 -- Table structure for table page
 --
-DROP TABLE IF EXISTS {$gvDBPrefix}page;
-CREATE TABLE IF NOT EXISTS {$gvDBPrefix}page (
+DROP TABLE IF EXISTS {$vgDBPrefix}page;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   pageID int(11) unsigned NOT NULL AUTO_INCREMENT,
   title varchar(512) NOT NULL,
   startTime datetime NOT NULL,
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS {$gvDBPrefix}page (
 -- Table structure for table presentation
 --
 
-DROP TABLE IF EXISTS {$gvDBPrefix}presentation;
-CREATE TABLE IF NOT EXISTS {$gvDBPrefix}presentation (
+DROP TABLE IF EXISTS {$vgDBPrefix}presentation;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   surveyID int(10) unsigned NOT NULL,
   presentationID tinyint(10) unsigned NOT NULL,
   presentation varchar(1000) NOT NULL,
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS {$gvDBPrefix}presentation (
 -- Table structure for table survey
 --
 
-DROP TABLE IF EXISTS {$gvDBPrefix}survey;
-CREATE TABLE IF NOT EXISTS {$gvDBPrefix}survey (
+DROP TABLE IF EXISTS {$vgDBPrefix}survey;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
   pageID int(11) NOT NULL,
   surveyID int(11) unsigned NOT NULL AUTO_INCREMENT,
   question varchar(4000) NOT NULL,
@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS {$gvDBPrefix}survey (
 -- Table structure for table surveychoice
 --
 
-DROP TABLE IF EXISTS {$gvDBPrefix}surveychoice;
-CREATE TABLE IF NOT EXISTS {$gvDBPrefix}surveychoice (
+DROP TABLE IF EXISTS {$vgDBPrefix}surveychoice;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   surveyID int(11) NOT NULL,
   choiceID tinyint(4) unsigned NOT NULL DEFAULT '1',
   choice varchar(400) NOT NULL,
@@ -97,8 +97,8 @@ CREATE TABLE IF NOT EXISTS {$gvDBPrefix}surveychoice (
 -- Table structure for table surveyrecord
 --
 
-DROP TABLE IF EXISTS {$gvDBPrefix}surveyrecord;
-CREATE TABLE IF NOT EXISTS {$gvDBPrefix}surveyrecord (
+DROP TABLE IF EXISTS {$vgDBPrefix}surveyrecord;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
   ID int(11) unsigned NOT NULL AUTO_INCREMENT,
   voterID varchar(50) NOT NULL DEFAULT 'unknown',
   surveyID int(11) NOT NULL,
@@ -117,7 +117,7 @@ END_SQL;
 		$sql = trim($sql);
 		if($sql)
 		{
-			$gvDB->Execute($sql);
+			$vgDB->Execute($sql);
 		}
 	}
 	//@todo add Template:$gvSurveyTemplate

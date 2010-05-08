@@ -59,19 +59,19 @@ include_once("adodb/adodb-exceptions.inc.php");
  */
 function vfConnectDatabase()
 {
-	global $gvDBType, $gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName;
+	global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
 
-	$cn = &ADONewConnection($gvDBType);
-	if (!$cn->Connect($gvDBserver, $gvDBUserName, $gvDBUserPassword, $gvDBName))
+	$cn = &ADONewConnection($vgDBType);
+	if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
 		throw new SurveyException("Could not connect to database", 400);
 	return $cn;
 }
 /**
  * Global variable - ADOdb
- * @var $gvDB global variable ADOdb connection
+ * @var $vgDB global variable ADOdb connection
  */
-global $gvDB;
-$gvDB = vfConnectDatabase();
+global $vgDB;
+$vgDB = vfConnectDatabase();
 /**
  * Rotates color images for a choice.
  * 
