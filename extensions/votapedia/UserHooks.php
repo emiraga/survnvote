@@ -43,10 +43,13 @@ function vpOnResetPreferences($prefsform, $wgUser )
 $wgHooks['UserCreateForm'][] = 'vpOnUserCreateForm';
 function vpOnUserCreateForm(&$template)
 {
-	global $wgMessageCache;
-	$wgMessageCache->addMessages(array( 'mobile-phone' => 'Mobile Phone:' ));
-
-	$template->set('extraInput', array( array('msg' => 'mobile-phone', 'type' => 'text', 'name'=> 'phonenumber' ) ) );
+	wfLoadExtensionMessages('Votapedia');
+	$template->set('extraInput', 
+		array( 	array(
+			'msg' => 'mobile-phone',
+			'type' => 'text',
+			'name'=> 'phonenumber'
+		) ) );
 	return true;
 }
 

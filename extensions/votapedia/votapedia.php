@@ -61,6 +61,10 @@ function vfSurveyChoicesInit( &$parser ){
 	$parser->setHook( 'SurveyChoice', 'tagSurveyChoices::execute' ); return true;
 }
 
+//Survey view options
+$wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
+$wgAjaxExportList[] = 'SurveyView::getButtons';
+
 //Credits
 $wgExtensionCredits['other'][] = array(
 	'name' => 'Votapedia',

@@ -15,6 +15,9 @@ $messages['en'] = array(
 	'survey-question' => 'Question: $1',
 	'processsurvey' => 'Process Survey',
 	'start-survey' => 'Start Survey',
+	'control-survey' => 'Control Survey',
 	'cat-survey-name' => 'Category:Pages with survey id $1',
+	'mobile-phone' => 'Mobile Phone:',
 );
+
 ?>

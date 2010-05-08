@@ -55,8 +55,6 @@ class tagSurveyChoices
 		$output.= '<h2>'.wfMsg('survey-question', htmlspecialchars($page->getTitle())).'</h2>';
 		$output.='<table cellspacing="0" style="font-size:large">';
 		
-		$prosurv = Title::newFromText('Special:ProcessSurvey');
-		$cresurv = Title::newFromText('Special:CreateSurvey');
 		global $gvScript;
 		$output.= '<tr><td valign="top" colspan="2"><img src="'.$gvScript.'/images/spacer.gif" />';
 		// put an 250*1 spacer image above the choices so that the text doesn't get 
@@ -95,24 +93,18 @@ class tagSurveyChoices
 				}
 			}
 			$output.='</ul>';
-
-			$output.='<tr><td>';
-			//start button
-			$output.='<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
-			.'<input type="hidden" name="id" value="'.$page_id.'">'
-			.'<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />'
-			.'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />'
-			.'</form>';
-
-			$output.='<td>';
-			//edit button
-			$output.='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
-			.'<input type="hidden" name="id" value="'.$page_id.'">'
-			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
-			.'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'" />'
-			.'<input type="hidden" name="returnto" value="'.htmlspecialchars( $wikititle->getDBkey() ).'" />'
-			.'</form>';
-
+			
+			$output.='';
+			
+			//control button for those that don't have javascript
+			$output.= '<noscript><tr><td>'
+			.SurveyView::noscriptButtons($page_id, $wikititle->getDBkey()).'</noscript>';
+			
+			$divname = "btnsSurvey$page_id";
+			$output.= "<div id='$divname'></div><script>if(wgUserName=='{$page->getAuthor()}')"
+			."sajax_do_call('SurveyView::getButtons',[$page_id,wgPageName],function(o){"
+			."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
+			
 			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
 			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
 			#alt="sample graph" /></div></td></tr>';
@@ -125,6 +117,8 @@ class tagSurveyChoices
 		{
 			;
 		}
+		$output .= '</table>';
+		return $output;
 		
 		//add sms voting label
 		if($surveyStatus == 'active' && $page->getTeleVoteAllowed() && $userName == $page->getAuthor())
@@ -151,13 +145,6 @@ class tagSurveyChoices
 		if($surveyStatus == 'active')
 			$output .= '<p><script>var d=new Date(); d.setTime('.$startTimeStamp.'*1000);document.write("Start Time: "+d.toLocaleString());</script></p><p><script>var d=new Date(); d.setTime('.$endTimeStamp.'*1000);document.write("End Time: "+d.toLocaleString());</script></p>';
 		//<p>Start time: $startTime<br />End time: $endTime<br />Now: $now<br />background:$background<br />Time Remaining: $timeleft seconds<br />$tt<br />$ttt<br />$tttt<br />background:$background</p>
-		
-		/*
-		 * Edit survey button
-		 */
-		if($surveyStatus == 'ready')
-		{
-		}
 		$output .= '</table>';
 		return $output;
 		

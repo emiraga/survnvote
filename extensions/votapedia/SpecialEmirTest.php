@@ -46,7 +46,7 @@ function wfExtensionSpEmirTest() {
 			//--></script>");
 			
 			$article = new Article( Title::newFromText( "Sandbox" ) );
-			$editor = new EditPage( $article );
+			#$editor = new EditPage( $article );
 			#$wgOut->addHTML('<script type="text/javascript" src="/new/skins/common/edit.js?207"></script>');
 			#$editor->showEditForm();
 		}

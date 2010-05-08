@@ -345,9 +345,9 @@ class CreateSurvey extends SpecialPage {
 		if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
 		{
 			//user has submitted to add new page or edit existing one
-		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
-				die('Something is wrong, please try again.');
-			}
+			//form originates from the CreateSurvey special page
+			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
+				die('Something is wrong, please try again. Edit token is missing');
 			$this->form->loadValuesFromRequest();
 			$error = $this->form->Validate();
 			if(! $error)
@@ -366,11 +366,8 @@ class CreateSurvey extends SpecialPage {
 		else if( $wgRequest->getVal('wpEditButton') == wfMsg('edit-survey'))
 		{
 			//user wants to edit the existing survey
-			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
-				die('Something is wrong, please try again.');
-			
 			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-				
+			
 			$surveydao = new SurveyDAO();
 			$page_id = intval($wgRequest->getVal('id'));
 			try
