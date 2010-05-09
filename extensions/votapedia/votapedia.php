@@ -21,7 +21,7 @@ $gvNumberPBX = '8116';
 $gvCountry = 'Malaysia';
 
 /* Remove prefixes and suffixes in "Survey Category" listing */
-$gvCatRemovePrefix = array('Surveys in ', 'Quizes in ');
+$gvCatRemovePrefix = array('Category:Surveys in ', 'Category:Quizes in ','Category:');
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 
 /* Allowed HTML/Mediawiki tags in survey choices. */
@@ -50,6 +50,10 @@ $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
 $wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
 $wgSpecialPages['CreateSurvey'] = 'CreateSurvey';
 
+//Special page ViewSurvey
+$wgAutoloadClasses['ViewSurvey'] = "$gvPath/special/ViewSurvey.php";
+$wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
+
 //Special page ProcessSurvey
 $wgAutoloadClasses['ProcessSurvey'] = "$gvPath/special/ProcessSurvey.php";
 $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
@@ -60,7 +64,7 @@ $wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
 $wgAjaxExportList[] = 'SurveyView::getButtons';
 $wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
 function vfSurveyChoicesInit( &$parser ){
-	$parser->setHook( 'SurveyChoice', 'SurveyView::execute' ); return true;
+	$parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' ); return true;
 }
 
 //Credits

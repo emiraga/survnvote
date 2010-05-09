@@ -154,42 +154,12 @@ class CreateSurvey extends SpecialPage {
 				'learn_more' => 'Changing Title of a survey',
 			),
 		);
-		$subcat = $this->getSubcategories();
+		$subcat = vfGetSubCategories('Category:Survey Categories');
 		$subcat = $this->removePrefSufCategories($subcat);
 		$this->formitems['category']['options'] = $subcat;
 		
 		$this->form = new FormControl($this->formitems);
 		$this->includable( true ); //we can include this from other pages
-	}
-	/**
-	 * Get a list of subcategories of a category
-	 * 
-	 * @param $category Name of a category
-	 * @return array with a list of categories
-	 */
-	function getSubcategories($category = 'Category:Survey Categories')
-	{
-		$params = new FauxRequest(array(
-			'cmtitle' => $category,
-			'action' => 'query',
-			'list' => 'categorymembers',
-			'cmprop' => 'title',
-			//'cmsort' => 'timestamp',
-		));
-		$api = new ApiMain($params);
-		$api->execute();
-		$data = & $api->getResultData();
-		$result = array();
-		foreach($data['query']['categorymembers'] as $subcat)
-		{
-			$subcat = $subcat['title'];
-			
-			if( substr($subcat,0,9) == 'Category:' )
-				$result[] = substr($subcat,9);
-			else
-				$result[] = $subcat;
-		}
-		return $result;
 	}
 	/**
 	 * Remove prefix and suffix from category list
@@ -340,7 +310,7 @@ class CreateSurvey extends SpecialPage {
 			$wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
 			return;
 		}
-
+		
 		global $wgRequest, $wgParser;
 		if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
 		{
@@ -367,11 +337,11 @@ class CreateSurvey extends SpecialPage {
 		{
 			//user wants to edit the existing survey
 			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-			
-			$surveydao = new SurveyDAO();
 			$page_id = intval($wgRequest->getVal('id'));
+			
 			try
 			{
+				$surveydao = new SurveyDAO();
 				$page = $surveydao->findByPageID( $page_id );
 			}
 			catch(SurveyException $e)
@@ -397,9 +367,9 @@ class CreateSurvey extends SpecialPage {
 			
 			$this->drawFormEdit($page_id, $error);
 		}
-		else if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
+		else //user has submitted to add new page or edit existing one
+		if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
 		{
-			//user has submitted to add new page or edit existing one
 		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
 				die('Something is wrong, please try again.');
 			}
@@ -425,7 +395,7 @@ class CreateSurvey extends SpecialPage {
 				}
 				
 				//Purge all pages that have this survey included.
-				$surcats = $this->getSubcategories( wfMsg('cat-survey-name', $page_id) );
+				$surcats = vfGetSubCategories( wfMsg('cat-survey-name', $page_id) );
 				foreach($surcats as $cat)
 					vfPurgePage(Title::newFromText( $cat )->getDBkey());
 
@@ -476,14 +446,14 @@ class CreateSurvey extends SpecialPage {
 
 		global $wgOut, $wgUser, $wgScriptPath;
 		$wgOut->setArticleFlag(false);
-		$wgOut->setPageTitle("Edit a Survey");
+		$wgOut->setPageTitle(wfMsg('title-edit-survey'));
 		
-		$returnto = Title::newFromText($this->returnTo);
-		$wgOut->addReturnTo($returnto);
+		$wgOut->returnToMain();
 		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
 		
-		if($errors) $wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-
+		if($errors)
+			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
+		
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');

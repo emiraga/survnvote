@@ -73,7 +73,7 @@ class SurveyDAO
 	{
 		$page = $this->getOnePage("where title = ?", array($title));
 		if(!$page)
-			throw new SurveyException("Cannot find corresponding page.", 201);
+			throw new SurveyException("Cannot find this survey.", 201);
 		return $page;
 	}
 	/**
@@ -87,7 +87,7 @@ class SurveyDAO
 	{
 		$page = $this->getOnePage("where pageID = ?", array($id));
 		if(!$page)
-			throw new SurveyException("Cannot find corresponding page.", 201);
+			throw new SurveyException("Cannot find this survey.", 201);
 		return $page;
 	}
 	/**

@@ -98,4 +98,29 @@ function vfPurgePage($title)
 	if(!isset($data['purge'][0]['purged']))
 		throw new Exception('Page purging has failed');
 }
+/**
+ * Get a list of subcategories of a category
+ * 
+ * @param $category Name of a category
+ * @return array with a list of categories
+ */
+function vfGetSubCategories($category) // = )
+{
+	$params = new FauxRequest(array(
+		'cmtitle' => $category,
+		'action' => 'query',
+		'list' => 'categorymembers',
+		'cmprop' => 'title',
+		//'cmsort' => 'timestamp',
+	));
+	$api = new ApiMain($params);
+	$api->execute();
+	$data = & $api->getResultData();
+	$result = array();
+	foreach($data['query']['categorymembers'] as $subcat)
+	{
+		$result[] = $subcat['title'];
+	}
+	return $result;
+}
 ?>

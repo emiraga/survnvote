@@ -21,11 +21,11 @@ class SurveyView
 	private $page_id; /** Integer */
 	private $wikititle; /** Title */
 
-	static function execute( $input, $args, $parser, $frame = NULL )
+	static function executeTag( $input, $args, $parser, $frame = NULL )
 	{
 		try{
 			$page_id = intval(trim($input));
-			$tag = new SurveyView($page_id, $parser, $frame);
+			$tag = new SurveyView($page_id, $parser, NULL, $frame);
 			return $tag->getHTMLBody();
 		}
 		catch(Exception $e)
@@ -34,13 +34,13 @@ class SurveyView
 		}
 	}
 	
-	function __construct($page_id, $parser, $frame)
+	function __construct($page_id, $parser, $parserOptions = NULL, $frame = NULL)
 	{
 		wfLoadExtensionMessages('Votapedia');
 		global $wgUser, $wgTitle;
 		$this->parser = $parser;
 		$this->frame = $frame;
-		
+		$this->parserOptions = $parserOptions;
 		$this->page_id=$page_id;
 		$this->username = $wgUser->getName();
 		
@@ -149,6 +149,8 @@ class SurveyView
 		global $gvScript, $gvAllowedTags;
 		$output = '';
 		
+		$output.= '<a name="survey_id_'.$this->page_id.'"></a>';
+		
 		$output.= '<h2>'.wfMsg('survey-question', htmlspecialchars($this->page->getTitle())).'</h2>';
 		$output.='<table cellspacing="0" style="font-size:large">';
 		
@@ -167,8 +169,8 @@ class SurveyView
 			foreach ($choices as $choice)
 			{
 				$i++;
-				$choice = $this->parser->recursiveTagParse(
-					strip_tags( $choice->getChoice(), $gvAllowedTags));
+				global $wgOut;
+				$choice = $this->parse(strip_tags( $choice->getChoice(), $gvAllowedTags));
 				if($choice)
 				{
 					$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
@@ -189,12 +191,12 @@ class SurveyView
 		//control button for those that don't have javascript
 		$output.= '<noscript>'.SurveyView::noscriptButtons().'</noscript>';
 		
-		$divname = "btnsSurvey$page_id";
+		$divname = "btnsSurvey$page_id-".rand();
 		$output.= "<div id='$divname'><input type=button value='Loading...'/></div>"
 		."<script>if(wgUserName=='{$this->page->getAuthor()}')"
-		."sajax_do_call('SurveyView::getButtons',[$page_id,wgPageName,'$this->status'],function(o){"
+		."sajax_do_call('SurveyView::getButtons',[$this->page_id,wgPageName,'$this->status'],function(o){"
 		."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
-			
+		
 		#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
 		#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
 		#alt="sample graph" /></div></td></tr>';
@@ -202,4 +204,22 @@ class SurveyView
 		$output .= '</table>';
 		return $output;
 	}
+	private function parse($text)
+	{
+		if($this->parserOptions)
+		{
+			return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, false, true )->getText();
+		}
+		else
+		{
+			return $this->parser->recursiveTagParse($text);
+		}
+	}
+	
+	function &getPage()
+	{
+		return $this->page;
+	}
 }
+
+?>

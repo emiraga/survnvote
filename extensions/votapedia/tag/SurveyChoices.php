@@ -4,7 +4,6 @@ funon-exist();
 
 global $gvPath;
 require_once("$gvPath/Common.php");
-require_once("$gvPath/DAO/SurveyDAO.php");
 
 class tagSurveyChoices
 {
