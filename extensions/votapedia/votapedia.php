@@ -62,9 +62,20 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
 $wgAjaxExportList[] = 'SurveyView::getButtons';
-$wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
-function vfSurveyChoicesInit( &$parser ){
-	$parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' ); return true;
+
+$wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
+function vfParserFirstCallInit( &$parser ){
+	$parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' );
+	$parser->setFunctionHook( 'Survey', 'SurveyView::executeMagic' );
+	return true;
+}
+
+//Magic words
+$wgHooks['LanguageGetMagic'][]       = 'vfLanguageGetMagic';
+function vfLanguageGetMagic(&$magicWords, $langCode)
+{
+	$magicWords['Survey'] = array( 0, 'Survey' );
+	return true;
 }
 
 //Credits

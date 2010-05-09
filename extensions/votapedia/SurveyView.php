@@ -23,15 +23,22 @@ class SurveyView
 
 	static function executeTag( $input, $args, $parser, $frame = NULL )
 	{
+		$page_id = intval(trim($input));
 		try{
-			$page_id = intval(trim($input));
-			$tag = new SurveyView($page_id, $parser, NULL, $frame);
+			$tag = new SurveyView($page_id, $parser);
 			return $tag->getHTMLBody();
 		}
 		catch(Exception $e)
 		{
 			return vfErrorBox($e->getMessage());
 		}
+	}
+	
+	static function executeMagic($parser, $page_id)
+	{
+		$page_id = intval(trim($page_id));
+		$output =  "<SurveyChoice>$page_id</SurveyChoice>[[".wfMsg('cat-survey-name',$page_id)."]]";
+		return array($output, 'noparse' => false);
 	}
 	
 	function __construct($page_id, $parser, $parserOptions = NULL, $frame = NULL)

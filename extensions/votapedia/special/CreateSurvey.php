@@ -247,7 +247,7 @@ class CreateSurvey extends SpecialPage {
 		}
 		
 		global $gvSurveyTemplate;
-		$wikiText.='{{'.$gvSurveyTemplate.'|'. $page->getPageID() .'}}';
+		$wikiText.='{{#'.$gvSurveyTemplate.':'. $page->getPageID() .'}}';
 		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 		
