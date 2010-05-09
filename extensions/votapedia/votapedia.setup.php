@@ -11,6 +11,7 @@ require_once('../../LocalSettings.php');
 $vgDBUserName       = 'root';
 $vgDBUserPassword   = '';
 
+global $gvPath, $vgDB, $vgDBPrefix;
 require_once("$gvPath/Common.php");
 
 $sql = <<<END_SQL

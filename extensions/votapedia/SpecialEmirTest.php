@@ -17,10 +17,6 @@ function wfExtensionSpEmirTest() {
 	
 		public function __construct() {
 			parent::__construct( 'EmirTest' );
-		}
-		
-		function SpEmirTestPage() {
-			SpecialPage::SpecialPage( 'EmirTest' );
 			$this->includable( true );
 		}
 		

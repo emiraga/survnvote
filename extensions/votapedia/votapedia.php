@@ -55,15 +55,13 @@ $wgAutoloadClasses['ProcessSurvey'] = "$gvPath/special/ProcessSurvey.php";
 $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 
 //Tag <Survey />
-$wgAutoloadClasses['tagSurveyChoices'] = "$gvPath/tag/SurveyChoices.php";
-$wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
-function vfSurveyChoicesInit( &$parser ){
-	$parser->setHook( 'SurveyChoice', 'tagSurveyChoices::execute' ); return true;
-}
-
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
 $wgAjaxExportList[] = 'SurveyView::getButtons';
+$wgHooks['ParserFirstCallInit'][] = 'vfSurveyChoicesInit';
+function vfSurveyChoicesInit( &$parser ){
+	$parser->setHook( 'SurveyChoice', 'SurveyView::execute' ); return true;
+}
 
 //Credits
 $wgExtensionCredits['other'][] = array(

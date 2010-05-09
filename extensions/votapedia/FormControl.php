@@ -78,8 +78,8 @@ class FormControl
 			if($wgRequest->getCheck($id))
 			{
 				$this->setValue( $id, $wgRequest->getVal($id) );
-				if(isset($item['process']))
-					$this->setValue( $id , $item['process']( $this->values[ $id ] ));
+				if(isset($element['process'])) //@todo there is a bug here
+					$this->setValue( $id , $element['process']( $this->getValue( $id ) ));
 			}
 		}
 	}
@@ -250,7 +250,7 @@ class FormControl
 	<table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
 		<td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"" . $submit . "\" />
 		</td>
-		<td align='$rtl'></td>
+		<td></td>
 	</tr></table>
 	<input type='hidden' name='wpEditToken' value=\"{$token}\" />" );
 		$wgOut->addHTML('</div></form>');

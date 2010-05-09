@@ -1,5 +1,6 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+funon-exist();
 
 global $gvPath;
 require_once("$gvPath/Common.php");
@@ -7,6 +8,7 @@ require_once("$gvPath/DAO/SurveyDAO.php");
 
 class tagSurveyChoices
 {
+
 	/**
 	 * SurveyChoice tag handler, draws HTML in place of SurveyChoice tag
 	 * 
@@ -15,111 +17,8 @@ class tagSurveyChoices
 	 * @param $parser
 	 * @param $frame
 	 */
-	static function execute( $input, $args, $parser, $frame = NULL )
+	function drawTag( $input, $args, $parser, $frame = NULL )
 	{
-		wfLoadExtensionMessages('Votapedia');
-		#$parser->disableCache();
-		$output = '';
-		$page_id = intval(trim($input));
-		$surveydao = new SurveyDAO();
-
-		if(! $page_id)
-			return vfErrorBox( wfMsg('id-not-found', htmlspecialchars($page_id)) );
-		try {
-			$page = $surveydao->findByPageID( $page_id );
-		}
-		catch(SurveyException $e) {
-			return vfErrorBox( wfMsg('id-not-found', htmlspecialchars($page_id)) );
-		}
-
-		$title = htmlspecialchars( $page->getTitle() );
-	
-		global $wgRequest, $wgUser, $wgTitle, $wgOut;
-	
-		$starttime = mktime($page->getStartTime());
-		$endtime = mktime($page->getEndTime());
-		$now = time();
-	
-		$surveyStatus = 'ready';
-		if ($starttime == $endtime)
-			$surveyStatus = 'ready';
-		else if ($starttime <= $now && $now <= $endtime)
-			$surveyStatus = 'active';
-		else if ($endtime < $now)
-			$surveyStatus = 'ended';
-	
-		$userName = $wgUser->getName();
-		$timeleft = $endtime - $starttime;
-
-		
-		$output.= '<h2>'.wfMsg('survey-question', htmlspecialchars($page->getTitle())).'</h2>';
-		$output.='<table cellspacing="0" style="font-size:large">';
-		
-		global $gvScript;
-		$output.= '<tr><td valign="top" colspan="2"><img src="'.$gvScript.'/images/spacer.gif" />';
-		// put an 250*1 spacer image above the choices so that the text doesn't get 
-		// squashed by the graph when browser is less than full screen.
-		
-		$survey = $page->getSurveys();
-		$choices = $survey[0]->getChoices();
-		
-		// Get the page on which this survey is located.
-		$wikititle = $wgTitle;
-		if( $wikititle->getDBkey() == 'CreateSurvey')
-		{
-			//Specialpage:CreateSurvey may automatically call the renderer of a page
-			//we are trying to get this global variable for actual generated wiki page
-			global $gvWikiPageTitle;
-			if(! isset($gvWikiPageTitle))
-				throw new Exception('global variable $gvWikiPageTitle was not found');
-
-			$wikititle = Title::newFromText( $gvWikiPageTitle );
-		}
-		
-		global $gvAllowedTags;
-		if($surveyStatus=='ready')
-		{
-			$output.='<tr><td colspan="2">';
-			$output.='<ul>';
-			$i=0;
-			foreach ($choices as $choice)
-			{
-				$i++;
-				$choice = $parser->recursiveTagParse( strip_tags( $choice->getChoice(), $gvAllowedTags));
-				if($choice)
-				{
-					$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
-						")\"><label id=\"q$i\">$i. $choice</label></li>";
-				}
-			}
-			$output.='</ul>';
-			
-			$output.='';
-			
-			//control button for those that don't have javascript
-			$output.= '<noscript><tr><td>'
-			.SurveyView::noscriptButtons($page_id, $wikititle->getDBkey()).'</noscript>';
-			
-			$divname = "btnsSurvey$page_id";
-			$output.= "<div id='$divname'></div><script>if(wgUserName=='{$page->getAuthor()}')"
-			."sajax_do_call('SurveyView::getButtons',[$page_id,wgPageName],function(o){"
-			."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
-			
-			#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
-			#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
-			#alt="sample graph" /></div></td></tr>';
-		}
-		elseif($surveyStatus == 'active')
-		{
-			;
-		}
-		elseif($surveyStatus == 'ended')
-		{
-			;
-		}
-		$output .= '</table>';
-		return $output;
-		
 		//add sms voting label
 		if($surveyStatus == 'active' && $page->getTeleVoteAllowed() && $userName == $page->getAuthor())
 		{
