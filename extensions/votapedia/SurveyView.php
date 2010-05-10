@@ -14,13 +14,20 @@ class SurveyView
 {
 	private $parser;
 	private $frame;
+	private $parserOptions;
 	
 	private $page; /** PageVO */
-	private $status; /** String */
 	private $username; /** String */
 	private $page_id; /** Integer */
-	private $wikititle; /** Title */
-
+	protected $wikititle; /** Title */
+	
+	/**
+	 * Function called for the &lt;SurveyChoice&gt; tag 
+	 * @param  $input String text between tags
+	 * @param  $args Array tag arguments
+	 * @param  $parser Parser of Mediawiki
+	 * @param  $frame
+	 */
 	static function executeTag( $input, $args, $parser, $frame = NULL )
 	{
 		$page_id = intval(trim($input));
@@ -33,9 +40,15 @@ class SurveyView
 			return vfErrorBox($e->getMessage());
 		}
 	}
-	
+	/**
+	 * Function called for the {{#Survey:ID}} tag.
+	 * 
+	 * @param $parser Parser mediawiki Parser type
+	 * @param $page_id Integer page identifier
+	 */
 	static function executeMagic($parser, $page_id)
 	{
+		wfLoadExtensionMessages('Votapedia');
 		$page_id = intval(trim($page_id));
 		$output =  "<SurveyChoice>$page_id</SurveyChoice>[[".wfMsg('cat-survey-name',$page_id)."]]";
 		return array($output, 'noparse' => false);
@@ -56,7 +69,6 @@ class SurveyView
 		
 		$surveydao = new SurveyDAO();
 		$this->page = $surveydao->findByPageID( $page_id );
-		$this->calcStatus();
 		
 		$this->wikititle = $wgTitle;
 		if( $this->wikititle->getDBkey() == 'CreateSurvey')
@@ -71,20 +83,6 @@ class SurveyView
 		}
 	}
 	
-	private function calcStatus()
-	{
-		$starttime = mktime($this->page->getStartTime());
-		$endtime = mktime($this->page->getEndTime());
-		$now = time();
-
-		$this->status = 'ready';
-		if ($starttime == $endtime)
-			$this->status = 'ready';
-		else if ($starttime <= $now && $now <= $endtime)
-			$this->status = 'active';
-		else if ($endtime < $now)
-			$this->status = 'ended';
-	}
 	/**
 	 * AJAX call, get the buttons of user which can edit the survey.
 	 * 
@@ -137,17 +135,18 @@ class SurveyView
 	 */
 	function noscriptButtons()
 	{
-		$prosurv = Title::newFromText('Special:ProcessSurvey');
+		$viewsurv = Title::newFromText('Special:ViewSurvey');
 		$cresurv = Title::newFromText('Special:CreateSurvey');
 		
-		return '<tr><td><form id="page'.$this->page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
+		return '<tr><td><form id="page'.$this->page_id.'" action="'.$viewsurv->escapeLocalURL().'" method="POST">'
 			.'<input type="hidden" name="id" value="'.$this->page_id.'">'
 			.'<input type="submit" name="wpSubmit" value="'.wfMsg('control-survey').'" />'
+			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
 			.'</form>'
-			.'<form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+			.'<td><form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
 			.'<input type="hidden" name="id" value="'.$this->page_id.'">'
 			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
-			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />'
+			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
 			.'</form>';
 	}
 
@@ -162,13 +161,11 @@ class SurveyView
 		$output.='<table cellspacing="0" style="font-size:large">';
 		
 		$output.= '<tr><td valign="top" colspan="2"><img src="'.$gvScript.'/images/spacer.gif" />';
-		// put an 250*1 spacer image above the choices so that the text doesn't get 
-		// squashed by the graph when browser is less than full screen.
-		
+
 		$survey = $this->page->getSurveys();
 		$choices = $survey[0]->getChoices();
 		
-		if($this->status=='ready')
+		if($this->page->getStatus()=='ready')
 		{
 			$output.='<tr><td colspan="2">';
 			$output.='<ul>';
@@ -186,23 +183,15 @@ class SurveyView
 			}
 			$output.='</ul>';
 		}
-		elseif($surveyStatus == 'active')
+		elseif($this->page->getStatus() == 'active')
 		{
 			;
 		}
-		elseif($surveyStatus == 'ended')
+		elseif($this->page->getStatus() == 'ended')
 		{
 			;
 		}
-		
-		//control button for those that don't have javascript
-		$output.= '<noscript>'.SurveyView::noscriptButtons().'</noscript>';
-		
-		$divname = "btnsSurvey$page_id-".rand();
-		$output.= "<div id='$divname'><input type=button value='Loading...'/></div>"
-		."<script>if(wgUserName=='{$this->page->getAuthor()}')"
-		."sajax_do_call('SurveyView::getButtons',[$this->page_id,wgPageName,'$this->status'],function(o){"
-		."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
+		$output .= $this->getHTMLButtons();
 		
 		#$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
 		#<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'" 
@@ -211,6 +200,22 @@ class SurveyView
 		$output .= '</table>';
 		return $output;
 	}
+	
+	function getHTMLButtons()
+	{
+		//control button for those that don't have javascript
+		$output = '<noscript>'.SurveyView::noscriptButtons().'</noscript>';
+		
+		$divname = "btnsSurvey$page_id-".rand();
+		$output.= ""
+		."<script type='text/javascript'>"
+		."document.write('<div id=$divname><input type=button value=\"Loading...\"/></div>');"
+		."if(wgUserName=='{$this->page->getAuthor()}')"
+		."sajax_do_call('SurveyView::getButtons',[{$this->page_id},wgPageName,'{$this->page->getStatus()}'],function(o){"
+		."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
+		return $output;
+	}
+	
 	private function parse($text)
 	{
 		if($this->parserOptions)
@@ -226,6 +231,27 @@ class SurveyView
 	function &getPage()
 	{
 		return $this->page;
+	}
+}
+
+class SurveyViewNocache extends SurveyView
+{
+	public function __construct($page_id, $parser, $parserOptions = NULL, $frame = NULL)
+	{
+		parent::__construct($page_id, $parser, $parserOptions, $frame);
+	}
+	
+	/**
+	 * Get HTML buttons for a page that is not cacheable
+	 */
+	function getHTMLButtons()
+	{
+		$divname = "btnsSurvey$page_id-".rand();
+		$output = "<div id='$divname'>";
+		$output .= $this->getButtons($this->getPage()->getPageID(), 
+			$this->wikititle->getDBkey(),$this->getPage()->getStatus());
+		$output .= '</div>';
+		return $output;
 	}
 }
 

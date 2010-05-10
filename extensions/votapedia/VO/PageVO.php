@@ -420,6 +420,25 @@ class PageVO
 		else
 			throw new SurveyException("Date/Time must follow yyyy-mm-dd hh:mm:ss format!",100);
 	}
+	/**
+	 * Get the status of the survey/page
+	 * 
+	 * @return values of 'ready', 'active' or 'ended'
+	 */
+	function getStatus()
+	{
+		$starttime = mktime($this->getStartTime());
+		$endtime = mktime($this->getEndTime());
+		$now = time();
+
+		if ($starttime == $endtime)
+			return 'ready';
+		else if ($starttime <= $now && $now <= $endtime)
+			return 'active';
+		else if ($endtime < $now)
+			return 'ended';
+		throw new SurveyException('PageVO::getStatus no valid status');
+	}
 	/*
 	 *  Any Set methods are called, will set up $isUpdated = true
 	 *  updateSurvey method checks $isUpdated whether need to update this survey.

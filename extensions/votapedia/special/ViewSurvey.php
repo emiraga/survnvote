@@ -27,10 +27,12 @@ class ViewSurvey extends SpecialPage {
 	{
 		global $wgOut, $wgParser, $wgRequest;
 		$wgOut->setPageTitle( wfMsg('title-view-survey') );
+		$wgOut->setArticleFlag(false);
+		
 		try
 		{
 			$page_id = intval($wgRequest->getVal('id'));
-			$tag = new SurveyView($page_id, $wgParser, $wgOut->ParserOptions());
+			$tag = new SurveyViewNocache($page_id, $wgParser, $wgOut->ParserOptions());
 			$wgOut->addHTML($tag->getHTMLBody());
 			$wgOut->returnToMain();
 			
@@ -38,6 +40,8 @@ class ViewSurvey extends SpecialPage {
 			$text = '';
 			$text .= "== More information ==\n";
 			$text .= "* Author: [[User:$author|$author]]\n";
+			$text .= "* Use this following to include this survey into a wiki page:\n";
+			$text .= " <code><nowiki>{{#Survey:$page_id}}</nowiki></code>\n";
 			$text .= "\n== ".wfMsg('page-links')." ==\n";
 			$text .= wfMsg('pages-include')."\n";
 			$pages = vfGetSubCategories( wfMsg('cat-survey-name', $page_id) );
