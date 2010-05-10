@@ -2,9 +2,7 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
- * This package contains all value objects.
- * Basically, it contains Call,Page,Survey,Choice,Presentation and SurveyRecord
- * @package ValueObject of survey
+ * @package ValueObject
  */
 global $vpPath;
 require_once("$vpPath/SurveyVO.php");

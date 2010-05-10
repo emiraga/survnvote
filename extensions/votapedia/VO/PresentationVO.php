@@ -2,12 +2,14 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
-  * Value Object of Presentation
-  *
-  * @package ValueObject of survey
+  * @package ValueObject
   */
- class PresentationVO
- {
+
+/**
+  * Value Object of Presentation
+  */
+class PresentationVO
+{
  	private $surveyID;
  	private $presentationID = 0;
  	private $presentation;

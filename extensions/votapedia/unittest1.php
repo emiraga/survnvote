@@ -398,7 +398,7 @@
 	die("\nDone with testing.\n");
 
 	/* ********************************************************************************** */
-	/**
+	/*
 	 * These are scenario testing
 	 */
 	require_once("./survey/surveyDAO.php");

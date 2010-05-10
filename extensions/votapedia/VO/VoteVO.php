@@ -2,8 +2,11 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
+ * @package ValueObject
+ */
+
+/**
  * Vote value object
- * @package ValueObject of survey
  *
  */
 class VoteVO

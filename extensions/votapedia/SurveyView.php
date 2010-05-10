@@ -41,7 +41,7 @@ class SurveyView
 		}
 	}
 	/**
-	 * Function called for the {{#Survey:ID}} tag.
+	 * Function called for the Survey magic tag.
 	 * 
 	 * @param $parser Parser mediawiki Parser type
 	 * @param $page_id Integer page identifier
@@ -88,6 +88,7 @@ class SurveyView
 	 * 
 	 * @param $page_id identifier of a survey
 	 * @param $wikititle title of a current page
+	 * @param $status status of a survey
 	 */
 	static function getButtons($page_id, $wikititle, $status='ready')
 	{
@@ -129,9 +130,6 @@ class SurveyView
 	/**
 	 * Similar to getButtons function, but this is used when scripting 
 	 * is not enabled in browser. Get limited buttons for a user.
-	 * 
-	 * @param $page_id identifier of a survey
-	 * @param $wikititle title of a current page
 	 */
 	function noscriptButtons()
 	{

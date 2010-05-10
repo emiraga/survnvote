@@ -1,16 +1,16 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 /**
- * This page includes class SurveyDAO which is used to
- * save/retreive data of a Survey. It contains Read/Create/Update/Delete
- * and other relevant funtionalities
- *
- * @package DAO of Survey
+ * @package DataAccessObject
  */
 global $gvPath;
 require_once("$gvPath/DAO/Telephone.php");
 require_once("$gvPath/VO/PageVO.php");
 /**
+ * This page includes class SurveyDAO which is used to
+ * save/retreive data of a Survey. It contains Read/Create/Update/Delete
+ * and other relevant funtionalities
+ *
  * SurveyDAO includes functions which can access and set
  * (a) Survey(s)' info into or from database system.
  *
@@ -325,7 +325,8 @@ class SurveyDAO
 	}
 	/**
 	 * Insert a new survey contains multi choices,presentations
-	 * @param SurveyVO $survey an instance of SurveyVO
+	 * 
+	 * @param $survey SurveyVO an instance of SurveyVO
 	 * @version 2.0
 	 */
 	private function insertSurvey(SurveyVO $survey)
@@ -403,7 +404,7 @@ class SurveyDAO
 	 * Survey,SuveyChoice,Presentation,SurveyRecord.
 	 * Page table would still be saved.
 	 * 
-	 * @param $is id of a wiki page
+	 * @param $id id of a wiki page
 	 * @version 2.0
 	 */
 	function deleteSurveys($id)
@@ -442,11 +443,11 @@ class SurveyDAO
 	/**
 	 * private method. Using database record to fill in a SurveyVO.
 	 *
-	 * @param $pageID ID of wiki page.
+	 * @param $page PageVO page object
 	 * @return Array $surveys
 	 * @version 2.0
 	 */
-	private function loadSurveys($page)
+	private function loadSurveys(&$page)
 	{
 		global $vgDB, $vgDBPrefix;
 		$sql = "select * from {$vgDBPrefix}survey where pageID = ? order by surveyID";
@@ -587,10 +588,9 @@ class SurveyDAO
 	 * Calcuate the mark which choice gets
 	 *
 	 * @param $choiceID
-	 * @param $numOfChoices
-	 * @return integer $mark
+	 * @param $numberOfChoices
 	 */
-	private function evaluatePoints($choiceID,$numberOfChoices)
+	private function evaluatePoints($choiceID, $numberOfChoices)
 	{
 		//reversing the marks simplely
 		return $numberOfChoices - $choiceID + 1;

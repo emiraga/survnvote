@@ -191,7 +191,7 @@ class CreateSurvey extends SpecialPage {
 	/**
 	 * Generate PageVO object from the values
 	 * 
-	 * @param associative array with values
+	 * @param $values associative array with values
 	 */
 	private function generatePageVO($values)
 	{

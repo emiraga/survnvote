@@ -1,13 +1,14 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package ValueObject
+ */
 
 /**
  * A value object of a voting record of surveys which follows PHP MVC suggestion.
- * @package ValueObject of survey
  * @author Bai Qifeng
  * @version 1.0
  */
-
 class SurveyRecordVO
 {
 	private $surveyID;

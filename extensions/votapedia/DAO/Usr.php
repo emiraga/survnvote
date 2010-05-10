@@ -2,10 +2,9 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
- * This page includes class USR, SurveyRecordDAO and SurveyRecordVO which are used to
- * vote for a Survey.
+ * This page includes classes which are used to access objects of Survey.
  *
- * @package DAO of Survey
+ * @package DataAccessObject
  */
 
 require_once("$gvPath/VO/CallVO.php");

@@ -2,14 +2,14 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
- * Class for managing votes in database
- * 
- * @author Emir Habul
- * @package DAO of Survey
+ * @package DataAccessObject
  */
+
 global $gvPath;
 require_once("$gvPath/VO/VoteVO.php");
-
+/**
+ * Class for managing votes in database
+ */
 class VoteDAO
 {
 	/**

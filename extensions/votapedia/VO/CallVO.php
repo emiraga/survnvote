@@ -2,9 +2,7 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
- * Call value object.
- * 
- * @package ValueObject of survey
+ * @package ValueObject
  */
 
 /**

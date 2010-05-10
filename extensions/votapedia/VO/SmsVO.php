@@ -2,14 +2,14 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
- * A value object of SMS.
- * 
+ * @author Bai Qifeng
  * @author Emir Habul
- * @package ValueObject of survey
+ * @package ValueObject
  */
 
 /**
  *  A value object of SMS
+ * @author Emir Habul
  */
 class SmsVO
 {

@@ -1,15 +1,18 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 /**
- * SurveyRecordDAO includes functions which can access
- * voting records of surveys from database system.
- * 
- * @package DAO of Survey
+ * @package DataAccessObject
  * @author Bai Qifeng
  * @author Emir Habul
  * @version 1.1
  */
 
+/**
+ * 
+ * SurveyRecordDAO includes functions which can access
+ * voting records of surveys from database system.
+ * 
+ */
 class SurveyRecordDAO
 {
 	/**

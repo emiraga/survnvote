@@ -2,11 +2,14 @@
 if (!defined('MEDIAWIKI')) die();
 
 /**
+ * @package DataAccessObject
+ */
+
+/**
  * Abstract class for IncomingCALL and IncomingSMS
  * 
  * 
  * @author Emir Habul
- * @abstract
  */
 abstract class IncomingDAO
 {
@@ -57,7 +60,6 @@ abstract class IncomingDAO
 	/**
 	 * Update value of error
 	 * 
-	 * @abstract
 	 * @param $value
 	 */
 	abstract public function updateError($value);
