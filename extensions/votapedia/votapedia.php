@@ -20,6 +20,9 @@ $gvNumberUserPass = '81161899';
 $gvNumberPBX = '8116';
 $gvCountry = 'Malaysia';
 
+$vgSmsChoiceLen = 2; /* How many last digits of phone number should be used for SMS choice*/
+                     /* Example:   phone = +60102984598   sms = 98    vgSmsChoiceLen = 2*/
+
 /* Remove prefixes and suffixes in "Survey Category" listing */
 $gvCatRemovePrefix = array('Category:Surveys in ', 'Category:Quizes in ','Category:');
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
@@ -91,5 +94,13 @@ $wgExtensionCredits['other'][] = array(
 	'descriptionmsg' => 'votapedia-desc',
 	'version' => '1.0.0',
 );
+
+function vfGetAllNumbers()
+{
+	$out = array();
+	for($i=0;$i<=99;$i++)
+		$out[] = '+601029113' . sprintf("%02d",$i);
+	return $out;
+}
 
 ?>

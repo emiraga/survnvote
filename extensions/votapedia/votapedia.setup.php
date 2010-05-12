@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
   PRIMARY KEY (ID),
   KEY i_surveyrecord (surveyID)
 );
+
+--
+-- Table structure for table usedreceivers
+--
+
+DROP TABLE IF EXISTS {$vgDBPrefix}usedreceivers;
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
+  receiver varchar(20) NOT NULL,
+  UNIQUE(receiver)
+);
+
 END_SQL;
 
 	$commands = split(';', $sql);

@@ -6,14 +6,25 @@
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 	
 	require_once("./votapedia.php");
-	$vgDBName = "unittest";
+	global $vgDBName;
+	
+	$vgDBName = "unittest_setup";
 	$vgDBUserName       = 'root';
 	$vgDBUserPassword   = '';
 	$vgDBPrefix = '';
 	
 	require_once("$gvPath/Common.php");
-	require_once("$gvPath/empty_database.php");
-
+	require_once("$gvPath/votapedia.setup.php");
+	
+	$a = microtime(true);
+	function pointTime($msg = '')
+	{
+		global $a;
+		$b = microtime(true);
+		printf(">>>> TIMIG TO POINT %.6f $msg\n",$b-$a);
+		$a = microtime(true);
+	}
+	
 	if(true) /* Test choiceVO */
 	{
 		echo '.';
@@ -184,7 +195,7 @@
 		assert( $page->getAuthor() == 'UnknownUser' );
 		assert( $page->getStartTime() == '2999-01-01 00:00:00' );
 		assert( $page->getDuration() == 60 );
-		assert( $page->getEndTime() == '2999-01-01 01:00:00' );
+		assert( $page->getEndTime() == '2999-01-01 00:00:00' );
 		// assert( ! $page->getCreateTime() );
 		assert( $page->isInvalidAllowed() == '1' );
 		assert( $page->isSMSRequired() == '0' );
@@ -220,7 +231,6 @@
 		assert( $page->getEndTime() == '2001-01-01 04:00:00' );
 		assert($page->getPageID() == 45);
 		$page->setEndTime('2001-01-01 03:00:00');
-		assert( $page->getDuration() == 180 );
 		assert( $page->getAuthor() == 'Admin' );
 		assert( $page->getPhone() == '+060197654321' );
 		
@@ -312,7 +322,7 @@
 	
 	if( true ) /* testing SmsVO */
 	{
-		echo '.';
+		echo ".";
 		require_once('./VO/SmsVO.php');
 		$sms = new SmsVO();
 		assert(! $sms->getDate() );
@@ -333,44 +343,71 @@
 		assert('8768768' == $sms->getFrom() );
 		assert('text test text' == $sms->getText() );
 	}
+	echo "\n";
 	
 	if( true ) /* testing Telephone */
 	{
-		echo '.';
 		require_once('./DAO/Telephone.php');
-		$t = new Telephone();
-		assert( count($t->getAvailablePhones()) == count($t->getAllPhones()) );
-
-		$p = new PageVO();
-		$p->setPageID(1);
-		$p->setTitle('q1');
-		$p->setStartTime(date("Y-m-d H:i:s"));
 		
+		$p = new PageVO();
+		$p->setTitle('Question 1');
+		$p->setStartTime(date("Y-m-d H:i:s"));
 		if(true)
 		{
-			$s = new SurveyVO();
-			$s->setPageID(1);
-			$s->setSurveyID(1);
-			$s->setQuestion('How are you?');
-			if (true)
-			{
-				$c = new ChoiceVO();
-				$c->setSurveyID(1);
-				$c->setChoiceID(1);
-				
-				$c->setChoice('yes');
-				$s->setChoices(array($c));
-			}
-			$p->setSurveys(array($s));
+			$s1 = new SurveyVO();
+			$s1->setQuestion('How are you?');
+			$c1 = new ChoiceVO(); $c1->setChoice('good');
+			$c2 = new ChoiceVO(); $c2->setChoice('bad');
+			$s1->setChoices(array($c1, $c2));
+			
+			$s2 = new SurveyVO();
+			$s2->setQuestion('What day is today?');
+			$c1 = new ChoiceVO(); $c1->setChoice('mon');
+			$c2 = new ChoiceVO(); $c2->setChoice('tue');
+			$c3 = new ChoiceVO(); $c3->setChoice('wed');
+			$c4 = new ChoiceVO(); $c4->setChoice('thu');
+			$c5 = new ChoiceVO(); $c5->setChoice('fri');
+			$s2->setChoices(array($c1, $c2, $c3, $c4, $c5));
+			
+			$p->setSurveys(array($s1, $s2));
 		}
-		$t->setupReceivers(&$p);
-		foreach($p as &$s)
-		{
-			foreach($s as &$c)
-			{
-				echo "Chosen: ".$c->getReceiver()."\n";
-			}
-		}
+		$surdao = new SurveyDAO();
+		$surdao->insertPage($p);
+		$s = $p->getSurveys();
+		assert(count($s) == 2);
+		assert($s[0]->getSurveyID() == 1 && $s[1]->getSurveyID() == 2);
+		
+		$c1 = $s[0]->getChoices();
+		$c2 = $s[1]->getChoices();
+		assert(count($c1) == 2 && count($c2) == 5);
+		assert($c1[0]->getChoiceID() == 1);
+		assert($c2[4]->getChoiceID() == 5);
+		
+		$t = new Telephone();
+		$g = $t->makeGroups(array('11','12','24','37','38','39'));
+		assert(count($g) == 3 && count($g[0]) == 2 && count($g[1]) == 1 && count($g[2]) == 3);
+		$g = $t->makeGroups(array('+011','+012','+024','+037','+038','+039'));
+		assert(count($g) == 3 && count($g[0]) == 2 && count($g[1]) == 1 && count($g[2]) == 3);
+		
+		assert( count($t->getAvailablePhones()) == count($t->getAllPhones()) );
+		global $vgDB;
+		$vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911310')");
+		$vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911319')");
+		assert( count($t->getAvailablePhones()) == count($t->getAllPhones())-2 );
+		$g = $t->makeGroups($t->getAvailablePhones());
+		
+		assert(count($g) == 3 && count($g[0]) == 10 && count($g[1]) == 8);
+		assert(count($g[2]) == count($t->getAllPhones()) - 2 - 10 - 8);
+		$vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911305')");
+		
+		$g = $t->makeGroups($t->getAvailablePhones());
+		assert(count($g) == 4);
+		
+		$t->setupReceivers($p);
+		
+		$g = $t->makeGroups($t->getAvailablePhones());
+		assert(count($g) == 3);
+		assert( count($t->getAvailablePhones()) == count($t->getAllPhones())-3-2-5 );
 	}
 	
 	if( false ) /* testing Usr */
@@ -394,7 +431,7 @@
 	{
 		;
 	}
-	
+	pointTime('the end');
 	die("\nDone with testing.\n");
 
 	/* ********************************************************************************** */

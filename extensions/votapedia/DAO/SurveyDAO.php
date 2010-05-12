@@ -97,7 +97,7 @@ class SurveyDAO
 	 * @param $pageVO PageVO
 	 * @param $insertSurveys should surveys be inserted as well
 	 */
-	public function insertPage(PageVO &$pageVO, $insertSurveys = false)
+	public function insertPage(PageVO &$pageVO, $insertSurveys = true)
 	{
 		global $vgDB, $vgDBPrefix;
 		$vgDB->StartTrans();
@@ -127,8 +127,8 @@ class SurveyDAO
 
 		if($insertSurveys)
 		{
-			$surveys = $pageVO->getSurveys();
-			foreach ($surveys as $survey)
+			$surveys =& $pageVO->getSurveys();
+			foreach ($surveys as &$survey)
 			{
 				$survey->setPageID($pageVO->getPageID());
 				$this->insertSurvey($survey);
@@ -329,7 +329,7 @@ class SurveyDAO
 	 * @param $survey SurveyVO an instance of SurveyVO
 	 * @version 2.0
 	 */
-	private function insertSurvey(SurveyVO $survey)
+	private function insertSurvey(SurveyVO &$survey)
 	{
 		global $vgDB, $vgDBPrefix;
 		$sql="insert into {$vgDBPrefix}survey (pageID,question,answer,points) values (?,?,?,?)";
@@ -341,19 +341,16 @@ class SurveyDAO
 			$survey->getPoints()
 		);
 		$vgDB->Execute($res,$paramSurvey);
+		$survey->setSurveyID( $vgDB->Insert_ID() );
 
-		if ($survey->getNumOfChoices()>0)
+		if ($survey->getNumOfChoices() > 0)
 		{
-			// Get SurveyID from database.
-			$sql = "select surveyID from {$vgDBPrefix}survey where question = ? and pageID = ? order by surveyid desc";
-			$rsSurveyID = $vgDB->Execute($sql, array($survey->getQuestion(), $survey->getPageID()));
-			$survey->setSurveyID($rsSurveyID->fields["surveyID"]);
-			$rsSurveyID->Close();
 			//Insert Choices begin
 			$sql = "insert into {$vgDBPrefix}surveyChoice (surveyID, choiceID, choice, points) values (?,?,?,?)";
 			$resChoice = $vgDB->Prepare($sql);
 			$choiceID = 0;
-			foreach($survey->getChoices() as $surveyChoice)
+			$choices =& $survey->getChoices();
+			foreach($choices as &$surveyChoice)
 			{
 				$choiceID++;
 				$param = array(
@@ -363,6 +360,8 @@ class SurveyDAO
 					$this->evaluatePoints($choiceID,$survey->getNumOfChoices())
 				);
 				$vgDB->Execute($resChoice,$param);
+				
+				$surveyChoice->setChoiceID( $choiceID );
 			}
 		}
 		if ($survey->getNumOfPresentations()>0)
@@ -371,20 +370,21 @@ class SurveyDAO
 			$sql = "insert into {$vgDBPrefix}presentation (surveyID,presentationID,presentation,active)";
 			$sql = $sql."values(?,?,?,?)";
 			$resPre = $vgDB->Prepare($sql);
-			$presentationID = 1;
-			foreach($survey->getPresentations()as $presentation)
+			$presentationID = 0;
+			$presentations =& $survey->getPresentations();
+			foreach($presentations as &$presentation)
 			{
+				$presentationID++;
 				$vgDB->Execute($resPre,array(
 					$survey->getSurveyID(),
 					$presentationID,
 					$presentation->getPresentation(),
 					$presentation->getActive()
 				));
-				$presentationID++;
+				$presentation->SetPresentationID( $vgDB->Insert_ID() );
 			}
 		}
 	}
-
 	/**
 	 * Delete a page which includes tables of page,
 	 * Survey,SuveyChoice,Presentation,SurveyRecord.
@@ -656,6 +656,7 @@ class SurveyDAO
 	 * It is different with starting a survey.
 	 * Starting a survey requires we set up startint time before we are able to start it
 	 * In finishing procedure, we automatically set current time as finishing time.
+	 * 
 	 * @param $pageVO PageVO
 	 * @version 2.0
 	 */
@@ -674,9 +675,10 @@ class SurveyDAO
 	 * Basically, the following stages are used:
 	 * $surveyVO->setStartTime(now());
 	 * $surveyDAO->requestReceivers($surveyVO);
+	 * 
 	 * @param $page PageVO
 	 */
-	public function requestReceivers(PageVO $page)
+	public function requestReceivers(PageVO &$page)
 	{
 		$telephone = new Telephone();
 		return $telephone->setupReceivers($page);

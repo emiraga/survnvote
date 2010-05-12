@@ -235,7 +235,7 @@ class SurveyVO
 	 * @param $i id of the choice which want to be retrieved
 	 * @return ChoiceVO a choice
 	 */
-	function getChoiceByNum($i)
+	function &getChoiceByNum($i)
 	{
 		return ($this->choices[$i]);
 	}
