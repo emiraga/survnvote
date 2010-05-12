@@ -17,8 +17,7 @@ function vfGetPageTitle($mytitle)
 	$mytitle = trim(stripslashes($mytitle));
 	if(strlen($mytitle)>50)
 	{
-		$mytitle=substr($mytitle,0,50);
-		$mytitle.='...';
+		$mytitle=substr($mytitle,0,50).'...';
 	}
 	return $mytitle;
 }
@@ -71,7 +70,7 @@ function vfConnectDatabase()
  * @var $vgDB global variable ADOdb connection
  */
 global $vgDB;
-$vgDB = vfConnectDatabase();
+$vgDB =& vfConnectDatabase();
 /**
  * Rotates color images for a choice.
  * 
@@ -85,42 +84,14 @@ function vfGetColorImage()
 	return "$gvScript/images/colors/Choice$c.jpg";
 }
 /**
- * Purge the cache of a page with a given title
- * 
- * @param $title string title of wiki page
+ * Get a singleton of MediaWiki adapter
  */
-function vfPurgePage($title)
+function &vfAdapter()
 {
-	$params = new FauxRequest(array('action' => 'purge','titles' => $title));
-	$api = new ApiMain($params, true);
-	$api->execute();
-	$data = & $api->getResultData();
-	if(!isset($data['purge'][0]['purged']))
-		throw new Exception('Page purging has failed');
+	global $vgMWAdapter;
+	if(! isset($vgMWAdapter))
+		$vgMWAdapter =& new MwAdapter();
+	return $vgMWAdapter;
 }
-/**
- * Get a list of subcategories of a category
- * 
- * @param $category Name of a category
- * @return array with a list of categories
- */
-function vfGetSubCategories($category) // = )
-{
-	$params = new FauxRequest(array(
-		'cmtitle' => $category,
-		'action' => 'query',
-		'list' => 'categorymembers',
-		'cmprop' => 'title',
-		//'cmsort' => 'timestamp',
-	));
-	$api = new ApiMain($params);
-	$api->execute();
-	$data = & $api->getResultData();
-	$result = array();
-	foreach($data['query']['categorymembers'] as $subcat)
-	{
-		$result[] = $subcat['title'];
-	}
-	return $result;
-}
+
 ?>

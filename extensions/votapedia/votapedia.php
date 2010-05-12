@@ -46,6 +46,9 @@ require_once( "$gvPath/UserHooks.php" );
 $wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
 $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
 
+//MediaWiki Adapter
+$wgAutoloadClasses['MwAdapter'] = "$gvPath/MwAdapter.php";
+
 //Special page CreateSurvey
 $wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
 $wgSpecialPages['CreateSurvey'] = 'CreateSurvey';

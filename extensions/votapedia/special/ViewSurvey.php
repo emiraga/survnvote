@@ -40,11 +40,12 @@ class ViewSurvey extends SpecialPage {
 			$text = '';
 			$text .= "== More information ==\n";
 			$text .= "* Author: [[User:$author|$author]]\n";
-			$text .= "* Use this following to include this survey into a wiki page:\n";
+			$text .= "* Use following text to include this survey into a wiki page:\n";
 			$text .= " <code><nowiki>{{#Survey:$page_id}}</nowiki></code>\n";
 			$text .= "\n== ".wfMsg('page-links')." ==\n";
 			$text .= wfMsg('pages-include')."\n";
-			$pages = vfGetSubCategories( wfMsg('cat-survey-name', $page_id) );
+			$pages = vfAdapter()->getSubCategories( wfMsg('cat-survey-name', $page_id) );
+			
 			foreach($pages as $name)
 			{
 				$text.="* [[$name#survey_id_$page_id|$name]]\n";

@@ -10,6 +10,9 @@ $messages['en'] = array(
 
 	'surveynologin' => 'Not logged in',
 	'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
+	'notauthorized' => 'Not authorized',
+	'notauthorized-desc' => 'You are not authorized to perform this action.',
+
 	'survey-created' => 'New Survey succesfully created ($1)',
 	'id-not-found' => 'Page identifier "$1" was not found.',
 	'id-not-present' => 'Page identifier is not specified.',

@@ -109,7 +109,7 @@ function renderChoice( $input, $argv ) {
 	$anonymousVoteAllowed=true;
 	$votesAllowed=1;
 	$now=date("Y-m-d H:i:s");
-	$initDate= date("Y-m-d H:i:s", mktime(0, 0, 0, 1, 1, 2000));
+	$initDate= date("Y-m-d H:i:s", mktime(0, 0, 0, 1, 1, 2999));
 	$outsideAustralia=true;
 	//echo $encodedTitle;
 	if(odbc_fetch_row($queryexe))

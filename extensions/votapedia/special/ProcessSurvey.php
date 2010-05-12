@@ -34,11 +34,38 @@ class ProcessSurvey extends SpecialPage {
 			$wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
 			return;
 		}
+		$page_id = intval(trim($wgRequest->getVal('id')));
 		$action = $wgRequest->getVal( 'wpSubmit' );
-		if($action == wfMsg('start-survey'))
-		{
-			$wgOut->addHTML('start survey<br>');
+
+		if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
+			die('Edit token is wrong, please try again.');
 		}
+		try
+		{
+			$surveydao = new SurveyDAO();
+			$page = $surveydao->findByPageID($page_id);
+			if( !$page->getAuthor() == $wgUser->getName() )
+			{
+				$wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+			}
+
+			if($action == wfMsg('start-survey'))
+			{
+				#$wgOut->addHTML('start survey<br>');
+				$surveydao->startSurvey($page);
+				
+				//Purge all pages that have this survey included.
+				vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
 		
+				$title = Title::newFromText($wgRequest->getVal('returnto'));
+				$wgOut->redirect($title->escapeLocalURL(), 302);
+				return;
+			}
+		}
+		catch(Exception $e)
+		{
+			$wgOut->addHTML(vfErrorBox($e->getMessage()));
+			return;
+		}
 	}
 }

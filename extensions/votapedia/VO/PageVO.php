@@ -20,7 +20,7 @@ class PageVO
 	private $title;
 	private $phone='000';
 	private $author = "UnknownUser";
-	private $startTime = "2000-01-01 00:00:00";
+	private $startTime = "2999-01-01 00:00:00";
 	private $endTime;
 	private $duration = 60;
 	private $createTime;
@@ -80,7 +80,7 @@ class PageVO
 	function setEndTime($endTime)
 	{
 		$this->endTime = $endTime;
-		$this->duration = $this->renewDuration();
+		//$this->duration = $this->renewDuration();
 	}
 	/**
 	 * Set duration of this survey, must be Integer
@@ -425,17 +425,18 @@ class PageVO
 	 */
 	function getStatus()
 	{
-		$starttime = mktime($this->getStartTime());
-		$endtime = mktime($this->getEndTime());
+		$starttime = strtotime ($this->getStartTime());
+		$endtime = strtotime ($this->getEndTime());
 		$now = time();
-
-		if ($starttime == $endtime)
+		
+		if ($endtime == false || $endtime == -1 || $starttime == false || $starttime == -1)
 			return 'ready';
 		else if ($starttime <= $now && $now <= $endtime)
 			return 'active';
 		else if ($endtime < $now)
 			return 'ended';
-		throw new SurveyException('PageVO::getStatus no valid status');
+		else
+			return 'ready';
 	}
 	/*
 	 *  Any Set methods are called, will set up $isUpdated = true
@@ -449,24 +450,30 @@ class PageVO
 	}*/
 
 	/**
-	 * Recompute the end time based in the startTime and duration
+	 * Recompute the end time based in the startTime and duration.
+	 * 
+	 * If current unix time cannot fit into an integer, 
+	 * end time will be equal to start time.
+	 * 
 	 * @return new value of end time
 	 */
 	private function renewEndTime()
 	{
-		$start_S=strtotime($this->startTime);
-		$end_S = $start_S + $this->duration*60;
-		return date("Y-m-d H:i:s",$end_S);
+		$start=strtotime($this->startTime);
+		if($start == false || $start == -1)
+			return $this->startTime;
+		else
+			return date("Y-m-d H:i:s",$start + $this->duration*60);
 	}
 	/**
 	 * Recompute the duration based on startTime and endtime
 	 * @return duration of the survey
 	 */
-	private function renewDuration()
+	/*private function renewDuration()
 	{
 		$start=strtotime($this->startTime);
 		$end=strtotime($this->endTime);
 		return intval( ($end - $start) / 60 );
-	}
+	}*/
 }
 ?>

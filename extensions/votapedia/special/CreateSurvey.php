@@ -57,10 +57,10 @@ class CreateSurvey extends SpecialPage {
 			'duration' => array(
 				'type' => 'input',
 				'name' => 'Duration',
-				'default' => '1',
+				'default' => '60',
 				'width' => '10',
-				'textafter' => ' hours.',
-				'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11; },
+				'textafter' => ' minutes.',
+				'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11*60; },
 				'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
 				'learn_more' => 'Details of Duration',
 				'process' => function($v) { return intval($v); },
@@ -154,7 +154,7 @@ class CreateSurvey extends SpecialPage {
 				'learn_more' => 'Changing Title of a survey',
 			),
 		);
-		$subcat = vfGetSubCategories('Category:Survey Categories');
+		$subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
 		$subcat = $this->removePrefSufCategories($subcat);
 		$this->formitems['category']['options'] = $subcat;
 		
@@ -317,7 +317,7 @@ class CreateSurvey extends SpecialPage {
 			//user has submitted to add new page or edit existing one
 			//form originates from the CreateSurvey special page
 			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
-				die('Something is wrong, please try again. Edit token is missing');
+				die('Edit token is wrong, please try again. Edit token is missing');
 			$this->form->loadValuesFromRequest();
 			$error = $this->form->Validate();
 			if(! $error)
@@ -346,9 +346,19 @@ class CreateSurvey extends SpecialPage {
 			}
 			catch(SurveyException $e)
 			{
+				$wgOut->setPageTitle("Error");
 				$wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
+				$wgOut->returnToMain();
 				return;
 			}
+			if($page->getStatus() != 'ready')
+			{
+				$wgOut->setPageTitle("Error");
+				$wgOut->addWikiText( vfErrorBox( 'Survey is either active or finished, therefore cannot be edited.') );
+				$wgOut->returnToMain();
+				return;
+			}
+
 			$this->form->setValue('titleorquestion', $page->getTitle());
 			$survey = $page->getSurveys();
 			$surchoice = $survey[0]->getChoices();
@@ -371,7 +381,7 @@ class CreateSurvey extends SpecialPage {
 		if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
 		{
 		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
-				die('Something is wrong, please try again.');
+				die('Edit token is wrong, please try again.');
 			}
 			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
 			$page_id = intval($wgRequest->getVal('id'));
@@ -395,10 +405,8 @@ class CreateSurvey extends SpecialPage {
 				}
 				
 				//Purge all pages that have this survey included.
-				$surcats = vfGetSubCategories( wfMsg('cat-survey-name', $page_id) );
-				foreach($surcats as $cat)
-					vfPurgePage(Title::newFromText( $cat )->getDBkey());
-
+				vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+		
 				$title = Title::newFromText($this->returnTo);
 				$wgOut->redirect($title->escapeLocalURL(), 302);
 				return;

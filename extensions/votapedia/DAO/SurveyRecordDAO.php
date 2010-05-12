@@ -18,7 +18,6 @@ class SurveyRecordDAO
 	/**
 	 * Check whether the voter is in its first voting
 	 * Looks into tables 'incomingcall' and 'incomingsms'
-	 * @todo this does not belong here
 	 * 
 	 * @param $voterID ID of voter, could be wiki usrname, telephone number.
 	 * @return Boolean true represents it is the first time voting.
@@ -26,7 +25,6 @@ class SurveyRecordDAO
 	function isFirstVoting($voterID)
 	{
 		global $vgDB, $vgDBPrefix;
-		
 		$num= $vgDB->GetOne("select count(*) as num from {$vgDBPrefix}incomingcall where caller = ?", array($voterID));
 		if ($num > 0)
 			return false;

@@ -103,8 +103,9 @@ class SurveyView
 		$output = '<tr>';
 		$output .= '<td>';
 		$output .= '<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
-		    . '<input type="hidden" name="id" value="'.$page_id.'">'
-			.'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
+	    .'<input type="hidden" name="id" value="'.$page_id.'">'
+		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($wikititle).'" />'
+	    .'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
 		if($status == 'ready')
 		{
 			$output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />';
@@ -119,11 +120,14 @@ class SurveyView
 		}
 		$output .= '</form>';
 		$output .= '<td>';
-		$output .='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+		if($status == 'ready')
+		{
+			$output .='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
 			.'<input type="hidden" name="id" value="'.$page_id.'">'
 			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
 			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($wikititle).'" />'
 			.'</form>';
+		}
 		return $output;
 	}
 	
@@ -137,15 +141,15 @@ class SurveyView
 		$cresurv = Title::newFromText('Special:CreateSurvey');
 		
 		return '<tr><td><form id="page'.$this->page_id.'" action="'.$viewsurv->escapeLocalURL().'" method="POST">'
-			.'<input type="hidden" name="id" value="'.$this->page_id.'">'
-			.'<input type="submit" name="wpSubmit" value="'.wfMsg('control-survey').'" />'
-			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
-			.'</form>'
-			.'<td><form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
-			.'<input type="hidden" name="id" value="'.$this->page_id.'">'
-			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
-			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
-			.'</form>';
+		.'<input type="hidden" name="id" value="'.$this->page_id.'">'
+		.'<input type="submit" name="wpSubmit" value="'.wfMsg('control-survey').'" />'
+		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
+		.'</form>'
+		.'<td><form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+		.'<input type="hidden" name="id" value="'.$this->page_id.'">'
+		.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
+		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
+		.'</form>';
 	}
 
 	function getHTMLBody()
@@ -207,7 +211,7 @@ class SurveyView
 		$divname = "btnsSurvey$page_id-".rand();
 		$output.= ""
 		."<script type='text/javascript'>"
-		."document.write('<div id=$divname><input type=button value=\"Loading...\"/></div>');"
+		."document.write('<div id=$divname></div>');"
 		."if(wgUserName=='{$this->page->getAuthor()}')"
 		."sajax_do_call('SurveyView::getButtons',[{$this->page_id},wgPageName,'{$this->page->getStatus()}'],function(o){"
 		."document.getElementById('$divname').innerHTML=o.responseText;});</script>";

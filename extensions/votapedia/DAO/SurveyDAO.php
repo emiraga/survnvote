@@ -617,19 +617,18 @@ class SurveyDAO
 		return true;
 	}
 	/**
-	 * This is function is to start a survey.
-	 * So, it requires the starting time of survey is set up before it is started.
-	 * Basically, the following stages are used:
+	 * This is function is to start a survey. It will set the start time in PageVO
+	 * 
 	 * @param $pageVO PageVO;
 	 * @version 2.0
 	 */
-	function startSurvey(PageVO $pageVO)
+	function startSurvey(PageVO &$pageVO)
 	{
 		global $vgDB, $vgDBPrefix;
 		$startDate = date("Y-m-d H:i:s");
 		$pageVO->setStartTime($startDate);
 
-		$sql = "update {$vgDBPrefix}page set starttime = ?, endtime=? where pageID = ?";
+		$sql = "update {$vgDBPrefix}page set starttime = ?, endtime = ? where pageID = ?";
 		$vgDB->Execute($sql, array($pageVO->getStartTime(), $pageVO->getEndTime(), $pageVO->getPageID()));
 
 		return true;
@@ -637,6 +636,7 @@ class SurveyDAO
 	/**
 	 * This is function is to continue a survey.
 	 * It requires the time which the survey continue to run.
+	 * 
 	 * @param $pageVO PageVO
 	 * @version 2.0
 	 */
