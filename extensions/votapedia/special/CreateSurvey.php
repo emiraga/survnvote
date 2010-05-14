@@ -54,6 +54,24 @@ class CreateSurvey extends SpecialPage {
 				'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audiences can ring this number, send SMS or visit the survey page to enter their vote.',
 				'learn_more' => 'Details of Survey Procedure',
 			),
+			'privacy' => array(
+				'type' => 'radio',
+				'name' => 'Survey Privacy',
+				'default' => 'low',
+				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+				'options' => array(
+					  "Low - Public survey (anyone can vote) "=>"low",
+					  "Medium - No information (Information about survey voting is not publicly available)"=>"medium",
+					  "High - Restricted survey (Voting is restricted to the group of people) "=>"high",
+				),
+				'explanation' => 'This option determines who will be able to participate in your survey.',
+				'learn_more' => 'Details of Survey Privacy',
+			),
+			'privacy-group' => array(
+				'type' => 'null',
+				'explanation' => 'TODO.',
+				'learn_more' => 'TODO',
+			),
 			'duration' => array(
 				'type' => 'input',
 				'name' => 'Duration',
@@ -210,6 +228,7 @@ class CreateSurvey extends SpecialPage {
 		$page->setTeleVoteAllowed(true);
 		$page->setVotesAllowed(1);
 		$page->setSMSRequired(false); //@todo SMS sending to the users
+		$page->setPrivacyByName($values['privacy']);
 		
 		$surveyVO = new SurveyVO();
 		$surveyVO->generateChoices( split("\n", $values['choices']) );
@@ -374,6 +393,7 @@ class CreateSurvey extends SpecialPage {
 			$this->form->setValue('anonymousweb', $page->isAnonymousAllowed());
 			$this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
 			$this->form->setValue('showtop', $page->getDisplayTop());
+			$this->form->setValue('privacy', $page->getPrivacyByName());
 			
 			$this->drawFormEdit($page_id, $error);
 		}
@@ -436,8 +456,9 @@ class CreateSurvey extends SpecialPage {
 
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
+		
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
-		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
+		$this->form->AddPage ( 'Voting options', array('privacy', 'privacy-group', 'duration', 'voteridentity', 'anonymousweb', ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('create-survey'));
 	}
@@ -466,8 +487,9 @@ class CreateSurvey extends SpecialPage {
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
 		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
+		
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
-		$this->form->AddPage ( 'Voting options', array('duration', 'voteridentity', 'anonymousweb', ) );
+		$this->form->AddPage ( 'Voting options', array('privacy', 'privacy-group' ,'duration', 'voteridentity', 'anonymousweb', ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('edit-survey'));
 	}

@@ -58,6 +58,7 @@ class SurveyDAO
 		$page->setSubtractWrong($rs->fields['subtractWrong']);
 		$page->setPhone( $rs->fields['phone'] );
 		$page->setSMSRequired( $rs->fields['smsRequired'] );
+		$page->setPrivacy($rs->fields['privacy']);
 		$rs->Close();
 		$page->setSurveys($this->loadSurveys($page));
 		return $page;
@@ -103,10 +104,10 @@ class SurveyDAO
 		global $vgDB, $vgDBPrefix;
 		$vgDB->StartTrans();
 
-		$sql = "insert into {$vgDBPrefix}page (title,author,phone,startTime,duration,endTime,invalidAllowed,smsRequired,teleVoteAllowed,
-                       anonymousAllowed,showGraph,surveyType,displayTop,subtractWrong) ";
+		$sql = "insert into {$vgDBPrefix}page (title,author,phone,startTime,duration,endTime,"
+			."invalidAllowed,smsRequired,teleVoteAllowed,anonymousAllowed,showGraph,surveyType,"
+			."displayTop,subtractWrong,privacy)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		//@todo some fields from page are missing
-		$sql = $sql."values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		$resPage = $vgDB->Prepare($sql);
 		$param = array( $pageVO->getTitle(),
 			$pageVO->getAuthor(),
@@ -121,7 +122,8 @@ class SurveyDAO
 			$pageVO->isShowGraph(),
 			$pageVO->getType(),
 			$pageVO->getDisplayTop(),
-			$pageVO->isSubtractWrong()
+			$pageVO->isSubtractWrong(),
+			$pageVO->getPrivacy(),
 		);
 		$vgDB->Execute($resPage,$param);
 		$pageVO->setPageID($vgDB->Insert_ID());
@@ -159,7 +161,7 @@ class SurveyDAO
 		$vgDB->StartTrans();
 	 	$sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
 		 	. "invalidAllowed=?,smsRequired=?,teleVoteAllowed=?,"
-		 	. " anonymousAllowed=?,showGraph=?,surveyType=?,displayTop=?,votesallowed=?,subtractWrong=? "
+		 	. " anonymousAllowed=?,showGraph=?,surveyType=?,displayTop=?,votesallowed=?,subtractWrong=?,privacy=? "
 		 	. "where pageID = ?";
 	 	$resPage = $vgDB->Prepare($sql);
 	 	$param = array(
@@ -176,6 +178,8 @@ class SurveyDAO
 		 	$pageVO->getDisplayTop(),
 		 	$pageVO->getVotesAllowed(),
 		 	$pageVO->isSubtractWrong(),
+		 	$pageVO->getPrivacy(),
+		 	
 		 	$pageID
 	 	);
 	 	//@todo some fields here are missing

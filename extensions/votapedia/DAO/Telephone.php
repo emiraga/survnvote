@@ -160,14 +160,15 @@ class Telephone
 		return array_slice($availablePhones, 0, $number);
 	}
 	/**
-	 * Request receivers for choices in surveys contained in PageVO
+	 * Request receivers for choices in surveys contained in PageVO.
+	 * Updates database as well.
 	 *
 	 * @param $page PageVO
 	 * @return Boolean true
 	 */
 	function setupReceivers(PageVO &$page)
 	{
-		$milisec = 1; //miliseconds
+		$milisec = 1;
 		while(true)
 		{
 			try{
@@ -188,6 +189,7 @@ class Telephone
 	/**
 	 * Request receivers for choices in surveys contained in PageVO
 	 * Updates database as well.
+	 * Throws TelephoneException in case of collision.
 	 *
 	 * @param $page PageVO
 	 * @return Boolean true

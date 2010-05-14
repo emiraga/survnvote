@@ -207,6 +207,7 @@
 		assert( $page->getVotesAllowed() == 1 );
 		assert( $page->isSubtractWrong() == '0' );
 		assert( ! $page->getSurveys() );
+		assert( $page->getPrivacy() == 1);
 		// @todo test getSurveyBySurveyID()
 		// @todo test validateDate();
 		assert( $page->getNumOfSurveys() == 0 );
@@ -222,6 +223,7 @@
 		$page->setSubtractWrong(true);
 		$page->setType(2);
 		$page->setTeleVoteAllowed(false);
+		$page->setPrivacy(3);
 		
 		try{ $page->setTitle(' 	'); assert(false); } catch(Exception $e){}
 		assert($page->getTitle() == 'page1');
@@ -233,7 +235,7 @@
 		$page->setEndTime('2001-01-01 03:00:00');
 		assert( $page->getAuthor() == 'Admin' );
 		assert( $page->getPhone() == '+060197654321' );
-		
+		assert( $page->getPrivacy() == 3);
 		$page->setAnonymousAllowed(false);
 		assert( $page->isAnonymousAllowed() == false );
 		$page->setAnonymousAllowed(true);
@@ -245,8 +247,16 @@
 		assert( $page->isSubtractWrong() == '1' );
 		assert( $page->getType() == 2 );
 		assert( $page->getTeleVoteAllowed() == '0' );
-	}
 		
+		//This will throw exception if something is wrong
+		$page->setPrivacy(vPRIVACY_LOW); 
+		$page->setPrivacyByName( $page->getPrivacyByName() );
+		$page->setPrivacy(vPRIVACY_MEDIUM); 
+		$page->setPrivacyByName( $page->getPrivacyByName() );
+		$page->setPrivacy(vPRIVACY_HIGH); 
+		$page->setPrivacyByName( $page->getPrivacyByName() );
+	}
+
 	if( true ) /* testing SurveyRecordVO */
 	{
 		echo '.';

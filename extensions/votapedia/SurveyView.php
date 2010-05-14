@@ -3,6 +3,7 @@ if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
 require_once("$gvPath/Common.php");
+require_once("$gvPath/DAO/SurveyDAO.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey

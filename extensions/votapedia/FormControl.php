@@ -152,6 +152,13 @@ class FormControl
 					$select->addOption( $name, $optval );
 				$form_element = $select->getHTML();
 			}
+			elseif($item['type'] == 'radio')
+			{
+				$form_element = '';
+				foreach($item['options'] as $name => $optval )
+					$form_element .= Xml::radioLabel($name, $id, $optval, 
+						$id.'-'.$optval, $optval == $value).'<br />';
+			}
 			elseif($item['type'] == 'textarea')
 			{
 				$value = str_replace("\r", "\n", $value);

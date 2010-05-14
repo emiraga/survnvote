@@ -34,7 +34,7 @@ class PageVO
 	private $votesAllowed = 1;
 	private $subtractWrong = 0;
 	private $surveys = array();
-	//private $isUpdated = false;
+	private $privacy = 1;
 
 	function __construct()
 	{
@@ -49,7 +49,6 @@ class PageVO
 	{
 		$this->pageID = $id;
 	}
-	
 	/**
 	 * Set question of this survey
 	 * 
@@ -91,7 +90,6 @@ class PageVO
 		$this->duration = $duration;
 		$this->endTime = $this->renewEndTime();
 	}
-
 	/**
 	 * get created time of this survey
 	 * @param $createTime create time of this survey
@@ -108,7 +106,6 @@ class PageVO
 	{
 		$this->author = trim($author);
 	}
-
 	/**
 	 * Set phone of this survey , which is used to activate/deactivate survey
 	 * @param $phone
@@ -200,6 +197,31 @@ class PageVO
 		$this->subtractWrong = $subtractWrong;
 	}
 	/**
+	 * Privacy level of this Page
+	 * 
+	 * @param $privacy Integer
+	 */
+	function setPrivacy($privacy)
+	{
+		$this->privacy = $privacy;
+	}
+	/**
+	 * Privacy level of this Page
+	 * 
+	 * @param $privacy Integer
+	 */
+	function setPrivacyByName($privacy)
+	{
+		if($privacy == 'low')
+			$this->privacy = vPRIVACY_LOW;
+		elseif($privacy == 'medium')
+			$this->privacy = vPRIVACY_MEDIUM;
+		elseif($privacy == 'high')
+			$this->privacy = vPRIVACY_HIGH;
+		else
+			throw new SurveyException('setPrivacyByName: Wrong privacy level');
+	}
+	/**
 	 * get survey ID of this survey
 	 * @return Integer ID of the survey which contains this choice
 	 */
@@ -263,7 +285,6 @@ class PageVO
 	{
 		return $this->createTime;
 	}
-
 	/**
 	 * Check wether the survey allows invalid calls (-1) to vote
 	 * @return allow as 1, forbid as 0
@@ -288,7 +309,6 @@ class PageVO
 		else
 			return '0';
 	}
-
 	/**
 	 * Check wether the survey allows telephone/sms voting
 	 * 0 for Web voting Only
@@ -360,22 +380,29 @@ class PageVO
 		return $this->votesAllowed;
 	}
 	/**
-	 * get status of this survey
-	 * @return boolean true is for survey is running, false is for survey stopped
+	 * Get privacy level of this Page
+	 * @return integer
 	 */
-	/*function isActivated()
+	function getPrivacy()
 	{
-		return $this->activated;
-	}*/
-	/*
-	 * check wether this survey is updated
-	 * @return boolean
+		return $this->privacy;
+	}
+	/**
+	 * Get privacy level of this Page
+	 * 
+	 * @return String privacy 
 	 */
-	/*function isUpdated()
+	function getPrivacyByName()
 	{
-		return $this->isUpdated;
-	}*/
-
+		if($this->privacy == vPRIVACY_LOW)
+			return 'low';
+		elseif($this->privacy == vPRIVACY_MEDIUM)
+			return 'medium';
+		elseif($this->privacy == vPRIVACY_HIGH)
+			return 'high';
+		else
+			throw new SurveyException('getPrivacyByName: Wrong privacy level');
+	}
 	/**
 	 * get mulit choices in this survey
 	 * @return array a array of choices in this survey
@@ -438,17 +465,6 @@ class PageVO
 		else
 			return 'ready';
 	}
-	/*
-	 *  Any Set methods are called, will set up $isUpdated = true
-	 *  updateSurvey method checks $isUpdated whether need to update this survey.
-	 *  Usually the function is used internal, such as retrieve a survey from database
-	 *  ATTENTION: It does not matter with whether Choices is updated
-	 */
-	/*private function resetStatus()
-	{
-		$this->isUpdated = false;
-	}*/
-
 	/**
 	 * Recompute the end time based in the startTime and duration.
 	 * 
@@ -465,15 +481,5 @@ class PageVO
 		else
 			return date("Y-m-d H:i:s",$start + $this->duration*60);
 	}
-	/**
-	 * Recompute the duration based on startTime and endtime
-	 * @return duration of the survey
-	 */
-	/*private function renewDuration()
-	{
-		$start=strtotime($this->startTime);
-		$end=strtotime($this->endTime);
-		return intval( ($end - $start) / 60 );
-	}*/
 }
 ?>
