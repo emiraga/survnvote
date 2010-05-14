@@ -60,3 +60,54 @@ class MwAdapter
 		}
 	}	
 }
+
+/**
+ * Parser function adapter to MediaWiki Parser
+ * 
+ * @author Emir Habul
+ *
+ */
+class MwParser
+{
+	private $parser;
+	private $parserOptions;
+	private $wikititle;
+	private $isTag;
+	
+	public function __construct(Parser &$parser, ParserOptions &$options = NULL, Title $title = NULL)
+	{
+		$this->parser =& $parser;
+		$this->options =& $options;
+		$this->wikititle = $title;
+		$this->isTag = false;
+	}
+	/**
+	 * Set that this parser is running within execute "tag"
+	 */
+	public function setTag()
+	{
+		$this->isTag = true;
+	}
+	/**
+	 * Parse the wiki text while removing untrusted tags from the code
+	 * 
+	 * @param $text String
+	 */
+	public function run($text)
+	{
+		global $gvAllowedTags;
+		global $wgUser, $wgTitle;
+		$text = strip_tags($text, $gvAllowedTags);
+		// do the parsing inside a tag
+		if($this->isTag)
+			return $this->parser->recursiveTagParse($text);
+		//default values
+		if(! $this->parserOptions)
+			$this->parserOptions =& ParserOptions::newFromUser($wgUser);
+		//default values
+		if(! $this->wikititle)
+			$this->wikititle =& $wgTitle;
+		//parse for normal view
+		return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, false, true )->getText();
+	}
+}

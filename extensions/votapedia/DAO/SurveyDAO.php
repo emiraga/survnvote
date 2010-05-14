@@ -4,6 +4,7 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 global $gvPath;
+require_once("$gvPath/Common.php");
 require_once("$gvPath/DAO/Telephone.php");
 require_once("$gvPath/VO/PageVO.php");
 /**

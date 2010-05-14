@@ -12,9 +12,8 @@ require_once("$gvPath/Common.php");
  */
 class SurveyView
 {
-	private $parser;
 	private $frame;
-	private $parserOptions;
+	private $parser;
 	
 	private $page; /** PageVO */
 	private $username; /** String */
@@ -31,8 +30,12 @@ class SurveyView
 	static function executeTag( $input, $args, $parser, $frame = NULL )
 	{
 		$page_id = intval(trim($input));
-		try{
-			$tag = new SurveyView($page_id, $parser);
+		try
+		{
+			#var_dump($parser);
+			$mwparser = new MwParser($parser);
+			$mwparser->setTag();
+			$tag = new SurveyView($page_id, $mwparser);
 			return $tag->getHTMLBody();
 		}
 		catch(Exception $e)
@@ -43,7 +46,7 @@ class SurveyView
 	/**
 	 * Function called for the Survey magic tag.
 	 * 
-	 * @param $parser Parser mediawiki Parser type
+	 * @param $parser Parser mediawiki type
 	 * @param $page_id Integer page identifier
 	 */
 	static function executeMagic($parser, $page_id)
@@ -54,13 +57,12 @@ class SurveyView
 		return array($output, 'noparse' => false);
 	}
 	
-	function __construct($page_id, $parser, $parserOptions = NULL, $frame = NULL)
+	protected function __construct($page_id, $parser, $frame = NULL)
 	{
 		wfLoadExtensionMessages('Votapedia');
 		global $wgUser, $wgTitle;
 		$this->parser = $parser;
 		$this->frame = $frame;
-		$this->parserOptions = $parserOptions;
 		$this->page_id=$page_id;
 		$this->username = $wgUser->getName();
 		
@@ -87,10 +89,10 @@ class SurveyView
 	 * AJAX call, get the buttons of user which can edit the survey.
 	 * 
 	 * @param $page_id identifier of a survey
-	 * @param $wikititle title of a current page
+	 * @param $title title of a current page
 	 * @param $status status of a survey
 	 */
-	static function getButtons($page_id, $wikititle, $status='ready')
+	static function getButtons($page_id, $title, $status='ready')
 	{
 		global $wgUser;
 		if ($wgUser->isAnon()) { return ''; } //just in case
@@ -104,7 +106,7 @@ class SurveyView
 		$output .= '<td>';
 		$output .= '<form id="page'.$page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
 	    .'<input type="hidden" name="id" value="'.$page_id.'">'
-		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($wikititle).'" />'
+		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($title).'" />'
 	    .'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
 		if($status == 'ready')
 		{
@@ -125,7 +127,7 @@ class SurveyView
 			$output .='<form id="editpage'.$page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
 			.'<input type="hidden" name="id" value="'.$page_id.'">'
 			.'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
-			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($wikititle).'" />'
+			.'<input type="hidden" name="returnto" value="'.htmlspecialchars($title).'" />'
 			.'</form>';
 		}
 		return $output;
@@ -134,6 +136,8 @@ class SurveyView
 	/**
 	 * Similar to getButtons function, but this is used when scripting 
 	 * is not enabled in browser. Get limited buttons for a user.
+	 * 
+	 * @return HTML code
 	 */
 	function noscriptButtons()
 	{
@@ -152,9 +156,13 @@ class SurveyView
 		.'</form>';
 	}
 
+	/**
+	 * Get body of survey
+	 * @return html code
+	 */
 	function getHTMLBody()
 	{
-		global $gvScript, $gvAllowedTags;
+		global $gvScript;
 		$output = '';
 		
 		$output.= '<a name="survey_id_'.$this->page_id.'"></a>';
@@ -176,7 +184,7 @@ class SurveyView
 			{
 				$i++;
 				global $wgOut;
-				$choice = $this->parse(strip_tags( $choice->getChoice(), $gvAllowedTags));
+				$choice = $this->parser->run($choice->getChoice());
 				if($choice)
 				{
 					$output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
@@ -202,7 +210,11 @@ class SurveyView
 		$output .= '</table>';
 		return $output;
 	}
-	
+	/**
+	 * Get HTML buttons for a page that is cacheable
+	 * 
+	 * @return HTML code
+	 */
 	function getHTMLButtons()
 	{
 		//control button for those that don't have javascript
@@ -218,18 +230,11 @@ class SurveyView
 		return $output;
 	}
 	
-	private function parse($text)
-	{
-		if($this->parserOptions)
-		{
-			return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, false, true )->getText();
-		}
-		else
-		{
-			return $this->parser->recursiveTagParse($text);
-		}
-	}
-	
+	/**
+	 * Current PageVO object
+	 * 
+	 * @return PageVO
+	 */
 	function &getPage()
 	{
 		return $this->page;
@@ -238,13 +243,15 @@ class SurveyView
 
 class SurveyViewNocache extends SurveyView
 {
-	public function __construct($page_id, $parser, $parserOptions = NULL, $frame = NULL)
+	public function __construct($page_id, $parser, $frame = NULL)
 	{
-		parent::__construct($page_id, $parser, $parserOptions, $frame);
+		parent::__construct($page_id, $parser, $frame);
 	}
 	
 	/**
 	 * Get HTML buttons for a page that is not cacheable
+	 * 
+	 * @return HTML code
 	 */
 	function getHTMLButtons()
 	{

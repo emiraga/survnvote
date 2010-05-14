@@ -37,6 +37,17 @@ $gvScript = "$wgScriptPath/extensions/votapedia";
 /* Template which is used to insert an existing survey into the page */
 $gvSurveyTemplate = 'Survey';
 
+/**
+ * Returns an array containing all phone numbers that can be used for voting
+ */
+function vfGetAllNumbers()
+{
+	$out = array();
+	for($i=0;$i<=99;$i++)
+		$out[] = '+601029113' . sprintf("%02d",$i);
+	return $out;
+}
+
 /******************************************************************/
 /*** Do not edit items below unless you know what you are doing ***/
 /******************************************************************/
@@ -51,6 +62,7 @@ $wgExtensionAliasesFiles['Votapedia'] = "$gvPath/votapedia.alias.php";
 
 //MediaWiki Adapter
 $wgAutoloadClasses['MwAdapter'] = "$gvPath/MwAdapter.php";
+$wgAutoloadClasses['MwParser'] = "$gvPath/MwAdapter.php";
 
 //Special page CreateSurvey
 $wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
@@ -94,13 +106,5 @@ $wgExtensionCredits['other'][] = array(
 	'descriptionmsg' => 'votapedia-desc',
 	'version' => '1.0.0',
 );
-
-function vfGetAllNumbers()
-{
-	$out = array();
-	for($i=0;$i<=99;$i++)
-		$out[] = '+601029113' . sprintf("%02d",$i);
-	return $out;
-}
 
 ?>

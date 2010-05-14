@@ -2,8 +2,6 @@
 if (!defined('MEDIAWIKI')) die();
 
 global $gvPath;
-require_once("$gvPath/Common.php" );
-require_once("$gvPath/FormControl.php");
 require_once("$gvPath/VO/PageVO.php");
 require_once("$gvPath/DAO/SurveyDAO.php");
 
@@ -53,12 +51,21 @@ class ProcessSurvey extends SpecialPage {
 			{
 				if($page->getStatus() != 'ready')
 					throw new SurveyException('Survey is either running or finished and cannot be started');
-
-				//Setup receivers
+				
 				$tel = new Telephone();
-				$tel->setupReceivers($page);
-				$surveydao->updateReceiversSMS($page);
-				$surveydao->startSurvey($page);
+				try
+				{
+					//Setup receivers
+					$tel->setupReceivers($page);
+					$surveydao->updateReceiversSMS($page);
+					$surveydao->startSurvey($page);
+				}
+				catch(Exception $e)
+				{
+					// in case of an error
+					$tel->deleteReceivers($page); 
+					throw $e; //continue throwing
+				}
 				
 				//Purge all pages that have this survey included.
 				vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));

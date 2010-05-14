@@ -9,12 +9,11 @@ require_once('../../LocalSettings.php');
  * has priviledges for CREATE and DELETE of tables.
  */
 global $vgDBUserName, $vgDBUserPassword;
-$vgDBUserName       = 'root';
-$vgDBUserPassword   = '';
+$vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
+$vgDBUserPassword   = '';     // Password for database user
 
 function vfDoSetup()
 {
-	
 	global $gvPath, $vgDB, $vgDBPrefix;
 	require_once("$gvPath/Common.php");
 	
@@ -42,6 +41,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   votesAllowed tinyint(8) unsigned NOT NULL DEFAULT '1',
   subtractWrong tinyint(1) NOT NULL DEFAULT '0',
   eventID varchar(11) DEFAULT NULL,
+  privacy tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (pageID),
   KEY pageID (pageID)
 );
@@ -138,6 +138,7 @@ END_SQL;
 	}
 }
 
+global $gvScript, $wgScriptPath;
 if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
 {
 	try
@@ -155,7 +156,7 @@ if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
 		echo "<p><a href='$wgScriptPath'>Return to MediaWiki</a></p>";
 	}
 } else {
-	global $gvScript, $wgScriptPath;
+
 	echo <<<END_HTML
 <h1>Welcome to Votapedia installation.</h1>
 <p>This script <b>votapedia.setup.php</b> is very dangerous and must be deleted after installation has been completed</p>
