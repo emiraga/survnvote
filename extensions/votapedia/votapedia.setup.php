@@ -7,14 +7,18 @@ require_once('../../LocalSettings.php');
 /*
  * Enter user/pass of a admin account for mysql that
  * has priviledges for CREATE and DELETE of tables.
- */ 
+ */
+global $vgDBUserName, $vgDBUserPassword;
 $vgDBUserName       = 'root';
 $vgDBUserPassword   = '';
 
-global $gvPath, $vgDB, $vgDBPrefix;
-require_once("$gvPath/Common.php");
-
-$sql = <<<END_SQL
+function vfDoSetup()
+{
+	
+	global $gvPath, $vgDB, $vgDBPrefix;
+	require_once("$gvPath/Common.php");
+	
+	$sql = <<<END_SQL
 --
 -- Table structure for table page
 --
@@ -122,7 +126,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
 );
 
 END_SQL;
-
+	
 	$commands = split(';', $sql);
 	foreach($commands as $sql)
 	{
@@ -132,5 +136,44 @@ END_SQL;
 			$vgDB->Execute($sql);
 		}
 	}
-	//@todo add Template:$gvSurveyTemplate
+}
+
+if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
+{
+	try
+	{
+		vfDoSetup();
+	}
+	catch(Exception $e)
+	{
+		die("<h3>Error: ".htmlspecialchars($e->getMessage())."</h3>");
+	}
+	if(isset($_POST['do_install']))
+	{
+		echo "<h1>Votapedia installation is complete.</h1>\n";
+		echo "<u>Please</u> delete the file <b>votapedia.setup.php</b> from votapedia extension directory.<br>\n";
+		echo "<p><a href='$wgScriptPath'>Return to MediaWiki</a></p>";
+	}
+} else {
+	global $gvScript, $wgScriptPath;
+	echo <<<END_HTML
+<h1>Welcome to Votapedia installation.</h1>
+<p>This script <b>votapedia.setup.php</b> is very dangerous and must be deleted after installation has been completed</p>
+<p>Do not run this script if you have already installed votapedia, it will <b>delete</b> tables from database related to votapedia.</p>
+Installation Steps:
+<ol>
+<li>Configure MediaWiki by editing file <b>LocalSettings.php</b>.</li>
+<li>Make sure that MediaWiki is working properly.</li>
+<li>Edit file <b>extensions/votapedia/votapedia.php</b> to configure votapedia settings.</li>
+<li>Edit file <b>extensions/votapedia/votapedia.setup.php</b> to set the master user/password.</li>
+<li>Open this script in browser (you are doing it right now)</li>
+<li>
+<form action="$gvScript/votapedia.setup.php" method="POST">
+<input type=submit name=do_install value="Install" />
+</form>
+</li>
+</ol>
+END_HTML;
+}
+
 ?>

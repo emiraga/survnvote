@@ -404,6 +404,7 @@
 		assert(count($g) == 4);
 		
 		$t->setupReceivers($p);
+		$surdao->updateReceiversSMS($p);
 		
 		$g = $t->makeGroups($t->getAvailablePhones());
 		assert(count($g) == 3);
@@ -598,32 +599,7 @@
 	assert($p2surveys[0]->getSurveyID() == 3);
 	assert( count( $p2surveys[0]->getChoices() ) == 2 );
 	$p2choices = $p2surveys[0]->getChoices();
-	//var_dump($p2choices);
-	//var_dump( $p2surveys[0]->getChoiceByNum(1)->getReceiver() );
-	//$user->vote( $p2surveys[0]->getSurveyID(), 1 );
-	
-	/*
-	 * Test phone
-	 * 
-	 */
-	
-	require_once('./survey/Telephone.php');
-	
-	$telephone = new Telephone();
-	echo count( $telephone->getAvailablePhone() ) ."\n";
-	foreach( $page->getSurveys() as $sry  )
-	{
-		echo "numch:".count($sry->getChoices())."\n";
-		echo "ID:".$sry->getSurveyID()."\n";
-		foreach($sry->getChoices() as $choice)
-		{
-			echo "ch survey id:". $choice->getSurveyID() . "\n";
-		}
-	}
-	//echo count()."\n";
-	//var_dump( $telephone->setupReceivers($page) );
-	//echo count( $telephone->getAvailablePhone() ) ."\n";
-	
+
 	assert(true);
-	$cn->Close();
+
 ?>

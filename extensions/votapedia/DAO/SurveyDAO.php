@@ -683,5 +683,26 @@ class SurveyDAO
 		$telephone = new Telephone();
 		return $telephone->setupReceivers($page);
 	}
+	public function updateReceiversSMS(PageVO &$page)
+	{
+		global $vgDB, $vgDBPrefix;
+		$sqlChoice = "update {$vgDBPrefix}surveychoice set receiver = ?, sms = ? where surveyID = ? and choiceID = ?";
+		$resChoice = $vgDB->Prepare($sqlChoice);
+		$surveys = &$page->getSurveys();
+		foreach($surveys as &$survey)
+		{
+			$surveyChoices =& $survey->getChoices();
+			foreach($surveyChoices as &$surveyChoice)
+			{
+				$param = array(
+					$surveyChoice->getReceiver(),
+					$surveyChoice->getSMS(),
+					$surveyChoice->getSurveyID(),
+					$surveyChoice->getChoiceID(),
+				);
+				$vgDB->Execute($resChoice, $param);
+			}
+		}
+	}
 }
 ?>

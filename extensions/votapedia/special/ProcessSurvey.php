@@ -51,12 +51,18 @@ class ProcessSurvey extends SpecialPage {
 
 			if($action == wfMsg('start-survey'))
 			{
-				#$wgOut->addHTML('start survey<br>');
+				if($page->getStatus() != 'ready')
+					throw new SurveyException('Survey is either running or finished and cannot be started');
+
+				//Setup receivers
+				$tel = new Telephone();
+				$tel->setupReceivers($page);
+				$surveydao->updateReceiversSMS($page);
 				$surveydao->startSurvey($page);
 				
 				//Purge all pages that have this survey included.
 				vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-		
+				//Redirect to the previous page
 				$title = Title::newFromText($wgRequest->getVal('returnto'));
 				$wgOut->redirect($title->escapeLocalURL(), 302);
 				return;
