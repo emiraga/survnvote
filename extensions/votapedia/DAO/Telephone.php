@@ -4,6 +4,8 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
+class TelephoneException extends Exception { }
+
 global $gvPath;
 require_once("$gvPath/VO/SurveyVO.php");
 /**
@@ -43,14 +45,10 @@ class Telephone
 	 * @param $locked Boolean is this table locked, default false
 	 * @return Array $telephone the array of available telephone numbers
 	 */
-	function getAvailablePhones($locked = false)
+	function getAvailablePhones()
 	{
 		global $vgDB,$vgDBPrefix;
-		if(!$locked)
-			$sql = "select receiver from {$vgDBPrefix}usedreceivers{$addTable}";
-		else
-			$sql = "select receiver from {$vgDBPrefix}usedreceivers as {$vgDBPrefix}usedreceivers_r";
-		
+		$sql = "select receiver from {$vgDBPrefix}usedreceivers{$addTable}";
 		$rs= &$vgDB->GetAll($sql);
 		$telephones = array();
 		foreach($rs as $r)
@@ -169,17 +167,40 @@ class Telephone
 	 */
 	function setupReceivers(PageVO &$page)
 	{
+		$milisec = 1; //miliseconds
+		while(true)
+		{
+			try{
+				return $this->setupReceiversTryOnce($page);
+			}
+			catch(TelephoneException $e)
+			{
+				//someone else has taken these numbers, we try again
+				$this->deleteReceivers($page);
+				//In case we are food-fighting with someone, sleep randomly
+				usleep(rand(0, $milisec * 1000));
+				$milisec *= 2; //exponential backoff
+				if($milisec > 17000) //die after approximatelly 16 seconds
+					throw new SurveyException('Could not allocate receivers for phone, too many collisions.');
+			}
+		}
+	}
+	/**
+	 * Request receivers for choices in surveys contained in PageVO
+	 * Updates database as well.
+	 *
+	 * @param $page PageVO
+	 * @return Boolean true
+	 */
+	private function setupReceiversTryOnce(PageVO &$page)
+	{
 		global $vgDB, $vgDBPrefix;
 		global $vgSmsChoiceLen;
-		$pr = $vgDBPrefix;
-		
-		$surveys = &$page->getSurveys();
-		
-		$success = $vgDB->Execute("LOCK TABLES {$pr}usedreceivers WRITE, {$pr}usedreceivers AS {$pr}usedreceivers_r READ");
-		if(! $success)
-			throw new SurveyException('Failed to lock the usedreceivers table');
 
-		$available = $this->getAvailablePhones(true);
+		$surveys = &$page->getSurveys();
+		$available = $this->getAvailablePhones();
+		
+		$receivers = array();
 		foreach($surveys as &$survey)
 		{
 			sort($available);
@@ -188,22 +209,13 @@ class Telephone
 			
 			$number = $survey->getNumOfChoices();
 			if (count($results)< $number)
-			{
-				$vgDB->Execute("UNLOCK TABLES"); 
 				throw new SurveyException("No available phones!", 203);
-			}
 			
 			$i = 0;
 			$surveyChoices =& $survey->getChoices();
 			foreach($surveyChoices as &$surveyChoice)
 			{
-				$success = $vgDB->Execute("INSERT INTO {$pr}usedreceivers (receiver) VALUES(?)", array($results[$i]));
-				if($success == false)
-				{
-					$vgDB->Execute("UNLOCK TABLES"); 
-					throw new SurveyException("Duplicate phone found, even though table was locked.");
-				}
-				
+				$receivers[] = array($results[$i]);
 				$surveyChoice->setReceiver($results[$i]);
 				$surveyChoice->setSMS(substr($results[$i], -$vgSmsChoiceLen));
 				$i++;
@@ -211,7 +223,15 @@ class Telephone
 			//Get rid of the occupied numbers from the availablePhones
 			$available = array_values( array_diff($available, $results) );
 		}//foreach survey
-		$vgDB->Execute("UNLOCK TABLES");
+		
+		//insert into database
+		try
+		{
+			$success = $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers (receiver) VALUES(?)", $receivers);
+		}
+		catch(Exception $e){ $success = false; } 
+		if(! $success)
+			throw new TelephoneException("Duplicate receiver found.");
 		return true;
 	}
 	/**
@@ -222,6 +242,8 @@ class Telephone
 	 */
 	function deleteReceivers(PageVO &$page)
 	{
+		global $vgDB, $vgDBPrefix; 
+		$receivers = array();
 		$surveys = &$page->getSurveys();
 		foreach($surveys as &$survey)
 		{
@@ -229,16 +251,14 @@ class Telephone
 			foreach($surveyChoices as &$surveyChoice)
 			{
 				if($surveyChoice->getReceiver())
-				{
-					$success = $vgDB->Execute("DELETE FROM {$pr}usedreceivers WHERE receiver=?",
-						array($surveyChoice->getReceiver()));
-					if(!$success)
-						throw new SurveyException("Failed to delete used receiver");
-				}
+					$receivers[] = array($surveyChoice->getReceiver());
 				$surveyChoice->setReceiver(NULL);
 				$surveyChoice->setSMS(NULL);
 			}
 		}
+		$success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}usedreceivers WHERE receiver=?", $receivers);
+		if(! $success)
+			throw new SurveyException("Failed to delete used receivers");
 		return true;
 	}
 }

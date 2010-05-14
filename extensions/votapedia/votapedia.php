@@ -53,7 +53,7 @@ function vfGetAllNumbers()
 /******************************************************************/
 
 #debug script
-require_once( "$gvPath/SpecialEmirTest.php" ); //@todo remove this
+//require_once( "$gvPath/SpecialEmirTest.php" ); //@todo remove this
 require_once( "$gvPath/UserHooks.php" );
 
 //International Texts and Aliases

@@ -371,6 +371,8 @@
 			
 			$p->setSurveys(array($s1, $s2));
 		}
+		require_once('./DAO/surveyDAO.php');
+		
 		$surdao = new SurveyDAO();
 		$surdao->insertPage($p);
 		$s = $p->getSurveys();
