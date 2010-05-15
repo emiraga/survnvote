@@ -5,9 +5,10 @@ funon-exist();
 global $gvPath;
 require_once("$gvPath/Common.php");
 
+non_used_file();
+
 class tagSurveyChoices
 {
-
 	/**
 	 * SurveyChoice tag handler, draws HTML in place of SurveyChoice tag
 	 * 

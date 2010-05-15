@@ -81,6 +81,7 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 $wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
 $wgAutoloadClasses['SurveyViewNocache'] = "$gvPath/SurveyView.php";
 $wgAjaxExportList[] = 'SurveyView::getButtons';
+$wgAjaxExportList[] = 'SurveyView::getChoices';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser ){

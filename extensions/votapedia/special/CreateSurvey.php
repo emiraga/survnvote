@@ -39,7 +39,12 @@ class CreateSurvey extends SpecialPage {
 				'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
 				'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later in the survey page.',
 				'learn_more' => 'Details of Editing Surveys',
+				'textafter' => '<script>document.write("<b><a href=\'#\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); }); \\">&nbsp; + Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
 			),
+			/*'choices-preview' => array(
+				'type' => 'null',
+				'html' => '<script>alert(4);</script>'
+			),*/
 			'category' => array(
 				'type' => 'select',
 				'name' => 'Category',
@@ -206,7 +211,6 @@ class CreateSurvey extends SpecialPage {
 		$page->setDisplayTop($values['showtop']);
 		$page->setShowGraph(! (bool) $values['showresultsend']);
 		$page->setDuration( $values['duration'] );
-		$page->setTeleVoteAllowed(true);
 		$page->setVotesAllowed(1);
 		$page->setSMSRequired(false); //@todo SMS sending to the users
 		$page->setPrivacyByName($values['privacy']);
@@ -428,11 +432,12 @@ class CreateSurvey extends SpecialPage {
 	 */
 	function drawFormNew( $errors=null )
 	{
-		global $wgOut, $wgUser, $wgScriptPath;
+		global $wgOut, $wgUser, $wgScriptPath, $gvScript;
 		
 		$wgOut->setArticleFlag(false);
 		$wgOut->setPageTitle("Create New Simple Survey");
-		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
 		
 		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 
@@ -455,18 +460,20 @@ class CreateSurvey extends SpecialPage {
 		$this->formitems['titleorquestion']['explanation'] = '';
 		$this->formitems['titleorquestion']['learn_more'] = '';
 
-		global $wgOut, $wgUser, $wgScriptPath;
+		global $wgOut, $wgUser, $wgScriptPath, $gvScript;
 		$wgOut->setArticleFlag(false);
 		$wgOut->setPageTitle(wfMsg('title-edit-survey'));
 		
 		$wgOut->returnToMain();
-		$wgOut->addHTML('<script type="text/javascript" src="'.$wgScriptPath.'/skins/common/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
 		
 		if($errors)
 			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 		
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
+		
 		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
 		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 		

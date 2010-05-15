@@ -205,6 +205,7 @@ class FormControl
 			
 			if($item['name'])
 				$item['name'] .= ':';
+
 			$wgOut->addHTML(
 				$this->TableRow(
 					Xml::label( $item['name'], $id ),
@@ -213,6 +214,8 @@ class FormControl
 						$item['explanation'] )
 				)
 			);
+			if(isset($item['html']))
+				$wgOut->addHTML('<tr><td colspan=2>'. $item['html'] .'</tr>');
 		}
 		$wgOut->addHTML( Xml::closeElement( 'table' ) );
 

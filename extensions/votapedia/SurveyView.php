@@ -85,7 +85,6 @@ class SurveyView
 			$this->wikititle = Title::newFromText( $gvWikiPageTitle );
 		}
 	}
-	
 	/**
 	 * AJAX call, get the buttons of user which can edit the survey.
 	 * 
@@ -133,7 +132,6 @@ class SurveyView
 		}
 		return $output;
 	}
-	
 	/**
 	 * Similar to getButtons function, but this is used when scripting 
 	 * is not enabled in browser. Get limited buttons for a user.
@@ -156,7 +154,6 @@ class SurveyView
 		.'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getDBkey()).'" />'
 		.'</form>';
 	}
-
 	/**
 	 * Get body of survey
 	 * @return html code
@@ -211,6 +208,23 @@ class SurveyView
 		$output .= '</table>';
 		return $output;
 	}
+	static function getChoices($text)
+	{
+		global $wgParser;
+		$p = new MwParser($wgParser);
+		$lines = split("\n",$text);
+		$output = '';
+		foreach($lines as $line)
+		{
+			$line = trim($line);
+			if($line)
+			{
+				$output .= $p->run($line, true);
+			}
+		}
+		return $output;
+	}
+	
 	/**
 	 * Get HTML buttons for a page that is cacheable
 	 * 
@@ -230,7 +244,6 @@ class SurveyView
 		."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
 		return $output;
 	}
-	
 	/**
 	 * Current PageVO object
 	 * 
@@ -242,13 +255,19 @@ class SurveyView
 	}
 }
 
+/**
+ * Class used to display parts of HTML related to the viewing of survey.
+ * Elements are not cache-able, meaning that they are context sensitive.
+ * 
+ * @author Emir Habul
+ *
+ */
 class SurveyViewNocache extends SurveyView
 {
 	public function __construct($page_id, $parser, $frame = NULL)
 	{
 		parent::__construct($page_id, $parser, $frame);
 	}
-	
 	/**
 	 * Get HTML buttons for a page that is not cacheable
 	 * 

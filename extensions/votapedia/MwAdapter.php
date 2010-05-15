@@ -93,14 +93,14 @@ class MwParser
 	 * 
 	 * @param $text String
 	 */
-	public function run($text)
+	public function run($text, $linestart = false)
 	{
 		global $gvAllowedTags;
-		global $wgUser, $wgTitle;
 		$text = strip_tags($text, $gvAllowedTags);
 		// do the parsing inside a tag
 		if($this->isTag)
 			return $this->parser->recursiveTagParse($text);
+		global $wgUser, $wgTitle;
 		//default values
 		if(! $this->parserOptions)
 			$this->parserOptions =& ParserOptions::newFromUser($wgUser);
@@ -108,6 +108,6 @@ class MwParser
 		if(! $this->wikititle)
 			$this->wikititle =& $wgTitle;
 		//parse for normal view
-		return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, false, true )->getText();
+		return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, $linestart, true )->getText();
 	}
 }
