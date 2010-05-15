@@ -20,7 +20,7 @@ class CreateSurvey extends SpecialPage {
 		parent::__construct('CreateSurvey');
 		wfLoadExtensionMessages('Votapedia');
 
-		global $gvCountry;
+		global $gvCountry, $gvScript;
 		$this->formitems = array (
 			'titleorquestion' => array(
 				'type' => 'input',
@@ -37,14 +37,10 @@ class CreateSurvey extends SpecialPage {
 				'name' => 'Choices',
 				'textbefore' => 'Type choices here, one per line.<br />',
 				'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
-				'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later in the survey page.',
+				'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later.',
 				'learn_more' => 'Details of Editing Surveys',
-				'textafter' => '<script>document.write("<b><a href=\'#\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); }); \\">&nbsp; + Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
+				'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
 			),
-			/*'choices-preview' => array(
-				'type' => 'null',
-				'html' => '<script>alert(4);</script>'
-			),*/
 			'category' => array(
 				'type' => 'select',
 				'name' => 'Category',
@@ -71,6 +67,7 @@ class CreateSurvey extends SpecialPage {
 				),
 				'explanation' => 'This option determines who will be able to participate in your survey.',
 				'learn_more' => 'Details of Survey Privacy',
+				'icon' => $gvScript.'/icons/lock.png',
 			),
 			'duration' => array(
 				'type' => 'input',
@@ -83,14 +80,6 @@ class CreateSurvey extends SpecialPage {
 				'learn_more' => 'Details of Duration',
 				'process' => function($v) { return intval($v); },
 			),
-			/*'AllowInvalidVotes' => array(
-				'type' => 'checkbox',
-				'name' => 'Voter identity',
-				'default' => 'on',
-				'checklabel' => 'Enable unidentified voters. Compulsory for phone surveys from outside Australia.',
-				'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
-				'learn_more' => 'Details_of_Multiple_Voting',
-			),*/
 			'phonevoting' => array(
 				'type' => 'radio',
 				'name' => 'Phone voting',
@@ -99,9 +88,10 @@ class CreateSurvey extends SpecialPage {
 				'explanation' => '',
 				'learn_more' => 'Details of Phone Voting',
 				'options' => array(
-					  "Enable unidentified voters. Required for phone surveys from outside of $gvCountry"=>"anon",
+					  "Enable unidentified voters. Recommended for phone surveys from outside of $gvCountry."=>"anon",
 					  "Enable phone voting (only for identified callers - CallerID)"=>"yes",
-					  "Disable phone voting"=>"no",)
+					  "Disable phone voting"=>"no",),
+				'icon' => $gvScript.'/icons/phone.png',
 			),
 			'webvoting' => array(
 				'type' => 'radio',
@@ -113,7 +103,8 @@ class CreateSurvey extends SpecialPage {
 				'options' => array(
 					  "Enable anonymous web voting"=>"anon",
 					  "Enable web voting (only for registered users)"=>"yes",
-					  "Disable web voting"=>"no",)
+					  "Disable web voting"=>"no",),
+				'icon' => $gvScript.'/icons/laptop.png',
 			),
 			'showresultsend' => array(
 				'type' => 'checkbox',
@@ -324,7 +315,7 @@ class CreateSurvey extends SpecialPage {
 			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
 				die('Edit token is wrong, please try again. Edit token is missing');
 			$this->form->loadValuesFromRequest();
-			$error = $this->form->Validate();
+			$error = $this->Validate();
 			if(! $error)
 			{
 				$error = $this->insertPage($this->form->getValuesArray());
@@ -394,7 +385,7 @@ class CreateSurvey extends SpecialPage {
 			
 			$this->form->loadValuesFromRequest();
 			
-			$error = $this->form->Validate();
+			$error = $this->Validate();
 			if(! $error)
 			{
 				$page = $this->generatePageVO($this->form->getValuesArray());
@@ -424,6 +415,13 @@ class CreateSurvey extends SpecialPage {
 			//fresh new form
 			$this->drawFormNew();
 		}
+	}
+	function Validate()
+	{
+		$error = $this->form->Validate();
+		if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
+			$error .= '<li>Users cannot vote, enable either web or phone voting</li>';
+		return $error;
 	}
 	/**
 	 * Draw form for new survey using FormControl
@@ -477,7 +475,7 @@ class CreateSurvey extends SpecialPage {
 		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
 		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 		
-		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
+		$this->form->AddPage ( 'Edit Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
 		$this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('edit-survey'));

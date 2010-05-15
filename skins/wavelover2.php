@@ -125,16 +125,16 @@ class WaveLover2Template extends QuickTemplate {
 				<?php if($this->data['thispage'] == 'Main_Page') { ?>
 					<img src="<?php echo $this->data['wgScript']; ?>../../skins/wavelover2/malaysia.jpg" /> 
 				<?php } ?>
-				<a title="Purge current page" href="<?php echo $this->data['wgScript'].'/'.$this->data['thispage'].'?action=purge'; ?>"></a>
+				<a title="Purge current page" href="<?php echo $this->data['wgScript'].'/'.$this->data['thispage'].'?action=purge'; ?>">Purge</a>
 				<?php //print_r($this->data) ?>
 				</p>
 			</div>
 			<h1 id="firstHeading" class="firstHeading">
-			<a href=""><?php
+			<?php
 				if($this->data['thispage'] == 'Main_Page')
 					echo "Welcome to Votapedia development page in Malaysia.";
 				else
-					$this->data['displaytitle']!=""?$this->html('title'):$this->text('title') ?></a>
+					$this->data['displaytitle']!=""?$this->html('title'):$this->text('title') ?>
 			</h1>
 		</div>
 

@@ -63,7 +63,7 @@ class FormControl
 		{
 			if(isset($element['valid']))
 				if(! $element['valid']($this->values[ $id ], $element, false))
-					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> ('.$element['type'].') field </li>';
+					$error .= '<li>Incorrect value for <u>'.$element['name'].'</u> field.</li>';
 		}
 		return $error;
 	}
@@ -205,10 +205,14 @@ class FormControl
 			
 			if($item['name'])
 				$item['name'] .= ':';
-
+			
+			$label = 	Xml::label( $item['name'], $id );
+			if(isset($item['icon']))
+				$label = "<img src='$item[icon]'> ".$label;
+			
 			$wgOut->addHTML(
 				$this->TableRow(
-					Xml::label( $item['name'], $id ),
+					$label,
 					$form_element,
 					Xml::tags('div', array( 'class' => 'prefsectiontip' ),
 						$item['explanation'] )
