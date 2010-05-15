@@ -27,7 +27,6 @@ class SurveyVO
 	private $votesAllowed=1;
 
 	//Reduntant info from PageVO
-	private $invalidAllowed = 1;
 	private $surveyType = 1;
 
 	/**
@@ -136,14 +135,6 @@ class SurveyVO
 		$this->surveyType = $surveyType;
 	}
 	/**
-	 * set whether the suvey allows invalid calls (-1) to vote
-	 * @param $invalidAllowed
-	 */
-	function setInvalidAllowed($invalidAllowed)
-	{
-		$this->invalidAllowed = $invalidAllowed;
-	}
-	/**
 	 * Set number of votes allowed per one user
 	 * 
 	 * @param $votesAllowed
@@ -201,18 +192,6 @@ class SurveyVO
 	function getType()
 	{
 		return $this->surveyType;
-	}
-	/**
-	 * Check wether the survey allows invalid calls (-1) to vote
-	 * @return allow as 1, forbid as 0
-	 *
-	 */
-	function isInvalidAllowed()
-	{
-		if ($this->invalidAllowed)
-			return '1';
-		else
-			return '0';
 	}
 	/**
 	 * get mulit choices in this survey

@@ -61,16 +61,11 @@ class CreateSurvey extends SpecialPage {
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'options' => array(
 					  "Low - Public survey (anyone can vote) "=>"low",
-					  "Medium - No information (Information about survey voting is not publicly available)"=>"medium",
+					  "Medium - No information (Information about voting is not publicly available)"=>"medium",
 					  "High - Restricted survey (Voting is restricted to the group of people) "=>"high",
 				),
 				'explanation' => 'This option determines who will be able to participate in your survey.',
 				'learn_more' => 'Details of Survey Privacy',
-			),
-			'privacy-group' => array(
-				'type' => 'null',
-				'explanation' => 'TODO.',
-				'learn_more' => 'TODO',
 			),
 			'duration' => array(
 				'type' => 'input',
@@ -92,40 +87,28 @@ class CreateSurvey extends SpecialPage {
 				'learn_more' => 'Details_of_Multiple_Voting',
 			),*/
 			'phonevoting' => array(
-				'type' => 'select',
+				'type' => 'radio',
 				'name' => 'Phone voting',
-				'default' => 'Enable anonymous phone voting',
+				'default' => 'anon',
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => '',
 				'learn_more' => 'Details of Phone Voting',
 				'options' => array(
-					  "Enable anonymous phone voting"=>"yes-anon",
-					  "Enable phone voting (only local callers)"=>"yes-local",
+					  "Enable unidentified voters. Required for phone surveys from outside of $gvCountry"=>"anon",
+					  "Enable phone voting (only for identified callers - CallerID)"=>"yes",
 					  "Disable phone voting"=>"no",)
 			),
-			'smsvoting' => array(
-				'type' => 'select',
-				'name' => 'SMS voting',
-				'default' => 'Enable anonymous SMS voting',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => '',
-				'learn_more' => 'Details of SMS Voting',
-				'options' => array(
-					  "Enable anonymous SMS voting"=>"yes-anon",
-					  "Enable SMS voting (only local callers)"=>"yes-local",
-					  "Disable SMS voting"=>"no",)
-			),
 			'webvoting' => array(
-				'type' => 'select',
+				'type' => 'radio',
 				'name' => 'Web voting',
-				'default' => 'Enable anonymous WEB voting',
+				'default' => 'anon',
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => '',
 				'learn_more' => 'Details of Web Voting',
 				'options' => array(
-					  "Enable anonymous Web voting"=>"yes-anon",
-					  "Enable Web voting (only for registered users)"=>"yes-local",
-					  "Disable Web voting"=>"no",)
+					  "Enable anonymous web voting"=>"anon",
+					  "Enable web voting (only for registered users)"=>"yes",
+					  "Disable web voting"=>"no",)
 			),
 			'showresultsend' => array(
 				'type' => 'checkbox',
@@ -157,7 +140,7 @@ class CreateSurvey extends SpecialPage {
 				'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
 				'learn_more' => 'Details of Multiple Voting',
 			),
-			'anonymousweb' => array(
+			/*'anonymousweb' => array(
 				'type' => 'checkbox',
 				'name' => 'Web',
 				'default' => 'on',
@@ -165,10 +148,10 @@ class CreateSurvey extends SpecialPage {
 				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
 				'explanation' => 'If unchecked, only registered votApedia users will be allowed to vote on the survey page.',
 				'learn_more' => 'Details of Anonymous Voting',
-			),
+			),*/
 			'titlewarning' => array(
 				'type' => 'infobox',
-				'explanation' => 'If you decide to change the Title or question of a survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
+				'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
 				'learn_more' => 'Changing Title of a survey',
 			),
 		);
@@ -220,8 +203,6 @@ class CreateSurvey extends SpecialPage {
 		$page->setType(vSIMPLE_SURVEY);
 		$page->setTitle($values['titleorquestion']);
 		$page->setAuthor($author);
-		$page->setInvalidAllowed( (bool) $values['voteridentity'] );
-		$page->setAnonymousAllowed( (bool) $values['anonymousweb'] );
 		$page->setDisplayTop($values['showtop']);
 		$page->setShowGraph(! (bool) $values['showresultsend']);
 		$page->setDuration( $values['duration'] );
@@ -229,11 +210,12 @@ class CreateSurvey extends SpecialPage {
 		$page->setVotesAllowed(1);
 		$page->setSMSRequired(false); //@todo SMS sending to the users
 		$page->setPrivacyByName($values['privacy']);
+		$page->setPhoneVoting($values['phonevoting']);
+		$page->setWebVoting($values['webvoting']);
 		
 		$surveyVO = new SurveyVO();
 		$surveyVO->generateChoices( split("\n", $values['choices']) );
 		$surveyVO->setQuestion('#see page title');
-		$surveyVO->setInvalidAllowed( (bool) $values['voteridentity'] );
 		$surveyVO->setType(vSIMPLE_SURVEY);
 		$surveyVO->setVotesAllowed(1);
 		$surveyVO->setPoints(0);
@@ -389,11 +371,11 @@ class CreateSurvey extends SpecialPage {
 			}
 			$this->form->setValue('choices', $choices);
 			$this->form->setValue('duration', $page->getDuration());
-			$this->form->setValue('voteridentity', $page->isInvalidAllowed());
-			$this->form->setValue('anonymousweb', $page->isAnonymousAllowed());
 			$this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
 			$this->form->setValue('showtop', $page->getDisplayTop());
 			$this->form->setValue('privacy', $page->getPrivacyByName());
+			$this->form->setValue('phonevoting', $page->getPhoneVoting());
+			$this->form->setValue('webvoting', $page->getWebVoting());
 			
 			$this->drawFormEdit($page_id, $error);
 		}
@@ -458,7 +440,7 @@ class CreateSurvey extends SpecialPage {
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
-		$this->form->AddPage ( 'Voting options', array('privacy', 'privacy-group', 'duration', 'voteridentity', 'anonymousweb', ) );
+		$this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('create-survey'));
 	}
@@ -489,7 +471,7 @@ class CreateSurvey extends SpecialPage {
 		$wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 		
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
-		$this->form->AddPage ( 'Voting options', array('privacy', 'privacy-group' ,'duration', 'voteridentity', 'anonymousweb', ) );
+		$this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('edit-survey'));
 	}

@@ -90,7 +90,6 @@
 		require_once('./VO/VoteVO.php');
 		$vote = new VoteVO();
 		assert( ! $vote->getChoiceID() );
-		assert( ! $vote->getInvalidAllowed() );
 		assert( 1 == $vote->getPresentationID() );
 		assert( ! $vote->getSurveyID() );
 		assert( ! $vote->getVoteDate() );
@@ -99,7 +98,6 @@
 		assert( 1 == $vote->getVotesAllowed() );
 		
 		$vote->setChoiceID(34);
-		$vote->setInvalidAllowed(true);
 		$vote->setPresentationID(34);
 		$vote->setSurveyID(978);
 		$vote->setVoteDate('2001');
@@ -108,17 +106,12 @@
 		$vote->setVotesAllowed(6);
 
 		assert( 34 == $vote->getChoiceID() );
-		assert( true == $vote->getInvalidAllowed() );
 		assert( 34 == $vote->getPresentationID() );
 		assert( 978 == $vote->getSurveyID() );
 		assert( '2001' == $vote->getVoteDate() );
 		assert( 'WEB' == $vote->getVoteType() );
 		assert( 3 == $vote->getVoterID() );
 		assert( 6 == $vote->getVotesAllowed() );
-
-		$vote->setInvalidAllowed(false);
-		assert( false == $vote->getInvalidAllowed() );
-		
 		try
 		{
 			$vote->setVoteType('GHE');
@@ -150,8 +143,7 @@
 		assert(!  $survey->getSurveyID() );
 		assert( 1 ==  $survey->getType() );
 		assert( 1 == $survey->getVotesAllowed() );
-		assert( '1' == $survey->isInvalidAllowed() );
-		
+
 		$survey->setPageID(34);
 		$survey->setSurveyID(45);
 		$survey->setQuestion(" test ");
@@ -160,7 +152,6 @@
 		$survey->setType( 2 );
 		//@todo setChoices are for scenario testing
 		//@todo setPresentations are for scenario testing
-		$survey->setInvalidAllowed(false);
 		$survey->setVotesAllowed(1923);
 		
 		assert( $survey->getPageID() == 34 );
@@ -169,7 +160,6 @@
 		assert( $survey->getAnswer() == '34'  );
 		assert( $survey->getPoints() == '73'  );
 		assert( $survey->getType() == '2'  );
-		assert( '0' == $survey->isInvalidAllowed() );
 		assert( 1923 == $survey->getVotesAllowed() );
 		
 		try { $survey->setQuestion("  "); assert(false); } catch (Exception $e) {}
@@ -197,10 +187,8 @@
 		assert( $page->getDuration() == 60 );
 		assert( $page->getEndTime() == '2999-01-01 00:00:00' );
 		// assert( ! $page->getCreateTime() );
-		assert( $page->isInvalidAllowed() == '1' );
 		assert( $page->isSMSRequired() == '0' );
-		assert( $page->getTeleVoteAllowed() == '1' );
-		assert( $page->isAnonymousAllowed() == '1' );
+
 		assert( $page->isShowGraph() == '1' );
 		assert( $page->getType() == 1 );
 		assert( $page->getDisplayTop() == 0 );
@@ -211,6 +199,8 @@
 		// @todo test getSurveyBySurveyID()
 		// @todo test validateDate();
 		assert( $page->getNumOfSurveys() == 0 );
+		assert( $page->getPhoneVoting() == 'anon' );
+		assert( $page->getWebVoting() == 'anon' );
 		
 		$page->setTitle('page1');
 		$page->setPageID(45);
@@ -222,8 +212,10 @@
 		$page->setShowGraph(false);
 		$page->setSubtractWrong(true);
 		$page->setType(2);
-		$page->setTeleVoteAllowed(false);
+
 		$page->setPrivacy(3);
+		$page->setPhoneVoting('no');
+		$page->setWebVoting('no');
 		
 		try{ $page->setTitle(' 	'); assert(false); } catch(Exception $e){}
 		assert($page->getTitle() == 'page1');
@@ -236,17 +228,14 @@
 		assert( $page->getAuthor() == 'Admin' );
 		assert( $page->getPhone() == '+060197654321' );
 		assert( $page->getPrivacy() == 3);
-		$page->setAnonymousAllowed(false);
-		assert( $page->isAnonymousAllowed() == false );
-		$page->setAnonymousAllowed(true);
-		assert( $page->isAnonymousAllowed() == true );
 		assert($page->getDisplayTop() == 14);
 		assert($page->getVotesAllowed() == 7);
 		assert($page->isSMSRequired() == '1');
 		assert( $page->isShowGraph() == '0' );
 		assert( $page->isSubtractWrong() == '1' );
 		assert( $page->getType() == 2 );
-		assert( $page->getTeleVoteAllowed() == '0' );
+		assert( $page->getPhoneVoting() == 'no' );
+		assert( $page->getWebVoting() == 'no' );
 		
 		//This will throw exception if something is wrong
 		$page->setPrivacy(vPRIVACY_LOW); 

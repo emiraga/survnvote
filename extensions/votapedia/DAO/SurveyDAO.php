@@ -48,9 +48,6 @@ class SurveyDAO
 		$page->setEndTime($rs->fields["endTime"]);
 		$page->setAuthor(trim($rs->fields["author"]));
 		$page->setCreateTime($rs->fields['createTime']);
-		$page->setInvalidAllowed($rs->fields['invalidAllowed']);
-		$page->setAnonymousAllowed($rs->fields['anonymousAllowed']);
-		$page->setTeleVoteAllowed($rs->fields['teleVoteAllowed']);
 		$page->setShowGraph($rs->fields['showGraph']);
 		$page->setDisplayTop($rs->fields['displayTop']);
 		$page->setVotesAllowed($rs->fields['votesAllowed']);
@@ -59,6 +56,9 @@ class SurveyDAO
 		$page->setPhone( $rs->fields['phone'] );
 		$page->setSMSRequired( $rs->fields['smsRequired'] );
 		$page->setPrivacy($rs->fields['privacy']);
+		$page->setPhoneVoting($rs->fields['phonevoting']);
+		$page->setWebVoting($rs->fields['webvoting']);
+		
 		$rs->Close();
 		$page->setSurveys($this->loadSurveys($page));
 		return $page;
@@ -105,8 +105,9 @@ class SurveyDAO
 		$vgDB->StartTrans();
 
 		$sql = "insert into {$vgDBPrefix}page (title,author,phone,startTime,duration,endTime,"
-			."invalidAllowed,smsRequired,teleVoteAllowed,anonymousAllowed,showGraph,surveyType,"
-			."displayTop,subtractWrong,privacy)values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			."smsRequired,showGraph,surveyType,"
+			."displayTop,subtractWrong,privacy,phonevoting,webvoting)values"
+			."(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		//@todo some fields from page are missing
 		$resPage = $vgDB->Prepare($sql);
 		$param = array( $pageVO->getTitle(),
@@ -115,15 +116,14 @@ class SurveyDAO
 			$pageVO->getStartTime(),
 			$pageVO->getDuration(),
 			$pageVO->getEndTime(),
-			$pageVO->isInvalidAllowed(),
 			$pageVO->isSMSRequired(),
-			$pageVO->getTeleVoteAllowed(),
-			$pageVO->isAnonymousAllowed(),
 			$pageVO->isShowGraph(),
 			$pageVO->getType(),
 			$pageVO->getDisplayTop(),
 			$pageVO->isSubtractWrong(),
 			$pageVO->getPrivacy(),
+			$pageVO->getPhoneVoting(),
+			$pageVO->getWebVoting(),
 		);
 		$vgDB->Execute($resPage,$param);
 		$pageVO->setPageID($vgDB->Insert_ID());
@@ -160,8 +160,9 @@ class SurveyDAO
 
 		$vgDB->StartTrans();
 	 	$sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
-		 	. "invalidAllowed=?,smsRequired=?,teleVoteAllowed=?,"
-		 	. " anonymousAllowed=?,showGraph=?,surveyType=?,displayTop=?,votesallowed=?,subtractWrong=?,privacy=? "
+		 	. "smsRequired=?,"
+		 	. " showGraph=?,surveyType=?,displayTop=?,votesallowed=?,"
+		 	. "subtractWrong=?,privacy=?, phonevoting=?, webvoting=?"
 		 	. "where pageID = ?";
 	 	$resPage = $vgDB->Prepare($sql);
 	 	$param = array(
@@ -169,17 +170,15 @@ class SurveyDAO
 	 		$pageVO->getStartTime(),
 		 	$pageVO->getDuration(),
 		 	$pageVO->getEndTime(),
-		 	$pageVO->isInvalidAllowed(),
 		 	$pageVO->isSMSRequired(),
-		 	$pageVO->getTeleVoteAllowed(),
-		 	$pageVO->isAnonymousAllowed(),
 		 	$pageVO->isShowGraph(),
 		 	$pageVO->getType(),
 		 	$pageVO->getDisplayTop(),
 		 	$pageVO->getVotesAllowed(),
 		 	$pageVO->isSubtractWrong(),
 		 	$pageVO->getPrivacy(),
-		 	
+		 	$pageVO->getPhoneVoting(),
+		 	$pageVO->getWebVoting(),
 		 	$pageID
 	 	);
 	 	//@todo some fields here are missing
@@ -222,8 +221,7 @@ class SurveyDAO
 			$survey->setQuestion(trim($rsSurveys->fields["question"]));
 			$survey->setAnswer(trim($rsSurveys->fields["answer"]));
 			$survey->setPoints($rsSurveys->fields["points"]);
-			//Redundant info from PageVO for simplify further development
-			$survey->setInvalidAllowed($page->isInvalidAllowed());
+			//Redundant info from PageVO
 			$survey->setType($page->getType());
 			$survey->setVotesAllowed( $page->getVotesAllowed() );
 			//choices
@@ -471,7 +469,6 @@ class SurveyDAO
 			$survey->setPoints($rsSurveys->fields["points"]);
 
 			//Redundant info from PageVO for simplify further development
-			$survey->setInvalidAllowed($page->isInvalidAllowed());
 			$survey->setType($page->getType());
 				
 			$choices = $this->getChoices($survey->getSurveyID());

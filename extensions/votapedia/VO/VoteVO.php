@@ -17,22 +17,7 @@ class VoteVO
 	private $voterID;
 	private $voteDate;
 	private $voteType;
-	private $invalidAllowed = 0;
 	private $votesAllowed = 1;
-
-	/* @deprecated constructor
-	function __construct($surveyID,$choiceID,$presentationID,$voterID,$voteDate,$voteType,$invalidAllowed=NULL,$votesAllowed=NULL)
-	{
-		$this->surveyID = $surveyID;
-		$this->choiceID = $choiceID;
-		$this->presentationID = $presentationID;
-		$this->voterID = $voterID;
-		$this->voteDate = $voteDate;
-		$this->voteType = $voteType;
-		$this->invalidAllowed = (is_null($invalidAllowed)? 0:$invalidAllowed);
-		$this->votesAllowed=(is_null($votesAllowed)? 1:$votesAllowed);
-	} */
-
 	/**
 	 * @return integer survey ID
 	 */
@@ -76,13 +61,6 @@ class VoteVO
 	public function getVoteType()
 	{
 		return $this->voteType;
-	}
-	/**
-	 * @return boolean Are invalid votes allowed
-	 */
-	public function getInvalidAllowed()
-	{
-		return $this->invalidAllowed;
 	}
 	/**
 	 * @return integer number of votes allowed per user
@@ -141,14 +119,6 @@ class VoteVO
 			$this->voteType = $votetype;
 		else
 			throw new SurveyException("Invalid vote type", 400);
-	}
-	/**
-	 * 
-	 * @param $allowinvalid
-	 */
-	public function setInvalidAllowed($allowinvalid)
-	{
-		$this->invalidAllowed = $allowinvalid;
 	}
 	/**
 	 * Set number of allowed votes per user

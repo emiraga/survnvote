@@ -25,7 +25,7 @@ class VoteDAO
 	static function newFromCurrentSurvey($type, $username, $surveyID, $choiceID, $presentationID = 0)
 	{
 		global $vgDB, $vgDBPrefix;
-		$sql = "select invalidAllowed, votesAllowed ".
+		$sql = "select votesAllowed ".
 			"from {$vgDBPrefix}view_current_survey where surveyID = ? and choiceID = ? and presentationID = ?";
 		$vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
 		$rs = &$vgDB->Execute($sql,array($surveyID, $choiceID, $presentationID));
@@ -42,7 +42,6 @@ class VoteDAO
 		$vote->setVoterID($username);
 		$vote->setVoteDate(date("Y-m-d H:i:s"));
 		$vote->setVoteType( $type );
-		$vote->setInvalidAllowed( $rs->fields['invalidAllowed'] );
 		$vote->setVotesAllowed( $rs->fields['votesAllowed'] );
 		
 		return $vote;

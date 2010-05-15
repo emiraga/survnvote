@@ -24,10 +24,7 @@ class PageVO
 	private $endTime;
 	private $duration = 60;
 	private $createTime;
-	private $invalidAllowed = 1;
 	private $smsRequired = 0;
-	private $teleVoteAllowed = 1;
-	private $anonymousAllowed = 1;
 	private $showGraph = 1;
 	private $surveyType = 1;
 	private $displayTop = 0;
@@ -35,6 +32,8 @@ class PageVO
 	private $subtractWrong = 0;
 	private $surveys = array();
 	private $privacy = 1;
+	private $phonevoting = 'anon';
+	private $webvoting = 'anon';
 
 	function __construct()
 	{
@@ -115,36 +114,12 @@ class PageVO
 		$this->phone = trim($phone);
 	}
 	/**
-	 * set whether the suvey allows invalid calls (-1) to vote
-	 * @param $invalidAllowed
-	 */
-	function setInvalidAllowed($invalidAllowed)
-	{
-		$this->invalidAllowed = $invalidAllowed;
-	}
-	/**
 	 * set whether the suvey needs to sms back to the voters
 	 * @param $smsRequired
 	 */
 	function setSMSRequired($smsRequired)
 	{
 		$this->smsRequired = $smsRequired;
-	}
-	/**
-	 * set whether the suvey allow telephone/sms voting
-	 * @param $teleVoteAllowed
-	 */
-	function setTeleVoteAllowed($teleVoteAllowed)
-	{
-		$this->teleVoteAllowed = $teleVoteAllowed;
-	}
-	/**
-	 *  set whether the suvey allow anonymous voting
-	 *  @param $allowAnonymousVotes
-	 */
-	function setAnonymousAllowed($allowAnonymousVotes)
-	{
-		$this->anonymousAllowed  = $allowAnonymousVotes;
 	}
 	/**
 	 * set whether allow graph is shown in voting
@@ -222,6 +197,24 @@ class PageVO
 			throw new SurveyException('setPrivacyByName: Wrong privacy level');
 	}
 	/**
+	 * Set the voting options, 'anon', 'yes' or 'no'
+	 * 
+	 * @param $vote String
+	 */
+	function setPhoneVoting($vote)
+	{
+		$this->phonevoting = $vote;
+	}
+	/**
+	 * Set the voting options, 'anon', 'yes' or 'no'
+	 * 
+	 * @param $vote String
+	 */
+	function setWebVoting($vote)
+	{
+		$this->webvoting = $vote;
+	}
+	/**
 	 * get survey ID of this survey
 	 * @return Integer ID of the survey which contains this choice
 	 */
@@ -286,18 +279,6 @@ class PageVO
 		return $this->createTime;
 	}
 	/**
-	 * Check wether the survey allows invalid calls (-1) to vote
-	 * @return allow as 1, forbid as 0
-	 *
-	 */
-	function isInvalidAllowed()
-	{
-		if ($this->invalidAllowed)
-			return '1';
-		else
-			return '0';
-	}
-	/**
 	 * Check wether the survey needs to sms back to voters
 	 * @return allow as 1, forbid as 0
 	 *
@@ -305,30 +286,6 @@ class PageVO
 	function isSMSRequired()
 	{
 		if($this->smsRequired)
-			return '1';
-		else
-			return '0';
-	}
-	/**
-	 * Check wether the survey allows telephone/sms voting
-	 * 0 for Web voting Only
-	 * 1 Both allowed
-	 * 2 Telephone Voting only
-	 * @return allow as 1, forbid as 0
-	 *
-	 */
-	function getTeleVoteAllowed()
-	{
-		return $this->teleVoteAllowed;
-	}
-	/**
-	 * Check wether the survey allows anonymouse voting
-	 * @return allow as 1, forbid as 0
-	 *
-	 */
-	function isAnonymousAllowed()
-	{
-		if($this->anonymousAllowed)
 			return '1';
 		else
 			return '0';
@@ -402,6 +359,24 @@ class PageVO
 			return 'high';
 		else
 			throw new SurveyException('getPrivacyByName: Wrong privacy level');
+	}
+	/**
+	 * Get the voting options, 'anon', 'yes' or 'no'
+	 * 
+	 * @return String vote
+	 */
+	function getPhoneVoting()
+	{
+		return $this->phonevoting;
+	}
+	/**
+	 * Get the voting options, 'anon', 'yes' or 'no'
+	 * 
+	 * @return String vote
+	 */
+	function getWebVoting()
+	{
+		return $this->webvoting;
 	}
 	/**
 	 * get mulit choices in this survey
