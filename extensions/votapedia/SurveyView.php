@@ -61,7 +61,7 @@ class SurveyView
 	protected function __construct($page_id, $parser, $frame = NULL)
 	{
 		wfLoadExtensionMessages('Votapedia');
-		global $wgUser, $wgTitle;
+		global $wgUser, $wgOut;
 		$this->parser = $parser;
 		$this->frame = $frame;
 		$this->page_id=$page_id;
@@ -72,18 +72,7 @@ class SurveyView
 		
 		$surveydao = new SurveyDAO();
 		$this->page = $surveydao->findByPageID( $page_id );
-		
-		$this->wikititle = $wgTitle;
-		if( $this->wikititle->getDBkey() == 'CreateSurvey')
-		{
-			//Specialpage:CreateSurvey may automatically call the renderer of a page
-			//we are trying to get this global variable for actual generated wiki page
-			global $gvWikiPageTitle;
-			if(! isset($gvWikiPageTitle))
-				throw new Exception('global variable $gvWikiPageTitle was not found');
-
-			$this->wikititle = Title::newFromText( $gvWikiPageTitle );
-		}
+		$this->wikititle = Title::newFromText( $wgOut->getPageTitle() );
 	}
 	/**
 	 * AJAX call, get the buttons of user which can edit the survey.
@@ -219,12 +208,17 @@ class SurveyView
 			$line = trim($line);
 			if($line)
 			{
-				$output .= $p->run($line, true);
+				$output .= $p->run('&bull; '.$line, true);
 			}
 		}
 		return $output;
 	}
-	
+	static function getChoice($line)
+	{
+		global $wgParser;
+		$p = new MwParser($wgParser);
+		return $p->run(trim($line), false);
+	}
 	/**
 	 * Get HTML buttons for a page that is cacheable
 	 * 

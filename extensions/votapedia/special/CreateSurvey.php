@@ -8,155 +8,165 @@ require_once("$gvPath/VO/PageVO.php");
 require_once("$gvPath/DAO/SurveyDAO.php");
 
 /**
+ */
+class spCreateSurvey extends SpecialPage
+{
+	private $obj;
+	public function __construct()
+	{
+		parent::__construct('CreateSurvey');
+		$this->obj = new CreateSurvey();
+		$this->includable( true ); //we can include this from other pages
+	}
+	function execute( $par = null )
+	{
+		$this->obj->execute($par);
+	}
+}
+
+/**
  * Special page Create Survey
  * 
  * @author Emir Habul
  */
-class CreateSurvey extends SpecialPage {
+class CreateSurvey
+{
+	protected $formitems;
 	/**
 	 * Constructor for CreateSurvey
 	 */
 	function __construct() {
-		parent::__construct('CreateSurvey');
 		wfLoadExtensionMessages('Votapedia');
-
+		$this->setFormItems();
+		$this->form = new FormControl($this->formitems);
+	}
+	
+	function setFormItems()
+	{
 		global $gvCountry, $gvScript;
 		$this->formitems = array (
-			'titleorquestion' => array(
-				'type' => 'input',
-				'name' => 'Title or question',
-				'default' => '',
-				'valid' => function ($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
-				'explanation' => 'e.g. "What is the capital of '.$gvCountry.'?". This will be the title of your survey page.'
-				.'The following characters are not allowed in the title: #, +, &, <, >, [, ], {, }, |, / .',
-				'learn_more' => 'Details of Title or Survey Question',
-				'process' => function($v) { return FormControl::RemoveSpecialChars($v); },
+		'titleorquestion' => array(
+			'type' => 'input',
+			'name' => 'Title or question',
+			'default' => '',
+			'valid' => function ($v,$i,$js){ if($js) return ""; return strlen($v) > 10; },
+			'explanation' => 'e.g. "What is the capital of '.$gvCountry.'?". This will be the title of your survey page.',
+			'learn_more' => 'Details of Title or Survey Question',
+			'process' => function($v) { return FormControl::RemoveSpecialChars($v); },
+		),
+		'choices' => array(
+			'type' => 'textarea',
+			'name' => 'Choices',
+			'textbefore' => 'Type choices here, one per line.<br />',
+			'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
+			'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later.',
+			'learn_more' => 'Details of Editing Surveys',
+			'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
+		),
+		'category' => array(
+			'type' => 'select',
+			'name' => 'Category',
+			'default' => 'General',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
+			'learn_more' => 'Details of Survey Category',
+			'options' => array()
+		),
+		'label-details' => array(
+			'type' => 'null',
+			'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audiences can ring this number, send SMS or visit the survey page to enter their vote.',
+			'learn_more' => 'Details of Survey Procedure',
+		),
+		'privacy' => array(
+			'type' => 'radio',
+			'name' => 'Survey Privacy',
+			'default' => 'low',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'options' => array(
+				  "Low - Public survey (anyone can vote) "=>"low",
+				  "Medium - No information (Information about voting is not publicly available)"=>"medium",
+				  "High - Restricted survey (Voting is restricted to the group of people) "=>"high",
 			),
-			'choices' => array(
-				'type' => 'textarea',
-				'name' => 'Choices',
-				'textbefore' => 'Type choices here, one per line.<br />',
-				'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
-				'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later.',
-				'learn_more' => 'Details of Editing Surveys',
-				'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
-			),
-			'category' => array(
-				'type' => 'select',
-				'name' => 'Category',
-				'default' => 'General',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
-				'learn_more' => 'Details of Survey Category',
-				'options' => array()
-			),
-			'label-details' => array(
-				'type' => 'null',
-				'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audiences can ring this number, send SMS or visit the survey page to enter their vote.',
-				'learn_more' => 'Details of Survey Procedure',
-			),
-			'privacy' => array(
-				'type' => 'radio',
-				'name' => 'Survey Privacy',
-				'default' => 'low',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'options' => array(
-					  "Low - Public survey (anyone can vote) "=>"low",
-					  "Medium - No information (Information about voting is not publicly available)"=>"medium",
-					  "High - Restricted survey (Voting is restricted to the group of people) "=>"high",
-				),
-				'explanation' => 'This option determines who will be able to participate in your survey.',
-				'learn_more' => 'Details of Survey Privacy',
-				'icon' => $gvScript.'/icons/lock.png',
-			),
-			'duration' => array(
-				'type' => 'input',
-				'name' => 'Duration',
-				'default' => '60',
-				'width' => '10',
-				'textafter' => ' minutes.',
-				'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11*60; },
-				'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
-				'learn_more' => 'Details of Duration',
-				'process' => function($v) { return intval($v); },
-			),
-			'phonevoting' => array(
-				'type' => 'radio',
-				'name' => 'Phone voting',
-				'default' => 'anon',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => '',
-				'learn_more' => 'Details of Phone Voting',
-				'options' => array(
-					  "Enable unidentified voters. Recommended for phone surveys from outside of $gvCountry."=>"anon",
-					  "Enable phone voting (only for identified callers - CallerID)"=>"yes",
-					  "Disable phone voting"=>"no",),
-				'icon' => $gvScript.'/icons/phone.png',
-			),
-			'webvoting' => array(
-				'type' => 'radio',
-				'name' => 'Web voting',
-				'default' => 'anon',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => '',
-				'learn_more' => 'Details of Web Voting',
-				'options' => array(
-					  "Enable anonymous web voting"=>"anon",
-					  "Enable web voting (only for registered users)"=>"yes",
-					  "Disable web voting"=>"no",),
-				'icon' => $gvScript.'/icons/laptop.png',
-			),
-			'showresultsend' => array(
-				'type' => 'checkbox',
-				'name' => 'Graph Options',
-				'default' => 'on',
-				'checklabel' => ' Show results of voting only at the end. ',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => 'If checked, the survey result will only be shown after the survey finishes. Otherwise, voters will see the partial result after they vote.',
-				//'learn_more' => 'Details_of_Anonymous_Voting',
-			),
-			'showtop' => array(
-				'type' => 'input',
-				'name' => 'Show only top',
-				'default' => '',
-				'width' => '10',
-				'textbefore' => 'Show only top ',
-				'textafter' => ' choices on the graph.',
-				'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v >= 0 and $v < 1000; },
-				'explanation' => 'If a number is specified, the graph will only display the top few choices on the graph. Otherwise, voters will see all the choices no matter how many votes they have got.',
-				//'learn_more' => 'Details_of_Duration',
-				'process' => function($v) { return intval($v); },
-			),
-			'voteridentity' => array(
-				'type' => 'checkbox',
-				'name' => 'Voter Identity',
-				'default' => 'on',
-				'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$gvCountry.'.',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
-				'learn_more' => 'Details of Multiple Voting',
-			),
-			/*'anonymousweb' => array(
-				'type' => 'checkbox',
-				'name' => 'Web',
-				'default' => 'on',
-				'checklabel' => ' Enable anonymous web voting.',
-				'valid' => function($v,$i,$js){ if($js) return ""; return true; },
-				'explanation' => 'If unchecked, only registered votApedia users will be allowed to vote on the survey page.',
-				'learn_more' => 'Details of Anonymous Voting',
-			),*/
-			'titlewarning' => array(
-				'type' => 'infobox',
-				'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
-				'learn_more' => 'Changing Title of a survey',
-			),
+			'explanation' => 'This option determines who will be able to participate in your survey.',
+			'learn_more' => 'Details of Survey Privacy',
+			'icon' => $gvScript.'/icons/lock.png',
+		),
+		'duration' => array(
+			'type' => 'input',
+			'name' => 'Duration',
+			'default' => '60',
+			'width' => '10',
+			'textafter' => ' minutes.',
+			'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v > 0 && $v < 11*60; },
+			'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
+			'learn_more' => 'Details of Duration',
+			'process' => function($v) { return intval($v); },
+		),
+		'phonevoting' => array(
+			'type' => 'radio',
+			'name' => 'Phone voting',
+			'default' => 'anon',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'explanation' => '',
+			'learn_more' => 'Details of Phone Voting',
+			'options' => array(
+				  "Enable unidentified voters. Recommended for phone surveys from outside of $gvCountry."=>"anon",
+				  "Enable phone voting (only for identified callers - CallerID)"=>"yes",
+				  "Disable phone voting"=>"no",),
+			'icon' => $gvScript.'/icons/phone.png',
+		),
+		'webvoting' => array(
+			'type' => 'radio',
+			'name' => 'Web voting',
+			'default' => 'anon',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'explanation' => '',
+			'learn_more' => 'Details of Web Voting',
+			'options' => array(
+				  "Enable anonymous web voting"=>"anon",
+				  "Enable web voting (only for registered users)"=>"yes",
+				  "Disable web voting"=>"no",),
+			'icon' => $gvScript.'/icons/laptop.png',
+		),
+		'showresultsend' => array(
+			'type' => 'checkbox',
+			'name' => 'Graph Options',
+			'default' => 'on',
+			'checklabel' => ' Show results of voting only at the end. ',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'explanation' => 'If checked, the survey result will only be shown after the survey finishes. Otherwise, voters will see the partial result after they vote.',
+			//'learn_more' => 'Details_of_Anonymous_Voting',
+		),
+		'showtop' => array(
+			'type' => 'input',
+			'name' => 'Show only top',
+			'default' => '',
+			'width' => '10',
+			'textbefore' => 'Show only top ',
+			'textafter' => ' choices on the graph.',
+			'valid' => function($v,$i,$js){ if($js) return ""; $v=intval($v); return $v >= 0 and $v < 1000; },
+			'explanation' => 'If a number is specified, the graph will only display the top few choices on the graph. Otherwise, voters will see all the choices no matter how many votes they have got.',
+			//'learn_more' => 'Details_of_Duration',
+			'process' => function($v) { return intval($v); },
+		),
+		'voteridentity' => array(
+			'type' => 'checkbox',
+			'name' => 'Voter Identity',
+			'default' => 'on',
+			'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$gvCountry.'.',
+			'valid' => function($v,$i,$js){ if($js) return ""; return true; },
+			'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
+			'learn_more' => 'Details of Multiple Voting',
+		),
+		'titlewarning' => array(
+			'type' => 'infobox',
+			'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
+			'learn_more' => 'Changing Title of a survey',
+		),
 		);
 		$subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
 		$subcat = $this->removePrefSufCategories($subcat);
 		$this->formitems['category']['options'] = $subcat;
-		
-		$this->form = new FormControl($this->formitems);
-		$this->includable( true ); //we can include this from other pages
 	}
 	/**
 	 * Remove prefix and suffix from category list
@@ -258,7 +268,6 @@ class CreateSurvey extends SpecialPage {
 	}
 	/**
 	 * Insert wiki page, optionaly resolve duplicates
-	 * also sets value global $gvWikiPageTitle
 	 * 
 	 * @param $newtitle Title of wiki page
 	 * @param $wikiText text which will be written to wiki page
@@ -270,14 +279,13 @@ class CreateSurvey extends SpecialPage {
 		if($resolveDuplicates)
 		{
 			$i = 1;
-			global $gvWikiPageTitle;
-			$gvWikiPageTitle = $newtitle;
-			$error = $this->insertWikiPage($gvWikiPageTitle, $wikiText, false);
+			$this->wikiPageTitle = $newtitle;
+			$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
 			while($error)
 			{
 				$i++; //$this->wikiPageTitle 
-				$gvWikiPageTitle = $newtitle." ($i)";
-				$error = $this->insertWikiPage($gvWikiPageTitle, $wikiText, false);
+				$this->wikiPageTitle = $newtitle." ($i)";
+				$error = $this->insertWikiPage($this->wikiPageTitle, $wikiText, false);
 			}
 			return;
 		}
@@ -321,12 +329,12 @@ class CreateSurvey extends SpecialPage {
 				$error = $this->insertPage($this->form->getValuesArray());
 				if(! $error)
 				{
-					global $gvWikiPageTitle;
-					$titleObj = Title::newFromText( $gvWikiPageTitle );					
+					$titleObj = Title::newFromText( $this->wikiPageTitle );					
 					$wgOut->redirect($titleObj->getLocalURL(), 302);
 					return;
 				}
 			}
+			$this->preDrawForm();
 			$this->drawFormNew($error);
 		}
 		else if( $wgRequest->getVal('wpEditButton') == wfMsg('edit-survey'))
@@ -372,6 +380,7 @@ class CreateSurvey extends SpecialPage {
 			$this->form->setValue('phonevoting', $page->getPhoneVoting());
 			$this->form->setValue('webvoting', $page->getWebVoting());
 			
+			$this->preDrawForm();
 			$this->drawFormEdit($page_id, $error);
 		}
 		else //user has submitted to add new page or edit existing one
@@ -408,11 +417,13 @@ class CreateSurvey extends SpecialPage {
 				$wgOut->redirect($title->escapeLocalURL(), 302);
 				return;
 			}
+			$this->preDrawForm();
 			$this->drawFormEdit($page_id, $error);
 		}
 		else
 		{
 			//fresh new form
+			$this->preDrawForm();
 			$this->drawFormNew();
 		}
 	}
@@ -423,6 +434,13 @@ class CreateSurvey extends SpecialPage {
 			$error .= '<li>Users cannot vote, enable either web or phone voting</li>';
 		return $error;
 	}
+	function preDrawForm()
+	{
+		global $wgOut, $gvScript;
+		$wgOut->setArticleFlag(false);
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
+	}
 	/**
 	 * Draw form for new survey using FormControl
 	 * 
@@ -430,15 +448,9 @@ class CreateSurvey extends SpecialPage {
 	 */
 	function drawFormNew( $errors=null )
 	{
-		global $wgOut, $wgUser, $wgScriptPath, $gvScript;
-		
-		$wgOut->setArticleFlag(false);
+		global $wgOut, $wgUser;
 		$wgOut->setPageTitle("Create New Simple Survey");
-		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
-		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
-		
 		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		
@@ -458,16 +470,11 @@ class CreateSurvey extends SpecialPage {
 		$this->formitems['titleorquestion']['explanation'] = '';
 		$this->formitems['titleorquestion']['learn_more'] = '';
 
-		global $wgOut, $wgUser, $wgScriptPath, $gvScript;
-		$wgOut->setArticleFlag(false);
+		global $wgOut, $wgUser, $gvScript;
 		$wgOut->setPageTitle(wfMsg('title-edit-survey'));
 		
 		$wgOut->returnToMain();
-		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
-		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
-		
-		if($errors)
-			$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
+		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 		
 		$crform = Title::newFromText('Special:CreateSurvey');
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
@@ -479,6 +486,8 @@ class CreateSurvey extends SpecialPage {
 		$this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
 		$this->form->AddPage ( 'Graphing', array('showresultsend', 'showtop') );
 		$this->form->EndForm(wfMsg('edit-survey'));
+		
 	}
 }// End of class CreateSurvey
+
 ?>

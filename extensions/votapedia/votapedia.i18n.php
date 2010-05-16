@@ -2,9 +2,10 @@
 if (!defined('MEDIAWIKI')) die();
 
 $messages = array();
- 
+
 $messages['en'] = array( 
 	'createsurvey' => 'Create Survey',
+	'createquestionnaire' => 'Create Questionnaire',
 	'processsurvey' => 'Process Survey',
 	'viewsurvey' => 'View Survey',
 
@@ -18,6 +19,7 @@ $messages['en'] = array(
 	'id-not-present' => 'Page identifier is not specified.',
 	'votapedia-desc' => 'Votapedia - Audience Response System. This extension includes special pages, tags, etc.',
 	'create-survey' => 'Create Survey',
+	'create-questionnaire' => 'Create Questionnaire',
 	'edit-survey' => 'Edit Survey',
 	'survey-question' => 'Question: $1',
 	'start-survey' => 'Start Survey',

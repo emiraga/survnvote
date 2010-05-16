@@ -65,8 +65,11 @@ $wgAutoloadClasses['MwAdapter'] = "$gvPath/MwAdapter.php";
 $wgAutoloadClasses['MwParser'] = "$gvPath/MwAdapter.php";
 
 //Special page CreateSurvey
-$wgAutoloadClasses['CreateSurvey'] = "$gvPath/special/CreateSurvey.php";
-$wgSpecialPages['CreateSurvey'] = 'CreateSurvey';
+$wgAutoloadClasses['spCreateSurvey'] = "$gvPath/special/CreateSurvey.php";
+$wgSpecialPages['CreateSurvey'] = 'spCreateSurvey';
+
+$wgAutoloadClasses['spCreateQuestionnaire'] = "$gvPath/special/CreateQuestionnaire.php";
+$wgSpecialPages['CreateQuestionnaire'] = 'spCreateQuestionnaire';
 
 //Special page ViewSurvey
 $wgAutoloadClasses['ViewSurvey'] = "$gvPath/special/ViewSurvey.php";
@@ -82,6 +85,7 @@ $wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
 $wgAutoloadClasses['SurveyViewNocache'] = "$gvPath/SurveyView.php";
 $wgAjaxExportList[] = 'SurveyView::getButtons';
 $wgAjaxExportList[] = 'SurveyView::getChoices';
+$wgAjaxExportList[] = 'SurveyView::getChoice';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser ){

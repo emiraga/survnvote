@@ -15,7 +15,7 @@ function tabbedprefs() {
 	var seci = 0;
 	for (var i = 0; i < children.length; i++) {
 		if (children[i].nodeName.toLowerCase() == 'fieldset') {
-			children[i].id = 'prefsection-' + seci;
+			children[i].id = 'surveysection-' + seci;
 			children[i].className = 'prefsection';
 			if (is_opera || is_khtml) {
 				children[i].className = 'prefsection operaprefsection';

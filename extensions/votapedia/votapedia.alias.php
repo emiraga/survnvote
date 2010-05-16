@@ -4,7 +4,8 @@ $aliases = array();
 /** English */
 $aliases['en'] = array(
     'CreateSurvey' => array( 'CreateSurvey' ),
-    'ViewSurvey' => array( 'ViewSurvey' ),
+    'CreateQuestionnaire' => array( 'CreateQuestionnaire' ),
+	'ViewSurvey' => array( 'ViewSurvey' ),
 	'ProcessSurvey' => array( 'ProcessSurvey' ),
 );
 ?>

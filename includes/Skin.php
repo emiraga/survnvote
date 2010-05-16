@@ -280,9 +280,9 @@ class Skin extends Linker {
 
 		// See self::afterContentHook() for documentation
 		$afterContent = $this->afterContentHook();
-
+		
 		$out->out( $out->headElement( $this ) );
-
+		
 		$out->out( "\n<body" );
 		$ops = $this->getBodyOptions();
 		foreach ( $ops as $name => $val ) {

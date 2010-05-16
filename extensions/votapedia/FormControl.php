@@ -171,6 +171,10 @@ class FormControl
 				$form_element = '';
 				$item['name'] = $id = '';
 			}
+			elseif($item['type'] == 'html')
+			{
+				$form_element = $item['code'];
+			}
 			elseif($item['type'] == 'infobox')
 			{
 				$form_element = '';
@@ -278,7 +282,7 @@ class FormControl
 	 */
 	public static function RemoveSpecialChars($str)
 	{
-		$invalidChars  = array('&','#','+','<','>','[',']','|','{','}','/');
+		$invalidChars  = array('<','>','|','/');
 		return trim(str_replace($invalidChars, " ", $str));
 	}
 }
