@@ -28,14 +28,11 @@ $gvCatRemovePrefix = array('Category:Surveys in ', 'Category:Quizes in ','Catego
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 
 /* Allowed HTML/Mediawiki tags in survey choices. */
-$gvAllowedTags = '<math><code><source><pre><b><u><i><code>';
+$gvAllowedTags = '<math><code><b><u><i>';
 
 /* Votapedia script path, and extensions. */
 $gvPath = "$IP/extensions/votapedia";
 $gvScript = "$wgScriptPath/extensions/votapedia";
-
-/* Template which is used to insert an existing survey into the page */
-$gvSurveyTemplate = 'Survey';
 
 /**
  * Returns an array containing all phone numbers that can be used for voting
@@ -94,11 +91,19 @@ function vfParserFirstCallInit( &$parser ){
 	return true;
 }
 
-//Magic words
+//Magic words (tags)
+
+define('vtagSIMPLE_SURVEY',    'Survey');
+define('vtagQUIZ',             'Quiz');
+define('vtagRANK_EXPOSITIONS', 'Rankexpo');
+define('vtagQUESTIONNAIRE',    'Questionnaire');
+define('vtagTEXT_RESPONSE',    'TextResponse');
+
 $wgHooks['LanguageGetMagic'][]       = 'vfLanguageGetMagic';
 function vfLanguageGetMagic(&$magicWords, $langCode)
 {
-	$magicWords['Survey'] = array( 0, 'Survey' );
+	$magicWords['Survey'] = array(0, vtagSIMPLE_SURVEY, vtagQUIZ, vtagRANK_EXPOSITIONS, 
+				vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
 	return true;
 }
 

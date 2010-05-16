@@ -200,8 +200,8 @@ class FormControl
 			if($item['learn_more'])
 			{
 				$morepage = Title::newFromText($item['learn_more']);
-				$item['explanation'] .=' &nbsp; <span><a href="'.$morepage->escapeLocalURL()
-					.'"><img src="'.$gvScript.'/images/info.gif">Learn more</a></span>';
+				$item['explanation'] .=' &nbsp; <span>'
+					.'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$gvScript.'/icons/info.png"> Learn more</a></span>';
 			}
 			
 			if($item['type'] == 'infobox')

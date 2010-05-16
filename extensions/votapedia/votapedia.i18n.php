@@ -28,7 +28,10 @@ $messages['en'] = array(
 	'cat-survey-name' => 'Category:Pages with survey id $1',
 	'mobile-phone' => 'Mobile Phone:',
 	'title-view-survey'	=> 'View survey',
-	'title-edit-survey'	=> 'Edit Survey',
+	'title-new-survey'	=> 'Create New Simple Survey',
+	'title-edit-survey'	=> 'Edit Simple Survey',
+	'title-new-questionnaire' => 'Create New Questionnaire',
+	'title-edit-questionnaire' => 'Edit Questionnaire',
 	'pages-include' => 'Following pages include this survey:',
 	'page-links' => 'Page links',
 );

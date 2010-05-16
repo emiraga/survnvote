@@ -5,6 +5,7 @@ define('vQUIZ',            2);
 define('vRANK_EXPOSITIONS',3);
 define('vQUESTIONNAIRE',   4);
 define('vTEXT_RESPONSE',   5);
+
 /* Privacy levels. */
 define('vPRIVACY_LOW',    1);
 define('vPRIVACY_MEDIUM', 2);

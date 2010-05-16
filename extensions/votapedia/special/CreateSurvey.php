@@ -32,6 +32,7 @@ class spCreateSurvey extends SpecialPage
 class CreateSurvey
 {
 	protected $formitems;
+	protected $spPageName;
 	/**
 	 * Constructor for CreateSurvey
 	 */
@@ -39,11 +40,14 @@ class CreateSurvey
 		wfLoadExtensionMessages('Votapedia');
 		$this->setFormItems();
 		$this->form = new FormControl($this->formitems);
+		
+		$this->spPageName = 'Special:CreateSurvey';
+		$this->tagname = vtagSIMPLE_SURVEY;
 	}
 	
 	function setFormItems()
 	{
-		global $gvCountry, $gvScript;
+		global $gvCountry, $gvScript, $gvAllowedTags;
 		$this->formitems = array (
 		'titleorquestion' => array(
 			'type' => 'input',
@@ -59,7 +63,7 @@ class CreateSurvey
 			'name' => 'Choices',
 			'textbefore' => 'Type choices here, one per line.<br />',
 			'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
-			'explanation' => 'The choices can contain wiki markup language and you can add, delete or modify them later.',
+			'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($gvAllowedTags).' .',
 			'learn_more' => 'Details of Editing Surveys',
 			'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
 		),
@@ -200,7 +204,7 @@ class CreateSurvey
 	 * 
 	 * @param $values associative array with values
 	 */
-	private function generatePageVO($values)
+	protected function generatePageVO($values)
 	{
 		global $wgUser;
 		$author = $wgUser->getName();
@@ -218,15 +222,18 @@ class CreateSurvey
 		$page->setPhoneVoting($values['phonevoting']);
 		$page->setWebVoting($values['webvoting']);
 		
+		$page->setSurveys( $this->generateSurveysArray($values) );
+		return $page;
+	}
+	protected function generateSurveysArray($values)
+	{
 		$surveyVO = new SurveyVO();
 		$surveyVO->generateChoices( split("\n", $values['choices']) );
 		$surveyVO->setQuestion('#see page title');
 		$surveyVO->setType(vSIMPLE_SURVEY);
 		$surveyVO->setVotesAllowed(1);
 		$surveyVO->setPoints(0);
-		
-		$page->setSurveys(array($surveyVO));
-		return $page;
+		return array($surveyVO);
 	}
 	/**
 	 * Insert new page in mediawiki and votapedia database
@@ -252,13 +259,12 @@ class CreateSurvey
 			return '<li>'.$e->getMessage().'</li>';
 		}
 		
-		global $gvSurveyTemplate;
-		$wikiText.='{{#'.$gvSurveyTemplate.':'. $page->getPageID() .'}}';
+		$wikiText.='{{#'.$this->tagname.':'. $page->getPageID() .'}}';
 		$wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
 		$wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 		
 		if(strlen($values[category]) > 5)
-			$wikiText.="[[Category:$values[category]]]\n";
+			$wikiText.="[[".htmlspecialchars($values[category])."]]\n";
 		
 		$this->insertWikiPage($wikititle, $wikiText, true);
 		
@@ -301,7 +307,6 @@ class CreateSurvey
 			throw new Exception('Error has occured while creating a new page');
 		}
 	}
-	
 	function processNewSurveySubmit()
 	{
 		global $wgRequest, $wgUser, $wgOut;
@@ -463,12 +468,12 @@ class CreateSurvey
 	 * 
 	 * @param $errors string containing potential errors
 	 */
-	function drawFormNew( $errors=null )
+	protected function drawFormNew( $errors=null )
 	{
 		global $wgOut, $wgUser;
-		$wgOut->setPageTitle("Create New Simple Survey");
+		$wgOut->setPageTitle(wfMsg('title-new-survey'));
 		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-		$crform = Title::newFromText('Special:CreateSurvey');
+		$crform = Title::newFromText($this->spPageName);
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		
 		$this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
@@ -482,18 +487,18 @@ class CreateSurvey
 	 * @param $page_id
 	 * @param $errors string containing potential errors
 	 */
-	function drawFormEdit( $page_id, $errors=null )
+	protected function drawFormEdit( $page_id, $errors=null )
 	{
 		$this->formitems['titleorquestion']['explanation'] = '';
 		$this->formitems['titleorquestion']['learn_more'] = '';
-
+		
 		global $wgOut, $wgUser, $gvScript;
 		$wgOut->setPageTitle(wfMsg('title-edit-survey'));
 		
 		$wgOut->returnToMain();
 		if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 		
-		$crform = Title::newFromText('Special:CreateSurvey');
+		$crform = Title::newFromText($this->spPageName);
 		$this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 		
 		$wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');

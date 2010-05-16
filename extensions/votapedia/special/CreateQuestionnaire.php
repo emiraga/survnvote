@@ -30,17 +30,21 @@ class CreateQuestionnaire extends CreateSurvey
 		global $gvScript;
 		$this->formitems['titleorquestion']['name'] = 'Title';
 		$this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire page.';
-		$this->formitems['choices'] = array('type' => 'html',
-			'name' => 'Questions',
-			'code' => '<script>writeHTML()</script>');
+		$this->formitems['choices']['type'] = 'html';
+		$this->formitems['choices']['code'] = '<script>writeHTML()</script>';
+		$this->formitems['choices']['valid'] = function($v,$i,$js){ if($js) return ""; return true; };
+		$this->formitems['choices']['textafter'] = '';
+		$this->formitems['choices']['textbefore'] = '';
 		$this->isQuiz = false;
+		$this->spPageName = 'Special:CreateQuestionnaire';
+		$this->tagname = vtagQUESTIONNAIRE;
 	}
 	function generateScript()
 	{
 		global $gvScript;
 		$this->question_t = '<div class="questionBox" id="question%1$s" style="display:none">'
 		. '<fieldset id="questions" style="float: none; margin: 0em;">'
-		. '<legend id="questions">Question: %2$s</legend>'
+		. '<legend id="q%1$slegend">Question: %2$s</legend>'
 		. '<div style="float: right; top: -23px; position: relative;">'
 			. '<input type="image" title="Move up question" src="'.$gvScript.'/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
 			. '<img src="'.$gvScript.'/icons/spacer.gif" width="10px" />'
@@ -141,6 +145,8 @@ class CreateQuestionnaire extends CreateSurvey
 
 		var newQuestion = $("#newQuestion"); 
 		$("#questions").append( generateQuestion( newQuestion.val(), numQuestions ) );
+		sajax_do_call('SurveyView::getChoice', [newQuestion.val()], function(o) { $("#q"+numQuestions+"legend").html('Question: '+o.responseText); });
+
 		newQuestion.val("");
 		$("#question"+numQuestions).show(0, function() {
 			$("#question"+numQuestions).find("input#choice").focus();
@@ -154,6 +160,24 @@ class CreateQuestionnaire extends CreateSurvey
 </script>
 END_SCRIPT;
 	}
+	function generateSurveysArray($values)
+	{
+		global $wgRequest;
+		echo '<pre>';
+		
+		$surveys = array();
+		foreach($wgRequest->getIntArray('orderNum') as $index)
+		{
+			$surveyVO =& new SurveyVO();
+			$surveyVO->generateChoices( $wgRequest->getArray("q{$index}choices") );
+			$surveyVO->setQuestion($wgRequest->getVal("q{$index}name"));
+			$surveyVO->setType(vQUESTIONNAIRE);
+			$surveyVO->setVotesAllowed(1);
+			$surveyVO->setPoints(0);
+			$surveys[] = $surveyVO;
+		}
+		return $surveys;
+	}
 	function execute($par = null)
 	{
 		$this->generateScript();
@@ -162,6 +186,18 @@ END_SCRIPT;
 		$wgOut->addHTML(str_replace("\n",'',$this->script));
 		
 		parent::execute($par);
+	}
+	protected function drawFormNew( $errors=null )
+	{
+		parent::drawFormNew($errors);
+		global $wgOut;
+		$wgOut->setPageTitle(wfMsg('title-new-questionnaire'));
+	}
+	protected function drawFormEdit( $page_id, $errors=null )
+	{
+		parent:: drawFormEdit( $page_id, $errors );
+		global $wgOut;
+		$wgOut->setPageTitle(wfMsg('title-edit-questionnaire'));
 	}
 }
 ?>
