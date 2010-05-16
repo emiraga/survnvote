@@ -131,8 +131,9 @@ class WaveLover2Template extends QuickTemplate {
 			</div>
 			<h1 id="firstHeading" class="firstHeading">
 			<?php
+				global $wgSitename;
 				if($this->data['thispage'] == 'Main_Page')
-					echo "Welcome to Votapedia.net development page";
+					echo "Welcome to $wgSitename development page";
 				else
 					$this->data['displaytitle']!=""?$this->html('title'):$this->text('title') ?>
 			</h1>

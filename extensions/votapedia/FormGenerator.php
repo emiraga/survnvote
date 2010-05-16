@@ -171,7 +171,7 @@ class FormGenerator
 			}
 			else
 			{
-				die('error');
+				throw new Exception('Invalid item type');
 			}
 			if(isset($item['textbefore']))
 				$form_element = $item['textbefore'] . $form_element;

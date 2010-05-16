@@ -301,6 +301,118 @@ class CreateSurvey
 			throw new Exception('Error has occured while creating a new page');
 		}
 	}
+	
+	function processNewSurveySubmit()
+	{
+		global $wgRequest, $wgUser, $wgOut;
+		//user has submitted to add new page or edit existing one
+		//form originates from the CreateSurvey special page
+		if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
+			die('Edit token is wrong, please try again. Edit token is missing');
+		$this->form->loadValuesFromRequest();
+		$error = $this->Validate();
+		if(! $error)
+		{
+			$error = $this->insertPage($this->form->getValuesArray());
+			if(! $error)
+			{
+				$titleObj = Title::newFromText( $this->wikiPageTitle );					
+				$wgOut->redirect($titleObj->getLocalURL(), 302);
+				return;
+			}
+		}
+		$this->preDrawForm();
+		$this->drawFormNew($error);
+	}
+	function processEditSurvey()
+	{
+		global $wgRequest, $wgUser, $wgOut;
+		//user wants to edit the existing survey
+		$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
+		$page_id = intval($wgRequest->getVal('id'));
+		
+		try
+		{
+			$surveydao = new SurveyDAO();
+			$page = $surveydao->findByPageID( $page_id );
+		}
+		catch(SurveyException $e)
+		{
+			$wgOut->setPageTitle("Error");
+			$wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
+			$wgOut->returnToMain();
+			return;
+		}
+		if($page->getStatus() != 'ready')
+		{
+			$wgOut->setPageTitle("Error");
+			$wgOut->addWikiText( vfErrorBox( 'Survey is either active or finished, therefore cannot be edited.') );
+			$wgOut->returnToMain();
+			return;
+		}
+		$this->form->setValue('titleorquestion', $page->getTitle());
+		$survey = $page->getSurveys();
+		$surchoice = $survey[0]->getChoices();
+		$choices='';
+		foreach($surchoice as $ch)
+		{
+			if($choices) $choices .= "\r";
+			$choices .= $ch->getChoice();
+		}
+		$this->form->setValue('choices', $choices);
+		$this->form->setValue('duration', $page->getDuration());
+		$this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
+		$this->form->setValue('showtop', $page->getDisplayTop());
+		$this->form->setValue('privacy', $page->getPrivacyByName());
+		$this->form->setValue('phonevoting', $page->getPhoneVoting());
+		$this->form->setValue('webvoting', $page->getWebVoting());
+		
+		$this->preDrawForm();
+		$this->drawFormEdit($page_id, $error);
+	}
+	function processEditSurveySubmit()
+	{
+		global $wgRequest, $wgUser, $wgOut;
+		if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
+			die('Edit token is wrong, please try again.');
+		}
+		$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
+		$page_id = intval($wgRequest->getVal('id'));
+		
+		$this->form->loadValuesFromRequest();
+		
+		$error = $this->Validate();
+		if(! $error)
+		{
+			$page = $this->generatePageVO($this->form->getValuesArray());
+			$page->setPageID($page_id);
+			
+			try{
+				$surveydao = new SurveyDAO();
+				$surveydao->updatePage($page);
+			}
+			catch(SurveyException $e)
+			{
+				$wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
+				return;
+			}
+			
+			//Purge all pages that have this survey included.
+			vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+	
+			$title = Title::newFromText($this->returnTo);
+			$wgOut->redirect($title->escapeLocalURL(), 302);
+			return;
+		}
+		$this->preDrawForm();
+		$this->drawFormEdit($page_id, $error);
+	}
+	function processNewSurvey()
+	{
+		//fresh new form
+		$this->preDrawForm();
+		$this->drawFormNew();
+	}
 	/**
 	 * Mandatory execute function for a Special Page
 	 * 
@@ -314,117 +426,22 @@ class CreateSurvey
 			$wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
 			return;
 		}
-		
-		global $wgRequest, $wgParser;
-		if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
+		global $wgRequest;
+		if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
 		{
-			//user has submitted to add new page or edit existing one
-			//form originates from the CreateSurvey special page
-			if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
-				die('Edit token is wrong, please try again. Edit token is missing');
-			$this->form->loadValuesFromRequest();
-			$error = $this->Validate();
-			if(! $error)
-			{
-				$error = $this->insertPage($this->form->getValuesArray());
-				if(! $error)
-				{
-					$titleObj = Title::newFromText( $this->wikiPageTitle );					
-					$wgOut->redirect($titleObj->getLocalURL(), 302);
-					return;
-				}
-			}
-			$this->preDrawForm();
-			$this->drawFormNew($error);
+			$this->processEditSurveySubmit();
 		}
 		else if( $wgRequest->getVal('wpEditButton') == wfMsg('edit-survey'))
 		{
-			//user wants to edit the existing survey
-			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-			$page_id = intval($wgRequest->getVal('id'));
-			
-			try
-			{
-				$surveydao = new SurveyDAO();
-				$page = $surveydao->findByPageID( $page_id );
-			}
-			catch(SurveyException $e)
-			{
-				$wgOut->setPageTitle("Error");
-				$wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
-				$wgOut->returnToMain();
-				return;
-			}
-			if($page->getStatus() != 'ready')
-			{
-				$wgOut->setPageTitle("Error");
-				$wgOut->addWikiText( vfErrorBox( 'Survey is either active or finished, therefore cannot be edited.') );
-				$wgOut->returnToMain();
-				return;
-			}
-
-			$this->form->setValue('titleorquestion', $page->getTitle());
-			$survey = $page->getSurveys();
-			$surchoice = $survey[0]->getChoices();
-			$choices='';
-			foreach($surchoice as $ch)
-			{
-				if($choices) $choices .= "\r";
-				$choices .= $ch->getChoice();
-			}
-			$this->form->setValue('choices', $choices);
-			$this->form->setValue('duration', $page->getDuration());
-			$this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
-			$this->form->setValue('showtop', $page->getDisplayTop());
-			$this->form->setValue('privacy', $page->getPrivacyByName());
-			$this->form->setValue('phonevoting', $page->getPhoneVoting());
-			$this->form->setValue('webvoting', $page->getWebVoting());
-			
-			$this->preDrawForm();
-			$this->drawFormEdit($page_id, $error);
+			$this->processEditSurvey();
 		}
-		else //user has submitted to add new page or edit existing one
-		if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
+		else if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
 		{
-		    if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) ) {
-				die('Edit token is wrong, please try again.');
-			}
-			$this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-			$page_id = intval($wgRequest->getVal('id'));
-			
-			$this->form->loadValuesFromRequest();
-			
-			$error = $this->Validate();
-			if(! $error)
-			{
-				$page = $this->generatePageVO($this->form->getValuesArray());
-				$page->setPageID($page_id);
-				
-				try{
-					$surveydao = new SurveyDAO();
-					$surveydao->updatePage($page);
-				}
-				catch(SurveyException $e)
-				{
-					$wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
-					return;
-				}
-				
-				//Purge all pages that have this survey included.
-				vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-		
-				$title = Title::newFromText($this->returnTo);
-				$wgOut->redirect($title->escapeLocalURL(), 302);
-				return;
-			}
-			$this->preDrawForm();
-			$this->drawFormEdit($page_id, $error);
+			$this->processNewSurveySubmit();
 		}
 		else
 		{
-			//fresh new form
-			$this->preDrawForm();
-			$this->drawFormNew();
+			$this->processNewSurvey();
 		}
 	}
 	function Validate()
@@ -438,7 +455,7 @@ class CreateSurvey
 	{
 		global $wgOut, $gvScript;
 		$wgOut->setArticleFlag(false);
-		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/prefs.js"></script>');
+		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/survey.js"></script>');
 		$wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
 	}
 	/**

@@ -1,6 +1,4 @@
-// generate toc from prefs form, fold sections
-// XXX: needs testing on IE/Mac and safari
-// more comments to follow
+/* copied from prefs.js in MediaWiki */
 function tabbedprefs() {
 	var prefform = document.getElementById('preferences');
 	if (!prefform || !document.createElement) {
@@ -75,3 +73,81 @@ function uncoversection() {
 }
 
 hookEvent("load", tabbedprefs);
+
+function htmlspecialchars(str) {
+	if (typeof(str) == "string") {
+		str = str.replace(/&/g, "&amp;"); /* must be first */
+		str = str.replace(/"/g, "&quot;");
+		str = str.replace(/'/g, "&#039;");
+		str = str.replace(/</g, "&lt;");
+		str = str.replace(/>/g, "&gt;");
+	}
+	return str;
+}
+function rhtmlspecialchars(str) {
+	if (typeof(str) == "string") {
+		str = str.replace(/&gt;/ig, ">");
+		str = str.replace(/&lt;/ig, "<");
+		str = str.replace(/&#039;/g, "'");
+		str = str.replace(/&quot;/ig, '"');
+		str = str.replace(/&amp;/ig, '&'); /* must be last */
+	}
+	return str;
+}
+
+/**
+sprintf() for JavaScript 0.5
+
+Copyright (c) Alexandru Marasteanu <alexaholic [at) gmail (dot] com>
+All rights reserved.
+**/
+
+function str_repeat(i, m) {
+	for (var o = []; m > 0; o[--m] = i);
+	return(o.join(""));
+}
+
+function sprintf() {
+	var i = 0, a, f = arguments[i++], o = [], m, p, c, x, s = '';
+	while (f) {
+		if (m = /^[^\x25]+/.exec(f)) {
+			o.push(m[0]);
+		}
+		else if (m = /^\x25{2}/.exec(f)) {
+			o.push("%");
+		}
+		else if (m = /^\x25(?:(\d+)\$)?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(f)) {
+			if (((a = arguments[m[1] || i++]) == null) || (a == undefined)) {
+				throw("Too few arguments.");
+			}
+			if (/[^s]/.test(m[7]) && (typeof(a) != "number")) {
+				throw("Expecting number but found " + typeof(a));
+			}
+			switch (m[7]) {
+				case 'b': a = a.toString(2); break;
+				case 'c': a = String.fromCharCode(a); break;
+				case 'd': a = parseInt(a); break;
+				case 'e': a = m[6] ? a.toExponential(m[6]) : a.toExponential(); break;
+				case 'f': a = m[6] ? parseFloat(a).toFixed(m[6]) : parseFloat(a); break;
+				case 'o': a = a.toString(8); break;
+				case 's': a = ((a = String(a)) && m[6] ? a.substring(0, m[6]) : a); break;
+				case 'u': a = Math.abs(a); break;
+				case 'x': a = a.toString(16); break;
+				case 'X': a = a.toString(16).toUpperCase(); break;
+			}
+			if (/[def]/.test(m[7])) {
+				s = (a >= 0 ? (m[2] ? '+' : '') : '-');
+				a = Math.abs(a);
+			}
+			c = m[3] ? m[3] == '0' ? '0' : m[3].charAt(1) : ' ';
+			x = m[5] - String(a).length - s.length;
+			p = m[5] ? str_repeat(c, x) : '';
+			o.push(s + (m[4] ? a + p : p + a));
+		}
+		else {
+			throw("Huh ?!");
+		}
+		f = f.substring(m[0].length);
+	}
+	return o.join("");
+}

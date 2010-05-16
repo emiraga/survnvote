@@ -76,7 +76,7 @@ class SurveyView
 		if($wgTitle)
 			$this->wikititle = $wgTitle;
 		else
-			die('no page title');
+			throw new Exception('SurveyView::__construct no page title, wgTitle is unavailable');
 	}
 	/**
 	 * AJAX call, get the buttons of user which can edit the survey.

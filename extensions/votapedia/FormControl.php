@@ -189,7 +189,7 @@ class FormControl
 			}
 			else
 			{
-				die('error in FormControl::AddPage');
+				throw new Exception('error in FormControl::AddPage');
 			}
 			if(isset($item['textbefore']))
 				$form_element = $item['textbefore'] . $form_element;
