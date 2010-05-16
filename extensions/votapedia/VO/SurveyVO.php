@@ -99,12 +99,14 @@ class SurveyVO
 	 * 
 	 * @param $values array of strings
 	 */
-	function generateChoices(array $values)
+	function generateChoices(array $values, $urldecode = false)
 	{
 		$choices = array();
 		foreach($values as $value)
 		{
 			$value = trim($value);
+			if($urldecode)
+				$value = urldecode($value);
 			if(strlen($value)<1)
 				continue;
 			$choice = new ChoiceVO();

@@ -11,6 +11,7 @@ class FormControl
 {
 	private $values;
 	private $items;
+	private $onFormSubmit;
 	
 	/**
 	 * Constructor of FormControl
@@ -21,8 +22,16 @@ class FormControl
 	{
 		$this->items = &$items;
 		$this->values = array();
+		$this->onFormSubmit = "return true;";
 	}
-	
+	public function getOnFormSubmit()
+	{
+		return $this->onFormSubmit;
+	}
+	public function setOnFormSubmit($code)
+	{
+		$this->onFormSubmit = $code;
+	}
 	/**
 	 * Helper function for user information panel
 	 * @param $td1 label for an item
@@ -266,7 +275,7 @@ class FormControl
 		$token = htmlspecialchars( $wgUser->editToken() );
 		$wgOut->addHTML( "
 	<table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
-		<td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"" . $submit . "\" />
+		<td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onClick='{$this->onFormSubmit}' />
 		</td>
 		<td></td>
 	</tr></table>

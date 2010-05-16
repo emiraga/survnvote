@@ -35,14 +35,18 @@ class CreateQuestionnaire extends CreateSurvey
 		$this->formitems['choices']['valid'] = function($v,$i,$js){ if($js) return ""; return true; };
 		$this->formitems['choices']['textafter'] = '';
 		$this->formitems['choices']['textbefore'] = '';
-		$this->isQuiz = false;
 		$this->spPageName = 'Special:CreateQuestionnaire';
 		$this->tagname = vtagQUESTIONNAIRE;
+		
+		$this->isQuiz = false;
+		$this->prev_questions = '';
+		$this->prev_num_q = 0;
+		$this->prev_num_ch = '';
 	}
-	function generateScript()
+	function generateTemplates()
 	{
 		global $gvScript;
-		$this->question_t = '<div class="questionBox" id="question%1$s" style="display:none">'
+		$this->question_t = '<div class="questionBox" id="question%1$s">'
 		. '<fieldset id="questions" style="float: none; margin: 0em;">'
 		. '<legend id="q%1$slegend">Question: %2$s</legend>'
 		. '<div style="float: right; top: -23px; position: relative;">'
@@ -55,13 +59,13 @@ class CreateQuestionnaire extends CreateSurvey
 		. '<input id="orderNum" type="hidden" name="orderNum[]" value="%1$s">'
 		. '<input type="hidden" name="q%1$sname" value="%3$s">'
 		. '<div class="prefsectiontip" style="padding: 0">Choices:</div>'
-		. '<div id="q%1$schoices" style="padding-right: 30px;"></div>'
+		. '<div id="q%1$schoices" style="padding-right: 30px;"><!--PREV_CHOICES--></div>'
 		. '<div><input type=text id="choice" size="50" onkeypress="if((event.keyCode||event.which)==13) return addChoice(this, %1$s);" />'
-		. '<input type=button onClick="return addChoice(this, %1$s);" value="Add choice"></div>'
+		. '<input type=button onClick="return addChoice(this, %1$s);" value="Add choice" class="btnAddChoice"></div>'
 		.'</fieldset></div>';
 		//Arguments: num , htmlspecialchars(question), escape(question)
 		
-		$this->choice_t = '<div class="choiceItem" style="display:none" id="%2$sdiv">'
+		$this->choice_t = '<div class="choiceItem" id="%2$sdiv">'
 			.($this->isQuiz?'<input type="radio" name="q%1$scorrect" id="%2$s" value="%4$s">':'&bull; ')
 			.'<label for="%2$s" id="label%2$s">%3$s</label>'
 			.'<input type=hidden name="q%1$schoices[]" value="%4$s" />'
@@ -75,22 +79,26 @@ class CreateQuestionnaire extends CreateSurvey
 			.'</div>';
 		//Arguments: num, id, htmlspecialchars(choice.val()), escape(choice.val())
 		
-		$this->main_t = '<div id="questions"></div>'
+		$this->main_t = '<div id="questions"><!--PREV_QUESTIONS--></div>'
 		.'<div><input type="text" name="newQuestion" id="newQuestion" size="50" onkeypress="if((event.keyCode||event.which)==13) return addQuestion();" />'
 		.'<input type="button" id="btnAddQuestion" value="Add question" onClick="return addQuestion();" />'
 		.'</div>';
-		
+	}
+
+	function generateScript()
+	{
 		$this->script = <<<END_SCRIPT
 <script type="text/javascript">
-	var numQuestions = 0; //number of questions added (including deleted ones)
+	var numQuestions = {$this->prev_num_q};
 	var numChoices = new Array();
+	{$this->prev_num_ch}
 	function addChoice(buttonElement, num)
 	{
 		numChoices[num]++;
 		var id = 'q'+num+"c"+numChoices[num];
 		var choice =  $(buttonElement).parent().find("#choice");
 		if(choice.val().length < 1)	return false;
-		$('#q'+num+'choices').append(sprintf('{$this->choice_t}',num, id, htmlspecialchars(choice.val()), escape(choice.val())));
+		$('#q'+num+'choices').append(sprintf('{$this->choice_t}', num, id, htmlspecialchars(choice.val()), escape(choice.val())));
 		sajax_do_call('SurveyView::getChoice', [choice.val()], function(o) { $("#label"+id).html(o.responseText); });
 		choice.val('');
 		$('#'+id+'div').show(0);
@@ -163,14 +171,14 @@ END_SCRIPT;
 	function generateSurveysArray($values)
 	{
 		global $wgRequest;
-		echo '<pre>';
-		
 		$surveys = array();
-		foreach($wgRequest->getIntArray('orderNum') as $index)
+		foreach($wgRequest->getIntArray('orderNum', array()) as $index)
 		{
+			$question = urldecode( $wgRequest->getVal("q{$index}name") );
+			$choices = $wgRequest->getArray("q{$index}choices");
 			$surveyVO =& new SurveyVO();
-			$surveyVO->generateChoices( $wgRequest->getArray("q{$index}choices") );
-			$surveyVO->setQuestion($wgRequest->getVal("q{$index}name"));
+			$surveyVO->generateChoices($choices, true);
+			$surveyVO->setQuestion($question);
 			$surveyVO->setType(vQUESTIONNAIRE);
 			$surveyVO->setVotesAllowed(1);
 			$surveyVO->setPoints(0);
@@ -178,13 +186,64 @@ END_SCRIPT;
 		}
 		return $surveys;
 	}
+	function Validate()
+	{
+		$error = parent::Validate();
+
+		global $wgRequest;
+		$ordernum = $wgRequest->getIntArray('orderNum', array());
+		foreach($ordernum as $index)
+		{
+			$choices = $wgRequest->getArray("q{$index}choices", array());
+			
+			if(count($choices) < 2)
+				$error .= "<li>Question must have at least two choices.</li>";
+		}
+		if(count($ordernum) == 0)
+			$error .= "<li>There must be at least one question.</li>";
+		return $error;
+	}
+	function generatePrevQuestions()
+	{
+		global $wgRequest;
+		$num = 1;
+		global $wgParser;
+		$parser = new MwParser($wgParser);
+		
+		foreach($wgRequest->getIntArray('orderNum', array()) as $index)
+		{
+			$question = urldecode($wgRequest->getVal("q{$index}name"));
+			$choices = $wgRequest->getArray("q{$index}choices", array());
+			$choiceshtml = '';
+			$cnum = 1;
+			foreach($choices as $choice)
+			{
+				$choice = urldecode($choice);
+				$id = 'q'.$num."c".$cnum;
+				$choiceshtml .= sprintf($this->choice_t, $num, $id, $parser->run(trim($choice),false), urlencode($choice));
+				$cnum++;
+			}
+			$this->prev_num_ch .= 'numChoices['.$num.'] = '.$cnum.";\n";
+			$questionhtml = sprintf($this->question_t, $num , $parser->run(trim($question), false), urlencode($question) );
+			$questionhtml = str_replace('<!--PREV_CHOICES-->',  $choiceshtml, $questionhtml);
+			$this->prev_questions .= $questionhtml;
+			$num++;
+		}
+		$this->prev_num_q = $num;
+	}
 	function execute($par = null)
 	{
-		$this->generateScript();
-		//echo htmlspecialchars($this->main_t);
 		global $wgOut;
-		$wgOut->addHTML(str_replace("\n",'',$this->script));
-		
+
+		$this->generateTemplates();
+		$this->generatePrevQuestions();
+		$this->generateScript();
+
+		$script = str_replace("<!--PREV_QUESTIONS-->", addslashes( $this->prev_questions ), $this->script);
+		$script = str_replace("\n",'',$script);
+		$wgOut->addHTML(str_replace("\n",'',$script));
+
+		$this->form->setOnFormSubmit('$(".btnAddChoice").click(); return true;');
 		parent::execute($par);
 	}
 	protected function drawFormNew( $errors=null )

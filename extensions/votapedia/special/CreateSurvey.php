@@ -33,6 +33,8 @@ class CreateSurvey
 {
 	protected $formitems;
 	protected $spPageName;
+	protected $form;
+	
 	/**
 	 * Constructor for CreateSurvey
 	 */
@@ -63,7 +65,7 @@ class CreateSurvey
 			'name' => 'Choices',
 			'textbefore' => 'Type choices here, one per line.<br />',
 			'valid' => function($v,$i,$js){ if($js) return ""; return strlen($v) > 1; },
-			'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($gvAllowedTags).' .',
+			'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($gvAllowedTags).'.',
 			'learn_more' => 'Details of Editing Surveys',
 			'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyView::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none\\"></div>");</script>',
 		),

@@ -92,7 +92,6 @@ function vfParserFirstCallInit( &$parser ){
 }
 
 //Magic words (tags)
-
 define('vtagSIMPLE_SURVEY',    'Survey');
 define('vtagQUIZ',             'Quiz');
 define('vtagRANK_EXPOSITIONS', 'Rankexpo');
@@ -102,8 +101,9 @@ define('vtagTEXT_RESPONSE',    'TextResponse');
 $wgHooks['LanguageGetMagic'][]       = 'vfLanguageGetMagic';
 function vfLanguageGetMagic(&$magicWords, $langCode)
 {
-	$magicWords['Survey'] = array(0, vtagSIMPLE_SURVEY, vtagQUIZ, vtagRANK_EXPOSITIONS, 
-				vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
+	$magicWords['Survey'] = array(0, 
+		vtagSIMPLE_SURVEY, vtagQUIZ, vtagRANK_EXPOSITIONS, 
+		vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
 	return true;
 }
 
