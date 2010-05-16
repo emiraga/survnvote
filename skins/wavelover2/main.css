@@ -227,11 +227,13 @@ code {
 	background-color: #f9f9f9;
 }
 pre {
-	padding: 1em;
-	border: 1px dashed #2f6fab;
+	/*padding: 1em;
+	border: 1px dashed #2f6fab;*/
 	color: black;
 	background-color: #f9f9f9;
 	line-height: 1.1em;
+	padding: 0.3em;
+	border: none;
 }
 
 /*
@@ -1625,38 +1627,3 @@ body {
 }
 
 #firstHeading a, #firstHeading a:visited, #firstHeading a:hover {color:black; }
-
-/*****************/
-/* For votapedia */
-
-.rightButton{
-	float: right;
-	top: -23px;
-	position: relative;
-}
-.rightButton2{
-	float: right;
-}
-.choicesBox{
-	padding-right: 30px;
-}
-.choiceItem
-{
-}
-#questions fieldset
-{
-	float: none;
-	margin: 0em;
-	/*border: 1px solid #781351;
-	background-color: #f5f5f5;
-	width: 100%;*/
-}
-#questions legend
-{
-	/*margin: 0em;
-	color: #000;
-	background: #fff49c;
-	border: 1px solid #781351;
-	padding: 2px 6px;
-	font-weight: bold;*/
-}

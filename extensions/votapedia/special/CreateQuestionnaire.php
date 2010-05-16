@@ -69,7 +69,7 @@ class CreateQuestionnaire extends CreateSurvey
 			+(isquiz?'<input type="radio" name="q'+num+'correct" id="'+id+'" value="'+escape(choice.val())+'">':'&bull; ')
 			+'<label for="'+id+'" id="label'+id+'">'+htmlspecialchars(choice.val())+'</label>'
 			+'<input type=hidden name="q'+num+'choices[]" value="'+escape(choice.val())+'" />'
-			+'<div class="rightButton2">'
+			+'<div style="float: right;">'
 			+'<input type="image" title="Move up choice" src="$gvScript/icons/arrow_up.png" onClick="return moveChoiceUp(this);" />'
 			+'<img src="$gvScript/icons/spacer.gif" width="10px" />'
 			+'<input type="image" title="Move down choice" src="$gvScript/icons/arrow_down.png" onClick="return moveChoiceDown(this);" />'
@@ -87,7 +87,7 @@ class CreateQuestionnaire extends CreateSurvey
 	function generateChoices(num)
 	{
 		return ''
-		+ '<div id="q'+num+'choices" class="choicesBox"></div>'
+		+ '<div id="q'+num+'choices" style="padding-right: 30px;"></div>'
 		+ '<div><input type=text id="choice" size="50" onkeypress="if((event.keyCode||event.which)==13) return addChoice(this, '+num+');" />'
 		+ '<input type=button onClick="return addChoice(this, '+num+');" value="Add choice"></div>';
 	}
@@ -96,13 +96,13 @@ class CreateQuestionnaire extends CreateSurvey
 		if(question.length < 3)
 			return '';
 		return '<div class="questionBox" id="question'+num+'" style="display:none">'
-		+ '<fieldset id="questions">'
+		+ '<fieldset id="questions" style="float: none; margin: 0em;">'
 		+ '<legend id="questions">Question: '+htmlspecialchars(question)+'</legend>'
-		+ '<input class="rightButton" type="image" title="Delete question" src="$gvScript/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
-		+ '<img class="rightButton" src="$gvScript/icons/spacer.gif" width="10px" />'
-		+ '<input class="rightButton" type="image" title="Move down question" src="$gvScript/icons/arrow_down.png"  onClick="return moveQuestionDown(this);" value="Down">'
-		+ '<img class="rightButton" src="$gvScript/icons/spacer.gif" width="10px" />'
-		+ '<input class="rightButton" type="image" title="Move up question" src="$gvScript/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
+		+ '<input style="float: right; top: -23px; position: relative;" type="image" title="Delete question" src="$gvScript/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
+		+ '<img style="float: right; top: -23px; position: relative;" src="$gvScript/icons/spacer.gif" width="10px" />'
+		+ '<input style="float: right; top: -23px; position: relative;" type="image" title="Move down question" src="$gvScript/icons/arrow_down.png"  onClick="return moveQuestionDown(this);" value="Down">'
+		+ '<img style="float: right; top: -23px; position: relative;" src="$gvScript/icons/spacer.gif" width="10px" />'
+		+ '<input style="float: right; top: -23px; position: relative;" type="image" title="Move up question" src="$gvScript/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
 		+ 'Choices:'
 		+ '<input id="orderNum" type="hidden" name="orderNum[]" value="'+num+'">'
 		+ '<input type="hidden" name="q'+num+'name" value="'+escape(question)+'">'
