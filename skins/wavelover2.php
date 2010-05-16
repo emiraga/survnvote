@@ -118,21 +118,21 @@ class WaveLover2Template extends QuickTemplate {
 			<a name="top" id="top"></a> 
 			<div id="pageTopper">
 				<p>
-				<a href="<?php echo htmlspecialchars($this->data['nav_urls']['mainpage']['href']); ?>" class="external text">Votapedia 2.0</a>
+				<a href="<?php echo htmlspecialchars($this->data['nav_urls']['mainpage']['href']); ?>" class="external text"><?php global $wgSitename; echo $wgSitename; ?></a>
 				</p></div> 
 			<div style="float:right;margin-top:15px;margin-right:25px">
 				<p>
 				<?php if($this->data['thispage'] == 'Main_Page') { ?>
 					<img src="<?php echo $this->data['wgScript']; ?>../../skins/wavelover2/malaysia.jpg" /> 
 				<?php } ?>
-				<a title="Purge current page" href="<?php echo $this->data['wgScript'].'/'.$this->data['thispage'].'?action=purge'; ?>">Purge</a>
+				<a title="Purge current page" href="<?php echo $this->data['wgScript'].'/'.$this->data['thispage'].'?action=purge'; ?>"></a>
 				<?php //print_r($this->data) ?>
 				</p>
 			</div>
 			<h1 id="firstHeading" class="firstHeading">
 			<?php
 				if($this->data['thispage'] == 'Main_Page')
-					echo "Welcome to Votapedia development page in Malaysia.";
+					echo "Welcome to Votapedia.net development page";
 				else
 					$this->data['displaytitle']!=""?$this->html('title'):$this->text('title') ?>
 			</h1>

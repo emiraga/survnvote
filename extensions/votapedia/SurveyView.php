@@ -61,7 +61,7 @@ class SurveyView
 	protected function __construct($page_id, $parser, $frame = NULL)
 	{
 		wfLoadExtensionMessages('Votapedia');
-		global $wgUser, $wgOut;
+		global $wgUser, $wgOut, $wgTitle;
 		$this->parser = $parser;
 		$this->frame = $frame;
 		$this->page_id=$page_id;
@@ -72,7 +72,11 @@ class SurveyView
 		
 		$surveydao = new SurveyDAO();
 		$this->page = $surveydao->findByPageID( $page_id );
-		$this->wikititle = Title::newFromText( $wgOut->getPageTitle() );
+
+		if($wgTitle)
+			$this->wikititle = $wgTitle;
+		else
+			die('no page title');
 	}
 	/**
 	 * AJAX call, get the buttons of user which can edit the survey.

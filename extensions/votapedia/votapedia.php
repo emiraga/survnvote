@@ -28,7 +28,7 @@ $gvCatRemovePrefix = array('Category:Surveys in ', 'Category:Quizes in ','Catego
 $gvCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 
 /* Allowed HTML/Mediawiki tags in survey choices. */
-$gvAllowedTags = '<math><code><source><pre><b><u><i>';
+$gvAllowedTags = '<math><code><source><pre><b><u><i><code>';
 
 /* Votapedia script path, and extensions. */
 $gvPath = "$IP/extensions/votapedia";
