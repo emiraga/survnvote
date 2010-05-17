@@ -70,6 +70,8 @@ $wgSpecialPages['CreateQuestionnaire'] = 'spCreateQuestionnaire';
 
 //Special page ViewSurvey
 $wgAutoloadClasses['ViewSurvey'] = "$gvPath/special/ViewSurvey.php";
+$wgAutoloadClasses['SurveyButtons'] = "$gvPath/survey/SurveyButtons.php";
+$wgAutoloadClasses['SurveyButtonsNocache'] = "$gvPath/survey/SurveyButtons.php";
 $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 
 //Special page ProcessSurvey
@@ -78,9 +80,8 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 
 //Tag <Survey />
 //Survey view options
-$wgAutoloadClasses['SurveyView'] = "$gvPath/SurveyView.php";
-$wgAutoloadClasses['SurveyViewNocache'] = "$gvPath/SurveyView.php";
-$wgAjaxExportList[] = 'SurveyView::getButtons';
+$wgAutoloadClasses['SurveyView'] = "$gvPath/survey/SurveyView.php";
+$wgAjaxExportList[] = 'SurveyButtons::ajaxButtons';
 $wgAjaxExportList[] = 'SurveyView::getChoices';
 $wgAjaxExportList[] = 'SurveyView::getChoice';
 

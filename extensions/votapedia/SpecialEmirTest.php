@@ -2,7 +2,6 @@
 if (!defined('MEDIAWIKI')) die();
 
 $wgExtensionFunctions[] = "wfExtensionSpEmirTest";
-require_once( "$IP/extensions/votapedia/FormGenerator.php" );
 require_once( "$IP/includes/Article.php" );
 require_once( "$IP/extensions/votapedia/DAO/surveyDAO.php" );
 
