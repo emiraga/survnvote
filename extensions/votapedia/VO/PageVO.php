@@ -380,7 +380,7 @@ class PageVO
 	}
 	/**
 	 * get mulit choices in this survey
-	 * @return array a array of choices in this survey
+	 * @return array(SurveyVO) a array of choices in this survey
 	 */
 	function &getSurveys()
 	{

@@ -22,6 +22,7 @@ $messages['en'] = array(
 	'create-questionnaire' => 'Create Questionnaire',
 	'edit-survey' => 'Edit Survey',
 	'survey-question' => 'Question: $1',
+	'survey-caption' => 'Title: $1',
 	'start-survey' => 'Start Survey',
 	'stop-survey' => 'Stop Survey',
 	'control-survey' => 'Control Survey',

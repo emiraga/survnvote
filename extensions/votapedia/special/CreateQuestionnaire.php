@@ -1,5 +1,6 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+
 global $gvPath;
 require_once("$gvPath/special/CreateSurvey.php" );
 
@@ -186,6 +187,16 @@ END_SCRIPT;
 		}
 		return $surveys;
 	}
+        protected function setPageVOvalues(PageVO &$page, &$values)
+        {
+            parent::setPageVOvalues($page, $values);
+            $page->setType(vQUESTIONNAIRE);
+        }
+        /**
+         *
+         * @global $wgRequest WebRequest
+         * @return String error if any
+         */
 	function Validate()
 	{
 		$error = parent::Validate();

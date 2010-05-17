@@ -77,13 +77,17 @@ global $vgDB;
 $vgDB =& vfConnectDatabase();
 /**
  * Rotates color images for a choice.
- * 
- * @return a path to image
+ *
+ * @param $reset Boolean should colors be reset
+ * @return String a path to image
  */
-function vfGetColorImage()
+function vfGetColorImage($reset = false)
 {
 	static $c = 0;
-	$c = ($c + 1) % 50;
+        if($reset)
+            return $c = 0;
+
+        $c = ($c + 1) % 50;
 	global $gvScript;
 	return "$gvScript/images/colors/Choice$c.jpg";
 }

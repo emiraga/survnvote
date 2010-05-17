@@ -3,11 +3,20 @@ if (!defined('MEDIAWIKI')) die();
 
 class SurveyButtons
 {
-    protected $page_id;
-    protected $page_status;
-    protected $page_author;
-    protected $wikititle;
+    /** @var Integer */protected $page_id;
+    /** @var String */ protected $page_status;
+    /** @var String */ protected $page_author;
+    /** @var String */ protected $wikititle;
+    /** @var Title */  protected $prosurv;
+    /** @var Title */  protected $cresurv;
+    /** @var Title */  protected $viewsurv;
 
+    public function __construct()
+    {
+        $this->viewsurv = Title::newFromText('Special:ViewSurvey');
+        $this->prosurv = Title::newFromText('Special:ProcessSurvey');
+        $this->setCreateTitle('Special:CreateSurvey');
+    }
     function setPageID($page_id)
     {
         $this->page_id = $page_id;
@@ -25,13 +34,21 @@ class SurveyButtons
         $this->wikititle = $title;
     }
     /**
+     *
+     * @param $title String
+     */
+    function setCreateTitle($title)
+    {
+        $this->cresurv = Title::newFromText($title);
+    }
+    /**
      * AJAX call, get the buttons of user which can edit the survey.
      *
      * @param $page_id Integer identifier of a survey
      * @param $title String title of a current page
      * @param $status String status of a survey, default 'ready'
      */
-    static function ajaxButtons($page_id, $title, $status='ready')
+    static function ajaxButtons($page_id, $title, $status='ready', $specialpage = 'Special:CreateSurvey')
     {
         global $wgUser;
         if ($wgUser->isAnon())
@@ -43,7 +60,8 @@ class SurveyButtons
         $buttons->setPageID(intval($page_id));
         $buttons->setPageStatus($status);
         $buttons->setWikiTitle($title);
-        
+        $buttons->setCreateTitle($specialpage);
+
         return $buttons->getButtons();
     }
     function getButtons()
@@ -51,12 +69,9 @@ class SurveyButtons
         wfLoadExtensionMessages('Votapedia');
         global $wgUser;
 
-        $prosurv = Title::newFromText('Special:ProcessSurvey');
-        $cresurv = Title::newFromText('Special:CreateSurvey');
-
         $output = '<tr>';
         $output .= '<td>';
-        $output .= '<form id="page'.$this->page_id.'" action="'.$prosurv->escapeLocalURL().'" method="POST">'
+        $output .= '<form id="page'.$this->page_id.'" action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />'
                 .'<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
@@ -76,7 +91,7 @@ class SurveyButtons
         $output .= '<td>';
         if($this->page_status == 'ready')
         {
-            $output .='<form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+            $output .='<form id="editpage'.$this->page_id.'" action="'.$this->cresurv->escapeLocalURL().'" method="POST">'
                     .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                     .'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
                     .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />'
@@ -92,15 +107,12 @@ class SurveyButtons
      */
     function getButtonsNoScript()
     {
-        $viewsurv = Title::newFromText('Special:ViewSurvey');
-        $cresurv = Title::newFromText('Special:CreateSurvey');
-
-        return '<tr><td><form id="page'.$this->page_id.'" action="'.$viewsurv->escapeLocalURL().'" method="POST">'
+        return '<tr><td><form id="page'.$this->page_id.'" action="'.$this->viewsurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="submit" name="wpSubmit" value="'.wfMsg('control-survey').'" />'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />'
                 .'</form>'
-                .'<td><form id="editpage'.$this->page_id.'" action="'.$cresurv->escapeLocalURL().'" method="POST">'
+                .'<td><form id="editpage'.$this->page_id.'" action="'.$this->cresurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="submit" name="wpEditButton" value="'.wfMsg('edit-survey').'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />'
@@ -117,13 +129,12 @@ class SurveyButtons
         assert($this->page_author);
         //control button for those that don't have javascript
         $output = '<noscript>'.$this->getButtonsNoScript().'</noscript>';
-
         $divname = "btnsSurvey{$this->page_id}-".rand();
         $output.= ""
                 ."<script type='text/javascript'>"
                 ."document.write('<div id=$divname></div>');"
                 ."if(wgUserName=='{$this->page_author}')"
-                ."sajax_do_call('SurveyButtons::ajaxButtons',[{$this->page_id},wgPageName,'{$this->page_status}'],function(o){"
+                ."sajax_do_call('SurveyButtons::ajaxButtons',[{$this->page_id},wgPageName,'{$this->page_status}','{$this->cresurv->getFullText()}'],function(o){"
                 ."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
         return $output;
     }
@@ -141,7 +152,7 @@ class SurveyButtonsNocache extends SurveyButtons
     /**
      * Get HTML buttons for a page that is not cacheable
      *
-     * @return HTML code
+     * @return String HTML code
      */
     function getHTML()
     {

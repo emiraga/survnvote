@@ -7,8 +7,6 @@ require_once("$gvPath/FormControl.php");
 require_once("$gvPath/VO/PageVO.php");
 require_once("$gvPath/DAO/SurveyDAO.php");
 
-/**
- */
 class spCreateSurvey extends SpecialPage
 {
 	private $obj;
@@ -204,15 +202,28 @@ class CreateSurvey
 	/**
 	 * Generate PageVO object from the values
 	 * 
-	 * @param $values associative array with values
+	 * @param $values Array associative array with values
+         * @return PageVO
 	 */
 	protected function generatePageVO($values)
 	{
+		$page = new PageVO();
+                $this->setPageVOvalues($page, $values);
+		
+		$page->setSurveys( $this->generateSurveysArray($values) );
+		return $page;
+	}
+        /**
+         * 
+         * @param $page PageVO
+         * @param $values Array
+         */
+        protected function setPageVOvalues(PageVO &$page, &$values)
+        {
 		global $wgUser;
 		$author = $wgUser->getName();
 
-		$page = new PageVO();
-		$page->setType(vSIMPLE_SURVEY);
+                $page->setType(vSIMPLE_SURVEY);
 		$page->setTitle($values['titleorquestion']);
 		$page->setAuthor($author);
 		$page->setDisplayTop($values['showtop']);
@@ -223,10 +234,12 @@ class CreateSurvey
 		$page->setPrivacyByName($values['privacy']);
 		$page->setPhoneVoting($values['phonevoting']);
 		$page->setWebVoting($values['webvoting']);
-		
-		$page->setSurveys( $this->generateSurveysArray($values) );
-		return $page;
-	}
+        }
+        /**
+         *
+         * @param $values Array associative array
+         * @return Array array of SurveyVO
+         */
 	protected function generateSurveysArray($values)
 	{
 		$surveyVO = new SurveyVO();
