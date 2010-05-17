@@ -1,5 +1,7 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+global $gvPath;
+require_once("$gvPath/Common.php");
 
 /**
  * SurveyBody shows the main part of the survey
@@ -49,10 +51,7 @@ class SurveyBody
 
                     $choice = $this->parser->run($choice->getChoice());
                     if($choice)
-                    {
-                        $output.="<li STYLE=\"list-style-image: url(".vfGetColorImage().
-                                ")\"> <label id=\"q$i\">$choice</label></li>";
-                    }
+                        $output.=SurveyBody::getChoiceHTML($choice);
                 }
                 $output.='</ul>';
             }
@@ -65,6 +64,35 @@ class SurveyBody
                 ;
             }
         }
+        return $output;
+    }
+    static function getChoiceHTML($choice)
+    {
+        return "<li STYLE=\"list-style-image: url(".vfGetColorImage().")\"> <label>$choice</label></li>";
+    }
+    static function ajaxChoice($line)
+    {
+        global $wgParser;
+        $p = new MwParser($wgParser);
+        return SurveyBody::getChoiceHTML( $p->run(trim($line), false) );
+    }
+    static function getChoices($text)
+    {
+        global $wgParser;
+        $p = new MwParser($wgParser);
+        $lines = split("\n",$text);
+        $output = '';
+        $output .= '<div>';
+        
+        foreach($lines as $line)
+        {
+            $line = trim($line);
+            if($line)
+            {
+                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) );
+            }
+        }
+        $output .= '</div>';
         return $output;
     }
 }

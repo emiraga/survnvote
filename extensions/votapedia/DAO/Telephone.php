@@ -4,7 +4,10 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
-class TelephoneException extends Exception { }
+class TelephoneException extends Exception
+{
+
+}
 
 global $gvPath;
 require_once("$gvPath/VO/SurveyVO.php");
@@ -19,249 +22,247 @@ require_once("$gvPath/VO/SurveyVO.php");
  */
 class Telephone
 {
-	private $sizeOfBlock = 5;
-	private $numberOfDynamic = 25;
-	private $numberOfPhones;
-	private $numberOfBlocks;
-	private $blocks = array();
-	private $dynamicBlock = array();
-	private $allPhones = array();
+    private $allPhones = array();
 
-	/**
-	 *  Set up Blocks, which telephone numbers are read directly from database
-	 *   - read telephone numbers from database
-	 *   - write to $this->dynamicBlock $this->blocks
-	 *   - count elements for $numberOfBlocks $numberOfDynamic
-	 */
-	function __construct()
-	{
-		$this->allPhones = vfGetAllNumbers();
-		$this->numberOfPhones = count($this->allPhones);
-	}
-	/**
-	 * Initiate connection before using this function
-	 * Gets available telephones
-	 * 
-	 * @param $locked Boolean is this table locked, default false
-	 * @return Array $telephone the array of available telephone numbers
-	 */
-	function getAvailablePhones()
-	{
-		global $vgDB,$vgDBPrefix;
-		$sql = "select receiver from {$vgDBPrefix}usedreceivers{$addTable}";
-		$rs= &$vgDB->GetAll($sql);
-		$telephones = array();
-		foreach($rs as $r)
-		{
-			$telephones[] = $r[0];
-		}
-		return array_values( array_diff($this->allPhones, $telephones) );
-	}
-	/**
-	 * Get a list of all phones from database
-	 * 
-	 * @return list of all phones
-	 */
-	function getAllPhones()
-	{
-		return $this->allPhones;
-	}
-	/**
-	 * Calculate next sequential phone number
-	 * 
-	 * @param $phone string phone
-	 * @return next phone in sequene
-	 */
-	private function nextPhone($phone)
-	{
-		for($i=strlen($phone)-1; $i>=0; $i--)
-		{
-			if( $phone[$i] != '9' )
-			{
-				$phone[$i] = chr( ord($phone[$i]) + 1 );
-				break;
-			}
-			$phone[$i] = '0';
-		}
-		return $phone;
-	}
-	/**
-	 * Categorize sequential telephones to groups
-	 * 
-	 * @param $telephones a list of phones
-	 * @return a list of groups of sequential phones
-	 */
-	function makeGroups($telephones)
-	{
-		$seqPhones = array();
-		$temp = array($telephones[0]);
-		$expect = $this->nextPhone( $telephones[0] );
+    /**
+     *  Set up Blocks, which telephone numbers are read directly from database
+     *   - read telephone numbers from database
+     *   - write to $this->dynamicBlock $this->blocks
+     *   - count elements for $numberOfBlocks $numberOfDynamic
+     */
+    function __construct()
+    {
+        $this->allPhones = vfGetAllNumbers();
+        $this->numberOfPhones = count($this->allPhones);
+    }
+    /**
+     * Initiate connection before using this function
+     * Gets available telephones
+     *
+     * @param $locked Boolean is this table locked, default false
+     * @return Array $telephone the array of available telephone numbers
+     */
+    function getAvailablePhones()
+    {
+        global $vgDB,$vgDBPrefix;
+        $sql = "select receiver from {$vgDBPrefix}usedreceivers{$addTable}";
+        $rs= &$vgDB->GetAll($sql);
+        $telephones = array();
+        foreach($rs as $r)
+        {
+            $telephones[] = $r[0];
+        }
+        return array_values( array_diff($this->allPhones, $telephones) );
+    }
+    /**
+     * Get a list of all phones from database
+     *
+     * @return list of all phones
+     */
+    function getAllPhones()
+    {
+        return $this->allPhones;
+    }
+    /**
+     * Calculate next sequential phone number
+     *
+     * @param $phone string phone
+     * @return next phone in sequene
+     */
+    private function nextPhone($phone)
+    {
+        for($i=strlen($phone)-1; $i>=0; $i--)
+        {
+            if( $phone[$i] != '9' )
+            {
+                $phone[$i] = chr( ord($phone[$i]) + 1 );
+                break;
+            }
+            $phone[$i] = '0';
+        }
+        return $phone;
+    }
+    /**
+     * Categorize sequential telephones to groups
+     *
+     * @param $telephones a list of phones
+     * @return a list of groups of sequential phones
+     */
+    function makeGroups($telephones)
+    {
+        $seqPhones = array();
+        $temp = array($telephones[0]);
+        $expect = $this->nextPhone( $telephones[0] );
 
-		for ($i=1;$i<count($telephones);$i++)
-		{
-			if ($telephones[$i] == $expect)
-			{
-				$temp[] = $telephones[$i];
-			}
-			else
-			{
-				$seqPhones[]=$temp;
-				$temp = array($telephones[$i]);
-			}
-			$expect = $this->nextPhone($telephones[$i]);
-		}
-		$seqPhones[]=$temp;
-		return $seqPhones;
-	}
-	/**
-	 * For a given survey allocate available phones.
-	 * 
-	 * @param $survey
-	 * @param $listedPhones represents the history of used phones history by the author
-	 * @param $history represents the history of used block
-	 * @param $availablePhones  available phones now
-	 */
-	public function allocatePhonesSequence(SurveyVO &$survey, &$groups)
-	{
-		$number = $survey->getNumOfChoices();
-		$sortkey = array();
-		$sortvalue = array();
-		foreach($groups as $gr)
-		{
-			if(count($gr) >= $number)
-			{
-				$sortkey[] = count($gr);
-				$sortvalue[] = $gr;
-			}
-		}
-		if(count($sortkey) == 0)
-			return array();
-		array_multisort($sortkey, $sortvalue);
-		//return $number of first elements from the smallest group
-		return array_slice($sortvalue[0], 0, $number);
-	}
-	/**
-	 * For a given survey allocate available phones.
-	 * 
-	 * @param $survey
-	 * @param $listedPhones represents the history of used phones history by the author
-	 * @param $history represents the history of used block
-	 * @param $availablePhones  available phones now
-	 */
-	public function allocatePhones(SurveyVO &$survey, &$availablePhones)
-	{
-		$groups = $this->makeGroups($availablePhones);
-		$number = $survey->getNumOfChoices();
-		//Try to find a sequential block
-		$seq = $this->allocatePhonesSequence($survey, $groups);
-		if(count($seq) == $number)
-			return $seq;
-		//If that fails, take first X numbers
-		return array_slice($availablePhones, 0, $number);
-	}
-	/**
-	 * Request receivers for choices in surveys contained in PageVO.
-	 * Updates database as well.
-	 *
-	 * @param $page PageVO
-	 * @return Boolean true
-	 */
-	function setupReceivers(PageVO &$page)
-	{
-		$milisec = 1;
-		while(true)
-		{
-			try{
-				return $this->setupReceiversTryOnce($page);
-			}
-			catch(TelephoneException $e)
-			{
-				//someone else has taken these numbers, we try again
-				$this->deleteReceivers($page);
-				//In case we are food-fighting with someone, sleep randomly
-				usleep(rand(0, $milisec * 1000));
-				$milisec *= 2; //exponential backoff
-				if($milisec > 17000) //die after approximatelly 16 seconds
-					throw new SurveyException('Could not allocate receivers for phone, too many collisions.');
-			}
-		}
-	}
-	/**
-	 * Request receivers for choices in surveys contained in PageVO
-	 * Updates database as well.
-	 * Throws TelephoneException in case of collision.
-	 *
-	 * @param $page PageVO
-	 * @return Boolean true
-	 */
-	private function setupReceiversTryOnce(PageVO &$page)
-	{
-		global $vgDB, $vgDBPrefix;
-		global $vgSmsChoiceLen;
+        for ($i=1;$i<count($telephones);$i++)
+        {
+            if ($telephones[$i] == $expect)
+            {
+                $temp[] = $telephones[$i];
+            }
+            else
+            {
+                $seqPhones[]=$temp;
+                $temp = array($telephones[$i]);
+            }
+            $expect = $this->nextPhone($telephones[$i]);
+        }
+        $seqPhones[]=$temp;
+        return $seqPhones;
+    }
+    /**
+     * For a given survey allocate available phones.
+     *
+     * @param $survey
+     * @param $listedPhones represents the history of used phones history by the author
+     * @param $history represents the history of used block
+     * @param $availablePhones  available phones now
+     */
+    public function allocatePhonesSequence(SurveyVO &$survey, &$groups)
+    {
+        $number = $survey->getNumOfChoices();
+        $sortkey = array();
+        $sortvalue = array();
+        foreach($groups as $gr)
+        {
+            if(count($gr) >= $number)
+            {
+                $sortkey[] = count($gr);
+                $sortvalue[] = $gr;
+            }
+        }
+        if(count($sortkey) == 0)
+            return array();
+        array_multisort($sortkey, $sortvalue);
+        //return $number of first elements from the smallest group
+        return array_slice($sortvalue[0], 0, $number);
+    }
+    /**
+     * For a given survey allocate available phones.
+     *
+     * @param $survey
+     * @param $listedPhones represents the history of used phones history by the author
+     * @param $history represents the history of used block
+     * @param $availablePhones  available phones now
+     */
+    public function allocatePhones(SurveyVO &$survey, &$availablePhones)
+    {
+        $groups = $this->makeGroups($availablePhones);
+        $number = $survey->getNumOfChoices();
+        //Try to find a sequential block
+        $seq = $this->allocatePhonesSequence($survey, $groups);
+        if(count($seq) == $number)
+            return $seq;
+        //If that fails, take first X numbers
+        return array_slice($availablePhones, 0, $number);
+    }
+    /**
+     * Request receivers for choices in surveys contained in PageVO.
+     * Updates database as well.
+     *
+     * @param $page PageVO
+     * @return Boolean true
+     */
+    function setupReceivers(PageVO &$page)
+    {
+        $milisec = 1;
+        while(true)
+        {
+            try
+            {
+                return $this->setupReceiversTryOnce($page);
+            }
+            catch(TelephoneException $e)
+            {
+                //someone else has taken these numbers, we try again
+                $this->deleteReceivers($page);
+                //In case we are food-fighting with someone, sleep randomly
+                usleep(rand(0, $milisec * 1000));
+                $milisec *= 2; //exponential backoff
+                if($milisec > 17000) //die after approximatelly 16 seconds
+                    throw new SurveyException('Could not allocate receivers for phone, too many collisions.');
+            }
+        }
+    }
+    /**
+     * Request receivers for choices in surveys contained in PageVO
+     * Updates database as well.
+     * Throws TelephoneException in case of collision.
+     *
+     * @param $page PageVO
+     * @return Boolean true
+     */
+    private function setupReceiversTryOnce(PageVO &$page)
+    {
+        global $vgDB, $vgDBPrefix;
+        global $vgSmsChoiceLen;
 
-		$surveys = &$page->getSurveys();
-		$available = $this->getAvailablePhones();
-		
-		$receivers = array();
-		foreach($surveys as &$survey)
-		{
-			sort($available);
-			//Allocate Phones into a survey
-			$results = $this->allocatePhones($survey, $available);
-			
-			$number = $survey->getNumOfChoices();
-			if (count($results)< $number)
-				throw new SurveyException("No available phones!", 203);
-			
-			$i = 0;
-			$surveyChoices =& $survey->getChoices();
-			foreach($surveyChoices as &$surveyChoice)
-			{
-				$receivers[] = array($results[$i]);
-				$surveyChoice->setReceiver($results[$i]);
-				$surveyChoice->setSMS(substr($results[$i], -$vgSmsChoiceLen));
-				$i++;
-			}
-			//Get rid of the occupied numbers from the availablePhones
-			$available = array_values( array_diff($available, $results) );
-		}//foreach survey
-		
-		//insert into database
-		try
-		{
-			$success = $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers (receiver) VALUES(?)", $receivers);
-		}
-		catch(Exception $e){ $success = false; } 
-		if(! $success)
-			throw new TelephoneException("Duplicate receiver found.");
-		return true;
-	}
-	/**
-	 * Delete receivers from a given PageVO
-	 * 
-	 * @param $page PageVO
-	 * @return Boolean true
-	 */
-	function deleteReceivers(PageVO &$page)
-	{
-		global $vgDB, $vgDBPrefix; 
-		$receivers = array();
-		$surveys = &$page->getSurveys();
-		foreach($surveys as &$survey)
-		{
-			$surveyChoices =& $survey->getChoices();
-			foreach($surveyChoices as &$surveyChoice)
-			{
-				if($surveyChoice->getReceiver())
-					$receivers[] = array($surveyChoice->getReceiver());
-				$surveyChoice->setReceiver(NULL);
-				$surveyChoice->setSMS(NULL);
-			}
-		}
-		$success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}usedreceivers WHERE receiver=?", $receivers);
-		if(! $success)
-			throw new SurveyException("Failed to delete used receivers");
-		return true;
-	}
+        $surveys = &$page->getSurveys();
+        $available = $this->getAvailablePhones();
+
+        $receivers = array();
+        foreach($surveys as &$survey)
+        {
+            sort($available);
+            //Allocate Phones into a survey
+            $results = $this->allocatePhones($survey, $available);
+
+            $number = $survey->getNumOfChoices();
+            if (count($results)< $number)
+                throw new SurveyException("No available phones!", 203);
+
+            $i = 0;
+            $surveyChoices =& $survey->getChoices();
+            foreach($surveyChoices as &$surveyChoice)
+            {
+                $receivers[] = array($results[$i]);
+                $surveyChoice->setReceiver($results[$i]);
+                $surveyChoice->setSMS(substr($results[$i], -$vgSmsChoiceLen));
+                $i++;
+            }
+            //Get rid of the occupied numbers from the availablePhones
+            $available = array_values( array_diff($available, $results) );
+        }//foreach survey
+
+        //insert into database
+        try
+        {
+            $success = $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers (receiver) VALUES(?)", $receivers);
+        }
+        catch(Exception $e)
+        {
+            $success = false;
+        }
+        if(! $success)
+            throw new TelephoneException("Duplicate receiver found.");
+        return true;
+    }
+    /**
+     * Delete receivers from a given PageVO
+     *
+     * @param $page PageVO
+     * @return Boolean true
+     */
+    function deleteReceivers(PageVO &$page)
+    {
+        global $vgDB, $vgDBPrefix;
+        $receivers = array();
+        $surveys = &$page->getSurveys();
+        foreach($surveys as &$survey)
+        {
+            $surveyChoices =& $survey->getChoices();
+            foreach($surveyChoices as &$surveyChoice)
+            {
+                if($surveyChoice->getReceiver())
+                    $receivers[] = array($surveyChoice->getReceiver());
+                $surveyChoice->setReceiver(NULL);
+                $surveyChoice->setSMS(NULL);
+            }
+        }
+        $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}usedreceivers WHERE receiver=?", $receivers);
+        if(! $success)
+            throw new SurveyException("Failed to delete used receivers");
+        return true;
+    }
 }
 ?>
