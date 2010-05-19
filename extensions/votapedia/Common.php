@@ -70,7 +70,6 @@ function vfConnectDatabase()
 	return $cn;
 }
 /**
- * Global variable - ADOdb
  * @var $vgDB global variable ADOdb connection
  */
 global $vgDB;

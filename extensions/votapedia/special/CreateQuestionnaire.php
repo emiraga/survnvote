@@ -6,7 +6,7 @@ require_once("$gvPath/special/CreateSurvey.php" );
 
 class spCreateQuestionnaire extends SpecialPage
 {
-    private $obj;
+    /** @var CreateQuestionnaire */ private $obj;
     public function __construct()
     {
         parent::__construct('CreateQuestionnaire');
@@ -21,8 +21,9 @@ class spCreateQuestionnaire extends SpecialPage
 
 class CreateQuestionnaire extends CreateSurvey
 {
-    /** @var String javascript code */ private $script;
+    /** @var String */ private $script;
     /** @var Boolean */ private $isQuiz;
+    /** @var PageVO */ var $page;
 
     /**
      * Constructor for CreateSurvey
