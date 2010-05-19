@@ -45,6 +45,8 @@ function vfGetAllNumbers()
     return $out;
 }
 
+$gvUseDaemon = false; /* specify whether or not you are using daemon, please refer to documentation */
+
 /******************************************************************/
 /*** Do not edit items below unless you know what you are doing ***/
 /******************************************************************/
@@ -93,7 +95,19 @@ function vfParserFirstCallInit( &$parser )
 {
     $parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' );
     $parser->setFunctionHook( 'Survey', 'SurveyView::executeMagic' );
+
     return true;
+}
+
+/* if we are not using daemon, maintenance must be manually called */
+if(! $gvUseDaemon)
+{
+    $wgHooks['SetupAfterCache'][] = 'vfSetupAfterCache';
+    function vfSetupAfterCache()
+    {
+        ProcessSurvey::maintenance();
+        return true;
+    }
 }
 
 //Magic words (tags)

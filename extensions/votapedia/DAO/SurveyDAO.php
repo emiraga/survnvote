@@ -719,12 +719,28 @@ class SurveyDAO
             }
         }
     }
+    /**
+     * Find and mark as stopped pages (surveys) which have expired.
+     *
+     * @return Array array of integers specifying pageID of pages which
+     * have been finalized
+     */
     public function processFinished()
     {
         global $vgDB, $vgDBPrefix;
         $now = date("Y-m-d H:i:s");
-        $this->getPages("endTime < ? and finished = 0", array($now));
+        $pages = $this->getPages("WHERE endTime < ? and finished = 0", array($now));
 
+        $telephone = new Telephone();
+        $ret = array();
+        foreach ($pages as $page)
+        {
+            /* @var $page PageVO */
+            $telephone->deleteReceivers($page);
+            $vgDB->Execute("UPDATE {$vgDBPrefix}page SET finished = 1 WHERE pageID = ?", array($page->getPageID()));
+            $ret[] = $page->getPageID();
+        }
+        return $ret;
     }
 }
 ?>

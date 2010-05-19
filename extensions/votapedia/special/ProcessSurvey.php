@@ -87,4 +87,22 @@ class ProcessSurvey extends SpecialPage
             return;
         }
     }
+    /**
+     * Perform maintenace operations related to Surveys
+     * 1. Mark surveys as finished
+     * 2. Invalidate cache of pages which include these surveys
+     * 
+     */
+    static function maintenance()
+    {
+        $s = new SurveyDAO();
+        //stop expired surveys/pages
+        $finished = $s->processFinished();
+
+        //invalidate cache of all finished pages
+        foreach($finished as $page_id)
+        {
+            vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+        }
+    }
 }
