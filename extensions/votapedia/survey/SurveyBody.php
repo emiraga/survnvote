@@ -54,7 +54,21 @@ class SurveyBody
             }
             elseif($this->page->getStatus() == 'active')
             {
-                $output.='active';
+                $output.='<ul>';
+                foreach ($choices as &$choice)
+                {
+                    /* @var $choice ChoiceVO */
+                    $name = $this->parser->run($choice->getChoice());
+                    if($name)
+                        $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
+                    $output.='<font color=#AAA>Phone Number: </font>';
+                    $output.='<span style="background-color: #E9F3FE">';
+                    $output.=''. $this->colorizePhone( $choice->getReceiver() );
+                    $output.='</span>';
+                }
+                $output.='</ul>';
+
+                $output.= "Time Left: " . (strtotime($this->page->getEndTime()) - time());
             }
             elseif($this->page->getStatus() == 'ended')
             {
@@ -80,6 +94,12 @@ class SurveyBody
             }
         }
         return $output;
+    }
+    function colorizePhone($phone)
+    {
+        global $vgSmsChoiceLen;
+        return substr($phone, 0, -$vgSmsChoiceLen)
+                . '<font color=red>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
     }
     static private function getChoiceHTML($choice, $image, $addtext='')
     {
