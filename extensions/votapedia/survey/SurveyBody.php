@@ -32,49 +32,64 @@ class SurveyBody
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
-            $choices =& $survey->getChoices();
+            $choices = $survey->getChoices();
+
+            $output.='<tr><td colspan="2">';
+            if($this->type != vSIMPLE_SURVEY)
+            {
+                $output .= '<h5>'. wfMsg( 'survey-question', $survey->getQuestion() ) .'</h5>';
+            }
 
             if($this->page->getStatus()=='ready')
             {
-                $output.='<tr><td colspan="2">';
-
-                if($this->type != vSIMPLE_SURVEY)
-                {
-                    $output .= '<h5>'. wfMsg( 'survey-question', $survey->getQuestion() ) .'</h5>';
-                }
                 $output.='<ul>';
-                $i=0;
                 foreach ($choices as &$choice)
                 {
-                    /* @var $survey ChoiceVO */
-                    $i++;
-
-                    $choice = $this->parser->run($choice->getChoice());
-                    if($choice)
-                        $output.=SurveyBody::getChoiceHTML($choice);
+                    /* @var $choice ChoiceVO */
+                    $name = $this->parser->run($choice->getChoice());
+                    if($name)
+                        $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
                 }
                 $output.='</ul>';
             }
             elseif($this->page->getStatus() == 'active')
             {
-                ;
+                $output.='active';
             }
             elseif($this->page->getStatus() == 'ended')
             {
-                ;
+                $output.='<ul>';
+                $numvotes = 0;
+                foreach ($choices as &$choice)
+                {
+                    /* @var $choice ChoiceVO */
+                    $numvotes += $choice->getVote();
+                }
+                if($numvotes == 0) $numvotes = 1;
+                foreach ($choices as &$choice)
+                {
+                    /* @var $choice ChoiceVO */
+                    $image = vfGetColorImage();
+                    $percent = 100.0 * $choice->getVote() / $numvotes;
+                    $name = $this->parser->run($choice->getChoice());
+                    if($name)
+                        $output.=SurveyBody::getChoiceHTML($name, '');
+                    $output .= "<img src='$image' align=top border=1 height=10 width='$percent' /> $percent% ({$choice->getVote()})";
+                }
+                $output.='</ul>';
             }
         }
         return $output;
     }
-    static function getChoiceHTML($choice)
+    static private function getChoiceHTML($choice, $image, $addtext='')
     {
-        return "<li STYLE=\"list-style-image: url(".vfGetColorImage().")\"> <label>$choice</label></li>";
+        return "<li STYLE=\"list-style-image: url(".$image.")\"> <label>$choice</label> $addtext</li>";
     }
     static function ajaxChoice($line)
     {
         global $wgParser;
         $p = new MwParser($wgParser);
-        return SurveyBody::getChoiceHTML( $p->run(trim($line), false) );
+        return SurveyBody::getChoiceHTML( $p->run(trim($line), false) , vfGetColorImage());
     }
     static function getChoices($text)
     {
@@ -83,13 +98,13 @@ class SurveyBody
         $lines = split("\n",$text);
         $output = '';
         $output .= '<div>';
-        
+
         foreach($lines as $line)
         {
             $line = trim($line);
             if($line)
             {
-                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) );
+                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColorImage());
             }
         }
         $output .= '</div>';

@@ -18,10 +18,16 @@ function vfDoSetup()
 	require_once("$gvPath/Common.php");
 	
 	$sql = <<<END_SQL
+DROP TABLE IF EXISTS {$vgDBPrefix}page;
+DROP TABLE IF EXISTS {$vgDBPrefix}presentation;
+DROP TABLE IF EXISTS {$vgDBPrefix}survey;
+DROP TABLE IF EXISTS {$vgDBPrefix}surveychoice;
+DROP TABLE IF EXISTS {$vgDBPrefix}surveyrecord;
+DROP TABLE IF EXISTS {$vgDBPrefix}usedreceivers;
+
 --
 -- Table structure for table page
 --
-DROP TABLE IF EXISTS {$vgDBPrefix}page;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   pageID int(11) unsigned NOT NULL AUTO_INCREMENT,
   title varchar(512) NOT NULL,
@@ -51,7 +57,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
 -- Table structure for table presentation
 --
 
-DROP TABLE IF EXISTS {$vgDBPrefix}presentation;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   surveyID int(10) unsigned NOT NULL,
   presentationID tinyint(10) unsigned NOT NULL,
@@ -66,7 +71,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
 -- Table structure for table survey
 --
 
-DROP TABLE IF EXISTS {$vgDBPrefix}survey;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
   pageID int(11) NOT NULL,
   surveyID int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -83,7 +87,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
 -- Table structure for table surveychoice
 --
 
-DROP TABLE IF EXISTS {$vgDBPrefix}surveychoice;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   surveyID int(11) NOT NULL,
   choiceID tinyint(4) unsigned NOT NULL DEFAULT '1',
@@ -101,7 +104,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
 -- Table structure for table surveyrecord
 --
 
-DROP TABLE IF EXISTS {$vgDBPrefix}surveyrecord;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
   ID int(11) unsigned NOT NULL AUTO_INCREMENT,
   voterID varchar(50) NOT NULL DEFAULT 'unknown',
@@ -118,7 +120,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
 -- Table structure for table usedreceivers
 --
 
-DROP TABLE IF EXISTS {$vgDBPrefix}usedreceivers;
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
   receiver varchar(20) NOT NULL,
   UNIQUE(receiver)

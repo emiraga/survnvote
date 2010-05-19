@@ -95,6 +95,7 @@ class ProcessSurvey extends SpecialPage
      */
     static function maintenance()
     {
+        wfLoadExtensionMessages('Votapedia');
         $s = new SurveyDAO();
         //stop expired surveys/pages
         $finished = $s->processFinished();

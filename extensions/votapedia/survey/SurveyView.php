@@ -61,7 +61,6 @@ class SurveyView
         $output =  "<SurveyChoice>$page_id</SurveyChoice>[[".wfMsg('cat-survey-name',$page_id)."]]";
         return array($output, 'noparse' => false);
     }
-
     /**
      *
      * @global $wgUser User
@@ -136,6 +135,12 @@ class SurveyView
         #alt="sample graph" /></div></td></tr>';
 
         $output .= '</table>';
+
+        if($this->page->getStatus() == 'ended')
+        {
+            $output .= "This survey has ended.";
+        }
+
         return $output;
     }
     static function getChoices($text)
@@ -170,5 +175,4 @@ class SurveyView
         return $this->page;
     }
 }
-
 ?>
