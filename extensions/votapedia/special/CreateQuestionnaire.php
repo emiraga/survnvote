@@ -37,10 +37,10 @@ class CreateQuestionnaire extends CreateSurvey
         $this->formitems['choices']['type'] = 'html';
         $this->formitems['choices']['code'] = '<script>writeHTML()</script>';
         $this->formitems['choices']['valid'] = function($v,$i,$js)
-        {
-            if($js) return "";
-            return true;
-        };
+                {
+                    if($js) return "";
+                    return true;
+                };
         $this->formitems['choices']['textafter'] = '';
         $this->formitems['choices']['textbefore'] = '';
         $this->spPageName = 'Special:CreateQuestionnaire';
@@ -296,7 +296,7 @@ END_SCRIPT;
     function processNewSurvey()
     {
         parent::processNewSurvey(); //there are not previous questions
-        
+
         $this->generateScript();
     }
     public function processEditSurvey()

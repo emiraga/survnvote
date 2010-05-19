@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   privacy tinyint(4) NOT NULL DEFAULT '1',
   phonevoting varchar(5) DEFAULT 'anon',
   webvoting varchar(5) DEFAULT 'anon',
+  finished TINYINT(1) DEFAULT 0,
   PRIMARY KEY (pageID),
   KEY pageID (pageID)
 );

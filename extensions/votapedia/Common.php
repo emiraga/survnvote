@@ -13,35 +13,35 @@ define('vPRIVACY_HIGH',   3);
 
 /**
  * Convert page title into a friendly form, shorter and trimmed
- * 
+ *
  * @param $mytitle
  */
 function vfGetPageTitle($mytitle)
 {
-	$mytitle = trim(stripslashes($mytitle));
-	if(strlen($mytitle)>50)
-	{
-		$mytitle=substr($mytitle,0,50).'...';
-	}
-	return $mytitle;
+    $mytitle = trim(stripslashes($mytitle));
+    if(strlen($mytitle)>50)
+    {
+        $mytitle=substr($mytitle,0,50).'...';
+    }
+    return $mytitle;
 }
 /**
  * Return a message in error box, will show as red in HTML
- * 
+ *
  * @param $message
  */
 function vfErrorBox($message)
 {
-	return '<div class="errorbox" style="margin-bottom: 0.5em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
+    return '<div class="errorbox" style="margin-bottom: 0.5em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
 }
 /**
  * Return a message in error box, will show as red in HTML
- * 
+ *
  * @param $message
  */
 function vfSuccessBox($message)
 {
-	return '<div class="successbox" style="margin-bottom: 0em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
+    return '<div class="successbox" style="margin-bottom: 0em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
 }
 /**
  * Custom Exception class for surveys
@@ -49,7 +49,7 @@ function vfSuccessBox($message)
  */
 class SurveyException extends Exception
 {
-	//
+    //
 }
 /**
  * This is used to connect database.
@@ -62,12 +62,12 @@ include_once("adodb/adodb-exceptions.inc.php");
  */
 function vfConnectDatabase()
 {
-	global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
+    global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
 
-	$cn = &ADONewConnection($vgDBType);
-	if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
-		throw new SurveyException("Could not connect to database", 400);
-	return $cn;
+    $cn = &ADONewConnection($vgDBType);
+    if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
+        throw new SurveyException("Could not connect to database", 400);
+    return $cn;
 }
 /**
  * @var $vgDB global variable ADOdb connection
@@ -82,23 +82,23 @@ $vgDB =& vfConnectDatabase();
  */
 function vfGetColorImage($reset = false)
 {
-	static $c = 0;
-        if($reset)
-            return $c = 0;
+    static $c = 0;
+    if($reset)
+        return $c = 0;
 
-        $c = ($c + 1) % 50;
-	global $gvScript;
-	return "$gvScript/images/colors/Choice$c.jpg";
+    $c = ($c + 1) % 50;
+    global $gvScript;
+    return "$gvScript/images/colors/Choice$c.jpg";
 }
 /**
  * Get a singleton of MediaWiki adapter
  */
 function &vfAdapter()
 {
-	global $vgMWAdapter;
-	if(! isset($vgMWAdapter))
-		$vgMWAdapter =& new MwAdapter();
-	return $vgMWAdapter;
+    global $vgMWAdapter;
+    if(! isset($vgMWAdapter))
+        $vgMWAdapter =& new MwAdapter();
+    return $vgMWAdapter;
 }
 
 ?>

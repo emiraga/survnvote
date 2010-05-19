@@ -50,7 +50,7 @@ class Telephone
         $telephones = array();
         foreach($rs as $r)
         {
-            $telephones[] = $r[0];
+            $telephones[] = $r["receiver"];
         }
         return array_values( array_diff($this->allPhones, $telephones) );
     }
