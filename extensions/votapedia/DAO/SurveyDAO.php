@@ -714,7 +714,6 @@ class SurveyDAO
                         $surveyChoice->getSurveyID(),
                         $surveyChoice->getChoiceID(),
                 );
-                echo $surveyChoice->getReceiver().'<br>';
                 $vgDB->Execute($resChoice, $param);
             }
         }

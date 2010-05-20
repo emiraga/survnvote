@@ -57,7 +57,6 @@ class ProcessSurvey extends SpecialPage
                     throw new SurveyException('Survey is either running or finished and cannot be started');
 
                 $tel = new Telephone();
-                echo "Setting up receivers<br>";
                 try
                 {
                     //Setup receivers
@@ -75,7 +74,6 @@ class ProcessSurvey extends SpecialPage
                 //Purge all pages that have this survey included.
                 vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
                 //Redirect to the previous page
-                die('done');
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;

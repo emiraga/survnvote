@@ -65,11 +65,6 @@ if(! $gvUseDaemon)
         return true;
     }
 }
-else
-{
-    // otherwise, we directly expose maintenance script which will be called by daemon
-    $wgAjaxExportList[] = 'ProcessSurvey::maintenance';
-}
 
 //International Texts and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$gvPath/votapedia.i18n.php";
@@ -107,6 +102,11 @@ $wgAjaxExportList[] = 'SurveyView::getChoice';
 
 $wgAjaxExportList[] = 'SurveyBody::ajaxChoice';
 $wgAjaxExportList[] = 'SurveyBody::getChoices';
+
+$wgAjaxExportList[] = 'SurveyBody::ajaxTimeLeft';
+
+// We directly expose maintenance script which will be called by daemon
+$wgAjaxExportList[] = 'ProcessSurvey::maintenance';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser )

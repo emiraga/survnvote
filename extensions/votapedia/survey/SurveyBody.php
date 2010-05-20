@@ -47,8 +47,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
-                    if($name)
-                        $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
                 }
                 $output.='</ul>';
             }
@@ -59,16 +58,45 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
-                    if($name)
-                        $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
-                    $output.='<font color=#AAA>Phone Number: </font>';
-                    $output.='<span style="background-color: #E9F3FE">';
-                    $output.=''. $this->colorizePhone( $choice->getReceiver() );
-                    $output.='</span>';
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
+                    if($this->page->getPhoneVoting() != 'no')
+                    {
+                        $output.='<font color=#AAA>Phone Number: </font>';
+                        $output.='<span style="background-color: #E9F3FE">';
+                        $output.=''. $this->colorizePhone( $choice->getReceiver() );
+                        $output.='</span>';
+                    }
                 }
                 $output.='</ul>';
-
-                $output.= "Time Left: " . (strtotime($this->page->getEndTime()) - time());
+                $timeleft = strtotime($this->page->getEndTime()) - time();
+                $id='timeleft_'.$this->page->getPageID().'_'.rand();
+                $output.= "Time Left: ";
+                $output.= "<noscript>" . $timeleft .'</noscript>';
+$script=
+"<script>
+document.write('<span id=\"$id\">Loading...</span>');
+var vTimeleft;
+function updateTimeLeft(){
+    if(vTimeleft<=0)
+    {
+        sajax_do_call('ProcessSurvey::maintenance',[{$this->page->getPageID()}], function(o)
+        {
+            javascript:location.reload(true);
+        }
+        return;
+    }
+    c=vTimeleft%60+' seconds';
+    if(Math.floor(vTimeleft/60))
+        c=Math.floor(vTimeleft/60) + ' minutes ' + c;
+    document.getElementById(\"$id\").innerHTML=c;
+    setTimeout(\"updateTimeLeft()\",999); vTimeleft--;
+};
+sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(o)
+{
+    vTimeleft=parseInt(o.responseText);
+    updateTimeLeft();
+})</script>";
+                $output.= str_replace("\n", "", $script);
             }
             elseif($this->page->getStatus() == 'ended')
             {
@@ -86,14 +114,23 @@ class SurveyBody
                     $image = vfGetColorImage();
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
-                    if($name)
-                        $output.=SurveyBody::getChoiceHTML($name, '');
+                    $output.=SurveyBody::getChoiceHTML($name, '');
                     $output .= "<img src='$image' align=top border=1 height=10 width='$percent' /> $percent% ({$choice->getVote()})";
                 }
                 $output.='</ul>';
             }
         }
         return $output;
+    }
+    static function ajaxTimeLeft($page_id)
+    {
+        global $gvPath;
+        require_once("$gvPath/DAO/SurveyDAO.php");
+        
+        $s = new SurveyDAO();
+        $page = $s->findByPageID($page_id);
+        $timeleft = strtotime($page->getEndTime()) - time();
+        return strval($timeleft);
     }
     function colorizePhone($phone)
     {
