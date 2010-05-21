@@ -97,11 +97,13 @@ class ProcessSurvey extends SpecialPage
         $s = new SurveyDAO();
         //stop expired surveys/pages
         $finished = $s->processFinished();
-
+        $extra = '';
         //invalidate cache of all finished pages
         foreach($finished as $page_id)
         {
             vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+            $extra .= "Finished $page_id\n";
         }
+        return "OK\n".$extra;
     }
 }

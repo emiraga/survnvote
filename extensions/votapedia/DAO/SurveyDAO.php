@@ -728,7 +728,7 @@ class SurveyDAO
     {
         global $vgDB, $vgDBPrefix;
         $now = date("Y-m-d H:i:s");
-        $pages = $this->getPages("WHERE endTime < ? and finished = 0", array($now));
+        $pages = $this->getPages("WHERE endTime <= ? and finished = 0", array($now));
 
         $telephone = new Telephone();
         $ret = array();

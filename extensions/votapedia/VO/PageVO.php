@@ -433,9 +433,9 @@ class PageVO
 		
 		if ($endtime == false || $endtime == -1 || $starttime == false || $starttime == -1)
 			return 'ready';
-		else if ($starttime <= $now && $now <= $endtime)
+		else if ($starttime <= $now && $now < $endtime)
 			return 'active';
-		else if ($endtime < $now)
+		else if ($endtime <= $now)
 			return 'ended';
 		else
 			return 'ready';

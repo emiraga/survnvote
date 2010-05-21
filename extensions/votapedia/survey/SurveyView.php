@@ -140,7 +140,7 @@ class SurveyView
         {
             $output .= "This survey has ended.";
         }
-
+        $output .= " Survey status:".$this->page->getStatus();
         return $output;
     }
     static function getChoices($text)

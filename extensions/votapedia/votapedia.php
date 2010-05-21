@@ -61,7 +61,7 @@ if(! $gvUseDaemon)
     {
         //ArticleFromTitle hook is used to determine which class will handle article rendering
         //perfect spot to invalidate page caches of finished surveys
-        ProcessSurvey::maintenance();
+        //ProcessSurvey::maintenance();
         return true;
     }
 }
@@ -104,9 +104,6 @@ $wgAjaxExportList[] = 'SurveyBody::ajaxChoice';
 $wgAjaxExportList[] = 'SurveyBody::getChoices';
 
 $wgAjaxExportList[] = 'SurveyBody::ajaxTimeLeft';
-
-// We directly expose maintenance script which will be called by daemon
-$wgAjaxExportList[] = 'ProcessSurvey::maintenance';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser )

@@ -78,13 +78,7 @@ document.write('<span id=\"$id\">Loading...</span>');
 var vTimeleft;
 function updateTimeLeft(){
     if(vTimeleft<=0)
-    {
-        sajax_do_call('ProcessSurvey::maintenance',[{$this->page->getPageID()}], function(o)
-        {
-            javascript:location.reload(true);
-        }
-        return;
-    }
+        document.location.search = 'action=purge';
     c=vTimeleft%60+' seconds';
     if(Math.floor(vTimeleft/60))
         c=Math.floor(vTimeleft/60) + ' minutes ' + c;
