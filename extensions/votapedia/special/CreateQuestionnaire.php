@@ -1,8 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
-global $gvPath;
-require_once("$gvPath/special/CreateSurvey.php" );
+global $vgPath;
+require_once("$vgPath/special/CreateSurvey.php" );
 
 class spCreateQuestionnaire extends SpecialPage
 {
@@ -31,7 +31,7 @@ class CreateQuestionnaire extends CreateSurvey
     function __construct()
     {
         parent::__construct();
-        global $gvScript;
+        global $vgScript;
         $this->formitems['titleorquestion']['name'] = 'Title';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire page.';
         $this->formitems['choices']['type'] = 'html';
@@ -53,16 +53,16 @@ class CreateQuestionnaire extends CreateSurvey
     }
     function generateTemplates()
     {
-        global $gvScript;
+        global $vgScript;
         $this->question_t = '<div class="questionBox" id="question%1$s">'
                 . '<fieldset id="questions" style="float: none; margin: 0em;">'
                 . '<legend id="q%1$slegend">Question: %2$s</legend>'
                 . '<div style="float: right; top: -23px; position: relative;">'
-                . '<input type="image" title="Move up question" src="'.$gvScript.'/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
-                . '<img src="'.$gvScript.'/icons/spacer.gif" width="10px" />'
-                . '<input type="image" title="Move down question" src="'.$gvScript.'/icons/arrow_down.png"  onClick="return moveQuestionDown(this);" value="Down">'
-                . '<img src="'.$gvScript.'/icons/spacer.gif" width="10px" />'
-                . '<input type="image" title="Delete question" src="'.$gvScript.'/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
+                . '<input type="image" title="Move up question" src="'.$vgScript.'/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
+                . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
+                . '<input type="image" title="Move down question" src="'.$vgScript.'/icons/arrow_down.png"  onClick="return moveQuestionDown(this);" value="Down">'
+                . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
+                . '<input type="image" title="Delete question" src="'.$vgScript.'/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
                 . '</div>'
                 . '<input id="orderNum" type="hidden" name="orderNum[]" value="%1$s">'
                 . '<input type="hidden" name="q%1$sname" value="%3$s">'
@@ -78,11 +78,11 @@ class CreateQuestionnaire extends CreateSurvey
                 .'<label for="%2$s" id="label%2$s">%3$s</label>'
                 .'<input type=hidden name="q%1$schoices[]" value="%4$s" />'
                 .'<div style="float: right;">'
-                .'<input type="image" title="Move up choice" src="'.$gvScript.'/icons/arrow_up.png" onClick="return moveChoiceUp(this);" />'
-                .'<img src="'.$gvScript.'/icons/spacer.gif" width="10px" />'
-                .'<input type="image" title="Move down choice" src="'.$gvScript.'/icons/arrow_down.png" onClick="return moveChoiceDown(this);" />'
-                .'<img src="'.$gvScript.'/icons/spacer.gif" width="10px" />'
-                .'<input type="image" title="Delete choice" src="'.$gvScript.'/icons/comment_delete.png" onClick="return deleteChoice(this);" value="Delete" />'
+                .'<input type="image" title="Move up choice" src="'.$vgScript.'/icons/arrow_up.png" onClick="return moveChoiceUp(this);" />'
+                .'<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
+                .'<input type="image" title="Move down choice" src="'.$vgScript.'/icons/arrow_down.png" onClick="return moveChoiceDown(this);" />'
+                .'<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
+                .'<input type="image" title="Delete choice" src="'.$vgScript.'/icons/comment_delete.png" onClick="return deleteChoice(this);" value="Delete" />'
                 .'</div>'
                 .'</div>';
         //Arguments: num, id, htmlspecialchars(choice.val()), escape(choice.val())

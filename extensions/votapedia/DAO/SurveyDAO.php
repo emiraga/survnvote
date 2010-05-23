@@ -3,10 +3,10 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * @package DataAccessObject
  */
-global $gvPath;
-require_once("$gvPath/Common.php");
-require_once("$gvPath/DAO/Telephone.php");
-require_once("$gvPath/VO/PageVO.php");
+global $vgPath;
+require_once("$vgPath/Common.php");
+require_once("$vgPath/DAO/Telephone.php");
+require_once("$vgPath/VO/PageVO.php");
 /**
  * This page includes class SurveyDAO which is used to
  * save/retreive data of a Survey. It contains Read/Create/Update/Delete

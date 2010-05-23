@@ -4,8 +4,8 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
-global $gvPath;
-require_once("$gvPath/VO/SurveyVO.php");
+global $vgPath;
+require_once("$vgPath/VO/SurveyVO.php");
 /**
  * This page includes class TeleNumber which is in care of
  * allocating available telephones to surveys based on

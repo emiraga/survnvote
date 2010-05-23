@@ -13,8 +13,8 @@
 	$vgDBUserPassword   = '';
 	$vgDBPrefix = '';
 	
-	require_once("$gvPath/Common.php");
-	require_once("$gvPath/votapedia.setup.php");
+	require_once("$vgPath/Common.php");
+	require_once("$vgPath/votapedia.setup.php");
 	
 	$a = microtime(true);
 	function pointTime($msg = '')

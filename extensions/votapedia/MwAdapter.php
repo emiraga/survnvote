@@ -99,8 +99,8 @@ class MwParser
 	 */
 	public function run($text, $linestart = false)
 	{
-		global $gvAllowedTags;
-		$text = strip_tags($text, $gvAllowedTags);
+		global $vgAllowedTags;
+		$text = strip_tags($text, $vgAllowedTags);
 		// do the parsing inside a tag
 		if($this->isTag)
 			return $this->parser->recursiveTagParse($text);
@@ -114,4 +114,8 @@ class MwParser
 		//parse for normal view
 		return $this->parser->parse( $text, $this->wikititle, $this->parserOptions, $linestart, true )->getText();
 	}
+        public function disableCache()
+        {
+            $this->parser->disableCache();
+        }
 }

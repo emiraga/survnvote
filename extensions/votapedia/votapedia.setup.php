@@ -14,8 +14,8 @@ $vgDBUserPassword   = '';     // Password for database user
 
 function vfDoSetup()
 {
-	global $gvPath, $vgDB, $vgDBPrefix;
-	require_once("$gvPath/Common.php");
+	global $vgPath, $vgDB, $vgDBPrefix;
+	require_once("$vgPath/Common.php");
 	
 	$sql = <<<END_SQL
 DROP TABLE IF EXISTS {$vgDBPrefix}page;
@@ -138,7 +138,7 @@ END_SQL;
 	}
 }
 
-global $gvScript, $wgScriptPath;
+global $vgScript, $wgScriptPath;
 if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
 {
 	try
@@ -169,7 +169,7 @@ Installation Steps:
 <li>Edit file <b>extensions/votapedia/votapedia.setup.php</b> to set the master user/password.</li>
 <li>Open this script in browser (you are doing it right now)</li>
 <li>
-<form action="$gvScript/votapedia.setup.php" method="POST">
+<form action="$vgScript/votapedia.setup.php" method="POST">
 <input type=submit name=do_install value="Install" />
 </form>
 </li>

@@ -1,9 +1,9 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
-global $gvPath;
-require_once("$gvPath/VO/PageVO.php");
-require_once("$gvPath/DAO/SurveyDAO.php");
+global $vgPath;
+require_once("$vgPath/VO/PageVO.php");
+require_once("$vgPath/DAO/SurveyDAO.php");
 
 /**
  * Special page Create Survey
@@ -89,10 +89,12 @@ class ProcessSurvey extends SpecialPage
      * Perform maintenace operations related to Surveys
      * 1. Mark surveys as finished
      * 2. Invalidate cache of pages which include these surveys
-     * 
+     * @deprecated survey tags are no longer cache-able
      */
     static function maintenance()
     {
+        die('@deprecated');
+
         wfLoadExtensionMessages('Votapedia');
         $s = new SurveyDAO();
         //stop expired surveys/pages

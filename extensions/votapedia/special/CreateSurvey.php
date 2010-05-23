@@ -1,11 +1,11 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
-global $gvPath;
-require_once("$gvPath/Common.php" );
-require_once("$gvPath/FormControl.php");
-require_once("$gvPath/VO/PageVO.php");
-require_once("$gvPath/DAO/SurveyDAO.php");
+global $vgPath;
+require_once("$vgPath/Common.php" );
+require_once("$vgPath/FormControl.php");
+require_once("$vgPath/VO/PageVO.php");
+require_once("$vgPath/DAO/SurveyDAO.php");
 
 class spCreateSurvey extends SpecialPage
 {
@@ -48,7 +48,7 @@ class CreateSurvey
     
     function setFormItems()
     {
-        global $gvCountry, $gvScript, $gvAllowedTags;
+        global $vgCountry, $vgScript, $vgAllowedTags;
         $this->formitems = array (
                 'titleorquestion' => array(
                         'type' => 'input',
@@ -59,7 +59,7 @@ class CreateSurvey
                             if($js) return "";
                             return strlen($v) > 10;
                         },
-                        'explanation' => 'e.g. "What is the capital of '.$gvCountry.'?". This will be the title of your survey page.',
+                        'explanation' => 'e.g. "What is the capital of '.$vgCountry.'?". This will be the title of your survey page.',
                         'learn_more' => 'Details of Title or Survey Question',
                         'process' => function($v)
                         {
@@ -75,9 +75,9 @@ class CreateSurvey
                             if($js) return "";
                             return strlen($v) > 1;
                         },
-                        'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($gvAllowedTags).'.',
+                        'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).'.',
                         'learn_more' => 'Details of Editing Surveys',
-                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$gvScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 20px; font-size: large;\\"></div>");</script>',
+                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 20px; font-size: large;\\"></div>");</script>',
                 ),
                 'category' => array(
                         'type' => 'select',
@@ -113,7 +113,7 @@ class CreateSurvey
                         ),
                         'explanation' => 'This option determines who will be able to participate in your survey.',
                         'learn_more' => 'Details of Survey Privacy',
-                        'icon' => $gvScript.'/icons/lock.png',
+                        'icon' => $vgScript.'/icons/lock.png',
                 ),
                 'duration' => array(
                         'type' => 'input',
@@ -146,10 +146,10 @@ class CreateSurvey
                         'explanation' => '',
                         'learn_more' => 'Details of Phone Voting',
                         'options' => array(
-                                "Enable unidentified voters. Recommended for phone surveys from outside of $gvCountry."=>"anon",
+                                "Enable unidentified voters. Recommended for phone surveys from outside of $vgCountry."=>"anon",
                                 "Enable identified phone voting (only for callers with CallerID)"=>"yes",
                                 "Disable phone voting"=>"no",),
-                        'icon' => $gvScript.'/icons/phone.png',
+                        'icon' => $vgScript.'/icons/phone.png',
                 ),
                 'webvoting' => array(
                         'type' => 'radio',
@@ -166,7 +166,7 @@ class CreateSurvey
                                 "Enable anonymous web voting"=>"anon",
                                 "Enable registered web voting (for registered users)"=>"yes",
                                 "Disable web voting"=>"no",),
-                        'icon' => $gvScript.'/icons/laptop.png',
+                        'icon' => $vgScript.'/icons/laptop.png',
                 ),
                 'showresultsend' => array(
                         'type' => 'checkbox',
@@ -205,7 +205,7 @@ class CreateSurvey
                         'type' => 'checkbox',
                         'name' => 'Voter Identity',
                         'default' => 'on',
-                        'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$gvCountry.'.',
+                        'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$vgCountry.'.',
                         'valid' => function($v,$i,$js)
                         {
                             if($js) return "";
@@ -226,24 +226,24 @@ class CreateSurvey
     }
     /**
      * Remove prefix and suffix from category list
-     * $gvCatRemovePrefix, $gvCatRemoveSuffix
+     * $vgCatRemovePrefix, $vgCatRemoveSuffix
      *
      * @param $cats array of category names
      * @return array without prefixes and suffixes
      */
     function removePrefSufCategories($cats)
     {
-        global $gvCatRemovePrefix, $gvCatRemoveSuffix;
+        global $vgCatRemovePrefix, $vgCatRemoveSuffix;
 
         $result = array();
         foreach($cats as $cat)
         {
             $name = $cat;
-            foreach($gvCatRemovePrefix as $prefix)
+            foreach($vgCatRemovePrefix as $prefix)
                 if(strcasecmp(substr($name,0,strlen($prefix)),$prefix) == 0)
                     $name = substr($name, strlen($prefix));
 
-            foreach($gvCatRemoveSuffix as $suffix)
+            foreach($vgCatRemoveSuffix as $suffix)
                 if(strcasecmp(substr($name,strlen($name) - strlen($suffix)),$suffix) == 0)
                     $name = substr($name, 0, strlen($name) - strlen($suffix));
 
@@ -540,10 +540,10 @@ class CreateSurvey
     }
     function preDrawForm()
     {
-        global $wgOut, $gvScript;
+        global $wgOut, $vgScript;
         $wgOut->setArticleFlag(false);
-        $wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/survey.js"></script>');
-        $wgOut->addHTML('<script type="text/javascript" src="'.$gvScript.'/jquery-1.4.2.min.js"></script>');
+        $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/survey.js"></script>');
+        $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/jquery-1.4.2.min.js"></script>');
     }
     /**
      * Draw form for new survey using FormControl
@@ -574,7 +574,7 @@ class CreateSurvey
         $this->formitems['titleorquestion']['explanation'] = '';
         $this->formitems['titleorquestion']['learn_more'] = '';
 
-        global $wgOut, $wgUser, $gvScript;
+        global $wgOut, $wgUser, $vgScript;
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
 
         $wgOut->returnToMain();

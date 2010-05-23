@@ -87,8 +87,8 @@ function vfGetColorImage($reset = false)
         return $c = 0;
 
     $c = ($c + 1) % 50;
-    global $gvScript;
-    return "$gvScript/images/colors/Choice$c.jpg";
+    global $vgScript;
+    return "$vgScript/images/colors/Choice$c.jpg";
 }
 /**
  * Get a singleton of MediaWiki adapter

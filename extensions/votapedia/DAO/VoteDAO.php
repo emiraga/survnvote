@@ -5,8 +5,8 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
-global $gvPath;
-require_once("$gvPath/VO/VoteVO.php");
+global $vgPath;
+require_once("$vgPath/VO/VoteVO.php");
 /**
  * Class for managing votes in database
  */

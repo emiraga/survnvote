@@ -2,8 +2,8 @@
 if (!defined('MEDIAWIKI')) die();
 funon-exist();
 
-global $gvPath;
-require_once("$gvPath/Common.php");
+global $vgPath;
+require_once("$vgPath/Common.php");
 
 non_used_file();
 

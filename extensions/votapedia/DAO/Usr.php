@@ -7,8 +7,8 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
-require_once("$gvPath/VO/CallVO.php");
-require_once("$gvPath/DAO/VoteDAO.php");
+require_once("$vgPath/VO/CallVO.php");
+require_once("$vgPath/DAO/VoteDAO.php");
 
 /**
  * Class Usr includes functions which can vote surveys so far

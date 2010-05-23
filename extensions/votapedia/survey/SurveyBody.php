@@ -1,7 +1,7 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
-global $gvPath;
-require_once("$gvPath/Common.php");
+global $vgPath;
+require_once("$vgPath/Common.php");
 
 /**
  * SurveyBody shows the main part of the survey
@@ -118,8 +118,8 @@ sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(
     }
     static function ajaxTimeLeft($page_id)
     {
-        global $gvPath;
-        require_once("$gvPath/DAO/SurveyDAO.php");
+        global $vgPath;
+        require_once("$vgPath/DAO/SurveyDAO.php");
         
         $s = new SurveyDAO();
         $page = $s->findByPageID($page_id);

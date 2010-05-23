@@ -1,8 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
-global $gvPath;
-require_once("$gvPath/Common.php" );
+global $vgPath;
+require_once("$vgPath/Common.php" );
 
 /**
  * Special page View Survey

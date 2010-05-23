@@ -127,7 +127,7 @@ class FormControl
 	 */
 	public function AddPage($title, $add_items)
 	{
-		global $wgOut, $gvScript, $wgScriptPath;
+		global $wgOut, $vgScript, $wgScriptPath;
 		
 		//opentab tab
 		$wgOut->addHTML(
@@ -210,7 +210,7 @@ class FormControl
 			{
 				$morepage = Title::newFromText($item['learn_more']);
 				$item['explanation'] .=' &nbsp; <span>'
-					.'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$gvScript.'/icons/info.png"> Learn more</a></span>';
+					.'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
 			}
 			
 			if($item['type'] == 'infobox')
