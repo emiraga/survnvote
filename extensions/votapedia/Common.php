@@ -52,29 +52,6 @@ class SurveyException extends Exception
     //
 }
 /**
- * This is used to connect database.
- */
-include_once("adodb/adodb.inc.php");
-include_once("adodb/adodb-exceptions.inc.php");
-/**
- * Connect database without parameters
- * @return $cn ADOConnection
- */
-function vfConnectDatabase()
-{
-    global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
-
-    $cn = &ADONewConnection($vgDBType);
-    if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
-        throw new SurveyException("Could not connect to database", 400);
-    return $cn;
-}
-/**
- * @var $vgDB global variable ADOdb connection
- */
-global $vgDB;
-$vgDB =& vfConnectDatabase();
-/**
  * Rotates color images for a choice.
  *
  * @param $reset Boolean should colors be reset
@@ -100,5 +77,27 @@ function &vfAdapter()
         $vgMWAdapter =& new MwAdapter();
     return $vgMWAdapter;
 }
+/**
+ * This is used to connect database.
+ */
+include_once("adodb/adodb.inc.php");
+include_once("adodb/adodb-exceptions.inc.php");
+/**
+ * Connect database without parameters
+ * @return $cn ADOConnection
+ */
+function vfConnectDatabase()
+{
+    global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
 
+    $cn = &ADONewConnection($vgDBType);
+    if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
+        throw new SurveyException("Could not connect to database", 400);
+    return $cn;
+}
+/**
+ * @var $vgDB global variable ADOdb connection
+ */
+global $vgDB;
+$vgDB =& vfConnectDatabase();
 ?>

@@ -47,6 +47,7 @@ class SurveyButtons
      * @param $page_id Integer identifier of a survey
      * @param $title String title of a current page
      * @param $status String status of a survey, default 'ready'
+     * @deprecated
      */
     static function ajaxButtons($page_id, $title, $status='ready', $specialpage = 'Special:CreateSurvey')
     {
@@ -104,6 +105,7 @@ class SurveyButtons
      * is not enabled in browser. Get limited buttons for a user.
      *
      * @return String HTML code of survey buttons
+     * @deprecated
      */
     function getButtonsNoScript()
     {
@@ -123,9 +125,11 @@ class SurveyButtons
      * It contains javascript code which will load real buttons.
      *
      * @return HTML code
+     * @deprecated
      */
-    function getHTML()
+    function getHTML_ajax()
     {
+        die('deprecated');
         assert($this->page_author);
         //control button for those that don't have javascript
         $output = '<noscript>'.$this->getButtonsNoScript().'</noscript>';
@@ -138,22 +142,7 @@ class SurveyButtons
                 ."document.getElementById('$divname').innerHTML=o.responseText;});</script>";
         return $output;
     }
-}
 
-/**
- * Class used to display parts of HTML related to the buttons of survey.
- * Elements are NOT cache-able, meaning that they are context sensitive.
- *
- * @author Emir Habul
- *
- */
-class SurveyButtonsNocache extends SurveyButtons
-{
-    /**
-     * Get HTML buttons for a page that is not cacheable
-     *
-     * @return String HTML code
-     */
     function getHTML()
     {
         assert($this->page_id && $this->wikititle && $this->page_status);

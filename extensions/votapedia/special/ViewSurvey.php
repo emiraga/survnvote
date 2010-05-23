@@ -35,9 +35,9 @@ class ViewSurvey extends SpecialPage {
 			$page_id = intval($wgRequest->getVal('id'));
 			$parser = new MwParser($wgParser, $wgOut->ParserOptions());
                         
-                        $buttons =& new SurveyButtonsNocache();
+                        $buttons =& new SurveyButtons();
 			$tag = new SurveyView($page_id, $parser, $buttons);
-
+                        
 			$wgOut->addHTML($tag->getHTMLBody());
 			$wgOut->returnToMain();
 			

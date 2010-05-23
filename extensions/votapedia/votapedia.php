@@ -56,6 +56,7 @@ require_once( "$vgPath/UserHooks.php" );
 if(! $vgUseDaemon)
 {
     // If we are not using daemon, maintenance must be manually called
+    //@todo
 }
 
 //International Texts and Aliases
@@ -77,7 +78,6 @@ $wgSpecialPages['CreateQuestionnaire'] = 'spCreateQuestionnaire';
 $wgAutoloadClasses['ViewSurvey'] = "$vgPath/special/ViewSurvey.php";
 $wgAutoloadClasses['SurveyButtons'] = "$vgPath/survey/SurveyButtons.php";
 $wgAutoloadClasses['SurveyBody'] = "$vgPath/survey/SurveyBody.php";
-$wgAutoloadClasses['SurveyButtonsNocache'] = "$vgPath/survey/SurveyButtons.php";
 $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 
 //Special page ProcessSurvey
@@ -87,7 +87,6 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 //Tag <Survey />
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$vgPath/survey/SurveyView.php";
-$wgAjaxExportList[] = 'SurveyButtons::ajaxButtons';
 
 $wgAjaxExportList[] = 'SurveyView::getChoices';
 $wgAjaxExportList[] = 'SurveyView::getChoice';
@@ -95,14 +94,11 @@ $wgAjaxExportList[] = 'SurveyView::getChoice';
 $wgAjaxExportList[] = 'SurveyBody::ajaxChoice';
 $wgAjaxExportList[] = 'SurveyBody::getChoices';
 
-$wgAjaxExportList[] = 'SurveyBody::ajaxTimeLeft';
-
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser )
 {
     $parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' );
     $parser->setFunctionHook( 'Survey', 'SurveyView::executeMagic' );
-
     return true;
 }
 

@@ -71,26 +71,26 @@ class SurveyBody
                 $timeleft = strtotime($this->page->getEndTime()) - time();
                 $id='timeleft_'.$this->page->getPageID().'_'.rand();
                 $output.= "Time Left: ";
-                $output.= "<noscript>" . $timeleft .'</noscript>';
-$script=
-"<script>
-document.write('<span id=\"$id\">Loading...</span>');
-var vTimeleft;
-function updateTimeLeft(){
-    if(vTimeleft<=0)
-        document.location.search = 'action=purge';
-    c=vTimeleft%60+' seconds';
-    if(Math.floor(vTimeleft/60))
-        c=Math.floor(vTimeleft/60) + ' minutes ' + c;
-    document.getElementById(\"$id\").innerHTML=c;
-    setTimeout(\"updateTimeLeft()\",999); vTimeleft--;
-};
-sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(o)
-{
-    vTimeleft=parseInt(o.responseText);
-    updateTimeLeft();
-})</script>";
-                $output.= str_replace("\n", "", $script);
+                $timeleftstr = ($timeleft%60) .' seconds';
+                if(intval($timeleft/60))
+                    $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
+                $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
+                $script=
+                "<script>
+                var vTimeleft=$timeleft;
+                function updateTimeLeft(){
+                    if(vTimeleft<=0)
+                        document.location.search = 'action=purge';
+                    c=vTimeleft%60+' seconds';
+                    if(Math.floor(vTimeleft/60))
+                        c=Math.floor(vTimeleft/60) + ' minutes ' + c;
+                    document.getElementById(\"$id\").innerHTML=c;
+                    setTimeout(\"updateTimeLeft()\",999);
+                    vTimeleft--;
+                };
+                updateTimeLeft();
+                </script>";
+                $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
             }
             elseif($this->page->getStatus() == 'ended')
             {
@@ -116,6 +116,12 @@ sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(
         }
         return $output;
     }
+    /**
+     *
+     * @param $page_id Integer
+     * @return HTML code
+     * @deprecated
+     */
     static function ajaxTimeLeft($page_id)
     {
         global $vgPath;
@@ -126,22 +132,45 @@ sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(
         $timeleft = strtotime($page->getEndTime()) - time();
         return strval($timeleft);
     }
+    /**
+     * @param $phone String phone number
+     * @return String HTML code with modified phone
+     */
     function colorizePhone($phone)
     {
         global $vgSmsChoiceLen;
         return substr($phone, 0, -$vgSmsChoiceLen)
                 . '<font color=red>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
     }
+    /**
+     *
+     * @param $choice String value of choice
+     * @param $image String path to image used as bullet
+     * @param $addtext String Put Extra HTML after this choice
+     * @return String HTML code
+     */
     static private function getChoiceHTML($choice, $image, $addtext='')
     {
         return "<li STYLE=\"list-style-image: url(".$image.")\"> <label>$choice</label> $addtext</li>";
     }
+    /**
+     * Parse text with wiki code
+     *
+     * @param $line string
+     * @return String HTML code
+     */
     static function ajaxChoice($line)
     {
         global $wgParser;
         $p = new MwParser($wgParser);
         return SurveyBody::getChoiceHTML( $p->run(trim($line), false) , vfGetColorImage());
     }
+    /**
+     * Parse multiline wiki code
+     *
+     * @param $text string multiline string
+     * @return String HTML code
+     */
     static function getChoices($text)
     {
         global $wgParser;
@@ -162,7 +191,11 @@ sajax_do_call('SurveyBody::ajaxTimeLeft',[{$this->page->getPageID()}], function(
         return $output;
     }
 }
-
+/**
+ * 
+ * Body of a questionnaire
+ *
+ */
 class QuestionnaireBody extends SurveyBody
 {
     /**
