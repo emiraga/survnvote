@@ -64,10 +64,6 @@ class SurveyView
         return array($output, 'noparse' => false);
     }
     /**
-     *
-     * @global $wgUser User
-     * @global $wgOut OutputPage
-     * @global $wgTitle Title
      * @param $page_id Integer
      * @param $parser MwParser
      * @param $surveybuttons SurveyButtons
@@ -75,12 +71,12 @@ class SurveyView
     function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
     {
         wfLoadExtensionMessages('Votapedia');
-        global $wgUser, $wgOut, $wgTitle, $wgRequest;
+        global $wgOut, $wgTitle, $wgRequest;
 
         $this->parser =& $parser;
         $this->page_id=$page_id;
         $this->buttons =& $surveybuttons;
-        $this->username = $wgUser->getName();
+        $this->username = vfUser()->getName();
 
         if(! $this->page_id)
             throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
@@ -123,7 +119,7 @@ class SurveyView
         //enable web voting?
         if($this->page->getStatus() == 'active' && $this->page->getWebVoting() != 'no')
         {
-            if( $wgUser->isLoggedIn() || $this->page->getWebVoting() == 'anon' )
+            if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
             {
                 $this->buttons->setVoteButton(true);
                 $this->body->setShowVoting(true);
@@ -140,7 +136,7 @@ class SurveyView
      */
     function getHTML()
     {
-        global $vgScript, $wgUser;
+        global $vgScript;
         $output = '';
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
@@ -153,7 +149,7 @@ class SurveyView
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
         if($this->page->getStatus() != 'ended')
-            $output .='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
+            $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
         $output .= $this->body->getHTML();
         $output .= '<br />';
         $output .= $this->buttons->getHTML();

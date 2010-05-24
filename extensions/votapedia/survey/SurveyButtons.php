@@ -51,7 +51,6 @@ class SurveyButtons
     {
         $divname = "btnsSurvey{$this->page_id}-".rand();
         $output = "<div id='$divname'>";
-        global $wgUser;
 
         //Edit button
         if($this->has_control && $this->page_status == 'ready' )

@@ -2,6 +2,7 @@
 if (!defined('MEDIAWIKI')) die();
 
 global $vgPath;
+require_once("$vgPath/MwAdapter.php");
 require_once("$vgPath/VO/PageVO.php");
 require_once("$vgPath/DAO/SurveyDAO.php");
 
@@ -28,23 +29,25 @@ class ProcessSurvey extends SpecialPage
      */
     function execute( $par = null )
     {
-        global $wgUser, $wgTitle, $wgOut, $wgRequest;
+        global $wgTitle, $wgOut, $wgRequest;
         $wgOut->setArticleFlag(false);
         $page_id = intval(trim($wgRequest->getVal('id')));
         $action = $wgRequest->getVal( 'wpSubmit' );
 
-        if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
-        {
+        if ( ! vfUser()->checkEditToken() )
             die('Edit token is wrong, please try again.');
-        }
+
         try
         {
             $surveydao = new SurveyDAO();
             $page = $surveydao->findByPageID($page_id);
             if($action == wfMsg('start-survey'))
             {
-                if( $page->getAuthor() != $wgUser->getName() )
+                if( ! vfUser()->canControlSurvey($page) )
+                {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+                    return;
+                }
 
                 if($page->getStatus() != 'ready')
                     throw new SurveyException('Survey is either running or finished and cannot be started');

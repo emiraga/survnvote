@@ -72,10 +72,18 @@ function vfGetColorImage($reset = false)
  */
 function &vfAdapter()
 {
-    global $vgMWAdapter;
-    if(! isset($vgMWAdapter))
-        $vgMWAdapter =& new MwAdapter();
-    return $vgMWAdapter;
+    if(! isset($GLOBALS['vgAdapter']))
+        $GLOBALS['vgAdapter'] =& new MwAdapter();
+    return $GLOBALS['vgAdapter'];
+}
+/**
+ * Get a singleton of MediaWiki adapter
+ */
+function &vfUser()
+{
+    if(! isset($GLOBALS['vgUser']))
+        $GLOBALS['vgUser'] =& new MwUser();
+    return $GLOBALS['vgUser'];
 }
 /**
  * This is used to connect database.

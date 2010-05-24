@@ -272,8 +272,7 @@ class CreateSurvey
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
-        global $wgUser;
-        $author = $wgUser->getName();
+        $author = vfUser()->getName();
 
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);
@@ -309,8 +308,8 @@ class CreateSurvey
      */
     function insertPage($values)
     {
-        global $wgRequest, $wgUser;
-        $author = $wgUser->getName();
+        global $wgRequest;
+        $author = vfUser()->getName();
         $wikititle = vfGetPageTitle($values['titleorquestion']);
 
         try
@@ -403,13 +402,20 @@ class CreateSurvey
     }
     function processNewSurveySubmit()
     {
-        global $wgRequest, $wgUser, $wgOut;
+        global $wgRequest, $wgOut;
         //user has submitted to add new page or edit existing one
         //form originates from the CreateSurvey special page
-        if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
+        if ( ! vfUser()->checkEditToken() )
             die('Edit token is wrong, please try again. Edit token is missing');
         $this->form->loadValuesFromRequest();
         $error = $this->Validate();
+        
+        if( ! vfUser()->canCreateSurveys() )
+        {
+            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+            return;
+        }
+        
         if(! $error)
         {
             $error = $this->insertPage($this->form->getValuesArray());
@@ -425,10 +431,10 @@ class CreateSurvey
     }
     function processEditSurvey()
     {
-        global $wgRequest, $wgUser, $wgOut;
+
+        global $wgRequest, $wgOut;
         //user wants to edit the existing survey
         $this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
-        
         $page_id = intval($wgRequest->getVal('id'));
 
         try
@@ -441,6 +447,11 @@ class CreateSurvey
             $wgOut->setPageTitle("Error");
             $wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
             $wgOut->returnToMain();
+            return;
+        }
+        if( ! vfUser()->canControlSurvey($page) )
+        {
+            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
         if($page->getStatus() != 'ready')
@@ -457,11 +468,10 @@ class CreateSurvey
     }
     function processEditSurveySubmit()
     {
-        global $wgRequest, $wgUser, $wgOut;
-        if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) ) )
-        {
+        global $wgRequest, $wgOut;
+        if ( ! vfUser()->checkEditToken() )
             die('Edit token is wrong, please try again.');
-        }
+
         $this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
         $page_id = intval($wgRequest->getVal('id'));
 
@@ -470,9 +480,27 @@ class CreateSurvey
         $error = $this->Validate();
         if(! $error)
         {
+            try
+            {
+                $surveydao = new SurveyDAO();
+                $page = $surveydao->findByPageID( $page_id );
+            }
+            catch(SurveyException $e)
+            {
+                $wgOut->setPageTitle("Error");
+                $wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
+                $wgOut->returnToMain();
+                return;
+            }
+            if( ! vfUser()->canControlSurvey($page) )
+            {
+                $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+                return;
+            }
+            
             $page = $this->generatePageVO($this->form->getValuesArray());
             $page->setPageID($page_id);
-
+            
             try
             {
                 $surveydao = new SurveyDAO();
@@ -496,20 +524,26 @@ class CreateSurvey
     }
     function processNewSurvey()
     {
+        if( ! vfUser()->canCreateSurveys() )
+        {
+            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+            return;
+        }
         //fresh new form
         $this->preDrawForm();
         $this->drawFormNew();
     }
     /**
      * Mandatory execute function for a Special Page
-     *
+     * 
      * @param $par
      */
     function execute( $par = null )
     {
-        global $wgUser, $wgTitle, $wgOut;
+        global $wgTitle, $wgOut, $vgAnonSurveyCreation;
         $wgOut->setArticleBodyOnly(false);
-        if ( $wgUser->isAnon() )
+        
+        if ( ! vfUser()->canCreateSurveys() )
         {
             $wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
@@ -553,7 +587,7 @@ class CreateSurvey
      */
     protected function drawFormNew( $errors=null )
     {
-        global $wgOut, $wgUser;
+        global $wgOut;
         $wgOut->setPageTitle(wfMsg('title-new-survey'));
         if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
         $crform = Title::newFromText($this->spPageName);
@@ -575,7 +609,7 @@ class CreateSurvey
         $this->formitems['titleorquestion']['explanation'] = '';
         $this->formitems['titleorquestion']['learn_more'] = '';
 
-        global $wgOut, $wgUser, $vgScript;
+        global $wgOut, $vgScript;
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
         
         $wgOut->returnToMain();

@@ -28,6 +28,9 @@ $vgCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 // Allowed HTML/Mediawiki tags in survey choices.
 $vgAllowedTags = '<math><code><b><u><i>';
 
+//Allow anonymous users to create surveys
+$vgAnonSurveyCreation = true;
+
 // Votapedia script path, and extensions.
 $vgPath = "$IP/extensions/votapedia";
 $vgScript = "$wgScriptPath/extensions/votapedia";
@@ -66,6 +69,7 @@ $wgExtensionAliasesFiles['Votapedia'] = "$vgPath/votapedia.alias.php";
 //MediaWiki Adapter
 $wgAutoloadClasses['MwAdapter'] = "$vgPath/MwAdapter.php";
 $wgAutoloadClasses['MwParser'] = "$vgPath/MwAdapter.php";
+$wgAutoloadClasses['MwUser'] = "$vgPath/MwAdapter.php";
 
 //Special page CreateSurvey
 $wgAutoloadClasses['spCreateSurvey'] = "$vgPath/special/CreateSurvey.php";

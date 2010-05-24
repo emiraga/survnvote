@@ -42,7 +42,8 @@ class ViewSurvey extends SpecialPage {
 			$wgOut->addHTML($tag->getHTML());
 			$wgOut->returnToMain();
 			
-			$author = $tag->getPage()->getAuthor();
+			$author = MwUser::displayName($tag->getPage()->getAuthor());
+                        
 			$text = '';
 			$text .= "== More information ==\n";
 			$text .= "* Author: [[User:$author|$author]]\n";
