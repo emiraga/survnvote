@@ -10,6 +10,7 @@ class SurveyButtons
     /** @var Title */  protected $prosurv;
     /** @var Title */  protected $cresurv;
     /** @var Title */  protected $viewsurv;
+    /** @var Boolean */protected $show_details = true;
 
     public function __construct()
     {
@@ -30,10 +31,14 @@ class SurveyButtons
     {
         $this->wikititle = $title;
     }
+    function setDetailsButton($details)
+    {
+        $this->show_details = $details;
+    }
     /*
      * @return HTML code of buttons
      */
-    function getHTML()
+    function getHTML($show_details = false)
     {
         $divname = "btnsSurvey{$this->page_id}-".rand();
         $output = "<div id='$divname'>";
@@ -45,10 +50,8 @@ class SurveyButtons
             $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-survey').'">';
         }
 
-        echo $this->wikititle;
-        //Special:ViewSurvey
-
-        $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
+        if($this->show_details)
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
 
         if($this->page_status == 'ready')
         {

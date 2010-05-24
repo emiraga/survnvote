@@ -81,13 +81,13 @@ class ProcessSurvey extends SpecialPage
                     $title = Title::newFromText('Special:CreateSurvey');
                 elseif($page->getType() == vQUESTIONNAIRE)
                     $title = Title::newFromText('Special:CreateQuestionnaire');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getDBkey()}&wpEditButton=".wfMsg('edit-survey'), 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}&wpEditButton=".wfMsg('edit-survey'), 302);
             }
             elseif ($action == wfMsg('view-details'))
             {
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 $title = Title::newFromText('Special:ViewSurvey');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getDBkey()}", 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}", 302);
             }
         }
         catch(Exception $e)

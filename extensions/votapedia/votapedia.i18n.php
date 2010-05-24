@@ -37,5 +37,3 @@ $messages['en'] = array(
 	'pages-include' => 'Following pages include this survey:',
 	'page-links' => 'Page links',
 );
-
-?>

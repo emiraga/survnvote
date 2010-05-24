@@ -428,6 +428,7 @@ class CreateSurvey
         global $wgRequest, $wgUser, $wgOut;
         //user wants to edit the existing survey
         $this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
+        
         $page_id = intval($wgRequest->getVal('id'));
 
         try
@@ -576,7 +577,7 @@ class CreateSurvey
 
         global $wgOut, $wgUser, $vgScript;
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
-
+        
         $wgOut->returnToMain();
         if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
 

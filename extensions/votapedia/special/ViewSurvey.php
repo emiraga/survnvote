@@ -36,6 +36,7 @@ class ViewSurvey extends SpecialPage {
 			$parser = new MwParser($wgParser, $wgOut->ParserOptions());
                         
                         $buttons =& new SurveyButtons();
+                        $buttons->setDetailsButton(false);
 			$tag = new SurveyView($page_id, $parser, $buttons);
                         
 			$wgOut->addHTML($tag->getHTML());
@@ -45,6 +46,13 @@ class ViewSurvey extends SpecialPage {
 			$text = '';
 			$text .= "== More information ==\n";
 			$text .= "* Author: [[User:$author|$author]]\n";
+                        $text .= "* Creation date: {$tag->getPage()->getCreateTime()}\n";
+                        $text .= "* Status: {$tag->getPage()->getStatus()}\n";
+                        $text .= "* Type: {$tag->getPage()->getTypeName()}\n";
+                        $text .= "* Privacy: {$tag->getPage()->getPrivacyByName()}\n";
+                        $text .= "* Phone voting: {$tag->getPage()->getPhoneVoting()}\n";
+                        $text .= "* Web voting: {$tag->getPage()->getWebVoting()}\n";
+			$text .= "== Inclusion ==\n";
 			$text .= "* Use following text to include this survey into a wiki page:\n";
 			$text .= " <code><nowiki>{{#Survey:$page_id}}</nowiki></code>\n";
 			$text .= "\n== ".wfMsg('page-links')." ==\n";

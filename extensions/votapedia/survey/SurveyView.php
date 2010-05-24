@@ -75,7 +75,7 @@ class SurveyView
     function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
     {
         wfLoadExtensionMessages('Votapedia');
-        global $wgUser, $wgOut, $wgTitle;
+        global $wgUser, $wgOut, $wgTitle, $wgRequest;
 
         $this->parser =& $parser;
         $this->page_id=$page_id;
@@ -88,17 +88,23 @@ class SurveyView
         $surveydao = new SurveyDAO();
         $this->page = $surveydao->findByPageID( $page_id );
 
-        if($wgTitle)
-            $this->wikititle = $wgTitle;
+        if($wgRequest->getVal('returnto'))
+            $this->wikititle = Title::newFromText($wgRequest->getVal('returnto'));
         else
+            $this->wikititle = $wgTitle;
+        
+        if(! $this->wikititle)
             throw new Exception('SurveyView::__construct no page title, wgTitle is unavailable');
 
+        if($this->wikititle->isSpecial('ViewSurvey'))
+            $this->wikititle = Title::newMainPage();
+        
         if($this->page->getStatus() != 'ended' )
             $this->parser->disableCache(); // for active and ready type of surveys
 
         //configure buttons
         $this->buttons->setPageAuthor($this->page->getAuthor());
-        $this->buttons->setWikiTitle($this->wikititle->getDBKey());
+        $this->buttons->setWikiTitle($this->wikititle->getFullText());
         $this->buttons->setPageID($this->page_id);
         $this->buttons->setPageStatus($this->page->getStatus());
 
@@ -130,14 +136,12 @@ class SurveyView
         $output.= '<h2>'.wfMsg('survey-caption', htmlspecialchars($this->page->getTitle())).'</h2>';
 
         //$output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
-
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
-                .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />';
+                .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
         if($this->page->getStatus() != 'ended')
             $output .='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
-
         $output .= $this->body->getHTML();
         $output .= '<br />';
         $output .= $this->buttons->getHTML();
@@ -174,7 +178,7 @@ class SurveyView
     }
     /**
      * AJAX call to get preview of choioe
-     * 
+     *
      * @param  $line String wiki code for choice
      * @return String HTML code of preview of choice
      */

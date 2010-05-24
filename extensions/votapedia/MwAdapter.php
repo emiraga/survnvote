@@ -60,7 +60,7 @@ class MwAdapter
 		$members = $this->getSubCategories( $category );
 		foreach($members as $m)
 		{
-			$this->purgePage(Title::newFromText( $m )->getDBkey());
+			$this->purgePage(Title::newFromText( $m )->getFullText());
 		}
 	}	
 }
