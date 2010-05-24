@@ -34,10 +34,16 @@ class SurveyBody
      */
     static private function getChoiceHTML($choice, $image, $addtext='', $vote='', $voteid='')
     {
+        $output = $addtext."<div  style=\"display: block; width: 200px;\">";
+
         if($vote)
-            return "<li STYLE=\"list-style: none;\">$vote <label for=\"$voteid\">$choice</label> $addtext</li>";
+            $output .= "<li STYLE=\"list-style: none;\">$vote ";
         else
-            return "<li STYLE=\"list-style-image: url(".$image.");\"> <span>$choice</span> $addtext</li>";
+            $output .= "<li STYLE=\"list-style-image: url(".$image.");\"> ";
+
+        $output .= "<label for=\"$voteid\">$choice</label> </li>";
+
+        return $output.'</div>';
     }
     /**
      * 
@@ -78,8 +84,8 @@ class SurveyBody
                     $extra='';
                     if($this->page->getPhoneVoting() != 'no')
                     {
-                        $extra='<span style="background-color: #E9F3FE; margin-left: 10px;">'
-                        .'<font color=#AAA>Phone Number: </font> '
+                        $extra='<span style="background-color: #E9F3FE; float: right; margin-right: 400px;">'
+                        .'<font color="#AAAAAA">Number:</font> '
                         .$this->colorizePhone( $choice->getReceiver() )
                         .'</span>';
                     }

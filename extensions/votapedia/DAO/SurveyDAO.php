@@ -419,23 +419,16 @@ class SurveyDAO
      * Page table would still be saved.
      *
      * @param $id id of a wiki page
-     * @version 2.0
      */
     function deleteSurveys($id)
     {
         global $vgDB, $vgDBPrefix;
-        $sql = "select pageID from {$vgDBPrefix}page where pageID = ?";
-        $rs = $vgDB->Execute ($sql, array($id));
-        if ($rs->RecordCount() == 0)
-            throw new SurveyException("No survey matches this question!",201);
         $vgDB->StartTrans();
-        $id = $rs->fields[0];
-        $rs->Close();
         $sql = "select surveyID from {$vgDBPrefix}survey where pageID = ?";
         $rs = $vgDB->Execute($sql, array($id));
         while (!$rs->EOF)
         {
-            $surveyID = $rs->fields[0];
+            $surveyID = $rs->fields['surveyID'];
             $sql = "delete from {$vgDBPrefix}presentation where surveyID = ?";
             $vgDB->Execute($sql, array($surveyID));
             $sql = "delete from {$vgDBPrefix}surveychoice where surveyID = ?";
@@ -451,7 +444,7 @@ class SurveyDAO
         if ($vgDB->HasFailedTrans())
         {
             $message = $vgDB->ErrorMsg();
-            throw new Exception("ODBC Commit error:.$message");
+            throw new Exception("Commit error: $message");
         }
         return true;
     }

@@ -126,12 +126,12 @@ class SurveyView
             }
         }
         //control?.
-        if($this->username == $this->page->getAuthor())
+        if( vfUser()->canControlSurvey($this->page) )
             $this->buttons->setHasControl(true);
     }
     /**
      * Get HTML of survey
-     *
+     * 
      * @return String html code
      */
     function getHTML()

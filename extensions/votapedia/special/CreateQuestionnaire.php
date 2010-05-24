@@ -107,7 +107,7 @@ class CreateQuestionnaire extends CreateSurvey
 		var choice =  $(buttonElement).parent().find("#choice");
 		if(choice.val().length < 1)	return false;
 		$('#q'+num+'choices').append(sprintf('{$this->choice_t}', num, id, htmlspecialchars(choice.val()), escape(choice.val())));
-		sajax_do_call('SurveyView::getChoice', [choice.val()], 'label'+id);
+		sajax_do_call('SurveyView::getChoice', [choice.val()], function(o) { $("#label"+id).html(o.responseText); });
 		choice.val('');
 		$('#'+id+'div').show(0);
 		return false;

@@ -309,7 +309,7 @@ class CreateSurvey
     function insertPage($values)
     {
         global $wgRequest;
-        $author = vfUser()->getName();
+        $author = vfUser()->getDisplayName();
         $wikititle = vfGetPageTitle($values['titleorquestion']);
 
         try
@@ -483,7 +483,7 @@ class CreateSurvey
             try
             {
                 $surveydao = new SurveyDAO();
-                $page = $surveydao->findByPageID( $page_id );
+                $page_old = $surveydao->findByPageID( $page_id );
             }
             catch(SurveyException $e)
             {
@@ -492,7 +492,7 @@ class CreateSurvey
                 $wgOut->returnToMain();
                 return;
             }
-            if( ! vfUser()->canControlSurvey($page) )
+            if( ! vfUser()->canControlSurvey($page_old) )
             {
                 $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                 return;
@@ -500,10 +500,9 @@ class CreateSurvey
             
             $page = $this->generatePageVO($this->form->getValuesArray());
             $page->setPageID($page_id);
-            
+
             try
             {
-                $surveydao = new SurveyDAO();
                 $surveydao->updatePage($page);
             }
             catch(SurveyException $e)
