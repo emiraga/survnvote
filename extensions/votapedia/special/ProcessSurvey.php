@@ -50,7 +50,6 @@ class ProcessSurvey extends SpecialPage
             {
                 $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             }
-
             if($action == wfMsg('start-survey'))
             {
                 if($page->getStatus() != 'ready')
@@ -70,13 +69,25 @@ class ProcessSurvey extends SpecialPage
                     $tel->deleteReceivers($page);
                     throw $e; //continue throwing
                 }
-
-                //Purge all pages that have this survey included.
-                vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;
+            }
+            elseif ($action == wfMsg('edit-survey'))
+            {
+                $returnto = Title::newFromText($wgRequest->getVal('returnto'));
+                if($page->getType() == vSIMPLE_SURVEY)
+                    $title = Title::newFromText('Special:CreateSurvey');
+                elseif($page->getType() == vQUESTIONNAIRE)
+                    $title = Title::newFromText('Special:CreateQuestionnaire');
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getDBkey()}&wpEditButton=".wfMsg('edit-survey'), 302);
+            }
+            elseif ($action == wfMsg('view-details'))
+            {
+                $returnto = Title::newFromText($wgRequest->getVal('returnto'));
+                $title = Title::newFromText('Special:ViewSurvey');
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getDBkey()}", 302);
             }
         }
         catch(Exception $e)

@@ -25,6 +25,7 @@ $messages['en'] = array(
 	'survey-caption' => 'Title: $1',
 	'start-survey' => 'Start Survey',
 	'stop-survey' => 'Stop Survey',
+        'view-details' => 'View details',
 	'control-survey' => 'Control Survey',
 	'cat-survey-name' => 'Category:Pages with survey id $1',
 	'mobile-phone' => 'Mobile Phone:',

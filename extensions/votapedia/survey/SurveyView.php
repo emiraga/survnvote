@@ -72,7 +72,7 @@ class SurveyView
      * @param $parser MwParser
      * @param $surveybuttons SurveyButtons
      */
-    protected function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
+    function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
     {
         wfLoadExtensionMessages('Votapedia');
         global $wgUser, $wgOut, $wgTitle;
@@ -110,7 +110,6 @@ class SurveyView
                 break;
             case vQUESTIONNAIRE:
                 $this->body =& new QuestionnaireBody($this->page, $this->parser);
-                $this->buttons->setCreateTitle( 'Special:CreateQuestionnaire' );
                 break;
             default:
                 throw new Exception('Unknown survey type');
@@ -123,32 +122,40 @@ class SurveyView
      */
     function getHTML()
     {
-        global $vgScript;
+        global $vgScript, $wgUser;
         $output = '';
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
 
         $output.= '<h2>'.wfMsg('survey-caption', htmlspecialchars($this->page->getTitle())).'</h2>';
-        $output.='<table cellspacing="0" style="font-size:large">';
 
-        $output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
+        //$output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
+
+        $this->prosurv = Title::newFromText('Special:ProcessSurvey');
+        $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
+                .'<input type="hidden" name="id" value="'.$this->page_id.'">'
+                .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle).'" />';
+        if($this->page->getStatus() != 'ended')
+            $output .='<input type="hidden" name="wpEditToken" value="'.htmlspecialchars( $wgUser->editToken() ).'">';
 
         $output .= $this->body->getHTML();
+        $output .= '<br />';
         $output .= $this->buttons->getHTML();
 
-        #$output.='<td valign="top"><div style="margin:0px 0px 0px 40px">
-        #<img src="./utkgraph/displayGraph.php?pageTitle='.$encodedTitle.'&background='.$background.'"
-        #alt="sample graph" /></div></td></tr>';
-
-        $output .= '</table>';
+        $output .= '</form>';
 
         if($this->page->getStatus() == 'ended')
         {
             $output .= "This survey has ended.";
         }
-        $output .= " Survey status:".$this->page->getStatus();
         return $output;
     }
+    /**
+     * AJAX call for choices preview
+     *
+     * @param $text String multiline choices wiki code
+     * @return String HTML code for choices
+     */
     static function getChoices($text)
     {
         global $wgParser;
@@ -165,6 +172,12 @@ class SurveyView
         }
         return $output;
     }
+    /**
+     * AJAX call to get preview of choioe
+     * 
+     * @param  $line String wiki code for choice
+     * @return String HTML code of preview of choice
+     */
     static function getChoice($line)
     {
         global $wgParser;

@@ -38,7 +38,7 @@ class ViewSurvey extends SpecialPage {
                         $buttons =& new SurveyButtons();
 			$tag = new SurveyView($page_id, $parser, $buttons);
                         
-			$wgOut->addHTML($tag->getHTMLBody());
+			$wgOut->addHTML($tag->getHTML());
 			$wgOut->returnToMain();
 			
 			$author = $tag->getPage()->getAuthor();

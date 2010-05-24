@@ -723,9 +723,12 @@ class SurveyDAO
      *
      * @return Array array of integers specifying pageID of pages which
      * have been finalized
+     * @deprecated
      */
     public function processFinished()
     {
+        die('@deprecated');
+        
         global $vgDB, $vgDBPrefix;
         $now = date("Y-m-d H:i:s");
         $pages = $this->getPages("WHERE endTime <= ? and finished = 0", array($now));

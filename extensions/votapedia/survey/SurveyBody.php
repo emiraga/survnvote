@@ -34,67 +34,40 @@ class SurveyBody
             /* @var $survey SurveyVO */
             $choices = $survey->getChoices();
 
-            $output.='<tr><td colspan="2">';
             if($this->type != vSIMPLE_SURVEY)
             {
                 $output .= '<h5>'. wfMsg( 'survey-question', $survey->getQuestion() ) .'</h5>';
             }
 
+            $output.='<ul>';
             if($this->page->getStatus()=='ready')
             {
-                $output.='<ul>';
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
                     $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
                 }
-                $output.='</ul>';
             }
             elseif($this->page->getStatus() == 'active')
             {
-                $output.='<ul>';
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
+                    $extra='';
                     if($this->page->getPhoneVoting() != 'no')
                     {
-                        $output.='<font color=#AAA>Phone Number: </font>';
-                        $output.='<span style="background-color: #E9F3FE">';
-                        $output.=''. $this->colorizePhone( $choice->getReceiver() );
-                        $output.='</span>';
+                        $extra='<font color=#AAA>Phone Number: </font>'
+                        .'<span style="background-color: #E9F3FE">'
+                        .$this->colorizePhone( $choice->getReceiver() )
+                        .'</span>';
                     }
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra);
                 }
-                $output.='</ul>';
-                $timeleft = strtotime($this->page->getEndTime()) - time();
-                $id='timeleft_'.$this->page->getPageID().'_'.rand();
-                $output.= "Time Left: ";
-                $timeleftstr = ($timeleft%60) .' seconds';
-                if(intval($timeleft/60))
-                    $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
-                $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
-                $script=
-                "<script>
-                var vTimeleft=$timeleft;
-                function updateTimeLeft(){
-                    if(vTimeleft<=0)
-                        document.location.search = 'action=purge';
-                    c=vTimeleft%60+' seconds';
-                    if(Math.floor(vTimeleft/60))
-                        c=Math.floor(vTimeleft/60) + ' minutes ' + c;
-                    document.getElementById(\"$id\").innerHTML=c;
-                    setTimeout(\"updateTimeLeft()\",999);
-                    vTimeleft--;
-                };
-                updateTimeLeft();
-                </script>";
-                $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
             }
             elseif($this->page->getStatus() == 'ended')
             {
-                $output.='<ul>';
                 $numvotes = 0;
                 foreach ($choices as &$choice)
                 {
@@ -108,29 +81,43 @@ class SurveyBody
                     $image = vfGetColorImage();
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
-                    $output.=SurveyBody::getChoiceHTML($name, '');
-                    $output .= "<img src='$image' align=top border=1 height=10 width='$percent' /> $percent% ({$choice->getVote()})";
+
+                    $extra = "<img src='$image' align=top border=1 height=10 width='$percent' /> $percent% ({$choice->getVote()})";
+                    $output.=SurveyBody::getChoiceHTML($name, '', "<br />$extra");
                 }
-                $output.='</ul>';
             }
-        }
-        return $output;
-    }
-    /**
-     *
-     * @param $page_id Integer
-     * @return HTML code
-     * @deprecated
-     */
-    static function ajaxTimeLeft($page_id)
-    {
-        global $vgPath;
-        require_once("$vgPath/DAO/SurveyDAO.php");
+            $output.='</ul>';
+        } // foreach Survey
         
-        $s = new SurveyDAO();
-        $page = $s->findByPageID($page_id);
-        $timeleft = strtotime($page->getEndTime()) - time();
-        return strval($timeleft);
+        //Display how much time has left
+        if($this->page->getStatus() == 'active')
+        {
+            $timeleft = strtotime($this->page->getEndTime()) - time();
+            $id='timeleft_'.$this->page->getPageID().'_'.rand();
+            $output.= "Time Left: ";
+            $timeleftstr = ($timeleft%60) .' seconds';
+            if(intval($timeleft/60))
+                $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
+            $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
+            $script=
+                    "<script>
+            var vTimeleft=$timeleft;
+            function updateTimeLeft(){
+                if(vTimeleft<=0)
+                    document.location.search = 'action=purge';
+                c=vTimeleft%60+' seconds';
+                if(Math.floor(vTimeleft/60))
+                    c=Math.floor(vTimeleft/60) + ' minutes ' + c;
+                document.getElementById(\"$id\").innerHTML=c;
+                setTimeout(\"updateTimeLeft()\",999);
+                vTimeleft--;
+            };
+            updateTimeLeft();
+            </script>";
+            $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
+        }
+
+        return $output;
     }
     /**
      * @param $phone String phone number
@@ -163,7 +150,7 @@ class SurveyBody
     {
         global $wgParser;
         $p = new MwParser($wgParser);
-        return SurveyBody::getChoiceHTML( $p->run(trim($line), false) , vfGetColorImage());
+        return SurveyBody::getChoiceHTML( $p->run(trim($line), false), vfGetColorImage());
     }
     /**
      * Parse multiline wiki code
@@ -177,8 +164,7 @@ class SurveyBody
         $p = new MwParser($wgParser);
         $lines = split("\n",$text);
         $output = '';
-        $output .= '<div>';
-
+        $output .= '<ul  style="margin: 0.2em;">';
         foreach($lines as $line)
         {
             $line = trim($line);
@@ -187,12 +173,12 @@ class SurveyBody
                 $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColorImage());
             }
         }
-        $output .= '</div>';
+        $output .= '</ul>';
         return $output;
     }
 }
 /**
- * 
+ *
  * Body of a questionnaire
  *
  */
