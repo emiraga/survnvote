@@ -13,14 +13,34 @@ class SurveyBody
     /** @var PageVO */   protected $page;
     /** @var MwParser */ protected $parser;
     /** @var Integer */  protected $type;
+    /** @var Boolean */  protected $show_voting = false;
+
     function  __construct(PageVO &$page, MwParser &$parser)
     {
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
     }
+    function setShowVoting($show)
+    {
+        $this->show_voting = $show;
+    }
     /**
      *
+     * @param $choice String value of choice
+     * @param $image String path to image used as bullet
+     * @param $addtext String Put Extra HTML after this choice
+     * @return String HTML code
+     */
+    static private function getChoiceHTML($choice, $image, $addtext='', $vote='', $voteid='')
+    {
+        if($vote)
+            return "<li STYLE=\"list-style: none;\">$vote <label for=\"$voteid\">$choice</label> $addtext</li>";
+        else
+            return "<li STYLE=\"list-style-image: url(".$image.");\"> <span>$choice</span> $addtext</li>";
+    }
+    /**
+     * 
      * @global $wgOut OutputPage
      * @return String html code
      */
@@ -58,12 +78,19 @@ class SurveyBody
                     $extra='';
                     if($this->page->getPhoneVoting() != 'no')
                     {
-                        $extra='<font color=#AAA>Phone Number: </font>'
-                        .'<span style="background-color: #E9F3FE">'
+                        $extra='<span style="background-color: #E9F3FE; margin-left: 10px;">'
+                        .'<font color=#AAA>Phone Number: </font> '
                         .$this->colorizePhone( $choice->getReceiver() )
                         .'</span>';
                     }
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra);
+                    $vote = '';
+                    $voteid = '';
+                    if($this->show_voting)
+                    {
+                        $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
+                        $vote = "<input id=\"$voteid\" type=radio name=\"s{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\">";
+                    }
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra, $vote, $voteid);
                 }
             }
             elseif($this->page->getStatus() == 'ended')
@@ -128,17 +155,6 @@ class SurveyBody
         global $vgSmsChoiceLen;
         return substr($phone, 0, -$vgSmsChoiceLen)
                 . '<font color=red>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
-    }
-    /**
-     *
-     * @param $choice String value of choice
-     * @param $image String path to image used as bullet
-     * @param $addtext String Put Extra HTML after this choice
-     * @return String HTML code
-     */
-    static private function getChoiceHTML($choice, $image, $addtext='')
-    {
-        return "<li STYLE=\"list-style-image: url(".$image.")\"> <label>$choice</label> $addtext</li>";
     }
     /**
      * Parse text with wiki code

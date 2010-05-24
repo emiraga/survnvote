@@ -92,13 +92,13 @@ class SurveyView
             $this->wikititle = Title::newFromText($wgRequest->getVal('returnto'));
         else
             $this->wikititle = $wgTitle;
-        
+
         if(! $this->wikititle)
             throw new Exception('SurveyView::__construct no page title, wgTitle is unavailable');
 
         if($this->wikititle->isSpecial('ViewSurvey'))
             $this->wikititle = Title::newMainPage();
-        
+
         if($this->page->getStatus() != 'ended' )
             $this->parser->disableCache(); // for active and ready type of surveys
 
@@ -120,6 +120,18 @@ class SurveyView
             default:
                 throw new Exception('Unknown survey type');
         }
+        //enable web voting?
+        if($this->page->getStatus() == 'active' && $this->page->getWebVoting() != 'no')
+        {
+            if( $wgUser->isLoggedIn() || $this->page->getWebVoting() == 'anon' )
+            {
+                $this->buttons->setVoteButton(true);
+                $this->body->setShowVoting(true);
+            }
+        }
+        //control?.
+        if($this->username == $this->page->getAuthor())
+            $this->buttons->setHasControl(true);
     }
     /**
      * Get HTML of survey

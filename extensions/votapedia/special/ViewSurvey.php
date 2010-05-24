@@ -53,8 +53,8 @@ class ViewSurvey extends SpecialPage {
                         $text .= "* Phone voting: {$tag->getPage()->getPhoneVoting()}\n";
                         $text .= "* Web voting: {$tag->getPage()->getWebVoting()}\n";
 			$text .= "== Inclusion ==\n";
-			$text .= "* Use following text to include this survey into a wiki page:\n";
-			$text .= " <code><nowiki>{{#Survey:$page_id}}</nowiki></code>\n";
+			$text .= "* Use following text to include this {$tag->getPage()->getTypeName()} into a wiki page:\n";
+			$text .= " <code><nowiki>{{#{$tag->getPage()->getTypeName()}:$page_id}}</nowiki></code>\n";
 			$text .= "\n== ".wfMsg('page-links')." ==\n";
 			$text .= wfMsg('pages-include')."\n";
 			$pages = vfAdapter()->getSubCategories( wfMsg('cat-survey-name', $page_id) );

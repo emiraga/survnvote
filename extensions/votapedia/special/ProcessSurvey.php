@@ -30,11 +30,6 @@ class ProcessSurvey extends SpecialPage
     {
         global $wgUser, $wgTitle, $wgOut, $wgRequest;
         $wgOut->setArticleFlag(false);
-        if ( $wgUser->isAnon() )
-        {
-            $wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
-            return;
-        }
         $page_id = intval(trim($wgRequest->getVal('id')));
         $action = $wgRequest->getVal( 'wpSubmit' );
 
@@ -46,28 +41,30 @@ class ProcessSurvey extends SpecialPage
         {
             $surveydao = new SurveyDAO();
             $page = $surveydao->findByPageID($page_id);
-            if( !$page->getAuthor() == $wgUser->getName() )
-            {
-                $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
-            }
             if($action == wfMsg('start-survey'))
             {
+                if( $page->getAuthor() != $wgUser->getName() )
+                    $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+
                 if($page->getStatus() != 'ready')
                     throw new SurveyException('Survey is either running or finished and cannot be started');
 
-                $tel = new Telephone();
-                try
+                if($page->getPhoneVoting() != 'no')
                 {
-                    //Setup receivers
-                    $tel->setupReceivers($page);
-                    $surveydao->updateReceiversSMS($page);
-                    $surveydao->startSurvey($page);
-                }
-                catch(Exception $e)
-                {
-                    // in case of an error
-                    $tel->deleteReceivers($page);
-                    throw $e; //continue throwing
+                    $tel = new Telephone();
+                    try
+                    {
+                        //Setup receivers
+                        $tel->setupReceivers($page);
+                        $surveydao->updateReceiversSMS($page);
+                        $surveydao->startSurvey($page);
+                    }
+                    catch(Exception $e)
+                    {
+                        // in case of an error
+                        $tel->deleteReceivers($page);
+                        throw $e; //continue throwing
+                    }
                 }
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));

@@ -119,3 +119,13 @@ class MwParser
             $this->parser->disableCache();
         }
 }
+
+class MwUser
+{
+
+    function  __construct()
+    {
+
+    }
+    
+}

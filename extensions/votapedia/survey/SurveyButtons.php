@@ -11,6 +11,8 @@ class SurveyButtons
     /** @var Title */  protected $cresurv;
     /** @var Title */  protected $viewsurv;
     /** @var Boolean */protected $show_details = true;
+    /** @var Boolean */protected $show_vote = false;
+    /** @var Boolean */protected $has_control = false;
 
     public function __construct()
     {
@@ -31,13 +33,20 @@ class SurveyButtons
     {
         $this->wikititle = $title;
     }
-    function setDetailsButton($details)
+    function setDetailsButton($show)
     {
-        $this->show_details = $details;
+        $this->show_details = $show;
     }
-    /*
+    function setVoteButton($show)
+    {
+        $this->show_vote = $show;
+    }
+    function setHasControl($control)
+    {
+        $this->has_control = $control;
+    }    /*
      * @return HTML code of buttons
-     */
+    */
     function getHTML($show_details = false)
     {
         $divname = "btnsSurvey{$this->page_id}-".rand();
@@ -45,21 +54,31 @@ class SurveyButtons
         global $wgUser;
 
         //Edit button
-        if($this->page_status == 'ready')
+        if($this->has_control && $this->page_status == 'ready' )
         {
             $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-survey').'">';
         }
 
-        if($this->show_details)
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
-
-        if($this->page_status == 'ready')
+        if($this->show_vote)
         {
-            $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />';
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-survey').'">';
         }
-        elseif($this->page_status == 'active')
+
+        if($this->show_details)
         {
-            $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-survey').'" />';
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
+        }
+
+        if($this->has_control)
+        {
+            if($this->page_status == 'ready')
+            {
+                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />';
+            }
+            elseif($this->page_status == 'active')
+            {
+                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-survey').'" onClick="return confirm(\'Are you sure you want to stop this survey? This operation cannot be undone.\')" />';
+            }
         }
         $output .= '</div>';
         return $output;
