@@ -1,6 +1,9 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
+not-used();
+unused_codeee();
+
 /**
  * This page includes classes which are used to access objects of Survey.
  *
@@ -54,7 +57,6 @@ class Usr
         }
         $mobile = vfUser()->getOption('mobilephone');
         if(strlen($mobile) > 6) //@todo check validity of mobile number
-
         {
             return $mobile;
         }
@@ -72,11 +74,10 @@ class Usr
      */
     public function vote($type, $surveyID, $choiceID, $presentationID = 0, $callsmsid = NULL)
     {
-        $finalSql = array();
         $username = $this->getUsername();
-        $voteaccess = new VoteDAO();
+        $votedao = new VoteDAO();
 
-        $vote = $voteaccess->newFromCurrentSurvey($type, $username, $surveyID, $choiceID, $presentationID);
+        $vote = $votedao->newFromCurrentSurvey($type, $username, $surveyID, $choiceID, $presentationID);
 
         //Check whether have a user associated with the mobile phone
         //If it is, then use his mobilephone as voterID
@@ -88,7 +89,7 @@ class Usr
                 $vote->voterID = $mobile;
             }
         }
-        $voteaccess->processVote($vote, $callsmsid);
+        $votedao->processVote($vote, $callsmsid);
         return true;
     }
 }
