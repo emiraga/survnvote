@@ -46,7 +46,7 @@ class SurveyBody
         return $output.'</div>';
     }
     /**
-     * 
+     *
      * @global $wgOut OutputPage
      * @return String html code
      */
@@ -62,7 +62,7 @@ class SurveyBody
 
             if($this->type != vSIMPLE_SURVEY)
             {
-                $output .= '<h5>'. wfMsg( 'survey-question', $survey->getQuestion() ) .'</h5>';
+                $output .= 'A <h5>'. wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ) ).'</h5>';
             }
 
             $output.='<ul>';
@@ -85,9 +85,9 @@ class SurveyBody
                     if($this->page->getPhoneVoting() != 'no')
                     {
                         $extra='<span style="background-color: #E9F3FE; float: right; margin-right: 400px;">'
-                        .'<font color="#AAAAAA">Number:</font> '
-                        .$this->colorizePhone( $choice->getReceiver() )
-                        .'</span>';
+                                .'<font color="#AAAAAA">Number:</font> '
+                                .$this->colorizePhone( $choice->getReceiver() )
+                                .'</span>';
                     }
                     $vote = '';
                     $voteid = '';
@@ -121,7 +121,7 @@ class SurveyBody
             }
             $output.='</ul>';
         } // foreach Survey
-        
+
         //Display how much time has left
         if($this->page->getStatus() == 'active')
         {
@@ -177,15 +177,21 @@ class SurveyBody
     /**
      * Parse multiline wiki code
      *
-     * @param $text string multiline string
+     * @param $title String title of question
+     * @param $text String multiline string
+     *
      * @return String HTML code
      */
-    static function getChoices($text)
+    static function getChoices($text, $title='')
     {
         global $wgParser;
         $p = new MwParser($wgParser);
         $lines = split("\n",$text);
         $output = '';
+        if($title)
+        {
+            $output .= $p->run($title, true);
+        }
         $output .= '<ul  style="margin: 0.2em;">';
         foreach($lines as $line)
         {

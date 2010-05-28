@@ -61,10 +61,10 @@ class CreateSurvey
                         },
                         'explanation' => 'e.g. "What is the capital of '.$vgCountry.'?". This will be the title of your survey page.',
                         'learn_more' => 'Details of Title or Survey Question',
-                        'process' => function($v)
+                        /*'process' => function($v)
                         {
                             return FormControl::RemoveSpecialChars($v);
-                        },
+                        },*/
                 ),
                 'choices' => array(
                         'type' => 'textarea',
@@ -75,9 +75,9 @@ class CreateSurvey
                             if($js) return "";
                             return strlen($v) > 1;
                         },
-                        'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).'.',
+                        'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).' &amp;lt; &amp;gt;',
                         'learn_more' => 'Details of Editing Surveys',
-                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 20px; font-size: large;\\"></div>");</script>',
+                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 20px; font-size: large;\\"></div>");</script>',
                 ),
                 'category' => array(
                         'type' => 'select',
@@ -332,6 +332,7 @@ class CreateSurvey
         if(strlen($values[category]) > 5)
             $wikiText.="[[".htmlspecialchars($values[category])."]]\n";
 
+        $wikititle = FormControl::RemoveSpecialChars($wikititle);
         $this->insertWikiPage($wikititle, $wikiText, true);
 
         //Add an appropriate hidden category, don't show in recent changes
@@ -348,6 +349,7 @@ class CreateSurvey
      */
     function insertWikiPage($newtitle, $wikiText, $resolveDuplicates = false)
     {
+        echo "insertWikiPage: $newtitle<br>";
         if($resolveDuplicates)
         {
             $i = 1;
@@ -510,10 +512,8 @@ class CreateSurvey
                 $wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
                 return;
             }
-
-            //Purge all pages that have this survey included.
-            vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-
+            //It is no longer neede to purge all pages that have this survey included.
+            //vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
             $title = Title::newFromText($this->returnTo);
             $wgOut->redirect($title->escapeLocalURL(), 302);
             return;
@@ -620,7 +620,7 @@ class CreateSurvey
         $wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
         $wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 
-        $this->form->AddPage ( 'Edit Questionnaire', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
+        $this->form->AddPage ( 'Edit Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
         $this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
         $this->form->AddPage ( 'Graph settings', array('showresultsend', 'showtop') );
         $this->form->EndForm(wfMsg('edit-survey'));

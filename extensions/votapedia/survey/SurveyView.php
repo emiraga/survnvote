@@ -140,9 +140,7 @@ class SurveyView
         $output = '';
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
-
-        $output.= '<h2>'.wfMsg('survey-caption', htmlspecialchars($this->page->getTitle())).'</h2>';
-
+        $output.= '<h2>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</h2>';
         //$output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'

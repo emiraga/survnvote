@@ -31,6 +31,7 @@ class MwAdapter
 
         //$article = new Article( Title::newFromText($title) );
         //$article->doPurge(); // Directly purge and skip the UI part of purge().
+        debug_print_backtrace();
         does_not_work_an();
         sdfsd();
     }
@@ -91,7 +92,7 @@ class MwParser
     /** @var Boolean */ private $isTag;
 
     /**
-     * @param  $parser Parser
+     * @param $parser Parser
      * @param $options ParserOptions
      * @param $title Title
      */
@@ -111,7 +112,7 @@ class MwParser
     }
     /**
      * Parse the wiki text while removing untrusted tags from the code
-     *
+     * 
      * @param $text String
      */
     public function run($text, $linestart = false)
@@ -197,6 +198,7 @@ class MwUser
     }
     /**
      * Is provided edit token valid?
+     * 
      * @return Boolean is edit token valid
      */
     function checkEditToken()
@@ -235,6 +237,7 @@ class MwUser
     }
     /**
      * Is this user author of PageVO
+     *
      * @return Boolean
      */
     private function isAuthor(&$page)
@@ -253,6 +256,8 @@ class MwUser
     }
     /**
      * Can current user control survey?
+     *
+     * @return Boolean
      */
     function canControlSurvey(&$page)
     {

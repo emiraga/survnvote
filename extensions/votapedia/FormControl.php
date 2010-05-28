@@ -152,7 +152,7 @@ class FormControl
             else
                 $value = '';
 
-            $value = htmlspecialchars($value);
+            //$value = htmlspecialchars($value);
             if($item['type'] == 'input')
             {
                 if(!isset($item['width']))
@@ -177,7 +177,7 @@ class FormControl
             {
                 $value = str_replace("\r", "\n", $value);
                 $value = str_replace("\n\n", "\r", $value);
-                $value = htmlspecialchars_decode($value);
+                //$value = htmlspecialchars_decode($value);
                 $form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
             }
             elseif($item['type'] == 'null')
@@ -280,7 +280,7 @@ class FormControl
         require_once("$vgPath/MwAdapter.php");
         
         global $wgOut;
-        $token = htmlspecialchars( vfUser()->editToken() );
+        $token = vfUser()->editToken();
         $wgOut->addHTML( "
 	<table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
 		<td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onClick='{$this->onFormSubmit}' />
@@ -299,6 +299,9 @@ class FormControl
      */
     public static function RemoveSpecialChars($str)
     {
+        $str = str_replace("<math>", " ", $str);
+        $str = str_replace("</math>", " ", $str);
+
         $invalidChars  = array('<','>','|','/');
         return trim(str_replace($invalidChars, " ", $str));
     }
