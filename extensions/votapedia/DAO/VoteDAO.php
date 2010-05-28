@@ -70,7 +70,7 @@ class VoteDAO
         }
         */
         // Check whether voted before
-        $sql ="select * from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
+        $sql ="select * from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
         $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )

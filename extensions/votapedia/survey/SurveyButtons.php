@@ -63,11 +63,6 @@ class SurveyButtons
             $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-survey').'">';
         }
 
-        if($this->show_details)
-        {
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
-        }
-
         if($this->has_control)
         {
             if($this->page_status == 'ready')
@@ -79,7 +74,13 @@ class SurveyButtons
                 $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-survey').'" onClick="return confirm(\'Are you sure you want to stop this survey? This operation cannot be undone.\')" />';
             }
         }
-        $output .= '</div>';
+        //$output.= '<div style="float: right;">';
+        if($this->show_details)
+        {
+            $output .='&nbsp;&nbsp;&nbsp;<input type="submit" name="wpSubmit" value="'.wfMsg('view-details').'">';
+        }
+        //$output .='</div>';
+        $output .='</div>';
         return $output;
     }
 }

@@ -32,9 +32,9 @@ class SurveyBody
      * @param $addtext String Put Extra HTML after this choice
      * @return String HTML code
      */
-    static private function getChoiceHTML($choice, $image, $addtext='', $vote='', $voteid='')
+    static private function getChoiceHTML($choice, $image, $addtext='', $vote='', $voteid='', $style='')
     {
-        $output = $addtext."<div  style=\"display: block; width: 200px;\">";
+        $output = "<div style=''>".$addtext."<div  style=\"display: block; width: 200px;$style\">";
 
         if($vote)
             $output .= "<li STYLE=\"list-style: none;\">$vote ";
@@ -43,7 +43,7 @@ class SurveyBody
 
         $output .= "<label for=\"$voteid\">$choice</label> </li>";
 
-        return $output.'</div>';
+        return $output.'</div>'.'</div>';
     }
     /**
      *
@@ -77,6 +77,9 @@ class SurveyBody
             }
             elseif($this->page->getStatus() == 'active')
             {
+                global $vgDB, $vgDBPrefix;
+                $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
+                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->getName(), $survey->getSurveyID(), 0 ));
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
@@ -91,12 +94,23 @@ class SurveyBody
                     }
                     $vote = '';
                     $voteid = '';
+                    if($prev_vote == $choice->getChoiceID())
+                    {
+                        $style = "border:1px dashed gray; background-color:#F5F5F5;";
+                        $checked = ' checked';
+                    }
+                    else
+                    {
+                        $style = '';
+                        $checked = '';
+                    }
+
                     if($this->show_voting)
                     {
                         $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
-                        $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" />";
+                        $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" $checked/>";
                     }
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra, $vote, $voteid);
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra, $vote, $voteid, $style);
                 }
                 $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
             }
@@ -211,7 +225,8 @@ class SurveyBody
  * Body of a questionnaire
  *
  */
-class QuestionnaireBody extends SurveyBody
+class
+QuestionnaireBody extends SurveyBody
 {
     /**
      *
