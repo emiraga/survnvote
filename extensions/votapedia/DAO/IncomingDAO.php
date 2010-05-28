@@ -1,4 +1,7 @@
 <?php
+unusedsdfklsdf();
+notuse();
+
 if (!defined('MEDIAWIKI')) die();
 
 /**

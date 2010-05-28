@@ -7,7 +7,6 @@ if (!defined('MEDIAWIKI')) die();
 
 global $vgPath;
 require_once("$vgPath/VO/VoteVO.php");
-require_once("$vgPath/DAO/IncomingDAO.php");
 
 /**
  * Class for managing votes in database
@@ -55,10 +54,8 @@ class VoteDAO
      * @param $incoming IncomingDAO object related to CALL or SMS
      * @return true on success
      */
-    function vote(VoteVO &$vote, IncomingDAO &$incoming)
+    function vote(VoteVO &$vote)
     {
-        assert($vote->getVoteType() == $incoming->getType());
-        
         global $vgDB, $vgDBPrefix;
         $vgDB->StartTrans();
 
@@ -84,8 +81,6 @@ class VoteDAO
                     array($vote->getSurveyID(), $vote->getChoiceID()));
             $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote-1 where surveyID = ? and choiceID = ?",
                     array($vote->getSurveyID(), $choiceIDbyOldVote));
-            
-            $incoming->updateError(4); //Repeated voting
         }
         else
         {

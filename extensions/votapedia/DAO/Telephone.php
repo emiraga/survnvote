@@ -247,9 +247,11 @@ class Telephone
     {
         global $vgDB, $vgDBPrefix;
         $receivers = array();
+        $surveysid = array();
         $surveys = &$page->getSurveys();
         foreach($surveys as &$survey)
         {
+            /* @var $survey SurveyVO  */
             $surveyChoices =& $survey->getChoices();
             foreach($surveyChoices as &$surveyChoice)
             {
@@ -258,10 +260,14 @@ class Telephone
                 $surveyChoice->setReceiver(NULL);
                 $surveyChoice->setSMS(NULL);
             }
+            $surveysid[] = array($survey->getSurveyID());
         }
         $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}usedreceivers WHERE receiver=?", $receivers);
         if(! $success)
             throw new SurveyException("Failed to delete used receivers");
+        $success = $vgDB->Execute("UPDATE {$vgDBPrefix}surveychoice SET finished = 1 WHERE surveyID = ?", $surveysid );
+        if(! $success)
+            throw new SurveyException("Could not mark surveychoice as finished");
         return true;
     }
 }

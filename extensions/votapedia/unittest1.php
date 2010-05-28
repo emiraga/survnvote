@@ -1,13 +1,11 @@
 <?php
 	$IP = '/xampp/htdocs/new';
-	define('MEDIAWIKI', true);
 	define('VOTAPEDIA_TEST', true);
 	
 	ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 	
 	require_once("./votapedia.php");
-	global $vgDBName;
-	
+        
 	$vgDBName = "unittest_setup";
 	$vgDBUserName       = 'root';
 	$vgDBUserPassword   = '';

@@ -1,5 +1,5 @@
 <?php
-if (!defined('MEDIAWIKI')) die();
+if (!defined('MEDIAWIKI') && !defined('VOTAPEDIA_DAEMON')) die();
 
 // Votapedia database connection
 $vgDBserver         = $wgDBserver;
