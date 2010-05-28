@@ -38,7 +38,7 @@ class PageVO
     function __construct()
     {
         $this->endTime = $this->renewEndTime();
-        $this->setCreateTime(date("Y-m-d H:i:s"));
+        $this->setCreateTime(vfDate());
     }
     /**
      * Set an ID of this survey
@@ -420,7 +420,7 @@ class PageVO
             if ($survey->getSurveyID()== $id)
                 return $survey;
         }
-        return null;
+        throw new Exception("No such survey by ID");
     }
     /**
      * Validate whether matchs the requried data format
@@ -468,7 +468,7 @@ class PageVO
         if($start == false || $start == -1)
             return $this->startTime;
         else
-            return date("Y-m-d H:i:s",$start + $this->duration*60);
+            return vfDate($start + $this->duration*60);
     }
 }
 ?>

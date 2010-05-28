@@ -250,15 +250,35 @@ class SurveyDAO
     }
     /**
      * Get a survey(SurveyVO) by surveyID
+     * 
      * @param $id an ID which want to be retreived
      * @return SurveyVO $survey a survey which matches ID
-     * @version 2.0
      */
     function findSurveyByID($id)
     {
-        $surveys = getSurveysSQL("select * from {$vgDBPrefix}survey where surveyID = ?", array($surveyID));
+        $surveys = $this->getSurveysSQL("select * from {$vgDBPrefix}survey where surveyID = ?", array($surveyID));
         if(count($surveys) == 0)
             throw new SurveyException("Survey not found", 400);
+        return $surveys[0];
+    }
+    /**
+     *
+     * @param $surveyid
+     * @param $presentationid
+     * @return SurveyVO
+     */
+    function getActiveSurveyById($surveyid, $presentationid = 0)
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $sql = "select * from {$vgDBPrefix}survey join {$vgDBPrefix}page "
+        ."on {$vgDBPrefix}survey.pageID = {$vgDBPrefix}page.pageID "
+        ."where {$vgDBPrefix}survey.surveyID = ? and "
+        ."{$vgDBPrefix}page.startTime <= '$now' and {$vgDBPrefix}page.endTime <= '$now'";
+
+        $surveys = $this->getSurveysSQL($sql, array($surveyID));
+        if(count($surveys) == 0)
+            throw new SurveyException("Active survey not found", 400);
         return $surveys[0];
     }
     /**
@@ -270,7 +290,8 @@ class SurveyDAO
     {
         global $vgDB, $vgDBPrefix;
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
-        $sql = "select pageID from {$vgDBPrefix}page where starttime <= now() and endtime >= now() and surveytype = 1 order by starttime desc";
+        $now = vfDate();
+        $sql = "select pageID from {$vgDBPrefix}page where starttime <= '$now' and endtime >= '$now' and surveytype = 1 order by starttime desc";
         $param = array();
         if($num)
         {
@@ -632,7 +653,7 @@ class SurveyDAO
     function startSurvey(PageVO &$pageVO)
     {
         global $vgDB, $vgDBPrefix;
-        $startDate = date("Y-m-d H:i:s");
+        $startDate = vfDate();
         $pageVO->setStartTime($startDate);
 
         $sql = "update {$vgDBPrefix}page set starttime = ?, endtime = ? where pageID = ?";
@@ -652,7 +673,7 @@ class SurveyDAO
         global $vgDB, $vgDBPrefix; //@todo perhaps reduce the duration
         $duration= $pageVO->getDuration();
         $endTime=time()+$duration*60;
-        $endDate = date("Y-m-d H:i:s",$endTime);
+        $endDate = vfDate($endTime);
         $pageVO->setEndTime($endDate);
 
         $sql = "update {$vgDBPrefix}page set endtime = ? where pageID = ?";
@@ -670,7 +691,7 @@ class SurveyDAO
     function finishSurvey(PageVO $pageVO)
     {
         global $vgDB, $vgDBPrefix;
-        $expiredDate = date("Y-m-d H:i:s");
+        $expiredDate = vfDate();
         $sqlChoice = "update {$vgDBPrefix}page set endtime = ? where pageID = ?";
         $vgDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
         return true;
@@ -679,23 +700,20 @@ class SurveyDAO
      * Request telephone numbers .
      * It requires the starting time of survey is set up before request.
      * which represents the duration which the receivers are used is same with duration of survey
-     * Basically, the following stages are used:
-     * $surveyVO->setStartTime(now());
-     * $surveyDAO->requestReceivers($surveyVO);
      *
      * @param $page PageVO
      */
     public function requestReceivers(PageVO &$page)
     {
         $this->releaseReceivers(); //try to delete unused receivers if any
-        
+
         $telephone = new Telephone();
         return $telephone->setupReceivers($page);
     }
     /**
      * Update database and set new receivers and SMS from the PageVo object
-     * 
-     * @param PageVO $page 
+     *
+     * @param PageVO $page
      */
     public function updateReceiversSMS(PageVO &$page)
     {
@@ -727,9 +745,9 @@ class SurveyDAO
     public function releaseReceivers()
     {
         $telephone = new Telephone();
-        
+
         global $vgDB, $vgDBPrefix;
-        $now = date("Y-m-d H:i:s");
+        $now = vfDate();
         $pages = $this->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
 
         $ret = array();

@@ -2,7 +2,7 @@
 /**
  * Interface to MediaWiki classes. It consists of Adapter classes
  * which follow adapter design pattern.
- * 
+ *
  * @package Interface
  */
 
@@ -112,7 +112,7 @@ class MwParser
     }
     /**
      * Parse the wiki text while removing untrusted tags from the code
-     * 
+     *
      * @param $text String
      */
     public function run($text, $linestart = false)
@@ -143,7 +143,7 @@ class MwParser
 
 /**
  * Interface to MediaWiki User object.
- * 
+ *
  * Adapter design pattern.
  */
 class MwUser
@@ -152,7 +152,7 @@ class MwUser
 
     /**
      * Construct a MwUser object. Try to get username of anonymous users from cookie.
-     * 
+     *
      * @global $wgUser User
      */
     function  __construct()
@@ -198,7 +198,7 @@ class MwUser
     }
     /**
      * Is provided edit token valid?
-     * 
+     *
      * @return Boolean is edit token valid
      */
     function checkEditToken()
@@ -227,13 +227,24 @@ class MwUser
     }
     /**
      * Is current user anonymous
-     * 
+     *
      * @return Boolean
      */
     function isAnon()
     {
         global $wgUser;
         return $wgUser->isAnon();
+    }
+    /**
+     * Get user preferences and options
+     *
+     * @param $option String option name
+     * @return <type>
+     */
+    function getOption($option)
+    {
+        global $wgUser;
+        return $wgUser->getOption($wgUser);
     }
     /**
      * Is this user author of PageVO
@@ -246,7 +257,7 @@ class MwUser
     }
     /**
      * Can current user create surveys?
-     * 
+     *
      * @return Boolean
      */
     function canCreateSurveys()
@@ -275,5 +286,23 @@ class MwUser
         if(intval($num) > 0 && User::isIP($ip))
             return $ip;
         return $author;
+    }
+    /**
+     * Get mobile phone from wikidb
+     * Asumes that current logged user is the user doing the voting
+     *
+     * @return a string representing mobile phone of a user, or false if it does not exist
+     */
+    function getUserMobileNumber()
+    {
+        if($this->isAnon())
+            throw new SurveyException("Not logged in", 400);
+        
+        $mobile = $this->getOption('mobilephone');
+        if(strlen($mobile) > 6) //@todo check validity of mobile number
+        {
+            return $mobile;
+        }
+        return false;
     }
 }

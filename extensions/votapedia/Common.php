@@ -10,7 +10,18 @@ define('vTEXT_RESPONSE',   5);
 define('vPRIVACY_LOW',    1);
 define('vPRIVACY_MEDIUM', 2);
 define('vPRIVACY_HIGH',   3);
-
+/**
+ * Return a current datetime formated in particular way.
+ * 
+ * @return String
+ */
+function vfDate($date = NULL)
+{
+    if($date)
+        return date("Y-m-d H:i:s", $date);
+    else
+        return date("Y-m-d H:i:s");
+}
 /**
  * Convert page title into a friendly form, shorter and trimmed
  *

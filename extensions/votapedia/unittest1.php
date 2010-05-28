@@ -254,7 +254,7 @@
 		assert( ! $sr->getChoiceID() );
 		assert( $sr->getPresentationID() == 1 );
 		assert( ! $sr->getSurveyID()  );
-		assert( strlen($sr->getVoteDate())>10 ); // date("Y-m-d H:i:s")
+		assert( strlen($sr->getVoteDate())>10 ); // vfDate()
 		assert( ! $sr->getVoteType() );
 		assert( ! $sr->getVoterID() );
 		
@@ -350,7 +350,7 @@
 		
 		$p = new PageVO();
 		$p->setTitle('Question 1');
-		$p->setStartTime(date("Y-m-d H:i:s"));
+		$p->setStartTime(vfDate());
 		if(true)
 		{
 			$s1 = new SurveyVO();

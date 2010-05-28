@@ -94,10 +94,11 @@ class SurveyBody
                     if($this->show_voting)
                     {
                         $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
-                        $vote = "<input id=\"$voteid\" type=radio name=\"s{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\">";
+                        $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" />";
                     }
                     $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra, $vote, $voteid);
                 }
+                $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
             }
             elseif($this->page->getStatus() == 'ended')
             {

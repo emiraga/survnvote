@@ -24,7 +24,7 @@ class SurveyRecordVO
 	 */
 	public function __construct()
 	{
-		$this->voteDate = date("Y-m-d H:i:s");
+		$this->voteDate = vfDate();
 	}
 	/**
 	 * Set SurveyID

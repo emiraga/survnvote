@@ -13,7 +13,7 @@ class VoteVO
 {
 	private $surveyID;
 	private $choiceID;
-	private $presentationID = 1;
+	private $presentationID = 0;
 	private $voterID;
 	private $voteDate;
 	private $voteType;

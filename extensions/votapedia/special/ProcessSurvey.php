@@ -3,8 +3,8 @@ if (!defined('MEDIAWIKI')) die();
 
 global $vgPath;
 require_once("$vgPath/MwAdapter.php");
-require_once("$vgPath/VO/PageVO.php");
 require_once("$vgPath/DAO/SurveyDAO.php");
+require_once("$vgPath/DAO/VoteDAO.php");
 
 /**
  * Special page Create Survey
@@ -29,6 +29,7 @@ class ProcessSurvey extends SpecialPage
      */
     function execute( $par = null )
     {
+        /* @var $wgRequest WebRequest */
         global $wgTitle, $wgOut, $wgRequest;
         $wgOut->setArticleFlag(false);
         $page_id = intval(trim($wgRequest->getVal('id')));
@@ -88,6 +89,30 @@ class ProcessSurvey extends SpecialPage
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 $title = Title::newFromText('Special:ViewSurvey');
                 $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}", 302);
+            }
+            elseif ($action == wfMsg('vote-survey'))
+            {
+                $votedao = new VoteDAO($page, vfUser()->getName());
+                $webvote = new WebvoteDAO();
+
+                if($page->getWebVoting() == 'no')
+                        throw new Exception("Web voting is not allowed");
+                if($page->getWebVoting() == 'yes' && vfUser()->isAnon())
+                        throw new Exception("You must be logged in order to vote.");
+
+                $s = $wgRequest->getArray('surveylist', array());
+                foreach($s as $surveyid)
+                {
+                    $choiceid = intval($wgRequest->getVal('survey'.$surveyid));
+                    if( $choiceid )
+                    {
+                        $votevo = $votedao->newFromPage('WEB', vfUser()->getName(), $surveyid, $choiceid );
+                        $votedao->vote($votevo, $webvote);
+                    }
+                }
+                $title = Title::newFromText($wgRequest->getVal('returnto'));
+                $wgOut->redirect($title->escapeLocalURL(), 302);
+                return;
             }
         }
         catch(Exception $e)
