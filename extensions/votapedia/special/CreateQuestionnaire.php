@@ -36,6 +36,8 @@ class CreateQuestionnaire extends CreateSurvey
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire page.';
         $this->formitems['choices']['type'] = 'html';
         $this->formitems['choices']['code'] = '<script>writeHTML()</script>';
+        $this->formitems['choices']['name'] = 'Questions';
+
         $this->formitems['choices']['valid'] = function($v,$i,$js)
                 {
                     if($js) return "";

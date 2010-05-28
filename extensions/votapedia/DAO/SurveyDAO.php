@@ -687,9 +687,16 @@ class SurveyDAO
      */
     public function requestReceivers(PageVO &$page)
     {
+        $this->releaseReceivers(); //try to delete unused receivers if any
+        
         $telephone = new Telephone();
         return $telephone->setupReceivers($page);
     }
+    /**
+     * Update database and set new receivers and SMS from the PageVo object
+     * 
+     * @param PageVO $page 
+     */
     public function updateReceiversSMS(PageVO &$page)
     {
         global $vgDB, $vgDBPrefix;
@@ -712,27 +719,25 @@ class SurveyDAO
         }
     }
     /**
-     * Find and mark as stopped pages (surveys) which have expired.
+     * Release receivers which have not been released this far.
+     * Find and mark as receivers pages (surveys) which have expired.
      *
-     * @return Array array of integers specifying pageID of pages which
-     * have been finalized
-     * @deprecated
+     * @return Array array of integers specifying pageID of pages which have been finalized
      */
-    public function processFinished()
+    public function releaseReceivers()
     {
-        die('@deprecated');
+        $telephone = new Telephone();
         
         global $vgDB, $vgDBPrefix;
         $now = date("Y-m-d H:i:s");
-        $pages = $this->getPages("WHERE endTime <= ? and finished = 0", array($now));
+        $pages = $this->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
 
-        $telephone = new Telephone();
         $ret = array();
         foreach ($pages as $page)
         {
             /* @var $page PageVO */
             $telephone->deleteReceivers($page);
-            $vgDB->Execute("UPDATE {$vgDBPrefix}page SET finished = 1 WHERE pageID = ?", array($page->getPageID()));
+            $vgDB->Execute("UPDATE {$vgDBPrefix}page SET receivers_released = 1 WHERE pageID = ?", array($page->getPageID()));
             $ret[] = $page->getPageID();
         }
         return $ret;

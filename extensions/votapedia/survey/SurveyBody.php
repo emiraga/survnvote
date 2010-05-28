@@ -62,7 +62,7 @@ class SurveyBody
 
             if($this->type != vSIMPLE_SURVEY)
             {
-                $output .= 'A <h5>'. wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ) ).'</h5>';
+                $output .= '<h5>'. wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ) ).'</h5>';
             }
 
             $output.='<ul>';
