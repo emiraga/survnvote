@@ -227,16 +227,32 @@ class WaveLover2Template extends QuickTemplate {
 			<div id="footer">
 <?php
 		if($this->data['poweredbyico']) { ?>
-				<div id="f-poweredbyico"><?php $this->html('poweredbyico') ?></div>
-<?php 	}
+				<div id="f-poweredbyico2"><?php 
+				
+				$this->html('poweredbyico');  
+				
+				global $wgScriptPath;
+				echo '&nbsp;&nbsp;<a title="International Islamic University Malaysia" href="http://www.iiu.edu.my/"><img src="'.$wgScriptPath.'/skins/wavelover2/iium_mini.jpg" /></a>';
+				echo '&nbsp;&nbsp;<a title="Intelligent Environment Group" href="http://kict.iiu.edu.my/integ/index.html"><img src="'.$wgScriptPath.'/skins/wavelover2/integ_mini.jpg" /></a>';
+				
+				?></div>
+<?php 	} 
+		
 		if($this->data['copyrightico']) { ?>
 				<div id="f-copyrightico"><?php $this->html('copyrightico') ?></div>
 <?php	}
 
 		// Generate additional footer links
 		$footerlinks = array(
-			'lastmod', 'viewcount', 'numberofwatchingusers', 'credits', 'copyright',
-			'privacy', 'about', 'disclaimer', 'tagline',
+			//'lastmod',
+			//'viewcount', 
+			//'numberofwatchingusers', 
+			//'credits', 
+			//'copyright',
+			//'privacy', 
+			//'about', 
+			//'disclaimer', 
+			//'tagline',
 		);
 		$validFooterLinks = array();
 		foreach( $footerlinks as $aLink ) {

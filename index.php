@@ -1,4 +1,12 @@
 <?php
+if($_SERVER["HTTP_HOST"] != "www.votapedia.net")
+{
+	if(strlen($_SERVER['REQUEST_URI']) > 3)
+		header("Location: http://www.votapedia.net$_SERVER[REQUEST_URI]",true,301);
+	else
+		header("Location: http://www.votapedia.net/wiki/Main_Page",true,301);
+	die('');
+}
 
 /**
  * This is the main web entry point for MediaWiki.

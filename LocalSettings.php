@@ -26,7 +26,7 @@ if ( $wgCommandLineMode ) {
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
 
-$wgSitename         = "Votapedia 2.0";
+$wgSitename         = "Votapedia.net";
 $wgServer           = "http://www.votapedia.net";
 
 ## The URL base path to the directory containing the wiki;
