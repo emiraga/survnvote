@@ -211,13 +211,13 @@ class WaveLover2Template extends QuickTemplate {
 		if ( !isset( $sidebar['LANGUAGES'] ) ) $sidebar['LANGUAGES'] = true;
 		foreach ($sidebar as $boxName => $cont) {
 			if ( $boxName == 'SEARCH' ) {
-				$this->searchBox();
+				//$this->searchBox();
 			} elseif ( $boxName == 'TOOLBOX' ) {
-				$this->toolbox();
+				//$this->toolbox();
 			} elseif ( $boxName == 'LANGUAGES' ) {
-				$this->languageBox();
+				//$this->languageBox();
 			} else {
-				$this->customBox( $boxName, $cont );
+				//$this->customBox( $boxName, $cont );
 			}
 		}
 ?>
@@ -227,7 +227,7 @@ class WaveLover2Template extends QuickTemplate {
 			<div id="footer">
 <?php
 		if($this->data['poweredbyico']) { ?>
-				<div id="f-poweredbyico2"><?php 
+				<div id="f-poweredbyico"><?php 
 				
 				$this->html('poweredbyico');  
 				
@@ -250,7 +250,7 @@ class WaveLover2Template extends QuickTemplate {
 			//'credits', 
 			//'copyright',
 			//'privacy', 
-			//'about', 
+			'about', 
 			//'disclaimer', 
 			//'tagline',
 		);
@@ -262,13 +262,14 @@ class WaveLover2Template extends QuickTemplate {
 		}
 		if ( count( $validFooterLinks ) > 0 ) {
 ?>			<ul id="f-list">
+				<li style="margin-left: 300px;"></li>
 <?php
 			foreach( $validFooterLinks as $aLink ) {
 				if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
 ?>					<li id="<?php echo$aLink?>"><?php $this->html($aLink) ?></li>
 <?php 			}
 			}
-?>
+?><li> <?php echo "{$this->searchBox_mini()}"; ?>  </li>
 			</ul>
 <?php	}
 ?>
@@ -307,6 +308,17 @@ class WaveLover2Template extends QuickTemplate {
 			</div></form>
 		</div>
 	</div>
+<?php
+	}
+	/*************************************************************************************************/
+	function searchBox_mini() {
+?>
+<form style="display:inline" action="<?php $this->text('wgScript') ?>" id="searchform">
+	<input type='hidden' name="title" value="<?php $this->text('searchtitle') ?>"/>
+	<input id="searchInput2" name="search" type="text"<?php echo $this->skin->tooltipAndAccesskey('search');
+		if( isset( $this->data['search'] ) ) {
+			?> value="<?php $this->text('search') ?>"<?php } ?> />
+	<input type='submit' name="fulltext" class="searchButton2" id="mw-searchButton" value="<?php $this->msg('searchbutton') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-fulltext' ); ?> />
 <?php
 	}
 

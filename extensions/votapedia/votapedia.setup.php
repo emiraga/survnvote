@@ -12,6 +12,13 @@ global $vgDBUserName, $vgDBUserPassword;
 $vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
 $vgDBUserPassword   = '';     // Password for database master user
 
+/**
+ * function vfDoSetup:
+ * 
+ * Perform actions of votapedia setup
+ *
+ * @param $justprint Boolean
+ */
 function vfDoSetup($justprint = false)
 {
     global $vgPath, $vgDB, $vgDBPrefix;

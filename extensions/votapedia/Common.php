@@ -1,4 +1,6 @@
 <?php
+if (!defined('MEDIAWIKI') && !defined('VOTAPEDIA_DAEMON')) die();
+
 /* Types of surveys. */
 define('vSIMPLE_SURVEY',   1);
 define('vQUIZ',            2);

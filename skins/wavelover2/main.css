@@ -943,7 +943,7 @@ li#ca-watch, li#ca-unwatch, li#ca-varlang-0, li#ca-print {
 #footer {
 	/*background-color: white;*/
 	border-top: 1px solid #AAAAAA;
-	margin: 2em 0 0 0;
+	margin: 4em 0 0 0;
 	padding: .4em 0 1.2em 0em;
 	text-align: center;
 	font-size: 90%;
@@ -1573,7 +1573,7 @@ div#mw-search-interwiki-caption {
 /* CSS placed here will be applied to all skins */
 #column-content { margin: 0 0 .6em 0; }
 #content { width:800px; margin-left: auto; margin-right:auto;border: 1px solid #aaa; }
-#p-logo, .generated-sidebar, #p-lang, #p-tb, #p-search { display:none; }
+#p-logo, .generated-sidebar, #p-lang, #p-tb/*, #p-search*/ { display:none; }
 #p-cactions { width:800px; margin-left: auto; margin-right:auto; }
 #ca-page { display:none!important; }
 
