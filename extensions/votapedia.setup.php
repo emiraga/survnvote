@@ -2,7 +2,7 @@
 define('MEDIAWIKI',true);
 define('VOTAPEDIA_SETUP',true);
 
-require_once('../../LocalSettings.php');
+require_once('../LocalSettings.php');
 
 /*
  * Enter user/pass of a admin account for mysql that

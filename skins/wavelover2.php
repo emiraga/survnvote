@@ -260,16 +260,16 @@ class WaveLover2Template extends QuickTemplate {
 				$validFooterLinks[] = $aLink;
 			}
 		}
+		//&& ! $wgRequest->getBool( 'printable' )
 		if ( count( $validFooterLinks ) > 0 ) {
 ?>			<ul id="f-list">
-				<li style="margin-left: 300px;"></li>
 <?php
 			foreach( $validFooterLinks as $aLink ) {
 				if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
 ?>					<li id="<?php echo$aLink?>"><?php $this->html($aLink) ?></li>
 <?php 			}
 			}
-?><li> <?php echo "{$this->searchBox_mini()}"; ?>  </li>
+?><li><?php echo "{$this->searchBox_mini()}"; ?>  </li>
 			</ul>
 <?php	}
 ?>
