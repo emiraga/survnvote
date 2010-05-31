@@ -33,7 +33,7 @@ class MyPhones extends SpecialPage
                 'newnumber' => array(
                         'type' => 'html',
                         'name' => 'Add phone number',
-                        'explanation' => 'Mobile phone number with country prefix, for example: +6019 231 8195.',
+                        'explanation' => 'Mobile phone number with country prefix, for example: +60172318195.',
                         'learn_more' => 'Details of Phone numbers',
                         'code' => "<form action=\"{$this->target}\" method=\"POST\">"
                                 ."<input type=\"input\" name=\"newnumber\">"
@@ -47,7 +47,7 @@ class MyPhones extends SpecialPage
                         'name' => 'NUMBER GOES HERE',
                         'explanation' => 'This number has not been verified. You can request confirmation code.',
                         'learn_more' => 'Details of Phone confirmation',
-                        'code' => "<form action=\"{$this->target}\" method=\"POST\">"
+                        'code' => "Phone number needs confirmation.<form action=\"{$this->target}\" method=\"POST\">"
                                 ."<input type=\"hidden\" name=\"id\" value=\"{ID}\">"
                                 ."<input type=\"submit\" name=\"wpSubmit\" value=\"".wfMsg('request-code')."\">"
                                 .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
@@ -94,10 +94,10 @@ class MyPhones extends SpecialPage
             {
                 if(! vfUser()->checkEditToken())
                     die('Wrong edit token');
-                $phone = $wgRequest->getVal('newnumber');
-
+                $phone = vfProcessNumber( $wgRequest->getVal('newnumber') );
                 $this->dao->addNewPhone($phone);
                 $wgOut->redirect($this->target, 302);
+                return;
             }
             elseif($wgRequest->getVal('wpSubmit') == wfMsg('request-code'))
             {
@@ -107,9 +107,15 @@ class MyPhones extends SpecialPage
                 if($this->dao->checkConfirmAllowed())
                 {
                     $code = $this->dao->getConfirmCode($id);
-                    //@todo send SMS message
+                    $number = $this->dao->getPhoneNumber($id);
+                    global $vgPath;
+                    require_once("$vgPath/Sms.php");
+                    Sms::sendSMS($number, sprintf(Sms::$msgConfim, $code));
+                    $wgOut->setPageTitle("SMS sent");
+                    $wgOut->addHTML( vfSuccessBox("Sms message with confirmation code was sent to $number.") );
+                    $wgOut->addReturnTo( Title::newFromText('Special:MyPhones') );
+                    return;
                 }
-                $wgOut->redirect($this->target, 302);
             }
             elseif($wgRequest->getVal('wpSubmit') == wfMsg('submit-code') )
             {
@@ -119,15 +125,14 @@ class MyPhones extends SpecialPage
                 $id = $wgRequest->getVal('id');
                 $this->dao->verifyCode($id, $code);
                 $wgOut->redirect($this->target, 302);
+                return;
             }
-            else
-            {
-                $wgOut->setPageTitle(wfMsg('myphones'));
-                $this->listPhones();
-                $form = new FormControl($this->items);
-                $this->display[] = 'newnumber';
-                $form->AddPage('', $this->display);
-            }
+            //View the list
+            $wgOut->setPageTitle(wfMsg('myphones'));
+            $this->listPhones();
+            $form = new FormControl($this->items);
+            $this->display[] = 'newnumber';
+            $form->AddPage('', $this->display);
         }
         catch(Exception $e)
         {

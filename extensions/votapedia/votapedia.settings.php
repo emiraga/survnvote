@@ -21,6 +21,9 @@ $vgNumberCallerID = '82315772';
 $vgNumberUserPass = '81161899';
 $vgNumberPBX = '8116';
 $vgCountry = 'Malaysia';
+$vgCountryCode = '60';
+
+$vgEnableSMS = true;
 
 $vgSmsChoiceLen = 2; // How many last digits of phone number should be used for SMS choice
 // Example:   phone = +60102984598   sms = 98    vgSmsChoiceLen = 2
@@ -37,6 +40,9 @@ $vgAllowedTags = '<math><code><b><u><i>';
 //Allow anonymous users to create surveys
 $vgAnonSurveyCreation = true;
 
+// specify whether or not you are using the daemon
+$vgUseDaemon = false;
+
 /**
  * @return array containing all phone numbers that can be used for voting
  */
@@ -49,5 +55,16 @@ function vfGetAllNumbers()
     }
     return $out;
 }
-
-$vgUseDaemon = false; // specify whether or not you are using daemon
+/**
+ * @param $number String input number from user
+ * @return processed number
+ */
+function vfProcessNumber($number)
+{
+    global $vgCountryCode;
+    $number = preg_replace('/[^0-9]/','',$number);
+    $number = preg_replace('/^0*/', '', $number);
+    if(strlen($number) <= 9)
+        $number = $vgCountryCode . $number;
+    return "+".$number;
+}

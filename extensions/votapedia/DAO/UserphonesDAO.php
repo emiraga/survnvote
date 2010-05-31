@@ -104,6 +104,21 @@ class UserphonesDAO
         return $confirm;
     }
     /**
+     * Get phone number
+     * 
+     * @param $id Integer record ID
+     * @return String phone number
+     */
+    public function getPhoneNumber($id)
+    {
+        global $vgDB, $vgDBPrefix;
+        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}userphones WHERE id = ? and username = ?",
+                array($id, $this->user->getName(), vPHONE_VERIFIED));
+        if($number == false)
+            throw new Exception("No such record in userphones.");
+        return $number;
+    }
+    /**
      * Get new code that will be user for phone confirmation via SMS
      * 
      * @global $vConfirmCodeLen Boolean
