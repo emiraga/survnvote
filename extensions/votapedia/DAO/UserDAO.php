@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This page includes classes which are used to access objects of Survey.
  *

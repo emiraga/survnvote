@@ -1,6 +1,5 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
-
 /**
  * @author Bai Qifeng
  * @author Emir Habul

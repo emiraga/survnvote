@@ -1,4 +1,5 @@
 <?php
+if($_SERVER['HOST']) die('Must be run from command line.');
 
 $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_TEST', true);
@@ -24,7 +25,7 @@ function pointTime($msg = '')
 {
     global $a;
     $b = microtime(true);
-    printf(">>>> TIMIG TO POINT %.6f $msg\n",$b-$a);
+    printf(">>>> TIMIG TO POINT $msg --> %.6f\n",$b-$a);
     $a = microtime(true);
 }
 
@@ -380,7 +381,6 @@ if( true ) /* testing SmsVO */
     assert('8768768' == $sms->getFrom() );
     assert('text test text' == $sms->getText() );
 }
-echo "\n";
 
 if( true ) /* testing Telephone */
 {
@@ -464,9 +464,55 @@ if( false ) /* testing Usr */
     $user = new Usr('TestUser');
 }
 
-if( true ) /* testing */
+if( true ) /* testing DAO/UserphonesDAO */
 {
-    ;
+    echo '.';
+    require_once("$vgPath/DAO/UserphonesDAO.php");
+    require_once("$vgPath/MwAdapter.php");
+
+    /* Mocking object*/
+    class MwUserMock extends MwUser
+    {
+        public function __construct()
+        {
+            //parent::__construct(); don't call parent
+        }
+        function isAnon() { return false; }
+        function getName() { return 'TestUser'; }
+    };
+    $user = new MwUserMock();
+    $p = new UserphonesDAO( $user );
+    $p->addNewPhone('123456');
+    $l = $p->getList();
+    assert(count($l) == 1);
+    assert($l[0]['status'] == vPHONE_NEW);
+    assert($l[0]['number'] == '123456');
+    assert($p->checkConfirmAllowed());
+    $code = $p->getConfirmCode($l[0]['id']);
+    assert(! $p->checkConfirmAllowed());
+    try
+    {
+        $p->verifyCode($l[0]['id'], $code.'A');
+        assert(false);
+    }
+    catch(Exception $e)
+    {
+        assert(true);
+    }
+    $l = $p->getList();
+    assert(count($l) == 1);
+    assert($l[0]['id'] == 1);
+    assert($l[0]['status'] == vPHONE_SENT_CODE);
+    assert($p->verifyCode($l[0]['id'], $code));
+    $l = $p->getList();
+    assert(count($l) == 1);
+    assert($l[0]['status'] == vPHONE_VERIFIED);
+    assert($p->deletePhone($l[0]['id']));
+    $l = $p->getList();
+    assert(count($l) == 1);
+    assert($l[0]['status'] == vPHONE_DELETED);
+    $p->addNewPhone('123456');
+
 }
 
 if( true ) /* testing */
@@ -478,13 +524,18 @@ if( true ) /* testing */
 {
     ;
 }
+echo "\n";
 pointTime('the end');
 die("\nDone with testing.\n");
 
 /* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
 /*
-	 * These are scenario testing
-*/
+ * These are scenario testing
+ */
 require_once("./survey/surveyDAO.php");
 require_once("./survey/Usr.php");
 

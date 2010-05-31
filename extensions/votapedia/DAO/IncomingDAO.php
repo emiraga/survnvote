@@ -3,7 +3,6 @@ unusedsdfklsdf();
 notuse();
 
 if (!defined('MEDIAWIKI')) die();
-
 /**
  * @package DataAccessObject
  */

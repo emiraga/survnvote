@@ -1,6 +1,5 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
-
 /**
  * @package ValueObject
  */

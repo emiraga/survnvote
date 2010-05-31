@@ -1,6 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 /**
+ * This package contains all data access objects.
+ *
  * @package DataAccessObject
  */
 
