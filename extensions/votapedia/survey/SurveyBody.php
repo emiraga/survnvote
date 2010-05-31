@@ -199,15 +199,15 @@ class SurveyBody
      */
     static function getChoices($text, $title='')
     {
-        global $wgParser;
-        $p = new MwParser($wgParser);
+        $pars = new Parser();
+        $p = new MwParser($pars);
         $lines = split("\n",$text);
         $output = '';
         if($title)
         {
             $output .= $p->run($title, true);
         }
-        $output .= '<ul  style="margin: 0.2em;">';
+        $output .= '<ul style="margin: 0.2em;">';
         foreach($lines as $line)
         {
             $line = trim($line);

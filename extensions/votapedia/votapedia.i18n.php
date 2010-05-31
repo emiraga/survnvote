@@ -41,4 +41,5 @@ $messages['en'] = array(
     'request-code' => 'Request confirmation code',
     'submit-code' => 'Submit confirmation code',
     'add-number' => 'Add number',
+    'delete-number' => 'Delete',
 );

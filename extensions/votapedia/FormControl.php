@@ -39,7 +39,7 @@ class FormControl
      * @param $td3 optional help or null
      * @return xhtml block
      */
-    private function TableRow( $td1, $td2 = null, $td3 = null )
+    private function TableRow( $td1, $td2 = null, $td3 = null, $td4=null )
     {
 
         if ( is_null( $td3 ) )
@@ -56,13 +56,19 @@ class FormControl
         {
             $td1 = Xml::tags( 'td', array( 'class' => 'pref-label', 'colspan' => '2', 'valign'=>'top' ), $td1 );
             $td2 = '';
-        } else
+        }
+        else
         {
+            if(is_null( $td4 ))
+                $td4 = '';
+            else
+                $td4 = Xml::tags( 'td', array( 'class' => 'pref-label', 'colspan' => '1', 'valign'=>'top' ), $td4 );
+
             $td1 = Xml::tags( 'td', array( 'class' => 'pref-label', 'valign'=>'top', 'style'=>'font-weight: bold;' ), $td1 );
             $td2 = Xml::tags( 'td', array( 'class' => 'pref-input', 'valign'=>'top' ), $td2 );
         }
 
-        return Xml::tags( 'tr', null, $td1 . $td2 ). $td3 . "\n";
+        return Xml::tags( 'tr', null, $td1 . $td2 . $td4 ). $td3 . "\n";
     }
     /**
      * Check whether values in form pass the tests.
@@ -210,16 +216,20 @@ class FormControl
         if($item['name'])
             $item['name'] .= ':';
 
+
         $label = 	Xml::label( $item['name'], $id );
         if(isset($item['icon']))
             $label = "<img src='$item[icon]'> ".$label;
+
+        if(isset($item['aftername']))
+            $label .= $item['aftername'];
 
         $wgOut->addHTML(
                 $this->TableRow(
                 $label,
                 $form_element,
-                Xml::tags('div', array( 'class' => 'prefsectiontip' ),
-                $item['explanation'] )
+                Xml::tags('div', array( 'class' => 'prefsectiontip' ), $item['explanation'] ),
+                isset($item['afterall'])?$item['afterall']:null
                 )
         );
         if(isset($item['html']))

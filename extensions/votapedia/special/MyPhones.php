@@ -75,6 +75,14 @@ class MyPhones extends SpecialPage
                         'code' => vfSuccessBox('Number {NUMBER} has been verified.'),
                         'icon' => $vgScript.'/icons/mobile.png',
                 ),
+                'deleted' => array(
+                        'type' => 'html',
+                        'name' => 'NUMBER GOES HERE',
+                        //'explanation' => 'Confirm your phone number by entering confirmation code.',
+                        //'learn_more' => 'Details of Phone confirmation',
+                        'code' => 'This number has been deleted.',
+                        'icon' => $vgScript.'/icons/mobile.png',
+                ),
         );
         $this->display = array();
     }
@@ -127,6 +135,15 @@ class MyPhones extends SpecialPage
                 $wgOut->redirect($this->target, 302);
                 return;
             }
+            elseif($wgRequest->getVal('wpSubmit') == wfMsg('delete-number')  )
+            {
+                if(! vfUser()->checkEditToken())
+                    die('Wrong edit token');
+                $id = intval($wgRequest->getVal('id'));
+                $this->dao->deletePhone($id);
+                $wgOut->redirect($this->target, 302);
+                return;
+            }
             //View the list
             $wgOut->setPageTitle(wfMsg('myphones'));
             $this->listPhones();
@@ -148,15 +165,13 @@ class MyPhones extends SpecialPage
         $list = $this->dao->getList();
         $num = count($list);
 
-        global $wgOut;
+        global $wgOut, $vgScript;
         $wgOut->addHTML("<p><i>You have added a total of $num phone number(s).</i></p>");
 
         $this->display[] = 'empty';
         foreach($list as $phone)
         {
             $id = $phone['id'];
-            $this->display[] = $id;
-            $this->display[] = 'empty';
 
             if($phone['status'] == vPHONE_NEW 
                     || ($phone['status'] == vPHONE_SENT_CODE
@@ -175,11 +190,28 @@ class MyPhones extends SpecialPage
                 $this->items[ $id ] = $this->items[ 'verified' ];
                 $this->items[ $id ]['code'] = str_replace('{NUMBER}',$phone['number'],$this->items[ $id ]['code']);
             }
-            else
+            elseif($phone['status'] == vPHONE_DELETED)
             {
-                $this->items[ $id ] = $this->items[ 'empty' ];
+                $this->items[ $id ] = $this->items[ 'deleted' ];
+
             }
             $this->items[ $id ]['name'] = $phone['number'];
+            $this->display[] = $id;
+            $this->display[] = 'empty';
+
+            if($phone['status'] != vPHONE_DELETED)
+            {
+
+                $this->items[ $id ]['afterall'] = "<form style=\"text-align:center;\"action=\"{$this->target}\" method=\"POST\">"
+                    ."<input type=\"hidden\" name=\"id\" value=\"$id\">"
+                    ."<input onclick=\"return confirm('Are you sure you want to delete this number?');\" title=\"Delete this number\" type=\"image\" src=\"$vgScript/icons/file_delete.png\" name=\"wpSubmit\" value=\"".wfMsg('delete-number')."\">"
+                    .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
+                    ." Delete</form>";
+            }else{
+                $this->items[ $id ]['name'] = '';
+                $this->items[ $id ]['aftername'] = "<strike>$phone[number]</strike>";
+            }
         }
     }
 }
+

@@ -86,10 +86,10 @@ class MwAdapter
  */
 class MwParser
 {
-    /** @var Parser */ private $parser;
+    /** @var Parser */        private $parser;
     /** @var ParserOptions */ private $parserOptions;
-    /** @var Title */ private $wikititle;
-    /** @var Boolean */ private $isTag;
+    /** @var Title */         private $wikititle;
+    /** @var Boolean */       private $isTag;
 
     /**
      * @param $parser Parser

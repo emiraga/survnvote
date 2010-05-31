@@ -148,11 +148,6 @@ class WaveLover2Template extends QuickTemplate {
 			<!-- start content -->
 			<?php $this->html('bodytext') ?>
 			<?php if($this->data['catlinks']) { $this->html('catlinks'); } ?>
-<?php if($this->data['thispage'] == 'Main_Page') { ?>
-<div style="float:right">
-<iframe src="http://www.facebook.com/plugins/like.php?href=<?php echo urlencode($skin->mTitle->getFullURL()); ?>&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height:20px"></iframe>
-</div>
-<?php } ?>
 			<!-- end content -->
 			<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
 			<div class="visualClear"></div>
