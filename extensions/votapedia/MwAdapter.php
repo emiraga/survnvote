@@ -155,7 +155,7 @@ class MwUser
      *
      * @global $wgUser User
      */
-    function  __construct()
+    public function  __construct()
     {
         global $wgUser;
         if(! isset($wgUser))
@@ -191,7 +191,7 @@ class MwUser
      *
      * @return String edit token to prevent XSRF
      */
-    function editToken()
+    public function editToken()
     {
         global $wgUser;
         return htmlspecialchars( $wgUser->editToken() );
@@ -201,7 +201,7 @@ class MwUser
      *
      * @return Boolean is edit token valid
      */
-    function checkEditToken()
+    public function checkEditToken()
     {
         global $wgUser, $wgRequest;
         return $wgUser->matchEditToken( $wgRequest->getVal( 'wpEditToken' ) );
@@ -211,7 +211,7 @@ class MwUser
      *
      * @return String username or IP.rand() for anonymous users
      */
-    function getName()
+    public function getName()
     {
         return $this->name;
     }
@@ -220,7 +220,7 @@ class MwUser
      *
      * @return String username of ip of anonymous users
      */
-    function getDisplayName()
+    public function getDisplayName()
     {
         global $wgUser;
         return $wgUser->getName();
@@ -230,7 +230,7 @@ class MwUser
      *
      * @return Boolean
      */
-    function isAnon()
+    public function isAnon()
     {
         global $wgUser;
         return $wgUser->isAnon();
@@ -241,7 +241,7 @@ class MwUser
      * @param $option String option name
      * @return <type>
      */
-    function getOption($option)
+    public function getOption($option)
     {
         global $wgUser;
         return $wgUser->getOption($wgUser);
@@ -251,7 +251,7 @@ class MwUser
      *
      * @return Boolean
      */
-    private function isAuthor(&$page)
+    public function isAuthor(&$page)
     {
         return $page->getAuthor() == $this->getName();
     }
@@ -260,7 +260,7 @@ class MwUser
      *
      * @return Boolean
      */
-    function canCreateSurveys()
+    public function canCreateSurveys()
     {
         global $vgAnonSurveyCreation;
         return $vgAnonSurveyCreation || !$this->isAnon();
@@ -293,7 +293,7 @@ class MwUser
      *
      * @return a string representing mobile phone of a user, or false if it does not exist
      */
-    function getUserMobileNumber()
+    public function getUserMobileNumber()
     {
         if($this->isAnon())
             throw new SurveyException("Not logged in", 400);

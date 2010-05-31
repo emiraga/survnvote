@@ -34,16 +34,14 @@ class ProcessSurvey extends SpecialPage
         $wgOut->setArticleFlag(false);
         $page_id = intval(trim($wgRequest->getVal('id')));
         $action = $wgRequest->getVal( 'wpSubmit' );
-
-        if ( ! vfUser()->checkEditToken() )
-            die('Edit token is wrong, please try again.');
-
         try
         {
             $surveydao = new SurveyDAO();
             $page = $surveydao->findByPageID($page_id);
             if($action == wfMsg('start-survey'))
             {
+                if ( ! vfUser()->checkEditToken() )
+                    die('Edit token is wrong, please try again.');
                 if( ! vfUser()->canControlSurvey($page) )
                 {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
@@ -92,6 +90,8 @@ class ProcessSurvey extends SpecialPage
             }
             elseif ($action == wfMsg('vote-survey'))
             {
+                if ( ! vfUser()->checkEditToken() )
+                    die('Edit token is wrong, please try again.');
                 $votedao = new VoteDAO($page, vfUser()->getName());
 
                 if($page->getWebVoting() == 'no')
@@ -109,6 +109,17 @@ class ProcessSurvey extends SpecialPage
                         $votedao->vote($votevo);
                     }
                 }
+                $title = Title::newFromText($wgRequest->getVal('returnto'));
+                $wgOut->redirect($title->escapeLocalURL(), 302);
+                return;
+            }
+            elseif ($action ==  wfMsg('stop-survey'))
+            {
+                if ( ! vfUser()->checkEditToken() )
+                    die('Edit token is wrong, please try again.');
+                $surveydao->stopSurvey($page);
+                $surveydao->releaseReceivers();
+                //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;

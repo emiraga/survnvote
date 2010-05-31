@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   choice blob NOT NULL,
   receiver varchar(20) DEFAULT NULL,
   points tinyint(8) NOT NULL DEFAULT '0',
-  SMS varchar(200) NOT NULL DEFAULT 'none',
+  SMS varchar(200) DEFAULT NULL,
   vote int NOT NULL DEFAULT '0',
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
@@ -187,7 +187,7 @@ if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
     }
     if(isset($_POST['do_install']))
     {
-        echo "When you are done with installation, <u>please</u> delete the file <b>votapedia.setup.php</b> from votapedia extension directory.<br>\n";
+        echo "When you are done with installation, <u>please</u> delete the file <b>votapedia.setup.php</b> from extensions directory.<br>\n";
         echo "<p><a href='$wgScriptPath'>Return to MediaWiki</a></p>";
     }
 }
@@ -202,8 +202,8 @@ Installation Steps:
 <ol>
 <li>Configure MediaWiki by editing file <b>LocalSettings.php</b>.</li>
 <li>Make sure that MediaWiki is working properly.</li>
-<li>Edit file <b>extensions/votapedia/votapedia.php</b> to configure votapedia settings.</li>
-<li>Edit file <b>extensions/votapedia/votapedia.setup.php</b> to set the master user/password.</li>
+<li>Edit file <b>extensions/votapedia/config.php</b> to configure votapedia settings.</li>
+<li>Edit file <b>extensions/votapedia.setup.php</b> to set the master user/password.</li>
 <li>Open this script in browser (you are doing it right now)</li>
 <li>
 <form action="$vgScript/../votapedia.setup.php" method="POST">

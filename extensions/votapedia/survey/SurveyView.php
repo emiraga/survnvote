@@ -116,9 +116,12 @@ class SurveyView
             default:
                 throw new Exception('Unknown survey type');
         }
-        //enable web voting?
-        if($this->page->getStatus() == 'active' && $this->page->getWebVoting() != 'no')
+        //Should we enable web voting?
+        if($this->page->getStatus() == 'active' 
+                && $this->page->getWebVoting() != 'no'
+                && ! vfUser()->isAuthor( $this->page ))
         {
+            //either user is not anonymous or it is allowed to vote anonymously
             if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
             {
                 $this->buttons->setVoteButton(true);
@@ -190,8 +193,8 @@ class SurveyView
      */
     static function getChoice($line)
     {
-        global $wgParser;
-        $p = new MwParser($wgParser);
+        $pars = new Parser();
+        $p = new MwParser($pars);
         return $p->run(trim($line), false);
     }
     /**

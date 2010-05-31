@@ -1,1 +1,1 @@
-c:\xampp\php\php.exe Daemon.php
+/c/xampp/php/php.exe Daemon.php

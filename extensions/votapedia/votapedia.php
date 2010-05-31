@@ -1,7 +1,7 @@
 <?php
 if (!defined('MEDIAWIKI')) die('Cannot access this file.');
 
-require_once("$vgPath/votapedia.settings.php");
+require_once("$vgPath/config.php");
 require_once("$vgPath/UserHooks.php" );
 
 //International Texts and Aliases

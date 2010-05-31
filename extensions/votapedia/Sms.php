@@ -32,6 +32,7 @@ class Sms
      */
     static function getNewSms()
     {
+        global $vgDB;
         $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM smsd.inbox WHERE Processed = 'false'");
         $list = array();
         foreach($new as $sms)
@@ -71,7 +72,8 @@ class Sms
         $sender = 'votapedia';
         $phone = '';
         global $vgDB;
-        $vgDB->Execute("INSERT INTO smsd.outbox(Text,DestinationNumber,TextDecoded,SendingDateTime,RelativeValidity,SenderID,DeliveryReport,CreatorID) VALUES(?,?,?,?,?,?,?,?)",
-                array(                         $text,$destination,      $message,    $date,            $valid,       '',   'no',       $sender));
+        $vgDB->Execute("INSERT INTO smsd.outbox(Text,DestinationNumber,TextDecoded,SendingDateTime,"
+                ."RelativeValidity,SenderID,DeliveryReport,CreatorID) VALUES(?,?,?,?,?,?,?,?)",
+                array($text,$destination,$message,$date,$valid,'','no',$sender));
     }
 }

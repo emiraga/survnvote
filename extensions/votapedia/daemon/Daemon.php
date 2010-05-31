@@ -13,20 +13,21 @@ $vgDBUserName = 'root'; //user that has priviledges to access SMS and votapedia
 $vgDBUserPassword = '';
 
 require_once("$vgPath/Common.php");
-require_once("$vgPath/SmsIntegration.php");
+require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 
-$smsint = new SmsIntegration();
 $page_cache = array();
 
 function do_action()
 {
     global $smsint;
-    $new = $smsint->getNewSms();
+    $new = Sms::getNewSms();
     foreach($new as $sms)
     {
-        
+        ;
     }
+
+    
 }
 
 //get command line parameters

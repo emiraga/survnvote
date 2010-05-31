@@ -255,8 +255,8 @@ END_SCRIPT;
     function generatePrevQuestions(&$surveys)
     {
         $num = 1;
-        global $wgParser;
-        $parser = new MwParser($wgParser);
+        $pars = new Parser();
+        $parser = new MwParser($pars);
         $this->prev_num_ch = '';
         foreach($surveys as &$survey)
         {

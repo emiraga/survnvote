@@ -681,17 +681,14 @@ class SurveyDAO
         return true;
     }
     /**
-     * It is different with starting a survey.
-     * Starting a survey requires we set up startint time before we are able to start it
      * In finishing procedure, we automatically set current time as finishing time.
      *
      * @param $pageVO PageVO
-     * @version 2.0
      */
-    function finishSurvey(PageVO $pageVO)
+    function stopSurvey(PageVO $pageVO)
     {
         global $vgDB, $vgDBPrefix;
-        $expiredDate = vfDate();
+        $expiredDate = vfDate(time()-1);
         $sqlChoice = "update {$vgDBPrefix}page set endtime = ? where pageID = ?";
         $vgDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
         return true;
@@ -761,4 +758,3 @@ class SurveyDAO
         return $ret;
     }
 }
-?>
