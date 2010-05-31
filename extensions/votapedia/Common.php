@@ -12,6 +12,13 @@ define('vTEXT_RESPONSE',   5);
 define('vPRIVACY_LOW',    1);
 define('vPRIVACY_MEDIUM', 2);
 define('vPRIVACY_HIGH',   3);
+
+/* User phone status */
+define('vPHONE_NEW', 0);
+define('vPHONE_SENT_CODE', 1);
+define('vPHONE_VERIFIED', 2);
+define('vPHONE_DELETED', 3);
+
 /**
  * Return a current datetime formated in particular way.
  * 

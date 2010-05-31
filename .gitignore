@@ -2,6 +2,7 @@
 .project
 .settings/
 .htaccess
+.htaccess2
 debug.log.txt
 images/
 nbproject/

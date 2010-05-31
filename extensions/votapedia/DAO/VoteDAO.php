@@ -50,7 +50,6 @@ class VoteDAO
      * Check for validity of vote and add this vote to database
      *
      * @param $vote VoteVO object
-     * @param $incoming IncomingDAO object related to CALL or SMS
      * @return true on success
      */
     function vote(VoteVO &$vote)
@@ -58,13 +57,6 @@ class VoteDAO
         global $vgDB, $vgDBPrefix;
         $vgDB->StartTrans();
 
-        /*@todo put this somewhere else
-        if ($vote->getInvalidAllowed() == 0 && $vote->getVoterID() == '') //if multi-vote is not allowed
-        {
-            $incoming->updateError(5); //Invalid telephone is forbidden
-            return false;
-        }
-        */
         // Check whether voted before
         $sql ="select * from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
         $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));

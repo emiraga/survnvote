@@ -23,7 +23,6 @@ class MyPhones extends SpecialPage
         parent::__construct('MyPhones');
         wfLoadExtensionMessages('Votapedia');
         $this->includable( false );
-        $this->dao =& new UserphonesDAO(vfUser());
         global $vgScript;
         
         $this->target = Skin::makeSpecialUrl('MyPhones');
@@ -88,6 +87,7 @@ class MyPhones extends SpecialPage
     {
         try
         {
+            $this->dao =& new UserphonesDAO(vfUser());
             global $wgOut, $wgRequest;
             if($wgRequest->getVal('wpSubmit') == wfMsg('add-number'))
             {
@@ -145,6 +145,7 @@ class MyPhones extends SpecialPage
         global $wgOut;
         $wgOut->addHTML("<p><i>You have added a total of $num phone number(s).</i></p>");
 
+        $this->display[] = 'empty';
         foreach($list as $phone)
         {
             $id = $phone['id'];
@@ -173,9 +174,6 @@ class MyPhones extends SpecialPage
                 $this->items[ $id ] = $this->items[ 'empty' ];
             }
             $this->items[ $id ]['name'] = $phone['number'];
-
-            //'id', 'dateadded', 'number', 'status', 'description'
-            //$wgOut->addHTML("<tr><td>$phone[dateadded]<td>$phone[number]<td>description");
         }
     }
 }

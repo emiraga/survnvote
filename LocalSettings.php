@@ -127,7 +127,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $wgEnableWriteAPI=true; # required for votapedia
 require_once("$IP/extensions/votapedia/votapedia.php");
 require_once("$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php"); 
-require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
+# require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
 
 $wgUseAjax = true;
 $wgAjaxWatch = false;
@@ -137,8 +137,11 @@ $wgDisableCounters = true;
 #$wgDebugLogFile = "{$IP}/debug.log.txt";
 $wgEnableSidebarCache = true;
 
-include("extensions/Gnuplot/Gnuplot.php");
-$wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
+# include("extensions/Gnuplot/Gnuplot.php");
+# $wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
+# require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
 
-require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
+require_once("$IP/extensions/FBConnect/FBConnect.php");
 
+$wgFbAppId       = '1be83abc6c4c6c2f0e43aaa03fc38a38';
+$wgFbSecret      = '956d1c6e0572c973647155bbd066ae63';

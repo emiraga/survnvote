@@ -93,7 +93,6 @@ class ProcessSurvey extends SpecialPage
             elseif ($action == wfMsg('vote-survey'))
             {
                 $votedao = new VoteDAO($page, vfUser()->getName());
-                $webvote = new WebvoteDAO();
 
                 if($page->getWebVoting() == 'no')
                         throw new Exception("Web voting is not allowed");
@@ -107,7 +106,7 @@ class ProcessSurvey extends SpecialPage
                     if( $choiceid )
                     {
                         $votevo = $votedao->newFromPage('WEB', vfUser()->getName(), $surveyid, $choiceid );
-                        $votedao->vote($votevo, $webvote);
+                        $votedao->vote($votevo);
                     }
                 }
                 $title = Title::newFromText($wgRequest->getVal('returnto'));

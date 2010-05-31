@@ -6,11 +6,6 @@ if (!defined('MEDIAWIKI')) die();
  * @package DataAccessObject
  */
 
-define('vPHONE_NEW', 0);
-define('vPHONE_SENT_CODE', 1);
-define('vPHONE_VERIFIED', 2);
-define('vPHONE_DELETED', 3);
-
 /**
  * UserphonesDAO maintains a relationship between a user and phone number.
  * One user can have multiple phones assigned.
