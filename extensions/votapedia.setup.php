@@ -9,8 +9,8 @@ require_once('../LocalSettings.php');
  * has priviledges for CREATE and DELETE of tables.
 */
 global $vgDBUserName, $vgDBUserPassword;
-$vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
-$vgDBUserPassword   = '';     // Password for database master user
+//$vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
+//$vgDBUserPassword   = '';     // Password for database master user
 
 /**
  * function vfDoSetup:
@@ -31,16 +31,17 @@ DROP TABLE IF EXISTS {$vgDBPrefix}survey;
 DROP TABLE IF EXISTS {$vgDBPrefix}surveychoice;
 DROP TABLE IF EXISTS {$vgDBPrefix}surveyrecord;
 DROP TABLE IF EXISTS {$vgDBPrefix}usedreceivers;
+DROP TABLE IF EXISTS {$vgDBPrefix}userphones;
 
 --
 -- Table structure for table page
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
-  pageID int(11) unsigned NOT NULL AUTO_INCREMENT,
+  pageID int NOT NULL AUTO_INCREMENT,
   title varchar(512) NOT NULL,
   startTime datetime NOT NULL,
   endTime datetime NOT NULL,
-  duration int(11) NOT NULL,
+  duration int(16) NOT NULL,
   author varchar(20) NOT NULL,
   phone varchar(20) DEFAULT NULL,
   createTime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   showGraph tinyint(1) NOT NULL DEFAULT '1',
   displayTop tinyint(4) NOT NULL DEFAULT '0',
   surveyType tinyint(4) NOT NULL DEFAULT '1',
-  votesAllowed tinyint(8) unsigned NOT NULL DEFAULT '1',
+  votesAllowed tinyint(8) NOT NULL DEFAULT '1',
   subtractWrong tinyint(1) NOT NULL DEFAULT '0',
   privacy tinyint(4) NOT NULL DEFAULT '1',
   phonevoting varchar(5) DEFAULT 'anon',
@@ -65,11 +66,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
-  surveyID int(10) unsigned NOT NULL,
-  presentationID tinyint(10) unsigned NOT NULL,
+  surveyID int NOT NULL,
+  presentationID int NOT NULL,
   presentation varchar(1000) NOT NULL,
   active tinyint(1) NOT NULL DEFAULT '0',
-  mark tinyint(4) NOT NULL DEFAULT '0'
+  mark tinyint(8) NOT NULL DEFAULT '0'
 );
 
 -- --------------------------------------------------------
@@ -79,11 +80,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
-  pageID int(11) NOT NULL,
-  surveyID int(11) unsigned NOT NULL AUTO_INCREMENT,
-  question varchar(4000) NOT NULL,
-  answer tinyint(4) NOT NULL DEFAULT '0',
-  points tinyint(4) NOT NULL DEFAULT '0',
+  pageID int NOT NULL,
+  surveyID int NOT NULL AUTO_INCREMENT,
+  question blob NOT NULL,
+  answer tinyint(8) NOT NULL DEFAULT '0',
+  points tinyint(8) NOT NULL DEFAULT '0',
   PRIMARY KEY (surveyID),
   KEY pageID (pageID)
 );
@@ -95,13 +96,13 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
-  surveyID int(11) NOT NULL,
-  choiceID tinyint(4) unsigned NOT NULL DEFAULT '1',
-  choice varchar(400) NOT NULL,
+  surveyID int NOT NULL,
+  choiceID int NOT NULL DEFAULT '1',
+  choice blob NOT NULL,
   receiver varchar(20) DEFAULT NULL,
-  points tinyint(4) NOT NULL DEFAULT '0',
+  points tinyint(8) NOT NULL DEFAULT '0',
   SMS varchar(200) NOT NULL DEFAULT 'none',
-  vote int(11) NOT NULL DEFAULT '0',
+  vote int NOT NULL DEFAULT '0',
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
 );
@@ -113,11 +114,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
-  ID int(11) unsigned NOT NULL AUTO_INCREMENT,
-  voterID varchar(50) NOT NULL DEFAULT 'unknown',
-  surveyID int(11) NOT NULL,
-  presentationID tinyint(4) NOT NULL DEFAULT '0',
-  choiceID tinyint(4) NOT NULL,
+  ID int NOT NULL AUTO_INCREMENT,
+  voterID varchar(255) NOT NULL DEFAULT 'unknown',
+  surveyID int NOT NULL,
+  presentationID int NOT NULL DEFAULT '0',
+  choiceID int NOT NULL,
   voteDate datetime NOT NULL,
   voteType varchar(6) NOT NULL,
   PRIMARY KEY (ID),
@@ -131,6 +132,21 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
   receiver varchar(20) NOT NULL,
   UNIQUE(receiver)
+);
+
+--
+-- Table structure for table userphones
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}userphones
+(
+  id int NOT NULL AUTO_INCREMENT,
+  username varchar(255) NOT NULL,
+  phonenumber varchar(30) NOT NULL,
+  dateadded datetime NOT NULL,
+  status tinyint(4) NOT NULL default 0,
+  confirmcode varchar(20),
+  confirmsent datetime,
+  PRIMARY KEY (id)
 );
 
 END_SQL;
@@ -148,14 +164,16 @@ END_SQL;
         }
     }
 }
-echo '<html><head><title>votapedia installation</title></head><body>';
+if(!defined('VOTAPEDIA_TEST'))
+    echo '<html><head><title>votapedia installation</title></head><body>';
 global $vgScript, $wgScriptPath;
 if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
 {
     try
     {
         vfDoSetup();
-        echo "<h1>votapedia installation is complete.</h1>\n";
+        if(!defined('VOTAPEDIA_TEST'))
+            echo "<h1>votapedia installation is complete.</h1>\n";
     }
     catch(Exception $e)
     {
@@ -188,7 +206,7 @@ Installation Steps:
 <li>Edit file <b>extensions/votapedia/votapedia.setup.php</b> to set the master user/password.</li>
 <li>Open this script in browser (you are doing it right now)</li>
 <li>
-<form action="$vgScript/votapedia.setup.php" method="POST">
+<form action="$vgScript/../votapedia.setup.php" method="POST">
 <input type=submit name=do_install value="Install" />
 </form>
 </li>
@@ -196,6 +214,7 @@ Installation Steps:
 END_HTML;
 }
 
-echo '</body></html>';
+if(!defined('VOTAPEDIA_TEST'))
+    echo '</body></html>';
 
 ?>

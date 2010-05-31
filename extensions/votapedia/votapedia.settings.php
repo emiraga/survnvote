@@ -25,6 +25,8 @@ $vgCountry = 'Malaysia';
 $vgSmsChoiceLen = 2; // How many last digits of phone number should be used for SMS choice
 // Example:   phone = +60102984598   sms = 98    vgSmsChoiceLen = 2
 
+$vConfirmCodeLen = 6; // Length of confirm field
+
 // Remove prefixes and suffixes in "Survey Category" listing
 $vgCatRemovePrefix = array('Category:Surveys in ', 'Category:Quizes in ','Category:');
 $vgCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');

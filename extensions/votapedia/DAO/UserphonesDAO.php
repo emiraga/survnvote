@@ -1,0 +1,113 @@
+<?php
+if (!defined('MEDIAWIKI')) die();
+
+define('vPHONE_NEW', 0);
+define('vPHONE_SENT_CODE', 1);
+define('vPHONE_VERIFIED', 2);
+define('vPHONE_DELETED', 3);
+
+/**
+ * Description of UserphonesDAO
+ *
+ * @author Emir Habul <emiraga@gmail.com>
+ */
+class UserphonesDAO
+{
+    /** @var MwUser */ private $user;
+    private $statusdesc = array(
+        vPHONE_NEW => 'New phone number',
+        vPHONE_SENT_CODE => 'Confirmation code send by SMS',
+        vPHONE_VERIFIED => 'Phone verified',
+        vPHONE_DELETED => 'Phone has been cancelled',
+    );
+    public function __construct(MwUser &$user)
+    {
+        $this->user = $user;
+        if($this->user->isAnon())
+            throw new Exception("Cannot add phone numbers to anonymous user");
+    }
+    public function addNewPhone($number)
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username,phonenumber, status, dateadded) VALUES (?,?,?,?)",
+                array($this->user->getName(), $number),vPHONE_NEW, $now);
+        return true;
+    }
+    public function getList()
+    {
+        $result = array();
+        global $vgDB, $vgDBPrefix;
+        $p = $vgDB->GetALL("SELECT id, phonenumber, status, dateadded FROM {$vgDBPrefix}userphones WHERE username = ?", array($this->user->getName()));
+        foreach($p as $phone)
+        {
+            $result[] = array(
+                'id' => $phone['id'],
+                'dateadded' => $phone['dateadded'],
+                'number' => $phone['phonenumber'],
+                'status' => $phone['status'],
+                'description' => $this->statusdesc [ $phone['status'] ],
+            );
+        }
+        return $result;
+    }
+    public function checkConfirmAllowed()
+    {
+        global $vgDB, $vgDBPrefix;
+        $yesterday = vfDate( time() - 24*60*60 );
+        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE username = ? AND confirmsent NOT NULL and confirmsent <= ?", array($this->user->getName(), $yesterday));
+        return $c == 0;
+    }
+    public function getConfirmCode($id)
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE id = ? and username = ? AND status != ?",
+                array($id, $this->user->getName(), vPHONE_VERIFIED));
+        if($c == 0)
+            throw new Exception("No such record in userphones");
+
+        $confirm = $this->getNewCode();
+        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET confirmsent = ?, confirmcode = ?, status = ?  WHERE id = ?",
+                array($now, $confirm, vPHONE_SENT_CODE, $id));
+        return $confirm;
+    }
+    function getNewCode()
+    {
+        global $vConfirmCodeLen;
+        $code = '';
+        for($i = 0; $i < $vConfirmCodeLen; $i++)
+            $code .= rand(0, 9);
+        return $code;
+    }
+    public function verifyCode($id, $code)
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $yesterday = vfDate( time() - 24*60*60 );
+        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}userphones WHERE id = ? AND username = ? AND confirmcode = ? AND confirmsent > ? AND status = ?",
+                array($id, $this->user->getName(), $code, $yesterday, vPHONE_SENT_CODE));
+        if(! $number)
+            throw new Exception("Invalid code or it has expired");
+        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE status=? AND phonenumber = ?",
+                array(vPHONE_VERIFIED, $number));
+        if($c)
+        {
+            throw new Exception("That phone has already been verified by other user.");
+        }
+        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
+                array(vPHONE_VERIFIED, $id));
+        return true;
+    }
+    public function deletePhone($id)
+    {
+        global $vgDB, $vgDBPrefix;
+        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE id = ? AND username = ?",
+                array($id, $this->user->getName()));
+        if($c)
+            throw new Exception("Invalid code or it has expired");
+        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
+                array(vPHONE_DELETED, $id));
+        return true;
+    }
+}

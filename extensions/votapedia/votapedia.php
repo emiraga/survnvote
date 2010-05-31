@@ -1,8 +1,8 @@
 <?php
-if (!defined('MEDIAWIKI') && !defined('VOTAPEDIA_DAEMON')) die();
+if (!defined('MEDIAWIKI')) die('Cannot access this file.');
 
 require_once("$vgPath/votapedia.settings.php");
-require_once( "$vgPath/UserHooks.php" );
+require_once("$vgPath/UserHooks.php" );
 
 //International Texts and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$vgPath/votapedia.i18n.php";
