@@ -30,6 +30,10 @@ $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 $wgAutoloadClasses['ProcessSurvey'] = "$vgPath/special/ProcessSurvey.php";
 $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 
+//Special page MyPhones
+$wgAutoloadClasses['MyPhones'] = "$vgPath/special/MyPhones.php";
+$wgSpecialPages['MyPhones'] = 'MyPhones';
+
 //Tag <Survey />
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$vgPath/survey/SurveyView.php";

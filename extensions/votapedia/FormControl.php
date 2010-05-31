@@ -124,6 +124,107 @@ class FormControl
     {
         return $this->values;
     }
+
+    public function showItem($id)
+    {
+        global $wgOut, $vgScript, $wgScriptPath;
+        
+        $item = $this->items[$id];
+
+        if(isset($this->values[$id]))
+            $value = $this->values[$id];
+        elseif( isset ($item['default']) )
+            $value = $item['default'];
+        else
+            $value = '';
+
+        //$value = htmlspecialchars($value);
+        if($item['type'] == 'input')
+        {
+            if(!isset($item['width']))
+                $item['width'] = 70;
+            $form_element = Xml::input( $id, $item['width'], $value , array( 'id' => $id) );
+        }
+        elseif($item['type'] == 'select')
+        {
+            $select = new XMLSelect( $id, $id, $value );
+            foreach($item['options'] as $name => $optval )
+                $select->addOption( $name, $optval );
+            $form_element = $select->getHTML();
+        }
+        elseif($item['type'] == 'radio')
+        {
+            $form_element = '';
+            foreach($item['options'] as $name => $optval )
+                $form_element .= Xml::radioLabel($name, $id, $optval,
+                        $id.'-'.$optval, $optval == $value).'<br />';
+        }
+        elseif($item['type'] == 'textarea')
+        {
+            $value = str_replace("\r", "\n", $value);
+            $value = str_replace("\n\n", "\r", $value);
+            //$value = htmlspecialchars_decode($value);
+            $form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
+        }
+        elseif($item['type'] == 'null')
+        {
+            $form_element = '';
+            $item['name'] = $id = '';
+        }
+        elseif($item['type'] == 'html')
+        {
+            $form_element = $item['code'];
+        }
+        elseif($item['type'] == 'infobox')
+        {
+            $form_element = '';
+            $item['name'] = $id = '';
+        }
+        elseif($item['type'] == 'checkbox')
+        {
+            if(isset($item['checklabel']))
+                $form_element = Xml::checkLabel( $item['checklabel'] , $id, $id, $value );
+            else
+                $form_element = Xml::check( $id, $value );
+        }
+        else
+        {
+            throw new Exception('Error in FormControl::AddPage, unknown type.');
+        }
+        if(isset($item['textbefore']))
+            $form_element = $item['textbefore'] . $form_element;
+
+        if(isset($item['textafter']))
+            $form_element .= $item['textafter'];
+
+        if($item['learn_more'])
+        {
+            $morepage = Title::newFromText($item['learn_more']);
+            $item['explanation'] .=' &nbsp; <span>'
+                    .'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
+        }
+
+        if($item['type'] == 'infobox')
+            $item['explanation'] = vfSuccessBox($item['explanation']);
+
+        if($item['name'])
+            $item['name'] .= ':';
+
+        $label = 	Xml::label( $item['name'], $id );
+        if(isset($item['icon']))
+            $label = "<img src='$item[icon]'> ".$label;
+
+        $wgOut->addHTML(
+                $this->TableRow(
+                $label,
+                $form_element,
+                Xml::tags('div', array( 'class' => 'prefsectiontip' ),
+                $item['explanation'] )
+                )
+        );
+        if(isset($item['html']))
+            $wgOut->addHTML('<tr><td colspan=2>'. $item['html'] .'</tr>');
+    }
     /**
      * Adds a new tab to the output form
      *
@@ -137,107 +238,12 @@ class FormControl
         //opentab tab
         $wgOut->addHTML(
                 Xml::fieldset( $title ) .
-                Xml::openElement( 'table' ) // , array('height' => '300px')
-                // . vpFormFunc::TableRow( Xml::element( 'h2', null, $page['title'] ) )
+                Xml::openElement( 'table' )
         );
 
         foreach($add_items as $id)
         {
-            $item = $this->items[$id];
-
-            if(isset($this->values[$id]))
-                $value = $this->values[$id];
-            elseif( isset ($item['default']) )
-                $value = $item['default'];
-            else
-                $value = '';
-
-            //$value = htmlspecialchars($value);
-            if($item['type'] == 'input')
-            {
-                if(!isset($item['width']))
-                    $item['width'] = 70;
-                $form_element = Xml::input( $id, $item['width'], $value , array( 'id' => $id) );
-            }
-            elseif($item['type'] == 'select')
-            {
-                $select = new XMLSelect( $id, $id, $value );
-                foreach($item['options'] as $name => $optval )
-                    $select->addOption( $name, $optval );
-                $form_element = $select->getHTML();
-            }
-            elseif($item['type'] == 'radio')
-            {
-                $form_element = '';
-                foreach($item['options'] as $name => $optval )
-                    $form_element .= Xml::radioLabel($name, $id, $optval,
-                            $id.'-'.$optval, $optval == $value).'<br />';
-            }
-            elseif($item['type'] == 'textarea')
-            {
-                $value = str_replace("\r", "\n", $value);
-                $value = str_replace("\n\n", "\r", $value);
-                //$value = htmlspecialchars_decode($value);
-                $form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
-            }
-            elseif($item['type'] == 'null')
-            {
-                $form_element = '';
-                $item['name'] = $id = '';
-            }
-            elseif($item['type'] == 'html')
-            {
-                $form_element = $item['code'];
-            }
-            elseif($item['type'] == 'infobox')
-            {
-                $form_element = '';
-                $item['name'] = $id = '';
-            }
-            elseif($item['type'] == 'checkbox')
-            {
-                if(isset($item['checklabel']))
-                    $form_element = Xml::checkLabel( $item['checklabel'] , $id, $id, $value );
-                else
-                    $form_element = Xml::check( $id, $value );
-            }
-            else
-            {
-                throw new Exception('error in FormControl::AddPage');
-            }
-            if(isset($item['textbefore']))
-                $form_element = $item['textbefore'] . $form_element;
-
-            if(isset($item['textafter']))
-                $form_element .= $item['textafter'];
-
-            if($item['learn_more'])
-            {
-                $morepage = Title::newFromText($item['learn_more']);
-                $item['explanation'] .=' &nbsp; <span>'
-                        .'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
-            }
-
-            if($item['type'] == 'infobox')
-                $item['explanation'] = vfSuccessBox($item['explanation']);
-
-            if($item['name'])
-                $item['name'] .= ':';
-
-            $label = 	Xml::label( $item['name'], $id );
-            if(isset($item['icon']))
-                $label = "<img src='$item[icon]'> ".$label;
-
-            $wgOut->addHTML(
-                    $this->TableRow(
-                    $label,
-                    $form_element,
-                    Xml::tags('div', array( 'class' => 'prefsectiontip' ),
-                    $item['explanation'] )
-                    )
-            );
-            if(isset($item['html']))
-                $wgOut->addHTML('<tr><td colspan=2>'. $item['html'] .'</tr>');
+            $this->showItem($id);
         }
         $wgOut->addHTML( Xml::closeElement( 'table' ) );
 
@@ -278,7 +284,7 @@ class FormControl
     {
         global $vgPath;
         require_once("$vgPath/MwAdapter.php");
-        
+
         global $wgOut;
         $token = vfUser()->editToken();
         $wgOut->addHTML( "

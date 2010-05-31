@@ -9,8 +9,8 @@ require_once('../LocalSettings.php');
  * has priviledges for CREATE and DELETE of tables.
 */
 global $vgDBUserName, $vgDBUserPassword;
-//$vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
-//$vgDBUserPassword   = '';     // Password for database master user
+$vgDBUserName       = 'root'; // Master username for database (user has permission to create tables)
+$vgDBUserPassword   = '';     // Password for database master user
 
 /**
  * function vfDoSetup:

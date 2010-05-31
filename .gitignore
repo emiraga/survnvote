@@ -1,6 +1,7 @@
 .buildpath
 .project
 .settings/
+.htaccess
 debug.log.txt
 images/
 nbproject/

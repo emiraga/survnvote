@@ -33,9 +33,9 @@ class UserphonesDAO
      */
     public function __construct(MwUser &$user)
     {
-        $this->user = $user;
+        $this->user =& $user;
         if($this->user->isAnon())
-            throw new Exception("Cannot add phone numbers to anonymous user");
+            throw new Exception("Cannot add phone numbers to anonymous user.");
     }
     /**
      * Add new phone number for this user
@@ -101,7 +101,7 @@ class UserphonesDAO
         $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE id = ? and username = ? AND status != ?",
                 array($id, $this->user->getName(), vPHONE_VERIFIED));
         if($c == 0)
-            throw new Exception("No such record in userphones");
+            throw new Exception("No such record in userphones.");
 
         $confirm = $this->getNewCode();
         $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET confirmsent = ?, confirmcode = ?, status = ?  WHERE id = ?",
@@ -137,7 +137,7 @@ class UserphonesDAO
         $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}userphones WHERE id = ? AND username = ? AND confirmcode = ? AND confirmsent > ? AND status = ?",
                 array($id, $this->user->getName(), $code, $yesterday, vPHONE_SENT_CODE));
         if(! $number)
-            throw new Exception("Invalid code or it has expired");
+            throw new Exception("Invalid confirmation code.");
         $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE status=? AND phonenumber = ?",
                 array(vPHONE_VERIFIED, $number));
         if($c)
@@ -160,7 +160,7 @@ class UserphonesDAO
         $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE username = ? AND id = ?",
                 array($this->user->getName(), $id));
         if(! $c)
-            throw new Exception("Invalid code or it has expired");
+            throw new Exception("Invalid code or it has expired.");
         $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
                 array(vPHONE_DELETED, $id));
         return true;
