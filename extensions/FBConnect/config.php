@@ -89,11 +89,11 @@ $fbUserRightsFromGroup = false;  # Or a group ID
  */
 $fbPersonalUrls = array(
 	'hide_connect_button'   => false,
-	'hide_convert_button'   => false,
-	'hide_logout_of_fb'     => false,
+	'hide_convert_button'   => true,
+	'hide_logout_of_fb'     => true,
 	'link_back_to_facebook' => true,
 	'remove_user_talk_link' => false,
-	'use_real_name_from_fb' => false,
+	'use_real_name_from_fb' => true,
 );
 #$wgShowIPinHeader = false;
 
@@ -158,7 +158,7 @@ $fbIncludePreferencesExtension = true;
  * For more details see: http://developers.facebook.com/docs/authentication/permissions
  */
 $fbExtendedPermissions = array(
-	//'publish_stream',
+	'publish_stream',
 	//'read_stream',
 	//'email',
 	//'read_mailbox',
@@ -175,8 +175,8 @@ $fbExtendedPermissions = array(
  * This section allows controlling of whether push events are enabled, and which
  * of the push events to use.
  */
-$fbEnablePushToFacebook = false;
-if(!empty($fbEnablePushToFacebook)){
+$fbEnablePushToFacebook = true;
+//if(!empty($fbEnablePushToFacebook)){
 	$fbPushDir = dirname(__FILE__) . '/pushEvents/';
 	
 	// Convenience loop for push event classes in the fbPushDir directory
@@ -195,4 +195,4 @@ if(!empty($fbEnablePushToFacebook)){
 	// Example of explicitly adding a push event which doesn't meet the criteria above.
 	// $fbPushEventClasses[] = 'FBPush_OnEXAMPLE_CLASS';
 	// $wgAutoloadClasses['FBPush_OnEXAMPLE_CLASS'] = $fbPushDir . 'FBPush_OnEXAMPLE_version_1.php';
-}
+//}

@@ -498,6 +498,8 @@ class Facebook
    * @return String the response text
    */
   protected function makeRequest($url, $params, $ch=null) {
+      var_dump($url);
+      var_dump($params);
     if (!$ch) {
       $ch = curl_init();
     }
@@ -506,6 +508,8 @@ class Facebook
     $opts[CURLOPT_POSTFIELDS] = $params;
     $opts[CURLOPT_URL] = $url;
     curl_setopt_array($ch, $opts);
+    curl_setopt($ch,  CURLOPT_SSL_VERIFYPEER, FALSE);
+
     $result = curl_exec($ch);
     if ($result === false) {
       $e = new FacebookApiException(array(

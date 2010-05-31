@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright ï¿½ 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -210,12 +210,12 @@ class FBConnectAPI extends Facebook {
 	 * Publish message on Facebook wall.
 	 */
 	public function publishStream($message, $link = "", $link_title ) {
-		/*
+		
 		$attachment = array(
 			'name' => $message,
 			'href' => $link,
-			'caption' => $caption,
-			'description' => $description
+			'caption' => 'This is caption.',
+			'description' => 'This is description.',
 		);
 		
 		if( count($media) > 0 ) {
@@ -225,7 +225,7 @@ class FBConnectAPI extends Facebook {
 		}
 		/**/
 		// $api_error_descriptions
-		$attachment = array();
+		//$attachment = array();
 		
 		$query = array(
 			'method' => 'stream.publish',

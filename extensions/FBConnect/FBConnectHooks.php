@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright © 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
+ * Copyright ï¿½ 2008-2010 Garrett Brown <http://www.mediawiki.org/wiki/User:Gbruin>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,6 +23,21 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( 'This file is a MediaWiki extension, it is not a valid entry point' );
 }
 
+global $wgHooks;
+$wgHooks['UserLogout'][] = 'fnMyLogout';
+function fnMyLogout( &$user )
+{
+	foreach($_COOKIE as $name => $value)
+	{
+		setcookie ($name, "", time() - 3*24*60*60);
+		unset($_COOKIE[$name]);
+	}
+	//session_destroy();
+	global $facebook;
+	$facebook->setSession();
+	session_destroy();
+	return true;
+}
 
 /**
  * Class FBConnectHooks
@@ -39,6 +54,10 @@ class FBConnectHooks {
 	 * out the Facebook ID of the user that the userpage belongs to.
 	 */
 	public static function ArticleViewHeader( &$article, &$outputDone, &$pcache ) {
+//		echo "AAAAAAAAAAAAAAA";
+//                $ev = new FBConnectPushEvent();
+//        	$ev->pushEvent("New features", "http://www.votapedia.net/wiki/New_features", "Read more");
+
 		global $wgOut;
 		// Get the article title
 		$nt = $article->getTitle();
@@ -130,7 +149,7 @@ STYLE;
 			// Don't include jQuery if it's already in use on the site
 			#$out->includeJQuery();
 			// Temporary workaround until until MW is bundled with jQuery 1.4.2:
-			$out->addScriptFile('../../extensions/votapedia/jquery-1.4.2.min.js');
+			//$out->addScriptFile('../../extensions/votapedia/jquery-1.4.2.min.js');
 			
 			// Add the script file specified by $url
 			if(!empty($fbExtensionScript)){
@@ -144,7 +163,7 @@ STYLE;
 			
 			// Don't include jQuery if it's already in use on the site
 			if (!empty($fbIncludeJquery)){
-				$out->addScriptFile('../../extensions/votapedia/jquery-1.4.2.min.js');
+				//$out->addScriptFile('../../extensions/votapedia/jquery-1.4.2.min.js');
 			}
 			
 			// Add the script file specified by $url

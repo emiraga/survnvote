@@ -141,7 +141,7 @@ $wgEnableSidebarCache = true;
 # $wgGnuplotCommand = "C:\\bin\\gnuplot\\binary\\pgnuplot.exe";
 # require_once( "$IP/extensions/UsageStatistics/SpecialUserStats.php" );
 
-require_once("$IP/extensions/FBConnect/FBConnect.php");
+# require_once("$IP/extensions/FBConnect/FBConnect.php");
 
 $wgFbAppId       = '1be83abc6c4c6c2f0e43aaa03fc38a38';
 $wgFbSecret      = '956d1c6e0572c973647155bbd066ae63';

@@ -85,6 +85,7 @@ class MyPhones extends SpecialPage
      */
     function execute( $par = null )
     {
+        global $wgOut;
         try
         {
             $this->dao =& new UserphonesDAO(vfUser());
