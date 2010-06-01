@@ -15,7 +15,8 @@ $vgDBUserPassword = '';
 require_once("$vgPath/Common.php");
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
-require_once("$vgPath/DAO/Survey.php");
+require_once("$vgPath/DAO/SurveyDAO.php");
+require_once("$vgPath/DAO/UserphonesDAO.php");
 
 $page_cache = array();
 $surveydao = new SurveyDAO();
@@ -30,9 +31,18 @@ function rand_str($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
     return $string;
 }
 
+$a = microtime(true);
+function pointTime($msg = '')
+{
+    global $a;
+    $b = microtime(true);
+    printf(">>>> TIMIG TO POINT $msg --> %.6f\n",$b-$a);
+    $a = microtime(true);
+}
+
 function do_sms_action()
 {
-    global $vgSmsChoiceLen;
+    global $surveydao, $vgSmsChoiceLen, $vgDB, $vgDBPrefix;
     
     $new = Sms::getNewSms();
     foreach($new as $sms)
@@ -46,35 +56,45 @@ function do_sms_action()
             $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
                     array($username, $sms['from'],vPHONE_UNKNOWN, $now));
         }
-        //process SMS
-        $text = $sms['text'];
-        while(strlen($text) < $vgSmsChoiceLen)
-            $text = '0'+$text;
-        $text = substr($text, 0, $vgSmsChoiceLen);
 
-        //find page and vote
-        try
-        {
-            //load PageVO
-            $result = $vgDB->Execute("SELECT surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ?", array($sms));
-            if($result == false)
-                throw new SurveyException("SurveyID not found.");
-            $surveyid = $result['surveyID'];
-            $choiceid = $result['choiceID'];
-            $pageid = $vgDB->GetOne("SELECT pageID FROM {$vgDBPrefix}survey WHERE surveyID = ?", array($surveyid));
-            if($pageid == false)
-                throw new SurveyException("PageID not found.");
-            $page =& $surveydao->findByPageID($pageid, false);
+        $numbers = preg_split("/[^0-9]+/", $sms['text']);
 
-            //vote
-            $votedao = new VoteDAO($page, $username);
-            $votevo = $votedao->newFromPage('SMS', $surveyid, $choiceid );
-            $votedao->vote($votevo);
-        }
-        catch(Exception $e)
+        foreach($numbers as $choice)
         {
-            
+            if(strlen($choice) == 0 || strlen($choice) > $vgSmsChoiceLen)continue;
+
+            //process SMS
+            while(strlen($choice) < $vgSmsChoiceLen)
+                $choice = '0' . $choice;
+
+            //find page and try to vote
+            try
+            {
+                //load PageVO
+                $result = $vgDB->Execute("SELECT surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
+                        array($choice));
+                if($result == false)
+                    throw new SurveyException("SurveyID not found.");
+                $surveyid = $result->fields['surveyID'];
+                $choiceid = $result->fields['choiceID'];
+                $pageid = $vgDB->GetOne("SELECT pageID FROM {$vgDBPrefix}survey WHERE surveyID = ?",
+                        array($surveyid));
+                if($pageid == false)
+                    throw new SurveyException("PageID not found.");
+                $page =& $surveydao->findByPageID($pageid, false);
+
+                //vote
+                $votedao = new VoteDAO($page, $username);
+                $votevo = $votedao->newFromPage('SMS', $surveyid, $choiceid );
+                $votedao->vote($votevo);
+                echo "VOTE!\n";
+            }
+            catch(Exception $e)
+            {
+                echo $e->getMessage()."\n";
+            }
         }
+        Sms::processed($sms['id']);
     }
 }
 
@@ -91,7 +111,9 @@ if($args['daemon'] == '1')
 }
 else
 {
+    pointTime('start');
     do_sms_action();
+    pointTime('end');
 }
 
 ?>

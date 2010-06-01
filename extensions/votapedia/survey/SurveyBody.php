@@ -201,7 +201,7 @@ class SurveyBody
     {
         $pars = new Parser();
         $p = new MwParser($pars);
-        $lines = split("\n",$text);
+        $lines = preg_split("/\n/",$text);
         $output = '';
         if($title)
         {

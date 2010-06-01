@@ -186,7 +186,7 @@ END_SCRIPT;
         {
             $question = urldecode( $wgRequest->getVal("q{$index}name") );
             $choices = $wgRequest->getArray("q{$index}choices");
-            $surveyVO =& new SurveyVO();
+            $surveyVO = new SurveyVO();
             $surveyVO->generateChoices($choices, true);
             $surveyVO->setQuestion($question);
             $surveyVO->setType(vQUESTIONNAIRE);

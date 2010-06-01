@@ -1,7 +1,7 @@
 <?php
 if (!defined('MEDIAWIKI')) die('Cannot access this file.');
 
-require_once("$vgPath/config.php");
+require_once("config.php");
 require_once("$vgPath/UserHooks.php" );
 
 //International Texts and Aliases
@@ -33,6 +33,10 @@ $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
 //Special page MyPhones
 $wgAutoloadClasses['MyPhones'] = "$vgPath/special/MyPhones.php";
 $wgSpecialPages['MyPhones'] = 'MyPhones';
+
+//Special page SmsReport
+$wgAutoloadClasses['SmsReport'] = "$vgPath/special/SmsReport.php";
+$wgSpecialPages['SmsReport'] = 'SmsReport';
 
 //Tag <Survey />
 //Survey view options

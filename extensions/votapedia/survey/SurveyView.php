@@ -38,10 +38,10 @@ class SurveyView
         try
         {
             #var_dump($parser);
-            $mwparser =& new MwParser($parser);
+            $mwparser = new MwParser($parser);
             $mwparser->setTag();
-            $buttons =& new SurveyButtons();
-            $tag =& new SurveyView($page_id, $mwparser, $buttons);
+            $buttons = new SurveyButtons();
+            $tag = new SurveyView($page_id, $mwparser, $buttons);
             return $tag->getHTML();
         }
         catch(Exception $e)
@@ -108,10 +108,10 @@ class SurveyView
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body =& new SurveyBody($this->page, $this->parser);
+                $this->body = new SurveyBody($this->page, $this->parser);
                 break;
             case vQUESTIONNAIRE:
-                $this->body =& new QuestionnaireBody($this->page, $this->parser);
+                $this->body = new QuestionnaireBody($this->page, $this->parser);
                 break;
             default:
                 throw new Exception('Unknown survey type');

@@ -9,6 +9,7 @@ $messages['en'] = array(
     'processsurvey' => 'Process Survey',
     'viewsurvey' => 'View Survey',
     'myphones' => 'My Phones',
+    'smsreport' => 'Sms Report',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',

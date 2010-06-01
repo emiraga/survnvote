@@ -94,7 +94,7 @@ function vfGetColorImage($reset = false)
 function &vfAdapter()
 {
     if(! isset($GLOBALS['vgAdapter']))
-        $GLOBALS['vgAdapter'] =& new MwAdapter();
+        $GLOBALS['vgAdapter'] = new MwAdapter();
     return $GLOBALS['vgAdapter'];
 }
 /**
@@ -103,7 +103,7 @@ function &vfAdapter()
 function &vfUser()
 {
     if(! isset($GLOBALS['vgUser']))
-        $GLOBALS['vgUser'] =& new MwUser();
+        $GLOBALS['vgUser'] = new MwUser();
     return $GLOBALS['vgUser'];
 }
 /**
@@ -119,7 +119,7 @@ function vfConnectDatabase()
 {
     global $vgDBType, $vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName;
 
-    $cn = &ADONewConnection($vgDBType);
+    $cn = ADONewConnection($vgDBType);
     if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
         throw new SurveyException("Could not connect to database", 400);
     return $cn;
@@ -128,5 +128,5 @@ function vfConnectDatabase()
  * @var $vgDB global variable ADOdb connection
  */
 global $vgDB;
-$vgDB =& vfConnectDatabase();
+$vgDB = vfConnectDatabase();
 ?>

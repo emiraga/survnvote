@@ -498,8 +498,8 @@ class Facebook
    * @return String the response text
    */
   protected function makeRequest($url, $params, $ch=null) {
-      var_dump($url);
-      var_dump($params);
+      //var_dump($url);
+      //var_dump($params);
     if (!$ch) {
       $ch = curl_init();
     }

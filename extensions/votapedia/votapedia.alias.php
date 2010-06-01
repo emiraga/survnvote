@@ -8,5 +8,5 @@ $aliases['en'] = array(
         'ViewSurvey' => array( 'ViewSurvey' ),
         'ProcessSurvey' => array( 'ProcessSurvey' ),
         'MyPhones' => array( 'MyPhones' ),
+        'SmsReport' => array( 'SmsReport' ),
 );
-?>

@@ -428,7 +428,7 @@ class PageVO
      */
     function validateDate($date)
     {
-        if (ereg("^[0-9]{4}\-[0|1][0-9]\-[0-3][0-9]\040[0-9]{2}\:[0-9]{2}:[0-9]{2}", $date))
+        if (preg_match("/^[0-9]{4}\-[0|1][0-9]\-[0-3][0-9]\040[0-9]{2}\:[0-9]{2}:[0-9]{2}/", $date))
             return $date;
         else
             throw new SurveyException("Date/Time must follow yyyy-mm-dd hh:mm:ss format!",100);

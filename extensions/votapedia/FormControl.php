@@ -203,7 +203,7 @@ class FormControl
         if(isset($item['textafter']))
             $form_element .= $item['textafter'];
 
-        if($item['learn_more'])
+        if(isset($item['learn_more']))
         {
             $morepage = Title::newFromText($item['learn_more']);
             $item['explanation'] .=' &nbsp; <span>'
@@ -224,11 +224,16 @@ class FormControl
         if(isset($item['aftername']))
             $label .= $item['aftername'];
 
+        if(isset($item['explanation']))
+            $explanation = $item['explanation'];
+        else
+            $explanation = '';
+
         $wgOut->addHTML(
                 $this->TableRow(
                 $label,
                 $form_element,
-                Xml::tags('div', array( 'class' => 'prefsectiontip' ), $item['explanation'] ),
+                Xml::tags('div', array( 'class' => 'prefsectiontip' ), $explanation ),
                 isset($item['afterall'])?$item['afterall']:null
                 )
         );

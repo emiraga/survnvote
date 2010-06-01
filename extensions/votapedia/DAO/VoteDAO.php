@@ -33,7 +33,7 @@ class VoteDAO
      */
     function newFromPage($type, $surveyID, $choiceID, $presentationID = 0)
     {
-        $survey =& $this->page->getSurveyBySurveyID($surveyID);
+        //$survey =& $this->page->getSurveyBySurveyID($surveyID);
 
         $vote = new VoteVO();
         $vote->setSurveyID($surveyID);
@@ -80,7 +80,6 @@ class VoteDAO
             $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote+1 where surveyID = ? and choiceID = ?",
                     array($vote->getSurveyID(),  $vote->getChoiceID()));
         }
-        echo "COMPLETE";
         $vgDB->CompleteTrans();
         if ($vgDB->HasFailedTrans())
         {

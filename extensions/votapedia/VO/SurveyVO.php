@@ -62,7 +62,7 @@ class SurveyVO
 	 */
 	function setAnswer($answer)
 	{
-		if (ereg("^[0-9]{1,}$", $answer))
+		if (preg_match("/^[0-9]{1,}$/", $answer))
 		{
 			$this->answer = $answer;
 		}
@@ -78,7 +78,7 @@ class SurveyVO
 	 */
 	function setPoints($points)
 	{
-		if (ereg("^[0-9]{1,}$", $points))
+		if (preg_match("/^[0-9]{1,}$/", $points))
 		{
 			$this->points = $points;
 		}

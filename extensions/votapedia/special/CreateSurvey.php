@@ -57,7 +57,7 @@ class CreateSurvey
                         'valid' => function ($v,$i,$js)
                         {
                             if($js) return "";
-                            return strlen($v) > 10;
+                            return strlen($v) > 4;
                         },
                         'explanation' => 'e.g. "What is the capital of '.$vgCountry.'?". This will be the title of your survey page.',
                         'learn_more' => 'Details of Title or Survey Question',
@@ -201,7 +201,7 @@ class CreateSurvey
                             return intval($v);
                         },
                 ),
-                'voteridentity' => array(
+                /*'voteridentity' => array(
                         'type' => 'checkbox',
                         'name' => 'Voter Identity',
                         'default' => 'on',
@@ -213,7 +213,7 @@ class CreateSurvey
                         },
                         'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
                         'learn_more' => 'Details of Multiple Voting',
-                ),
+                ),*/
                 'titlewarning' => array(
                         'type' => 'infobox',
                         'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',

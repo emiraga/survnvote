@@ -53,7 +53,7 @@ class MwAdapter
         ));
         $api = new ApiMain($params);
         $api->execute();
-        $data = & $api->getResultData();
+        $data = $api->getResultData();
         $result = array();
         foreach($data['query']['categorymembers'] as $subcat)
         {
@@ -125,7 +125,7 @@ class MwParser
         global $wgUser, $wgTitle;
         //default values
         if(! $this->parserOptions)
-            $this->parserOptions =& ParserOptions::newFromUser($wgUser);
+            $this->parserOptions = ParserOptions::newFromUser($wgUser);
         //default values
         if(! $this->wikititle)
             $this->wikititle =& $wgTitle;
@@ -169,7 +169,7 @@ class MwUser
             {
                 // Is there a previous cookie?
                 $name = $_COOKIE['vcName'];
-                list($ip, $num)  = split('-', $name);
+                list($ip, $num)  = preg_split('/-/', $name);
                 if(intval($num) > 0 && $wgUser->getName() == $ip)
                 {
                     $randnum = intval($num);

@@ -96,7 +96,7 @@ class MyPhones extends SpecialPage
         global $wgOut;
         try
         {
-            $this->dao =& new UserphonesDAO(vfUser());
+            $this->dao = new UserphonesDAO(vfUser());
             global $wgOut, $wgRequest;
             if($wgRequest->getVal('wpSubmit') == wfMsg('add-number'))
             {
@@ -120,7 +120,8 @@ class MyPhones extends SpecialPage
                     require_once("$vgPath/Sms.php");
                     Sms::sendSMS($number, sprintf(Sms::$msgConfim, $code));
                     $wgOut->setPageTitle("SMS sent");
-                    $wgOut->addHTML( vfSuccessBox("Sms message with confirmation code was sent to $number.") );
+                    $wgOut->addHTML( vfSuccessBox("Sms message with confirmation code for $number will be delivered soon.") );
+                    $wgOut->addWikiText("\n[[Special:SmsReport|View the progress of your SMS on this page]]\n\n");
                     $wgOut->addReturnTo( Title::newFromText('Special:MyPhones') );
                     return;
                 }
@@ -130,6 +131,7 @@ class MyPhones extends SpecialPage
                 if(! vfUser()->checkEditToken())
                     die('Wrong edit token');
                 $code = $wgRequest->getVal('code');
+                $code = preg_replace('/[^0-9]/', '', $code);
                 $id = $wgRequest->getVal('id');
                 $this->dao->verifyCode($id, $code);
                 $wgOut->redirect($this->target, 302);
