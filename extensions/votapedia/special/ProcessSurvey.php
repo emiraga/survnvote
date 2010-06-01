@@ -105,7 +105,7 @@ class ProcessSurvey extends SpecialPage
                     $choiceid = intval($wgRequest->getVal('survey'.$surveyid));
                     if( $choiceid )
                     {
-                        $votevo = $votedao->newFromPage('WEB', vfUser()->getName(), $surveyid, $choiceid );
+                        $votevo = $votedao->newFromPage('WEB', $surveyid, $choiceid );
                         $votedao->vote($votevo);
                     }
                 }

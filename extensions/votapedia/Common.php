@@ -16,8 +16,9 @@ define('vPRIVACY_HIGH',   3);
 /* User phone status */
 define('vPHONE_NEW', 0);
 define('vPHONE_SENT_CODE', 1);
-define('vPHONE_VERIFIED', 2);
-define('vPHONE_DELETED', 3);
+define('vPHONE_DELETED', 2);
+define('vPHONE_VERIFIED', 10);
+define('vPHONE_UNKNOWN', 11); //phone owner did not confirm (verify) his phone
 
 /**
  * Return a current datetime formated in particular way.

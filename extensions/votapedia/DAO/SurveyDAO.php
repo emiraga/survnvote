@@ -90,16 +90,27 @@ class SurveyDAO
     /**
      * Find surveys which are related with wiki page
      *
-     * @param $id ID of wiki page
+     * @param $id IntegerID of wiki page
+     * @param $loadsurveys Boolean should we load all surveys
      * @return PageVO $page An instance of PageVO
      * @version 2.0
      */
-    function findByPageID($id)
+    function findByPageID($id, $loadsurveys = true)
     {
-        $page = $this->getOnePage("where pageID = ?", array($id));
+        $page = $this->getOnePage("where pageID = ?", array($id), $loadsurveys);
         if(!$page)
             throw new SurveyException("Cannot find this survey.", 201);
         return $page;
+    }
+    /**
+     * Find a page object based on the vote from SMS
+     * Assume that SMS is properly formated.
+     * @param $sms String properly formated SMS voting string
+     * @return PageVO PageVO object, or Boolean false if error.
+     */
+    function findPageBySMS($sms)
+    {
+        global $vgDB, $vgDBPrefix;
     }
     /**
      * Insert Page into database, optionally it includes

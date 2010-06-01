@@ -26,13 +26,12 @@ class VoteDAO
     /**
      * @param $page PageVO
      * @param $type of a vote, CALL, SMS or WEB
-     * @param $username ID of a user
      * @param $surveyID surveyID of a survey which want to be voted
      * @param $choiceID choice of a survey which voter wants to vote
      * @param $presentationID presentationID of a survey, could be NULL
      * @return SurveyVO object
      */
-    function newFromPage($type, $username, $surveyID, $choiceID, $presentationID = 0)
+    function newFromPage($type, $surveyID, $choiceID, $presentationID = 0)
     {
         $survey =& $this->page->getSurveyBySurveyID($surveyID);
 
@@ -40,7 +39,7 @@ class VoteDAO
         $vote->setSurveyID($surveyID);
         $vote->setChoiceID($choiceID);
         $vote->setPresentationID($presentationID);
-        $vote->setVoterID($username);
+        $vote->setVoterID($this->name);
         $vote->setVoteDate(vfDate());
         $vote->setVoteType( $type );
         $vote->setVotesAllowed( $this->page->getVotesAllowed() );

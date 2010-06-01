@@ -42,7 +42,7 @@ class UserphonesDAO
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username,phonenumber, status, dateadded) VALUES (?,?,?,?)",
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
                 array($this->user->getName(), $number,vPHONE_NEW, $now));
         return true;
     }
@@ -174,5 +174,12 @@ class UserphonesDAO
         $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
                 array(vPHONE_DELETED, $id));
         return true;
+    }
+
+    static function getNameFromPhone($phone)
+    {
+        global $vgDB, $vgDBPrefix;
+        return $vgDB->GetOne("SELECT username FROM {$vgDBPrefix}userphones WHERE phonenumber = ? AND status >= ?",
+            array($phone, vPHONE_VERIFIED));
     }
 }

@@ -163,7 +163,7 @@ class MwUser
         if($this->isAnon())
         {
             // Track anonymous users with cookies
-            $randnum = rand(10, getrandmax());
+            $randnum = rand(10, 2000000000);
             $needcookie = true;
             if(isset($_COOKIE['vcName']))
             {
@@ -287,22 +287,22 @@ class MwUser
             return $ip;
         return $author;
     }
-    /**
-     * Get mobile phone from wikidb
-     * Asumes that current logged user is the user doing the voting
-     *
-     * @return a string representing mobile phone of a user, or false if it does not exist
-     */
-    public function getUserMobileNumber()
+}
+/*
+class CustomUser extends MwUser
+{
+    public function __construct($name)
     {
-        if($this->isAnon())
-            throw new SurveyException("Not logged in", 400);
-        
-        $mobile = $this->getOption('mobilephone');
-        if(strlen($mobile) > 6) //@todo check validity of mobile number
-        {
-            return $mobile;
-        }
-        return false;
+        $this->name = $name;
+        //don't call parent
+    }
+    public function getDisplayName()
+    {
+        return $this->name;
+    }
+    public function isAnon()
+    {
+        throw new Exception("I don't know.");
     }
 }
+*/
