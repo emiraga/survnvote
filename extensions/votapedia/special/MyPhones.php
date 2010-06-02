@@ -103,7 +103,14 @@ class MyPhones extends SpecialPage
                 if(! vfUser()->checkEditToken())
                     die('Wrong edit token');
                 $phone = vfProcessNumber( $wgRequest->getVal('newnumber') );
-                $this->dao->addNewPhone($phone);
+                $id = $this->dao->addNewPhone($phone);
+                global $vgEnableSMS;
+                if($vgEnableSMS == false)
+                {
+                    //SMS is disabled, we have to assume that number is correct
+                    $code = $this->dao->getConfirmCode($id);
+                    $this->dao->verifyCode($id, $code);
+                }
                 $wgOut->redirect($this->target, 302);
                 return;
             }

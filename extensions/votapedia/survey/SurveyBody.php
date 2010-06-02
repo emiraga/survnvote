@@ -73,6 +73,8 @@ class SurveyBody
         $output = '';
         $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
+        $pagestatus = $this->page->getStatus();
+        
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
@@ -86,7 +88,7 @@ class SurveyBody
             }
 
             $output.='<ul>';
-            if($this->page->getStatus()=='ready')
+            if($pagestatus == 'ready')
             {
                 foreach ($choices as &$choice)
                 {
@@ -95,7 +97,7 @@ class SurveyBody
                     $output.=SurveyBody::getChoiceHTML($name, vfGetColor());
                 }
             }
-            elseif($this->page->getStatus() == 'active')
+            elseif($pagestatus == 'active')
             {
                 global $vgDB, $vgDBPrefix;
                 $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
@@ -139,7 +141,7 @@ class SurveyBody
                 }
                 $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
             }
-            elseif($this->page->getStatus() == 'ended')
+            elseif($pagestatus == 'ended')
             {
                 $numvotes = 0;
                 foreach ($choices as &$choice)
@@ -156,16 +158,43 @@ class SurveyBody
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
-                    $extra = "<div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"></div> $percent% ({$choice->getVote()})";
-                    $output.=SurveyBody::getChoiceHTML($name, '', $extra);
+                    if($percent)
+                        $extra = "<div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"></div> $percent% ({$choice->getVote()})";
+                    else
+                        $extra = '';
+                    $output.=SurveyBody::getChoiceHTML($name, $color, $extra);
                 }
             }
             $output.='</ul>';
             $this->graph->addSeries($graphseries);
         } // foreach Survey
 
+        //Show help message
+        if($pagestatus == 'active' && $this->has_control)
+        {
+            global $vgSmsNumber;
+            global $vgScript;
+            $output .= "<div class=\"successbox\" style=\"margin: 1em; float: none\">"
+            ."In order to vote: <ul>";
+            if($this->page->getPhoneVoting() != 'no')
+            {
+                $output .= "<li><img src=\"$vgScript/icons/phone.png\"> Ring a <u>number above</u>; (you will hear a busy tone).</li>";
+                global $vgEnableSMS;
+                if($vgEnableSMS)
+                {
+                    $output .= "<li><img src=\"$vgScript/icons/mobile.png\"> Sent SMS to <b>$vgSmsNumber</b> with <font color=red>red digits</font> corresponding to your choice.</li>";
+                }
+            }
+            if($this->page->getWebVoting() != 'no')
+            {
+                global $wgServer;
+                $output .= "<li><img src=\"$vgScript/icons/laptop.png\"> Visit webpage <code>$wgServer</code> and place a vote.</li>";
+            }
+            $output .= "</ul></div><div class=\"visualClear\"></div>";
+        }
+
         //Display how much time has left
-        if($this->page->getStatus() == 'active')
+        if($pagestatus == 'active')
         {
             $timeleft = strtotime($this->page->getEndTime()) - time();
             $id='timeleft_'.$this->page->getPageID().'_'.rand();
@@ -192,22 +221,42 @@ class SurveyBody
             $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         }
 
-        if($this->page->getStatus() == 'active' && $userhasvoted == false)
+        if($pagestatus == 'active' && $userhasvoted == false)
             $this->show_graph = false;
 
         if($this->has_control)
             $this->show_graph = true;
 
-        if($this->page->getStatus() == 'ready')
+        if($pagestatus == 'ready')
             $this->show_graph = false;
 
-        if(! $this->page->isShowGraphEnd() && $this->page->getStatus() != 'ended')
+        if(! $this->page->isShowGraphEnd() && $pagestatus != 'ended')
             $this->show_graph = false;
         
         if($this->show_graph)
         {
             //insert graph image at the beginning
-            $output = '<div style="float:right">'.$this->graph->getHTMLImage().'</div>' . $output;
+            $imgid = 'graph'.$this->page->getPageID().'_'.rand();
+            $output = '<div style="float:right">'.$this->graph->getHTMLImage($imgid).'</div>' . $output;
+
+            global $vgImageRefresh;
+            if($pagestatus == 'active' && $vgImageRefresh)
+            {
+                $script =
+                "<script>
+                function refresh$imgid()
+                {
+                    sajax_do_call('SurveyBody::graph', [{$this->page->getPageID()}],function(o) {
+                        graph = document.getElementById('$imgid');
+                        alert(graph.src);
+                        /*o.responseText*/
+                    });
+                }
+                setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
+                alert(document.getElementById('$imgid').src);
+                </script>";
+                $output.= str_replace("\n", "", $script);
+            }
         }
         return $output;
     }
@@ -217,7 +266,9 @@ class SurveyBody
      */
     function colorizePhone($phone)
     {
-        global $vgSmsChoiceLen;
+        global $vgSmsChoiceLen,$vgEnableSMS;
+        if($vgEnableSMS == false)
+            return $phone;
         return substr($phone, 0, -$vgSmsChoiceLen)
                 . '<font color=red>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
     }

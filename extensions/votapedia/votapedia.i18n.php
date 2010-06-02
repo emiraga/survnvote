@@ -43,4 +43,7 @@ $messages['en'] = array(
     'submit-code' => 'Submit confirmation code',
     'add-number' => 'Add number',
     'delete-number' => 'Delete',
+
+    'smsnot' => 'Sms is not enabled',
+    'smsnot-desc' => 'Sms is not enabled, please contact administrators.',
 );

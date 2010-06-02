@@ -18,12 +18,16 @@ class Graph {
     }
     public function addSeries($series)
     {
-        $this->series = $series;
+        $this->series[] = $series;
     }
-    public function getHTMLImage()
+    public function getHTMLImage($id = 'graph')
     {
         if($this->type == 'pie')
-            return "<img src=\"http://chart.apis.google.com/chart?cht=p3&chd={$this->series->getValuesFormat()}&chs=400x200&chdl={$this->series->getNamesFormat()}&chco={$this->series->getColorsFormat()}\" />";
+        {
+            $series = $this->series[0];
+            return "<img id=\"$id\" src=\"http://chart.apis.google.com/chart?cht=p3&chd={$series->getValuesFormat()}&"
+            ."chs=400x200&chdl={$series->getNamesFormat()}&chco={$series->getColorsFormat()}\" />";
+        }
         throw new Exception("Unknown graph type");
     }
 }

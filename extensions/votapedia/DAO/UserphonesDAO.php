@@ -36,15 +36,15 @@ class UserphonesDAO
      * Add new phone number for this user
      *
      * @param $number String
-     * @return Boolean true
+     * @return Integer New insert ID
      */
     public function addNewPhone($number)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
-                array($this->user->getName(), $number,vPHONE_NEW, $now));
-        return true;
+                array($this->user->getName(), $number, vPHONE_NEW, $now));
+        return $vgDB->Insert_ID();
     }
     /**
      * Get a list of phones for this user

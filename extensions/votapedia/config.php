@@ -39,11 +39,14 @@ $vgCatRemoveSuffix = array(' Surveys', ' Survey', ' Quiz', 'Quizes');
 // Allowed HTML/Mediawiki tags in survey choices.
 $vgAllowedTags = '<math><code><b><u><i>';
 
-//Allow anonymous users to create surveys
+// Allow anonymous users to create surveys
 $vgAnonSurveyCreation = true;
 
-// specify whether or not you are using the daemon
+// Specify whether or not you are using the daemon
 $vgUseDaemon = false;
+
+// Interval after which images will be refreshed, set 0 to disable
+$vgImageRefresh = 10; //@todo reduce this value
 
 /**
  * @return array containing all phone numbers that can be used for voting

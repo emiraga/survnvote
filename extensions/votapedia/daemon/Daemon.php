@@ -9,7 +9,7 @@ define('MEDIAWIKI',true);
 
 ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 
-$vgDBUserName = 'root'; //user that has priviledges to access SMS and votapedia
+$vgDBUserName = 'root'; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = '';
 
 require_once("$vgPath/Common.php");
@@ -22,7 +22,7 @@ $page_cache = array();
 $surveydao = new SurveyDAO();
 
 // Generate a random character string
-function rand_str($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
+function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
 {
     $chars_length = strlen($chars) - 1;
     $string = '';
@@ -32,7 +32,7 @@ function rand_str($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
 }
 
 $a = microtime(true);
-function pointTime($msg = '')
+function vfMeasureTime($msg = '')
 {
     global $a;
     $b = microtime(true);
@@ -40,9 +40,12 @@ function pointTime($msg = '')
     $a = microtime(true);
 }
 
-function do_sms_action()
+function vfDaemonSmsAction()
 {
-    global $surveydao, $vgSmsChoiceLen, $vgDB, $vgDBPrefix;
+    global $surveydao, $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS;
+    
+    if(! $vgEnableSMS)
+        return;
     
     $new = Sms::getNewSms();
     foreach($new as $sms)
@@ -51,7 +54,7 @@ function do_sms_action()
         $username = UserphonesDAO::getNameFromPhone($sms['from']);
         if($username == false)
         {
-            $username = rand_str();
+            $username = vfRandStr();
             $now = vfDate();
             $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
                     array($username, $sms['from'],vPHONE_UNKNOWN, $now));
@@ -105,15 +108,15 @@ if( isset($args['daemon']) && $args['daemon'] == '1')
     //run as a daemon
     while(1)
     {
-        do_sms_action();
+        vfDaemonSmsAction();
         sleep(2);
     }
 }
 else
 {
-    pointTime('start');
-    do_sms_action();
-    pointTime('end');
+    vfMeasureTime('start');
+    vfDaemonSmsAction();
+    vfMeasureTime('end');
 }
 
 ?>
