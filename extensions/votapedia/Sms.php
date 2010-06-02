@@ -38,18 +38,12 @@ class Sms
      */
     static function getNewSms()
     {
-        /*return array(
-            array(
-                    'id' => 100,
-                    'from' => '123459',
-                    'text' => '02 05',
-            ),
-            array(
-                    'id' => 100,
-                    'from' => '123467',
-                    'text' => '00 06',
-            ),
-        );*/
+        return array(
+            array('id' => 1001,'from' => '01','text' => '01 04',),
+            array('id' => 1002,'from' => '02','text' => '02 04',),
+            array('id' => 1003,'from' => '03','text' => '03 04',),
+            array('id' => 1004,'from' => '04','text' => '04 04',),
+        );
 
         global $vgDB;
         $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM smsd.inbox WHERE Processed = 'false'");

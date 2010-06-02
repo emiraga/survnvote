@@ -282,10 +282,14 @@ class MwUser
      */
     static function displayName($name)
     {
-        list($ip, $num)  = preg_split('/-/', $name);
+        $val = preg_split('/-/', $name);
+        if(count($val) == 1)
+            return $name;
+        $ip = $val[0];
+        $num = $val[1];
         if(intval($num) > 0 && User::isIP($ip))
             return $ip;
-        return $author;
+        return $name;
     }
 }
 /*

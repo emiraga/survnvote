@@ -171,7 +171,7 @@ class CreateSurvey
                 'showresultsend' => array(
                         'type' => 'checkbox',
                         'name' => 'Graph Options',
-                        'default' => 'on',
+                        'default' => false,
                         'checklabel' => ' Show results of voting only at the end. ',
                         'valid' => function($v,$i,$js)
                         {
@@ -278,7 +278,7 @@ class CreateSurvey
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
         $page->setDisplayTop($values['showtop']);
-        $page->setShowGraph(! (bool) $values['showresultsend']);
+        $page->setShowGraphEnd(! (bool) $values['showresultsend']);
         $page->setDuration( $values['duration'] );
         $page->setVotesAllowed(1);
         $page->setSMSRequired(false); //@todo SMS sending to the users
@@ -393,7 +393,7 @@ class CreateSurvey
     {
         $this->form->setValue('titleorquestion', $page->getTitle());
         $this->form->setValue('duration', $page->getDuration());
-        $this->form->setValue('showresultsend', ! (bool) $page->isShowGraph());
+        $this->form->setValue('showresultsend', ! (bool) $page->isShowGraphEnd());
         $this->form->setValue('showtop', $page->getDisplayTop());
         $this->form->setValue('privacy', $page->getPrivacyByName());
         $this->form->setValue('phonevoting', $page->getPhoneVoting());

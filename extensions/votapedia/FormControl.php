@@ -81,7 +81,7 @@ class FormControl
         $error = '';
         foreach($this->items as $id => &$element)
         {
-            if(isset($element['valid']))
+            if(isset($element['valid']) && isset($this->values[$id]))
                 if(! $element['valid']($this->values[ $id ], $element, false))
                     $error .= '<li>Incorrect value for <u>'.$element['name'].'</u> field.</li>';
         }

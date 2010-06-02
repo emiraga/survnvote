@@ -14,9 +14,14 @@ class SurveyBody
     /** @var MwParser */ protected $parser;
     /** @var Integer */  protected $type;
     /** @var Boolean */  protected $show_voting = false;
+    /** @var Boolean */  protected $show_phones = false;
+    /** @var Boolean */  protected $show_graph = false;
+    /** @var Boolean */  protected $has_control = false;
+    /** @var Graph */    protected $graph;
 
-    function  __construct(PageVO &$page, MwParser &$parser)
+    function  __construct(Graph &$graph, PageVO &$page, MwParser &$parser)
     {
+        $this->graph =& $graph;
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
@@ -24,6 +29,18 @@ class SurveyBody
     function setShowVoting($show)
     {
         $this->show_voting = $show;
+    }
+    function setShowNumbers($show)
+    {
+        $this->show_phones = $show;
+    }
+    function setHasControl($control)
+    {
+        $this->has_control = $control;
+    }
+    function setShowGraph($show)
+    {
+        $this->show_graph = $show;
     }
     /**
      *
@@ -34,16 +51,16 @@ class SurveyBody
      */
     static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
-        $output = "<div style=''>".$addtext."<div  style=\"display: block; width: 200px;$style\">";
+        $output = "<div style=''>".''."<div style=\"display: block; width: 340px;$style\">";
 
         if($vote)
-            $output .= "<li STYLE=\"list-style: none;\">$vote ";
+            $output .= "<li STYLE=\"list-style: square inside; color: #$color\">$vote";
         else
-            $output .= "<li STYLE=\"list-style: square inside; color: #$color\"><span style=\"color: black\">";
+            $output .= "<li STYLE=\"list-style: square inside; color: #$color\">";
 
-        $output .= "<label for=\"$voteid\">$choice</label> </li>";
+        $output .= "<label style=\"color: black\" for=\"$voteid\">$choice</label></li>";
 
-        return $output.'</p></div>'.'</div>';
+        return $output.'</div>'.$addtext.'</div>';
     }
     /**
      *
@@ -54,11 +71,14 @@ class SurveyBody
     {
         global $wgOut;
         $output = '';
+        $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
             $choices = $survey->getChoices();
+
+            $graphseries = new GraphSeries( $survey->getQuestion() ); //@todo remove extra things
 
             if($this->type != vSIMPLE_SURVEY)
             {
@@ -80,23 +100,28 @@ class SurveyBody
                 global $vgDB, $vgDBPrefix;
                 $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
                 $prev_vote = $vgDB->GetOne($sql, array(vfUser()->getName(), $survey->getSurveyID(), 0 ));
+                if($prev_vote)
+                    $userhasvoted=true;
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
+                    $graphseries->addItem($choice->getChoice(), $choice->getVote());
+
                     $name = $this->parser->run($choice->getChoice());
                     $extra='';
-                    if($this->page->getPhoneVoting() != 'no')
+                    if($this->show_phones)
                     {
-                        $extra='<span style="background-color: #E9F3FE; float: right; margin-right: 400px;">'
-                                .'<font color="#AAAAAA">Number:</font> '
+                        $extra='<span style="background-color: #E9F3FE">'
+                                .'<font color="#AAAAAA">Phone number:</font> '
                                 .$this->colorizePhone( $choice->getReceiver() )
                                 .'</span>';
                     }
                     $vote = '';
                     $voteid = '';
+
                     if($prev_vote == $choice->getChoiceID())
                     {
-                        $style = "border:1px dashed gray; background-color:#F5F5F5;";
+                        $style = "border:1px dashed gray; background-color:#F5F5F5; padding-left: 9px;";
                         $checked = ' checked';
                     }
                     else
@@ -105,7 +130,7 @@ class SurveyBody
                         $checked = '';
                     }
 
-                    if($this->show_voting)
+                    if($this->show_voting && $prev_vote == false)
                     {
                         $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
                         $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" $checked/>";
@@ -120,21 +145,23 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
+                    $graphseries->addItem($choice->getChoice(), $choice->getVote());
                     $numvotes += $choice->getVote();
                 }
                 if($numvotes == 0) $numvotes = 1;
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $image = vfGetColor();
+                    $color = vfGetColor();
                     $percent = 100.0 * $choice->getVote() / $numvotes;
+                    $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
-
-                    $extra = "<img src='$image' align=top border=1 height=10 width='$percent' /> $percent% ({$choice->getVote()})";
-                    $output.=SurveyBody::getChoiceHTML($name, '', "<br />$extra");
+                    $extra = "<div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"></div> $percent% ({$choice->getVote()})";
+                    $output.=SurveyBody::getChoiceHTML($name, '', $extra);
                 }
             }
             $output.='</ul>';
+            $this->graph->addSeries($graphseries);
         } // foreach Survey
 
         //Display how much time has left
@@ -152,7 +179,7 @@ class SurveyBody
             var vTimeleft=$timeleft;
             function updateTimeLeft(){
                 if(vTimeleft<=0)
-                    document.location.search = 'action=purge';
+                    location.reload(true);
                 c=vTimeleft%60+' seconds';
                 if(Math.floor(vTimeleft/60))
                     c=Math.floor(vTimeleft/60) + ' minutes ' + c;
@@ -165,6 +192,23 @@ class SurveyBody
             $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         }
 
+        if($this->page->getStatus() == 'active' && $userhasvoted == false)
+            $this->show_graph = false;
+
+        if($this->has_control)
+            $this->show_graph = true;
+
+        if($this->page->getStatus() == 'ready')
+            $this->show_graph = false;
+
+        if(! $this->page->isShowGraphEnd() && $this->page->getStatus() != 'ended')
+            $this->show_graph = false;
+        
+        if($this->show_graph)
+        {
+            //insert graph image at the beginning
+            $output = '<div style="float:right">'.$this->graph->getHTMLImage().'</div>' . $output;
+        }
         return $output;
     }
     /**
@@ -233,9 +277,9 @@ QuestionnaireBody extends SurveyBody
      * @param  $page PageVO
      * @param  $parser MwParser
      */
-    function  __construct(PageVO &$page, MwParser &$parser)
+    function  __construct(Graph &$graph, PageVO &$page, MwParser &$parser)
     {
-        parent::__construct($page, $parser);
+        parent::__construct($graph, $page, $parser);
         $this->type = vQUESTIONNAIRE;
     }
 }

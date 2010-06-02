@@ -24,7 +24,7 @@ class PageVO
     private $duration = 60;
     private $createTime;
     private $smsRequired = 0;
-    private $showGraph = 1;
+    private $showGraphEnd = 1;
     private $surveyType = 1;
     private $displayTop = 0;
     private $votesAllowed = 1;
@@ -124,9 +124,9 @@ class PageVO
      * set whether allow graph is shown in voting
      * @param $showGraph
      */
-    function setShowGraph($showGraph)
+    function setShowGraphEnd($showGraph)
     {
-        $this->showGraph = $showGraph;
+        $this->showGraphEnd = $showGraph;
     }
     /**
      * Set Top n presentations would be displayed
@@ -294,9 +294,9 @@ class PageVO
      * @return allow as 1, forbid as 0
      *
      */
-    function isShowGraph()
+    function isShowGraphEnd()
     {
-        if($this->showGraph)
+        if($this->showGraphEnd)
             return '1';
         else
             return '0';

@@ -1,0 +1,1 @@
+from PIL import Imagefor i in range(0,50):	im = Image.open("Choice%d.jpg"%i)	a = im.getcolors()	print "'%02X%02X%02X'," % a[0][1],

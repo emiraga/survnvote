@@ -5,7 +5,7 @@ $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
 
-require_once("$IP/LocalSettings.php");
+@require_once("$IP/LocalSettings.php");
 
 ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
 
@@ -100,7 +100,7 @@ function do_sms_action()
 
 //get command line parameters
 $args = $_SERVER['argv'];
-if($args['daemon'] == '1')
+if( isset($args['daemon']) && $args['daemon'] == '1')
 {
     //run as a daemon
     while(1)

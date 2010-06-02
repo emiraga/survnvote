@@ -6,6 +6,7 @@ require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/survey/SurveyButtons.php");
 require_once("$vgPath/survey/SurveyBody.php");
+require_once("$vgPath/Graph/Graph.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey
@@ -31,6 +32,7 @@ class SurveyView
      * @param  $frame
      */
     static function executeTag( $input, $args, $parser, $frame = NULL ) //do not change arguments
+
     {
         vfGetColor(true);
         $page_id = intval(trim($input));
@@ -107,16 +109,17 @@ class SurveyView
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody($this->page, $this->parser);
+                $this->body = new SurveyBody(new Graph('pie'), $this->page, $this->parser);
                 break;
             case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody($this->page, $this->parser);
+                $this->body = new QuestionnaireBody(new Graph('stack'), $this->page, $this->parser);
                 break;
             default:
                 throw new Exception('Unknown survey type');
         }
+
         //Should we enable web voting?
-        if($this->page->getStatus() == 'active' 
+        if($this->page->getStatus() == 'active'
                 && $this->page->getWebVoting() != 'no'
                 && ! vfUser()->isAuthor( $this->page ))
         {
@@ -127,13 +130,25 @@ class SurveyView
                 $this->body->setShowVoting(true);
             }
         }
+        
+        $this->body->setShowGraph(true);
+        
         //control?.
         if( vfUser()->canControlSurvey($this->page) )
+        {
             $this->buttons->setHasControl(true);
+            $this->body->setHasControl(true);
+
+            //Show phone numbers
+            if( $this->page->getPhoneVoting() != 'no')
+            {
+                $this->body->setShowNumbers(true);
+            }
+        }
     }
     /**
      * Get HTML of survey
-     * 
+     *
      * @return String html code
      */
     function getHTML()
@@ -153,9 +168,7 @@ class SurveyView
         $output .= $this->body->getHTML();
         $output .= '<br />';
         $output .= $this->buttons->getHTML();
-
         $output .= '</form>';
-
         if($this->page->getStatus() == 'ended')
         {
             $output .= "This survey has ended.";

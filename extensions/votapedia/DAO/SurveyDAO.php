@@ -38,7 +38,7 @@ class SurveyDAO
             $page->setEndTime($rs->fields["endTime"]);
             $page->setAuthor(trim($rs->fields["author"]));
             $page->setCreateTime($rs->fields['createTime']);
-            $page->setShowGraph($rs->fields['showGraph']);
+            $page->setShowGraphEnd($rs->fields['showGraph']);
             $page->setDisplayTop($rs->fields['displayTop']);
             $page->setVotesAllowed($rs->fields['votesAllowed']);
             $page->setType($rs->fields['surveyType']);
@@ -137,7 +137,7 @@ class SurveyDAO
                 $pageVO->getDuration(),
                 $pageVO->getEndTime(),
                 $pageVO->isSMSRequired(),
-                $pageVO->isShowGraph(),
+                $pageVO->isShowGraphEnd(),
                 $pageVO->getType(),
                 $pageVO->getDisplayTop(),
                 $pageVO->isSubtractWrong(),
@@ -192,7 +192,7 @@ class SurveyDAO
                 $pageVO->getDuration(),
                 $pageVO->getEndTime(),
                 $pageVO->isSMSRequired(),
-                $pageVO->isShowGraph(),
+                $pageVO->isShowGraphEnd(),
                 $pageVO->getType(),
                 $pageVO->getDisplayTop(),
                 $pageVO->getVotesAllowed(),
