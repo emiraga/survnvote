@@ -205,9 +205,8 @@ class FormControl
 
         if(isset($item['learn_more']))
         {
-            $morepage = Title::newFromText($item['learn_more']);
             $item['explanation'] .=' &nbsp; <span>'
-                    .'<a href="'.$morepage->escapeLocalURL().'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
+                    .'<a href="'.Skin::makeUrl($item['learn_more']).'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
         }
 
         if($item['type'] == 'infobox')
@@ -215,7 +214,6 @@ class FormControl
 
         if($item['name'])
             $item['name'] .= ':';
-
 
         $label = 	Xml::label( $item['name'], $id );
         if(isset($item['icon']))

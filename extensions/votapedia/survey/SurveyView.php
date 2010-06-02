@@ -31,9 +31,8 @@ class SurveyView
      * @param  $frame
      */
     static function executeTag( $input, $args, $parser, $frame = NULL ) //do not change arguments
-
     {
-        vfGetColorImage(true);
+        vfGetColor(true);
         $page_id = intval(trim($input));
         try
         {
@@ -173,7 +172,7 @@ class SurveyView
     {
         global $wgParser;
         $p = new MwParser($wgParser);
-        $lines = split("\n",$text);
+        $lines = preg_split("/\n/",$text);
         $output = '';
         foreach($lines as $line)
         {

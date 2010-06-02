@@ -39,7 +39,7 @@ class SmsReport extends SpecialPage
         if($admin)
         {
             $out .="== Account Balance ==\n";
-            $out .= '<font size="20" style="text-align:center">'.Sms::getLatestBalance()."</font>\n\n";
+            $out .= '<font size="20" style="text-align:center">'.Sms::getLatestBalance()."</font>\n\n\n";
         }
         $out .= "== Delivery ==\n";
         $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"

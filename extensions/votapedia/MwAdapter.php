@@ -282,7 +282,7 @@ class MwUser
      */
     static function displayName($name)
     {
-        list($ip, $num)  = split('-', $name);
+        list($ip, $num)  = preg_split('/-/', $name);
         if(intval($num) > 0 && User::isIP($ip))
             return $ip;
         return $author;

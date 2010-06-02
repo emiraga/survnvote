@@ -32,18 +32,18 @@ class SurveyBody
      * @param $addtext String Put Extra HTML after this choice
      * @return String HTML code
      */
-    static private function getChoiceHTML($choice, $image, $addtext='', $vote='', $voteid='', $style='')
+    static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
         $output = "<div style=''>".$addtext."<div  style=\"display: block; width: 200px;$style\">";
 
         if($vote)
             $output .= "<li STYLE=\"list-style: none;\">$vote ";
         else
-            $output .= "<li STYLE=\"list-style-image: url(".$image.");\"> ";
+            $output .= "<li STYLE=\"list-style: square inside; color: #$color\"><span style=\"color: black\">";
 
         $output .= "<label for=\"$voteid\">$choice</label> </li>";
 
-        return $output.'</div>'.'</div>';
+        return $output.'</p></div>'.'</div>';
     }
     /**
      *
@@ -72,7 +72,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage());
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColor());
                 }
             }
             elseif($this->page->getStatus() == 'active')
@@ -110,7 +110,7 @@ class SurveyBody
                         $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
                         $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" $checked/>";
                     }
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColorImage(), $extra, $vote, $voteid, $style);
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColor(), $extra, $vote, $voteid, $style);
                 }
                 $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
             }
@@ -126,7 +126,7 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $image = vfGetColorImage();
+                    $image = vfGetColor();
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
 
@@ -187,7 +187,7 @@ class SurveyBody
     {
         global $wgParser;
         $p = new MwParser($wgParser);
-        return SurveyBody::getChoiceHTML( $p->run(trim($line), false), vfGetColorImage());
+        return SurveyBody::getChoiceHTML( $p->run(trim($line), false), vfGetColor());
     }
     /**
      * Parse multiline wiki code
@@ -205,7 +205,7 @@ class SurveyBody
         $output = '';
         if($title)
         {
-            $output .= $p->run($title, true);
+            $output .= $p->run($title, false);
         }
         $output .= '<ul style="margin: 0.2em;">';
         foreach($lines as $line)
@@ -213,7 +213,7 @@ class SurveyBody
             $line = trim($line);
             if($line)
             {
-                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColorImage());
+                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColor());
             }
         }
         $output .= '</ul>';

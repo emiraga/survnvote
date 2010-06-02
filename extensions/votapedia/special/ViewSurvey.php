@@ -28,7 +28,7 @@ class ViewSurvey extends SpecialPage {
 		global $wgOut, $wgParser, $wgRequest;
 		$wgOut->setPageTitle( wfMsg('title-view-survey') );
 		$wgOut->setArticleFlag(false);
-		vfGetColorImage(true);
+		vfGetColor(true);
                 
 		try
 		{

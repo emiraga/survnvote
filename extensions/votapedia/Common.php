@@ -78,15 +78,24 @@ class SurveyException extends Exception
  * @param $reset Boolean should colors be reset
  * @return String a path to image
  */
-function vfGetColorImage($reset = false)
+global $vgColors;
+$vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '008001',
+    'FF6833', '330065', '006599', 'CD9933', '006766', '99CCCD', '660066', 'FFFFCB',
+    'CD3301', '272727', '807FFE', '804000', 'FE80FE', '00FF41', 'FFFF00', 'FE0000',
+    '808042', '247D9F', 'FE8081', '807FFE', 'FF8041', '427F80', 'C0C0C0', '7F00FF',
+    'FF00FE', '800000', '7FFFFE', 'E3A39A', '804000', 'FFFF00', '800000', '007FFF',
+    '7F00FF', 'FE0000', '81FF81', '47064A', 'B8D2D3', 'DBC1B0', '008001', 'FE8DA1',
+    '47064A', '804000', 'FF0080');
+
+function vfGetColor($reset = false)
 {
     static $c = 0;
     if($reset)
         return $c = 0;
 
-    $c = ($c + 1) % 50;
-    global $vgScript;
-    return "$vgScript/images/colors/Choice$c.jpg";
+    global $vgColors;
+    $c = ($c + 1) % count($vgColors);
+    return $vgColors[$c];
 }
 /**
  * Get a singleton of MediaWiki adapter

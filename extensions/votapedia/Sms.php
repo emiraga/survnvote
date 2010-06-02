@@ -20,7 +20,7 @@ class Sms
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */
-    static public $blackList = array('2888', '28882');
+    static public $blackList = array('2888', '28882', 'CELCOM', '22990');
 
     /**
      * function getNewSms()

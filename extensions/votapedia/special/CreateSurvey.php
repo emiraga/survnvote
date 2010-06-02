@@ -77,7 +77,7 @@ class CreateSurvey
                         },
                         'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).' &amp;lt; &amp;gt;',
                         'learn_more' => 'Details of Editing Surveys',
-                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 20px;\\"></div>");</script>',
+                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 5px;\\"></div>");</script>',
                 ),
                 'category' => array(
                         'type' => 'select',
@@ -294,7 +294,7 @@ class CreateSurvey
     protected function generateSurveysArray($values)
     {
         $surveyVO = new SurveyVO();
-        $surveyVO->generateChoices( split("\n", $values['choices']) );
+        $surveyVO->generateChoices( preg_split("/\n/", $values['choices']) );
         $surveyVO->setQuestion('#see page title');
         $surveyVO->setType(vSIMPLE_SURVEY);
         $surveyVO->setVotesAllowed(1);
@@ -324,13 +324,13 @@ class CreateSurvey
         {
             return '<li>'.$e->getMessage().'</li>';
         }
-
+        $wikiText = '';
         $wikiText.='{{#'.$this->tagname.':'. $page->getPageID() .'}}';
         $wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
         $wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
 
-        if(strlen($values[category]) > 5)
-            $wikiText.="[[".htmlspecialchars($values[category])."]]\n";
+        if(strlen($values['category']) > 5)
+            $wikiText.="[[".htmlspecialchars($values['category'])."]]\n";
 
         $wikititle = FormControl::RemoveSpecialChars($wikititle);
         $this->insertWikiPage($wikititle, $wikiText, true);
@@ -349,7 +349,6 @@ class CreateSurvey
      */
     function insertWikiPage($newtitle, $wikiText, $resolveDuplicates = false)
     {
-        echo "insertWikiPage: $newtitle<br>";
         if($resolveDuplicates)
         {
             $i = 1;
@@ -466,7 +465,7 @@ class CreateSurvey
         $this->fillFormValuesFromPage($page);
         //draw form
         $this->preDrawForm();
-        $this->drawFormEdit($page_id, $error);
+        $this->drawFormEdit($page_id);
     }
     function processEditSurveySubmit()
     {
