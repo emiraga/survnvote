@@ -2,7 +2,7 @@
 define('MEDIAWIKI',true);
 define('VOTAPEDIA_SETUP',true);
 
-require_once('../LocalSettings.php');
+@require_once('../LocalSettings.php');
 
 /*
  * Enter user/pass of a admin account for mysql that
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   phone varchar(20) DEFAULT NULL,
   createTime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   smsRequired tinyint(1) NOT NULL DEFAULT '0', 
-  showGraph tinyint(1) NOT NULL DEFAULT '1',
+  showGraphEnd tinyint(1) NOT NULL DEFAULT '0',
   displayTop tinyint(4) NOT NULL DEFAULT '0',
   surveyType tinyint(4) NOT NULL DEFAULT '1',
   votesAllowed tinyint(8) NOT NULL DEFAULT '1',
@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
+  pageID int NOT NULL,
   surveyID int NOT NULL,
   choiceID int NOT NULL DEFAULT '1',
   choice blob NOT NULL,
@@ -116,6 +117,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
   ID int NOT NULL AUTO_INCREMENT,
   voterID varchar(255) NOT NULL DEFAULT 'unknown',
+  pageID int NOT NULL,
   surveyID int NOT NULL,
   presentationID int NOT NULL DEFAULT '0',
   choiceID int NOT NULL,
@@ -151,7 +153,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}userphones
 
 END_SQL;
 
-    $commands = split(';', $sql);
+    $commands = preg_split('/;/', $sql);
     foreach($commands as $sql)
     {
         $sql = trim($sql);

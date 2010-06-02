@@ -35,7 +35,6 @@ class SurveyRecordDAO
 
 		return true;
 	}
-
 	/** 
 	 * Check whether the voter has voted to this survey before
 	 * 
@@ -62,9 +61,10 @@ class SurveyRecordDAO
 	{
 		global $vgDB, $vgDBPrefix;
 
-		$sql = "insert into {$vgDBPrefix}surveyRecord (surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?)";
+		$sql = "insert into {$vgDBPrefix}surveyRecord (pageID, surveyID, choiceID, presentationID, voterID, voteDate, voteType) values(?,?,?,?,?,?,?)";
 		
 		$params = array(
+                        $surveyRecordVO->getPageID(),
 			$surveyRecordVO->getSurveyID(),$surveyRecordVO->getChoiceID(),$surveyRecordVO->getPresentationID(),
 			$surveyRecordVO->getVoterID(),$surveyRecordVO->getVoteDate(), $surveyRecordVO->getVoteType(),
 		);

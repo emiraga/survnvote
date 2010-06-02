@@ -38,7 +38,7 @@ class SurveyDAO
             $page->setEndTime($rs->fields["endTime"]);
             $page->setAuthor(trim($rs->fields["author"]));
             $page->setCreateTime($rs->fields['createTime']);
-            $page->setShowGraphEnd($rs->fields['showGraph']);
+            $page->setShowGraphEnd($rs->fields['showGraphEnd']);
             $page->setDisplayTop($rs->fields['displayTop']);
             $page->setVotesAllowed($rs->fields['votesAllowed']);
             $page->setType($rs->fields['surveyType']);
@@ -125,7 +125,7 @@ class SurveyDAO
         $vgDB->StartTrans();
 
         $sql = "insert into {$vgDBPrefix}page (title,author,phone,startTime,duration,endTime,"
-                ."smsRequired,showGraph,surveyType,"
+                ."smsRequired,showGraphEnd,surveyType,"
                 ."displayTop,subtractWrong,privacy,phonevoting,webvoting)values"
                 ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         //@todo some fields from page are missing
@@ -137,7 +137,7 @@ class SurveyDAO
                 $pageVO->getDuration(),
                 $pageVO->getEndTime(),
                 $pageVO->isSMSRequired(),
-                $pageVO->isShowGraphEnd(),
+                $pageVO->getShowGraphEnd(),
                 $pageVO->getType(),
                 $pageVO->getDisplayTop(),
                 $pageVO->isSubtractWrong(),
@@ -182,7 +182,7 @@ class SurveyDAO
         $vgDB->StartTrans();
         $sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
                 . "smsRequired=?,"
-                . " showGraph=?,surveyType=?,displayTop=?,votesallowed=?,"
+                . " showGraphEnd=?,surveyType=?,displayTop=?,votesallowed=?,"
                 . "subtractWrong=?,privacy=?, phonevoting=?, webvoting=?"
                 . "where pageID = ?";
         $resPage = $vgDB->Prepare($sql);
@@ -192,7 +192,7 @@ class SurveyDAO
                 $pageVO->getDuration(),
                 $pageVO->getEndTime(),
                 $pageVO->isSMSRequired(),
-                $pageVO->isShowGraphEnd(),
+                $pageVO->getShowGraphEnd(),
                 $pageVO->getType(),
                 $pageVO->getDisplayTop(),
                 $pageVO->getVotesAllowed(),
@@ -246,8 +246,10 @@ class SurveyDAO
             //Redundant info from PageVO
             $survey->setType($page->getType());
             $survey->setVotesAllowed( $page->getVotesAllowed() );
+            trigger_error('$survey->setType($page->getType())',E_USER_ERROR);
+            die('horrible death');
             //choices
-            $choices = $this->getChoices($survey->getSurveyID());
+            $choices = $this->getChoices($survey->getSurveyID(), $survey->getPageID());
             $survey->setChoices($choices);
             //presentations
             $presentations = $this->getPresentations($survey->getSurveyID());
@@ -280,6 +282,10 @@ class SurveyDAO
      */
     function getActiveSurveyById($surveyid, $presentationid = 0)
     {
+        not_used();
+        trigger_error('getActiveSurveyById');
+        die('horribly?');
+        
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
         $sql = "select * from {$vgDBPrefix}survey join {$vgDBPrefix}page "
@@ -392,7 +398,7 @@ class SurveyDAO
         if ($survey->getNumOfChoices() > 0)
         {
             //Insert Choices begin
-            $sql = "insert into {$vgDBPrefix}surveyChoice (surveyID, choiceID, choice, points) values (?,?,?,?)";
+            $sql = "insert into {$vgDBPrefix}surveyChoice (pageID, surveyID, choiceID, choice, points) values (?,?,?,?,?)";
             $resChoice = $vgDB->Prepare($sql);
             $choiceID = 0;
             $choices =& $survey->getChoices();
@@ -400,6 +406,7 @@ class SurveyDAO
             {
                 $choiceID++;
                 $param = array(
+                        $survey->getPageID(),
                         $survey->getSurveyID(),
                         $choiceID,
                         $surveyChoice->getChoice(),
@@ -508,7 +515,7 @@ class SurveyDAO
             //Redundant info from PageVO for simplify further development
             $survey->setType($page->getType());
 
-            $choices = $this->getChoices($survey->getSurveyID());
+            $choices = $this->getChoices($survey->getSurveyID(), $survey->getPageID());
             $survey->setChoices($choices);
 
             $presentations = $this->getPresentations($survey->getSurveyID());
@@ -522,18 +529,19 @@ class SurveyDAO
         return $surveys;
     }
     /**
-     * private functin. Get choices of a survey
+     * Private function. Get choices of a survey.
      *
      * @param $surveyID
+     * @param $pageID
      * @return array $choices
      * @version 2.0
      */
-    private function getChoices($surveyID)
+    private function getChoices($surveyID, $pageID)
     {
         global $vgDB, $vgDBPrefix;
-        $sql = "select * from {$vgDBPrefix}surveyChoice where surveyID=? order by choiceID";
+        $sql = "select * from {$vgDBPrefix}surveyChoice where surveyID=? and pageID=? order by choiceID";
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
-        $rsChoice = &$vgDB->Execute($sql, array($surveyID));
+        $rsChoice = &$vgDB->Execute($sql, array($surveyID, $pageID));
 
         $choices = array();
         while(!$rsChoice->EOF)
@@ -542,6 +550,7 @@ class SurveyDAO
             //small case
             $choice = new ChoiceVO();
             $choice->setSurveyID($rsChoice->fields['surveyID']);
+            $choice->setPageID($rsChoice->fields['pageID']);
             $choice->setChoiceID($rsChoice->fields['choiceID']);
             $choice->setChoice(trim($rsChoice->fields['choice']));
             $choice->setReceiver(trim($rsChoice->fields['receiver']));

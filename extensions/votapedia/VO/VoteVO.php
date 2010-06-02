@@ -10,6 +10,7 @@ if (!defined('MEDIAWIKI')) die();
  */
 class VoteVO
 {
+    private $pageID;
     private $surveyID;
     private $choiceID;
     private $presentationID = 0;
@@ -23,6 +24,13 @@ class VoteVO
     public function getSurveyID()
     {
         return $this->surveyID;
+    }
+    /**
+     * @return integer page ID
+     */
+    public function getPageID()
+    {
+        return $this->pageID;
     }
     /**
      * @return integer choice ID
@@ -68,7 +76,13 @@ class VoteVO
     {
         return $this->votesAllowed;
     }
-
+    /**
+     * @param $pageid
+     */
+    public function setPageID($pageid)
+    {
+        $this->pageID = $pageid;
+    }
     /**
      * @param $surveyid
      */

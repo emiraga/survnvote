@@ -109,10 +109,10 @@ class SurveyView
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody(new Graph('pie'), $this->page, $this->parser);
+                $this->body = new SurveyBody($this->page, $this->parser);
                 break;
             case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody(new Graph('stack'), $this->page, $this->parser);
+                $this->body = new QuestionnaireBody($this->page, $this->parser);
                 break;
             default:
                 throw new Exception('Unknown survey type');
@@ -126,8 +126,8 @@ class SurveyView
             //either user is not anonymous or it is allowed to vote anonymously
             if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
             {
-                $this->buttons->setVoteButton(true);
                 $this->body->setShowVoting(true);
+                $this->buttons->setVoteButton(true);
             }
         }
         

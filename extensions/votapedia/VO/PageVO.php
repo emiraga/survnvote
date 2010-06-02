@@ -126,7 +126,7 @@ class PageVO
      */
     function setShowGraphEnd($showGraph)
     {
-        $this->showGraphEnd = $showGraph;
+        $this->showGraphEnd = (bool) $showGraph;
     }
     /**
      * Set Top n presentations would be displayed
@@ -284,22 +284,16 @@ class PageVO
      */
     function isSMSRequired()
     {
-        if($this->smsRequired)
-            return '1';
-        else
-            return '0';
+        return $this->smsRequired;
     }
     /**
      * Check wether the survey allows to show graph in voting
      * @return allow as 1, forbid as 0
      *
      */
-    function isShowGraphEnd()
+    function getShowGraphEnd()
     {
-        if($this->showGraphEnd)
-            return '1';
-        else
-            return '0';
+        return $this->showGraphEnd;
     }
     /**
      * Should incorrect answers be subtracted from points

@@ -39,10 +39,10 @@ class Sms
     static function getNewSms()
     {
         return array(
-            array('id' => 1001,'from' => '01','text' => '01 04',),
-            array('id' => 1002,'from' => '02','text' => '02 04',),
-            array('id' => 1003,'from' => '03','text' => '03 04',),
-            array('id' => 1004,'from' => '04','text' => '04 04',),
+            array('id' => 1001,'from' => '00','text' => '00 01',),
+            array('id' => 1001,'from' => '01','text' => '01 03',),
+            array('id' => 1002,'from' => '02','text' => '02 03',),
+            array('id' => 1003,'from' => '03','text' => '03 03',),
         );
 
         global $vgDB;

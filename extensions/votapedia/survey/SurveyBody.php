@@ -19,9 +19,9 @@ class SurveyBody
     /** @var Boolean */  protected $has_control = false;
     /** @var Graph */    protected $graph;
 
-    function  __construct(Graph &$graph, PageVO &$page, MwParser &$parser)
+    function  __construct(PageVO &$page, MwParser &$parser)
     {
-        $this->graph =& $graph;
+        $this->graph = new Graph('pie');
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
@@ -174,7 +174,7 @@ class SurveyBody
         {
             global $vgSmsNumber;
             global $vgScript;
-            $output .= "<div class=\"successbox\" style=\"margin: 1em; float: none\">"
+            $output .= "<div class=\"successbox\" style=\"margin: 1em; float: none; clear: both;\">"
             ."In order to vote: <ul>";
             if($this->page->getPhoneVoting() != 'no')
             {
@@ -229,19 +229,20 @@ class SurveyBody
 
         if($pagestatus == 'ready')
             $this->show_graph = false;
-
-        if(! $this->page->isShowGraphEnd() && $pagestatus != 'ended')
+        
+        if($this->page->getShowGraphEnd() && $pagestatus != 'ended')
             $this->show_graph = false;
         
         if($this->show_graph)
         {
             //insert graph image at the beginning
-            $imgid = 'graph'.$this->page->getPageID().'_'.rand();
+            $imgid = 'gr'.$this->page->getPageID().'_'.rand();
             $output = '<div style="float:right">'.$this->graph->getHTMLImage($imgid).'</div>' . $output;
 
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
             {
+                $now = time();
                 $script =
                 "<script>
                 function refresh$imgid()
@@ -249,12 +250,13 @@ class SurveyBody
                     sajax_do_call('SurveyBody::graph', [{$this->page->getPageID()}],function(o) {
                         graph = document.getElementById('$imgid');
                         alert(graph.src);
-                        /*o.responseText*/
                     });
                 }
+                var time$imgid = \"$now\";
                 setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
                 alert(document.getElementById('$imgid').src);
                 </script>";
+                /*o.responseText*/
                 $output.= str_replace("\n", "", $script);
             }
         }
@@ -328,10 +330,10 @@ QuestionnaireBody extends SurveyBody
      * @param  $page PageVO
      * @param  $parser MwParser
      */
-    function  __construct(Graph &$graph, PageVO &$page, MwParser &$parser)
+    function  __construct(PageVO &$page, MwParser &$parser)
     {
         parent::__construct($graph, $page, $parser);
+        $this->graph = new Graph('stacked');
         $this->type = vQUESTIONNAIRE;
     }
 }
-?>

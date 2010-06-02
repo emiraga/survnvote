@@ -31,11 +31,12 @@ class VoteDAO
      * @param $presentationID presentationID of a survey, could be NULL
      * @return SurveyVO object
      */
-    function newFromPage($type, $surveyID, $choiceID, $presentationID = 0)
+    function newFromPage($type, $pageID, $surveyID, $choiceID, $presentationID = 0)
     {
         //$survey =& $this->page->getSurveyBySurveyID($surveyID);
 
         $vote = new VoteVO();
+        $vote->setPageID($pageID);
         $vote->setSurveyID($surveyID);
         $vote->setChoiceID($choiceID);
         $vote->setPresentationID($presentationID);
@@ -57,7 +58,7 @@ class VoteDAO
         $vgDB->StartTrans();
 
         // Check whether voted before
-        $sql ="select * from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
+        $sql ="select ID, choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
         $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
@@ -74,8 +75,8 @@ class VoteDAO
         }
         else
         {
-            $vgDB->Execute("insert into {$vgDBPrefix}surveyRecord (voterID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?)",
-                    array($vote->getVoterID(), $vote->getSurveyID(), $vote->getChoiceID(),
+            $vgDB->Execute("insert into {$vgDBPrefix}surveyRecord (voterID, pageID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?,?)",
+                    array($vote->getVoterID(), $vote->getPageID(), $vote->getSurveyID(), $vote->getChoiceID(),
                     $vote->getPresentationID(), $vote->getVoteDate(), $vote->getVoteType()));
             $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote+1 where surveyID = ? and choiceID = ?",
                     array($vote->getSurveyID(),  $vote->getChoiceID()));

@@ -74,21 +74,17 @@ function vfDaemonSmsAction()
             try
             {
                 //load PageVO
-                $result = $vgDB->Execute("SELECT surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
+                $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
                         array($choice));
                 if($result == false)
                     throw new SurveyException("SurveyID not found.");
                 $surveyid = $result->fields['surveyID'];
                 $choiceid = $result->fields['choiceID'];
-                $pageid = $vgDB->GetOne("SELECT pageID FROM {$vgDBPrefix}survey WHERE surveyID = ?",
-                        array($surveyid));
-                if($pageid == false)
-                    throw new SurveyException("PageID not found.");
+                $pageid = $result->fields['pageID'];
                 $page =& $surveydao->findByPageID($pageid, false);
-
                 //vote
                 $votedao = new VoteDAO($page, $username);
-                $votevo = $votedao->newFromPage('SMS', $surveyid, $choiceid );
+                $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );
                 $votedao->vote($votevo);
                 echo "VOTE!\n";
             }

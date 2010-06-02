@@ -243,7 +243,6 @@ END_SCRIPT;
 
                 $chVO = new ChoiceVO();
                 $chVO->setChoice($choice);
-
                 $choices[] = $chVO;
             }
 

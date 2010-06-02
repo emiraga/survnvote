@@ -47,7 +47,7 @@ class Telephone
     function getAvailablePhones()
     {
         global $vgDB,$vgDBPrefix;
-        $sql = "select receiver from {$vgDBPrefix}usedreceivers{$addTable}";
+        $sql = "select receiver from {$vgDBPrefix}usedreceivers";
         $rs= &$vgDB->GetAll($sql);
         $telephones = array();
         foreach($rs as $r)
