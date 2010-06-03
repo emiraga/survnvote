@@ -1,5 +1,5 @@
 <?php
-define('MEDIAWIKI',true);
+if(!defined('MEDIAWIKI')) define('MEDIAWIKI',true);
 define('VOTAPEDIA_SETUP',true);
 
 @require_once('../LocalSettings.php');
@@ -62,20 +62,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
 -- --------------------------------------------------------
 
 --
--- Table structure for table presentation
---
-
-CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
-  surveyID int NOT NULL,
-  presentationID int NOT NULL,
-  presentation varchar(1000) NOT NULL,
-  active tinyint(1) NOT NULL DEFAULT '0',
-  mark tinyint(8) NOT NULL DEFAULT '0'
-);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table survey
 --
 
@@ -106,6 +92,20 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   vote int NOT NULL DEFAULT '0',
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table presentation
+--
+
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
+  surveyID int NOT NULL,
+  presentationID int NOT NULL,
+  presentation varchar(1000) NOT NULL,
+  active tinyint(1) NOT NULL DEFAULT '0',
+  mark tinyint(8) NOT NULL DEFAULT '0'
 );
 
 -- --------------------------------------------------------

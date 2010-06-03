@@ -38,12 +38,13 @@ class Sms
      */
     static function getNewSms()
     {
+        /* fake votes used for testing * /
         return array(
             array('id' => 1001,'from' => '00','text' => '00 01',),
             array('id' => 1001,'from' => '01','text' => '01 03',),
             array('id' => 1002,'from' => '02','text' => '02 03',),
             array('id' => 1003,'from' => '03','text' => '03 03',),
-        );
+        ); /* */
 
         global $vgDB;
         $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM smsd.inbox WHERE Processed = 'false'");

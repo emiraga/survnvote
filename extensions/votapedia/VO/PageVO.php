@@ -24,7 +24,7 @@ class PageVO
     private $duration = 60;
     private $createTime;
     private $smsRequired = 0;
-    private $showGraphEnd = 1;
+    private $showGraphEnd = true;
     private $surveyType = 1;
     private $displayTop = 0;
     private $votesAllowed = 1;

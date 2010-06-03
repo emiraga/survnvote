@@ -188,7 +188,7 @@ class SurveyBody
             if($this->page->getWebVoting() != 'no')
             {
                 global $wgServer;
-                $output .= "<li><img src=\"$vgScript/icons/laptop.png\"> Visit webpage <code>$wgServer</code> and place a vote.</li>";
+                $output .= "<li><img src=\"$vgScript/icons/laptop.png\"> Visit our webpage <code>$wgServer</code></li>";
             }
             $output .= "</ul></div><div class=\"visualClear\"></div>";
         }
@@ -249,7 +249,7 @@ class SurveyBody
                 {
                     sajax_do_call('SurveyBody::graph', [{$this->page->getPageID()}],function(o) {
                         graph = document.getElementById('$imgid');
-                        alert(graph.src);
+                        /*alert(graph.src);*/
                     });
                 }
                 var time$imgid = \"$now\";

@@ -1,16 +1,12 @@
 <?php
-if($_SERVER['HOST']) die('Must be run from command line.');
+if(isset($_SERVER['HOST'])) die('Must be run from command line.');
 
 $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_TEST', true);
 define('MEDIAWIKI', true);
-
-ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
-
-$vgPath = "$IP/extensions/votapedia";
+@require_once("$IP/LocalSettings.php");
 
 echo "Starting unit testing.\n";
-require_once("./votapedia/votapedia.php");
 
 $vgDBName = "unittest_setup";
 $vgDBUserName       = 'root';
@@ -135,8 +131,7 @@ if(true) /* test SurveyVO */
     assert( 0 == $survey->getActivePresentationID() );
     assert( 0 ==  $survey->getAnswer() );
     assert(!  $survey->getChoiceByNum(0) );
-    assert( ! $survey->getChoiceIDByReceiver('010') );
-    assert( array()==  $survey->getChoices() );
+    assert( array() ==  $survey->getChoices() );
     assert( 0 ==  $survey->getNumOfChoices() );
     assert( 0 == $survey->getNumOfPresentations() );
     assert( 0 ==  $survey->getPoints() );
@@ -214,7 +209,7 @@ if( true ) /* test PageVO */
     // assert( ! $page->getCreateTime() );
     assert( $page->isSMSRequired() == '0' );
 
-    assert( $page->isShowGraph() == '1' );
+    assert( $page->getShowGraphEnd() == true );
     assert( $page->getType() == 1 );
     assert( $page->getDisplayTop() == 0 );
     assert( $page->getVotesAllowed() == 1 );
@@ -234,7 +229,7 @@ if( true ) /* test PageVO */
     $page->setDisplayTop(14);
     $page->setVotesAllowed(7);
     $page->setSMSRequired(true);
-    $page->setShowGraph(false);
+    $page->setShowGraphEnd(false);
     $page->setSubtractWrong(true);
     $page->setType(2);
 
@@ -263,7 +258,7 @@ if( true ) /* test PageVO */
     assert($page->getDisplayTop() == 14);
     assert($page->getVotesAllowed() == 7);
     assert($page->isSMSRequired() == '1');
-    assert( $page->isShowGraph() == '0' );
+    assert( $page->getShowGraphEnd() == false );
     assert( $page->isSubtractWrong() == '1' );
     assert( $page->getType() == 2 );
     assert( $page->getPhoneVoting() == 'no' );
@@ -323,6 +318,7 @@ if( true ) /* testing SurveyRecordDAO */
     $srdao = new SurveyRecordDAO();
 
     $sr = new SurveyRecordVO();
+    $sr->setPageID(2);
     $sr->setChoiceID(1);
     $sr->setPresentationID(1);
     $sr->setSurveyID(1);

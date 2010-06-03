@@ -2,7 +2,6 @@
 if (!defined('MEDIAWIKI')) die('Cannot access this file.');
 
 require_once("config.php");
-require_once("$vgPath/UserHooks.php" );
 
 //International Texts and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$vgPath/votapedia.i18n.php";
@@ -69,6 +68,32 @@ function vfLanguageGetMagic(&$magicWords, $langCode)
     $magicWords['Survey'] = array(0,
             vtagSIMPLE_SURVEY, vtagQUIZ, vtagRANK_EXPOSITIONS,
             vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
+    return true;
+}
+
+//add personal URL for "my phones"
+$wgHooks['PersonalUrls'][] = 'vfPersonalUrlsHook';
+function vfPersonalUrlsHook( &$personal_urls, &$title )
+{
+    global $wgUser;
+    if($wgUser->isLoggedIn())
+    {
+        $keys = array_keys($personal_urls);
+        assert($keys[0] == 'userpage');
+
+        $pageurl = $title->getLocalURL();
+        $href = Skin::makeSpecialUrl( 'MyPhones' );
+        $add_urls = array(
+                'userpage' => $personal_urls['userpage'],
+                'phones' => array(
+                        'text' => 'My phones',
+                        'href' => $href,
+                        'active' => ( $href == $pageurl )
+                )
+        );
+        array_shift($personal_urls);
+        $personal_urls = $add_urls + $personal_urls;
+    }
     return true;
 }
 

@@ -7,8 +7,6 @@ define('MEDIAWIKI',true);
 
 @require_once("$IP/LocalSettings.php");
 
-ini_set('include_path',ini_get('include_path').';C:\\xampp\\php\\PEAR\\');
-
 $vgDBUserName = 'root'; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = '';
 
@@ -90,7 +88,8 @@ function vfDaemonSmsAction()
             }
             catch(Exception $e)
             {
-                echo $e->getMessage()."\n";
+                //We do not care about these Exceptions.
+                //Since this is error of a voter.
             }
         }
         Sms::processed($sms['id']);
@@ -99,12 +98,20 @@ function vfDaemonSmsAction()
 
 //get command line parameters
 $args = $_SERVER['argv'];
-if( isset($args['daemon']) && $args['daemon'] == '1')
+if(in_array('daemon', $args))
 {
     //run as a daemon
     while(1)
     {
-        vfDaemonSmsAction();
+        try
+        {
+            vfDaemonSmsAction();
+        }
+        catch(Exception $e)
+        {
+            error_log('Votapedia daemon error: '.$e->getMessage() . ' ' .$e->getFile().' '.$e->getLine());
+            error_log($e->getTraceAsString());
+        }
         sleep(2);
     }
 }
@@ -114,5 +121,3 @@ else
     vfDaemonSmsAction();
     vfMeasureTime('end');
 }
-
-?>
