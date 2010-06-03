@@ -84,7 +84,6 @@ function vfDaemonSmsAction()
                 $votedao = new VoteDAO($page, $username);
                 $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );
                 $votedao->vote($votevo);
-                echo "VOTE!\n";
             }
             catch(Exception $e)
             {

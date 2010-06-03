@@ -58,9 +58,9 @@ class SurveyBody
         else
             $output .= "<li STYLE=\"list-style: square inside; color: #$color\">";
 
-        $output .= "<label style=\"color: black\" for=\"$voteid\">$choice</label></li>";
+        $output .= "<label style=\"color: black\" for=\"$voteid\">$choice $addtext</label></li>";
 
-        return $output.'</div>'.$addtext.'</div>';
+        return $output.'</div></div>';
     }
     /**
      *
@@ -107,15 +107,16 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $graphseries->addItem($choice->getChoice(), $choice->getVote());
+                    $color = vfGetColor();
+                    $graphseries->addItem($choice->getChoice(), $choice->getVote(), $color);
 
                     $name = $this->parser->run($choice->getChoice());
                     $extra='';
                     if($this->show_phones)
                     {
                         $extra='<span style="background-color: #E9F3FE">'
-                                .'<font color="#AAAAAA">Phone number:</font> '
-                                .$this->colorizePhone( $choice->getReceiver() )
+                                //.'<font color="#AAAAAA">Phone number:</font> '
+                                .''.$this->colorizePhone( $choice->getReceiver() ).''
                                 .'</span>';
                     }
                     $vote = '';
@@ -137,7 +138,7 @@ class SurveyBody
                         $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
                         $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" $checked/>";
                     }
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColor(), $extra, $vote, $voteid, $style);
+                    $output.=SurveyBody::getChoiceHTML($name, $color, $extra, $vote, $voteid, $style);
                 }
                 $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
             }
@@ -147,7 +148,6 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $graphseries->addItem($choice->getChoice(), $choice->getVote());
                     $numvotes += $choice->getVote();
                 }
                 if($numvotes == 0) $numvotes = 1;
@@ -155,11 +155,12 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
+                    $graphseries->addItem($choice->getChoice(), $choice->getVote(), $color);
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
-                        $extra = "<div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"></div> $percent% ({$choice->getVote()})";
+                        $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$choice->getVote()})";
                     else
                         $extra = '';
                     $output.=SurveyBody::getChoiceHTML($name, $color, $extra);
@@ -254,7 +255,7 @@ class SurveyBody
                 }
                 var time$imgid = \"$now\";
                 setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
-                alert(document.getElementById('$imgid').src);
+                /*alert(document.getElementById('$imgid').src);*/
                 </script>";
                 /*o.responseText*/
                 $output.= str_replace("\n", "", $script);
@@ -272,7 +273,7 @@ class SurveyBody
         if($vgEnableSMS == false)
             return $phone;
         return substr($phone, 0, -$vgSmsChoiceLen)
-                . '<font color=red>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
+                . '<font color=#EE0000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
     }
     /**
      * Parse text with wiki code
@@ -332,8 +333,8 @@ QuestionnaireBody extends SurveyBody
      */
     function  __construct(PageVO &$page, MwParser &$parser)
     {
-        parent::__construct($graph, $page, $parser);
-        $this->graph = new Graph('stacked');
+        parent::__construct($page, $parser);
+        $this->graph = new Graph('stackpercent'); //stackpercent multipie
         $this->type = vQUESTIONNAIRE;
     }
 }

@@ -396,7 +396,7 @@ class CreateSurvey
     {
         $this->form->setValue('titleorquestion', $page->getTitle());
         $this->form->setValue('duration', $page->getDuration());
-        $this->form->setValue('showresultsend', (bool) $page->isShowGraphEnd());
+        $this->form->setValue('showresultsend', $page->getShowGraphEnd());
         $this->form->setValue('showtop', $page->getDisplayTop());
         $this->form->setValue('privacy', $page->getPrivacyByName());
         $this->form->setValue('phonevoting', $page->getPhoneVoting());

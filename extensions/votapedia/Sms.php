@@ -38,12 +38,13 @@ class Sms
      */
     static function getNewSms()
     {
-        /* fake votes used for testing * /
+        /* fake votes used for testing */
         return array(
-            array('id' => 1001,'from' => '00','text' => '00 01',),
-            array('id' => 1001,'from' => '01','text' => '01 03',),
-            array('id' => 1002,'from' => '02','text' => '02 03',),
-            array('id' => 1003,'from' => '03','text' => '03 03',),
+            array('id' => 1001,'from' => '000','text' => '17',),
+            array('id' => 1001,'from' => '001','text' => '17',),
+            array('id' => 1001,'from' => '002','text' => '18',),
+            array('id' => 1001,'from' => '003','text' => '17',),
+            array('id' => 1001,'from' => '004','text' => '19',),
         ); /* */
 
         global $vgDB;
