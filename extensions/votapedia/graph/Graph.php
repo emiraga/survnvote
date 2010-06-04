@@ -23,8 +23,40 @@ class Graph
     {
         $this->series[] = $series;
     }
+    public function setXLabel($xlabel)
+    {
+        $this->xlabel = $xlabel;
+    }
     public function getHTMLImage($id = 'graph')
     {
+        if($this->type == 'line')
+        {
+            $imglink = "http://chart.apis.google.com/chart?cht=lc&chs={$this->width}x{$this->height}";
+            $series = $this->series[0];
+            if($series->getCount())
+            {
+                $maxv = $series->getMaxValue();
+                $imglink .= "&chd=t:".$series->getValuesFormat();
+                $imglink .= "&chds=0,".($maxv);
+                $imglink .= "&chxt=y&chxl=0:|RM0|RM$maxv";
+            }
+            return "<img id=\"$id\" src=\"$imglink\">";
+        }
+        if($this->type == 'linexy')
+        {
+            $imglink = "http://chart.apis.google.com/chart?cht=lxy&chs={$this->width}x{$this->height}";
+            $series = $this->series[0];
+            if($series->getCount())
+            {
+                $maxv = $series->getMaxValue();
+                $maxvh = $maxv/2;
+                $imglink .= "&chd=t:".$series->getNamesFormat(',').'|'.$series->getValuesFormat();
+                $imglink .= "&chds=0,".($maxv).'';
+                $imglink .= "&chxt=y,x&chxl=0:||RM$maxvh|RM$maxv|1:|{$this->xlabel}";
+                $imglink .= "&chm=s,000000,0,-1,3";
+            }
+            return "<img id=\"$id\" src=\"$imglink\">";
+        }
         if($this->type == 'pie' || count($this->series) <= 1)
         {
             $series = $this->series[0];
@@ -137,6 +169,7 @@ class GraphSeries
     protected $colors = array();
     protected $count = 0;
     protected $sum = 0;
+    protected $maxValue = 0;
 
     public function __construct($title)
     {
@@ -144,6 +177,12 @@ class GraphSeries
         if(strlen($title) >= $maxtitle)
             $title = substr($title,0,$maxtitle-3).'...'; //@todo remove crazy characters
         $this->title = $title;
+    }
+    function reverseValues()
+    {
+        $this->names = array_reverse($this->names);
+        $this->values = array_reverse($this->values);
+        $this->colors = array_reverse($this->colors);
     }
     function getCount()
     {
@@ -155,6 +194,10 @@ class GraphSeries
             return $this->sum;
         return 1;
     }
+    function getMaxValue()
+    {
+        return $this->maxValue;
+    }
     function getTitle()
     {
         return $this->title;
@@ -164,6 +207,9 @@ class GraphSeries
         $maxname = 30;
         if($value == 0)return;
         $this->sum += $value;
+
+        if($this->maxValue < $value)
+            $this->maxValue = $value;
 
         if(strlen($name) >= $maxname)
             $name = substr($name,0,$maxname-3).'...'; //@todo remove crazy characters
@@ -195,9 +241,9 @@ class GraphSeries
         else
             return $this->names[$index];
     }
-    function getNamesFormat()
+    function getNamesFormat($glue = "|")
     {
-        return join("|", $this->names);
+        return join($glue, $this->names);
     }
     function getColorsFormat()
     {

@@ -20,7 +20,7 @@ class Sms
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */
-    static public $blackList = array('2888', '28882', 'CELCOM', '22990');
+    static public $blackList = array('2888', '28882', 'CELCOM', '22990', '23131','29292','ChannelC');
 
     /**
      * function getNewSms()
@@ -38,13 +38,13 @@ class Sms
      */
     static function getNewSms()
     {
-        /* fake votes used for testing */
+        /* fake votes used for testing
         return array(
-            array('id' => 1001,'from' => '000','text' => '17',),
-            array('id' => 1001,'from' => '001','text' => '17',),
-            array('id' => 1001,'from' => '002','text' => '18',),
-            array('id' => 1001,'from' => '003','text' => '17',),
-            array('id' => 1001,'from' => '004','text' => '19',),
+            array('id' => 1001,'from' => '000','text' => '01',),
+            array('id' => 1001,'from' => '001','text' => '01',),
+            array('id' => 1001,'from' => '002','text' => '02',),
+            array('id' => 1001,'from' => '003','text' => '03',),
+            array('id' => 1001,'from' => '004','text' => '04',),
         ); /* */
 
         global $vgDB;
@@ -53,7 +53,10 @@ class Sms
         foreach($new as $sms)
         {
             if(in_array($sms['SenderNumber'], Sms::$blackList))
+            {
+                Sms::processed($sms['ID']);
                 continue;
+            }
             
             $list[] = array(
                     'id' => $sms['ID'],
