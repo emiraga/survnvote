@@ -212,7 +212,7 @@ class Telephone
 
             $number = $survey->getNumOfChoices();
             if (count($results)< $number)
-                throw new SurveyException("No available phones!", 203);
+                throw new SurveyException("No available phones at the moment.", 203);
 
             $i = 0;
             $surveyChoices =& $survey->getChoices();

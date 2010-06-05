@@ -715,26 +715,14 @@ class SurveyDAO
         return true;
     }
     /**
-     * Request telephone numbers .
-     * It requires the starting time of survey is set up before request.
-     * which represents the duration which the receivers are used is same with duration of survey
-     *
-     * @param $page PageVO
-     */
-    /*public function requestReceivers(PageVO &$page)
-    {
-        $telephone = new Telephone();
-        return $telephone->setupReceivers($page);
-    }*/
-    /**
-     * Update database and set new receivers and SMS from the PageVo object
+     * Update database and set new receivers and SMS from the PageVO object
      *
      * @param PageVO $page
      */
     public function updateReceiversSMS(PageVO &$page)
     {
         global $vgDB, $vgDBPrefix;
-        $sqlChoice = "update {$vgDBPrefix}surveychoice set receiver = ?, sms = ? where surveyID = ? and choiceID = ?";
+        $sqlChoice = "update {$vgDBPrefix}surveychoice set receiver = ?, sms = ?, finished = 0 where surveyID = ? and choiceID = ?";
         $resChoice = $vgDB->Prepare($sqlChoice);
         $surveys = &$page->getSurveys();
         foreach($surveys as &$survey)

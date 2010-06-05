@@ -82,7 +82,10 @@ class Graph
             if($series->getCount())
             {
                 $imglink.="&chd=t:{$series->getValuesFormat()}";
-                $imglink.="&chdl=".$series->getNamesFormat(30, true);
+                if($series->getCount() <= 11)
+                    $imglink.="&chdl=".$series->getNamesFormat(30, true);
+                else
+                    $imglink.="&chl=".$series->getNamesFormat(30, true);
             }
             return $imglink;
         }
@@ -119,16 +122,15 @@ class Graph
         {
             $numseries = count($this->series);
             $labelLength = 3;
-            if($numseries == 2)
-            {
-                $labelLength = 25;
-            }
-            elseif($numseries == 3)
-            {
-                $labelLength = 18;
-            }
+            if($numseries == 2)     $labelLength = 25;
+            elseif($numseries == 3) $labelLength = 18;
+            elseif($numseries == 4) $labelLength = 13;
+            elseif($numseries == 5) $labelLength = 10;
+            elseif($numseries == 6) $labelLength = 8;
+            elseif($numseries == 7) $labelLength = 7;
+            elseif($numseries == 8) $labelLength = 6;
             $xlabel = '';
-            $chbh = intval(($this->width - 50) / count($this->series));
+            $chbh = intval(($this->width - 60) / count($this->series));
             $maxv = 0;
             $markers = array();
             foreach($this->series as &$series)

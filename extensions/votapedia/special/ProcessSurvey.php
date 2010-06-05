@@ -128,6 +128,7 @@ class ProcessSurvey extends SpecialPage
         catch(Exception $e)
         {
             $wgOut->addHTML(vfErrorBox($e->getMessage()));
+            $wgOut->addReturnTo(Title::newFromText($wgRequest->getVal('returnto')));
             return;
         }
     }
