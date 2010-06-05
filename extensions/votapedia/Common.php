@@ -116,6 +116,25 @@ function &vfUser()
     return $GLOBALS['vgUser'];
 }
 /**
+ * Convert wiki text to regular text.
+ * 
+ *  1. Strip tags
+ *  2. Replace '''bold text''' -> bold text
+ *  3. Replace ''italic'' -> Italic
+ *  4. Remove duplicate whitespace
+ * 
+ * @param $wiki String wiki text
+ * @return String regular text
+ */
+function vfWikiToText($wiki)
+{
+    $text = strip_tags($wiki);
+    $text = str_replace("'''",' ',$text);
+    $text = str_replace("''",' ',$text);
+    $text = preg_replace('/\s+/', ' ', $text); //@todo use mb_ereg_replace
+    return trim($text);
+}
+/**
  * This is used to connect database.
  */
 include_once("adodb/adodb.inc.php");

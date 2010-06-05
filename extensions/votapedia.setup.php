@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS {$vgDBPrefix}userphones;
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   pageID int NOT NULL AUTO_INCREMENT,
-  title varchar(512) NOT NULL,
+  title text NOT NULL,
   startTime datetime NOT NULL,
   endTime datetime NOT NULL,
   duration int(16) NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
   pageID int NOT NULL,
   surveyID int NOT NULL AUTO_INCREMENT,
-  question blob NOT NULL,
+  question text NOT NULL,
   answer tinyint(8) NOT NULL DEFAULT '0',
   points tinyint(8) NOT NULL DEFAULT '0',
   PRIMARY KEY (surveyID),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   pageID int NOT NULL,
   surveyID int NOT NULL,
   choiceID int NOT NULL DEFAULT '1',
-  choice blob NOT NULL,
+  choice text NOT NULL,
   receiver varchar(20) DEFAULT NULL,
   points tinyint(8) NOT NULL DEFAULT '0',
   SMS varchar(200) DEFAULT NULL,
@@ -219,4 +219,3 @@ END_HTML;
 if(!defined('VOTAPEDIA_TEST'))
     echo '</body></html>';
 
-?>

@@ -117,27 +117,15 @@ class SmsReport extends SpecialPage
         $wgOut->addWikiText($out);
         if($admin && count($bal)>1)
         {
-            $gs = new GraphSeries('');
-            $tmax = $tmin = strtotime($bal[0]['date']);
+            $gs = new GraphXYdate('');
             foreach($bal as $sms)
             {
-                $time = strtotime($sms['date']);
-                if($tmin > $time)
-                    $tmin = $time;
-                if($tmax < $time)
-                    $tmax = $time;
-            }
-            foreach($bal as $sms)
-            {
-                $time = strtotime($sms['date']);
-                $time = ($time - $tmin)/($tmax - $tmin)*5;
                 $balance = preg_replace("/RM/", '', $sms['balance']);
-                $gs->addItem($time, $balance,'');
+                $gs->addPoint($sms['date'], $balance);
             }
+            # echo $gs->getXMax().','.$gs->getXMin().'<br>';
+            # echo $gs->getYMax().','.$gs->getYMin().'<br>';
             $gr = new Graph('linexy');
-            $gr->setXLabel( date('Y-m-d',$tmin)
-                       .'|'.date('Y-m-d',$tmin+($tmax-$tmin)/2)
-                       .'|'.date('Y-m-d',$tmax) );
             $gr->addSeries($gs);
             $wgOut->addHTML('<center>'.$gr->getHTMLImage().'</center>');
         }

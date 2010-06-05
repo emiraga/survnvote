@@ -1,6 +1,5 @@
 <?php
-if (!defined('MEDIAWIKI') ) die();
-if (defined('VOTAPEDIA_TEST')) return;
+if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
 /**
  * This is example class that provides SMS integration with external source.
  *
@@ -13,10 +12,13 @@ if (defined('VOTAPEDIA_TEST')) return;
  * This class is being called by the Daemon.php.
  *
  */
+global $vgSmsdDatabasename;
+$vgSmsdDatabasename = 'smsd';
+
 class Sms
 {
     /* Message used for sending confirmation code. */
-    static public $msgConfim = 'Confirmation code is %s. Thank you for using www.votapedia.net';
+    static public $msgConfim = 'Confirmation code is %s. Thank you for using www.votapedia.net.';
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */
@@ -47,8 +49,9 @@ class Sms
             array('id' => 1001,'from' => '004','text' => '04',),
         ); /* */
 
-        global $vgDB;
-        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM smsd.inbox WHERE Processed = 'false'");
+        global $vgDB, $vgSmsdDatabasename;
+        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM $vgSmsdDatabasename.inbox "
+                ."WHERE Processed = 'false'");
         $list = array();
         foreach($new as $sms)
         {
@@ -79,8 +82,8 @@ class Sms
      */
     static function processed($id)
     {
-        global $vgDB;
-        $vgDB->Execute("UPDATE smsd.inbox SET Processed = 'true' WHERE ID = ?", array($id));
+        global $vgDB, $vgSmsdDatabasename;
+        $vgDB->Execute("UPDATE $vgSmsdDatabasename.inbox SET Processed = 'true' WHERE ID = ?", array($id));
     }
     /**
      * function sendSMS($destination, $message)
@@ -99,8 +102,8 @@ class Sms
         $valid="255";
         $sender = 'Gammu 1.27.0';
         $phone = '';
-        global $vgDB;
-        $vgDB->Execute("INSERT INTO smsd.outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
+        global $vgDB, $vgSmsdDatabasename;
+        $vgDB->Execute("INSERT INTO $vgSmsdDatabasename.outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
                 ."RelativeValidity,SenderID,CreatorID) VALUES(?,?,?,NOW(),?,?,?)",
                 array($text,$destination,$message, $valid,'',$sender));
     }
@@ -111,8 +114,9 @@ class Sms
      */
     static function getPending()
     {
-        global $vgDB;
-        $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, TextDecoded FROM smsd.outbox ORDER BY InsertIntoDB");
+        global $vgDB, $vgSmsdDatabasename;
+        $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, TextDecoded "
+                ."FROM $vgSmsdDatabasename.outbox ORDER BY InsertIntoDB");
         $result = array();
         foreach($rec as $message)
         {
@@ -131,8 +135,9 @@ class Sms
      */
     static function getReport()
     {
-        global $vgDB;
-        $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded FROM smsd.sentitems ORDER BY InsertIntoDB");
+        global $vgDB, $vgSmsdDatabasename;
+        $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded "
+                ."FROM $vgSmsdDatabasename.sentitems ORDER BY InsertIntoDB");
         $result = array();
         foreach($rec as $message)
         {
@@ -164,8 +169,9 @@ class Sms
      */
     static function getLatestBalance()
     {
-        global $vgDB;
-        $text = $vgDB->GetOne("SELECT TextDecoded FROM smsd.inbox WHERE SenderNumber = ? ORDER BY ID DESC",
+        global $vgDB, $vgSmsdDatabasename;
+        $text = $vgDB->GetOne("SELECT TextDecoded FROM $vgSmsdDatabasename.inbox "
+                ."WHERE SenderNumber = ? ORDER BY ID DESC",
                 array('2888'));
         preg_match('@RM([^,]+)@i', $text, $matches);
         return $matches[0];
@@ -177,8 +183,9 @@ class Sms
      */
     static function getBalanceReports()
     {
-        global $vgDB;
-        $bal = $vgDB->GetAll("SELECT TextDecoded, ReceivingDateTime FROM smsd.inbox WHERE SenderNumber = ? ORDER BY ID DESC",
+        global $vgDB, $vgSmsdDatabasename;
+        $bal = $vgDB->GetAll("SELECT TextDecoded, ReceivingDateTime FROM $vgSmsdDatabasename.inbox "
+                ."WHERE SenderNumber = ? ORDER BY ID DESC",
                 array('2888'));
         $result = array();
         foreach($bal as $sms)

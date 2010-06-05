@@ -19,19 +19,24 @@ class Graph
     {
         $this->type = $type;
     }
-    public function addSeries(GraphSeries $series)
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+    public function addSeries($series)
     {
         $this->series[] = $series;
     }
-    public function setXLabel($xlabel)
-    {
-        $this->xlabel = $xlabel;
-    }
     public function getHTMLImage($id = 'graph')
+    {
+        return "<img id=\"$id\" width=\"{$this->width}\" height=\"{$this->height}\" "
+        ."src=\"http://chart.apis.google.com/chart?{$this->getImageLink()}\">";
+    }
+    public function getImageLink()
     {
         if($this->type == 'line')
         {
-            $imglink = "http://chart.apis.google.com/chart?cht=lc&chs={$this->width}x{$this->height}";
+            $imglink = "cht=lc&chs={$this->width}x{$this->height}";
             $series = $this->series[0];
             if($series->getCount())
             {
@@ -40,28 +45,26 @@ class Graph
                 $imglink .= "&chds=0,".($maxv);
                 $imglink .= "&chxt=y&chxl=0:|RM0|RM$maxv";
             }
-            return "<img id=\"$id\" src=\"$imglink\">";
+            return $imglink;
         }
         if($this->type == 'linexy')
         {
-            $imglink = "http://chart.apis.google.com/chart?cht=lxy&chs={$this->width}x{$this->height}";
+            $imglink = "cht=lxy&chs={$this->width}x{$this->height}";
             $series = $this->series[0];
             if($series->getCount())
             {
-                $maxv = $series->getMaxValue();
-                $maxvh = $maxv/2;
-                $imglink .= "&chd=t:".$series->getNamesFormat(',').'|'.$series->getValuesFormat();
-                $imglink .= "&chds=0,".($maxv).'';
-                $imglink .= "&chxt=y,x&chxl=0:||RM$maxvh|RM$maxv|1:|{$this->xlabel}";
+                $imglink .= "&chd=t:".$series->getXFormat(',').'|'.$series->getYFormat(',');
+                $imglink .= "&chds={$series->getYMin()},{$series->getYMax()}";
+                $imglink .= "&chxt=y,x&chxl=0:|{$series->getYlabel()}|1:|{$series->getXlabel()}";
                 $imglink .= "&chm=s,000000,0,-1,3";
             }
-            return "<img id=\"$id\" src=\"$imglink\">";
+            return $imglink;
         }
-        if($this->type == 'pie' || count($this->series) <= 1)
+        if($this->type == 'pie')
         {
             $series = $this->series[0];
 
-            $imglink = "http://chart.apis.google.com/chart?cht=p3&chd=t:{$series->getValuesFormat()}"
+            $imglink = "cht=p3&chd=t:{$series->getValuesFormat()}"
                     ."&chs={$this->width}x{$this->height}";
             $colors = $series->getColorsFormat();
             if($colors)
@@ -70,7 +73,7 @@ class Graph
             if($names)
                 $imglink.="&chdl={$series->getNamesFormat()}";
 
-            return "<img id=\"$id\" src=\"$imglink\" />";
+            return $imglink;
         }
         if($this->type == 'multipie')
         {
@@ -93,13 +96,13 @@ class Graph
             $colors = join(',', $colors);
             $names = join('|', $names);
             echo "$data<br>$colors<br>$names<br>";
-            $imglink = "http://chart.apis.google.com/chart?cht=pc"
+            $imglink = "cht=pc"
                     ."&chs={$this->width}x{$this->height}&chd=$data";
             if($colors)
                 $imglink .= "&chco=$colors";
             if($names)
                 $imglink .= "&chdl=$names";
-            return "<img id=\"$id\" src=\"$imglink\">";
+            return $imglink;
         }
         if($this->type == 'stackpercent')
         {
@@ -149,13 +152,13 @@ class Graph
             }*/
             $data = 't:'.join('|',$data);
             $colors = join(',', $colors);
-            $imglink = "http://chart.apis.google.com/chart?cht=bvs"
+            $imglink = "cht=bvs"
                     ."&chs={$this->width}x{$this->height}&chd=$data&chbh=$chbh"
                     ."&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
             $maxsize = 1024;
 
             $imglink .= "&chm=".join('|', $markers);
-            return "<img id=\"$id\" src=\"$imglink\">";
+            return $imglink;
         }
         throw new Exception("Unknown graph type");
     }
@@ -252,5 +255,111 @@ class GraphSeries
     function getValuesFormat()
     {
         return join(",", $this->values);
+    }
+}
+
+class GraphXY
+{
+    protected $title;
+    protected $x = array();
+    protected $y = array();
+    protected $xmin;
+    protected $xmax;
+    protected $ymin;
+    protected $ymax;
+    public function __construct($title)
+    {
+        $this->title = $title;
+    }
+    public function getCount()
+    {
+        return count($this->x);
+    }
+    public function addPoint($x, $y)
+    {
+        if(count($this->x) == 0)
+        {
+            $this->xmin = $this->xmax = $x;
+            $this->ymin = $this->ymax = $y;
+        }
+        else
+        {
+            if($this->xmin > $x)   $this->xmin = $x;
+            if($this->xmax < $x)   $this->xmax = $x;
+            if($this->ymin > $y)   $this->ymin = $y;
+            if($this->ymax < $y)   $this->ymax = $y;
+        }
+        $this->x[] = $x;
+        $this->y[] = $y;
+    }
+    public function getX()
+    {
+        throw new Exception('not implemented');
+    }
+    public function getXFormat($glue = ',')
+    {
+        return join($glue, $this->getX());
+    }
+    public function getYFormat($glue = ',')
+    {
+        return join($glue, $this->getY());
+    }
+    public function getY()
+    {
+        return $this->y;
+    }
+    public function getYMax()
+    {
+        return $this->ymax;
+    }
+    public function getYMin()
+    {
+        return 0;
+    }
+    public function getXMax()
+    {
+        return $this->xmax;
+    }
+    public function getXMin()
+    {
+        return $this->xmin;
+    }
+    public function getYlabel()
+    {
+        $y2 = $this->ymax / 2;
+        return "|$y2|{$this->getYMax()}";
+    }
+    public function getXlabel()
+    {
+        throw new Exception('not implemented');
+    }
+}
+
+class GraphXYdate extends GraphXY
+{
+    public function __construct($title)
+    {
+        parent::__construct($title);
+    }
+    public function getX()
+    {
+        $result = array();
+        foreach ($this->x as $x)
+        {
+            $xmin = strtotime($this->xmin);
+            $xmax = strtotime($this->xmax);
+            $x = strtotime($x);
+            $x = ($x - $xmin)/($xmax - $xmin) * 5;
+            $result[] = sprintf("%.2f", $x);
+        }
+        return $result;
+    }
+    public function getXlabel($glue = '|')
+    {
+        $tmin = strtotime($this->xmin);
+        $tmax = strtotime($this->xmax);
+        return date('Y-m-d',$tmin)
+                .$glue.date('Y-m-d',$tmin+($tmax-$tmin)/2)
+                .$glue.date('Y-m-d',$tmax);
     }
 }

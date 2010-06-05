@@ -90,19 +90,19 @@ class WaveLover2Template extends QuickTemplate {
 		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath' ) ?>/common/wikibits.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"><!-- wikibits js --></script>
 		<!-- Head Scripts -->
 <?php $this->html('headscripts') ?>
-<?php	if($this->data['jsvarurl']) { ?>
+<?php	if(false && $this->data['jsvarurl']) { ?>
 		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('jsvarurl') ?>"><!-- site js --></script>
 <?php	} ?>
-<?php	if($this->data['pagecss']) { ?>
+<?php	if( false && $this->data['pagecss']) { ?>
 		<style type="text/css"><?php $this->html('pagecss') ?></style>
 <?php	}
-		if($this->data['usercss']) { ?>
+		if( false && $this->data['usercss']) { ?>
 		<style type="text/css"><?php $this->html('usercss') ?></style>
 <?php	}
-		if($this->data['userjs']) { ?>
+		if(false && $this->data['userjs']) { ?>
 		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('userjs' ) ?>"></script>
 <?php	}
-		if($this->data['userjsprev']) { ?>
+		if(false && $this->data['userjsprev']) { ?>
 		<script type="<?php $this->text('jsmimetype') ?>"><?php $this->html('userjsprev') ?></script>
 <?php	}
 		if($this->data['trackbackhtml']) print $this->data['trackbackhtml']; ?>

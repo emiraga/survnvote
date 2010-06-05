@@ -604,7 +604,8 @@ END;
 		if( ( $us = $wgRequest->getVal( 'useskin', '' ) ) !== '' ) {
 			$siteargs['useskin'] = $us;
 		}
-		$out->addStyle( self::makeUrl( '-', wfArrayToCGI( $siteargs ) ) );
+		//modified by Emir Habul (emiraga) config for extra css, not needed
+		//$out->addStyle( self::makeUrl( '-', wfArrayToCGI( $siteargs ) ) );
 
 		// Per-user custom style pages
 		if( $wgAllowUserCss && $wgUser->isLoggedIn() ) {

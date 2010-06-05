@@ -74,13 +74,13 @@ class SurveyBody
         $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
         $pagestatus = $this->page->getStatus();
-        
+
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
             $choices = $survey->getChoices();
 
-            $graphseries = new GraphSeries( $survey->getQuestion() ); //@todo remove extra things
+            $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) ); //@todo remove extra things
 
             if($this->type != vSIMPLE_SURVEY)
             {
@@ -108,7 +108,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
-                    $graphseries->addItem($choice->getChoice(), $choice->getVote(), $color);
+                    $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
 
                     $name = $this->parser->run($choice->getChoice());
                     $extra='';
@@ -155,7 +155,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
-                    $graphseries->addItem($choice->getChoice(), $choice->getVote(), $color);
+                    $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
                     $percent = 100.0 * $choice->getVote() / $numvotes;
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
@@ -176,7 +176,7 @@ class SurveyBody
             global $vgSmsNumber;
             global $vgScript;
             $output .= "<div class=\"successbox\" style=\"margin: 1em; float: none; clear: both;\">"
-            ."In order to vote: <ul>";
+                    ."In order to vote: <ul>";
             if($this->page->getPhoneVoting() != 'no')
             {
                 $output .= "<li><img src=\"$vgScript/icons/phone.png\"> Ring a <u>number above</u>; (you will hear a busy tone).</li>";
@@ -230,10 +230,10 @@ class SurveyBody
 
         if($pagestatus == 'ready')
             $this->show_graph = false;
-        
+
         if($this->page->getShowGraphEnd() && $pagestatus != 'ended')
             $this->show_graph = false;
-        
+
         if($this->show_graph)
         {
             //insert graph image at the beginning
@@ -245,7 +245,7 @@ class SurveyBody
             {
                 $now = time();
                 $script =
-                "<script>
+                        "<script>
                 function refresh$imgid()
                 {
                     sajax_do_call('SurveyBody::graph', [{$this->page->getPageID()}],function(o) {
@@ -334,7 +334,11 @@ QuestionnaireBody extends SurveyBody
     function  __construct(PageVO &$page, MwParser &$parser)
     {
         parent::__construct($page, $parser);
-        $this->graph = new Graph('stackpercent'); //stackpercent multipie
         $this->type = vQUESTIONNAIRE;
+        
+        if(count($this->page->getSurveys()) > 1)
+        {
+            $this->graph->setType('stackpercent'); //stackpercent multipie
+        }
     }
 }

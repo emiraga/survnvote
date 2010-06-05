@@ -78,6 +78,9 @@ $wgEnableUploads       = true;
 # $wgUseImageMagick = true;
 # $wgImageMagickConvertCommand = "/usr/bin/convert";
 
+# $wgFileExtensions = array( 'png', 'gif', 'jpg', 'jpeg', 'zip');
+# $wgVerifyMimeType = false;
+
 ## If you use ImageMagick (or any other shell command) on a
 ## Linux server, this will need to be set to the name of an
 ## available UTF-8 locale
@@ -145,3 +148,9 @@ $wgEnableSidebarCache = true;
 
 $wgFbAppId       = '1be83abc6c4c6c2f0e43aaa03fc38a38';
 $wgFbSecret      = '956d1c6e0572c973647155bbd066ae63';
+
+$wgAllowUserJs  = false;
+$wgAllowUserCss = false;
+$wgUseSiteCss = false;
+$wgUseSiteJs = false;
+
