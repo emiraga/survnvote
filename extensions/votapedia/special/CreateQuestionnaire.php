@@ -12,6 +12,7 @@ class spCreateQuestionnaire extends SpecialPage
         parent::__construct('CreateQuestionnaire');
         $this->obj = new CreateQuestionnaire();
         $this->includable( true ); //we can include this from other pages
+        $this->setGroup('CreateQuestionnaire', 'votapedia');
     }
     function execute( $par = null )
     {

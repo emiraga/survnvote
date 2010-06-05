@@ -135,6 +135,28 @@ function vfWikiToText($wiki)
     return trim($text);
 }
 /**
+ * @param $phone String phone number
+ * @return String HTML code with modified phone
+ */
+function vfColorizePhone($phone, $colorsms=false)
+{
+    global $vgSmsChoiceLen, $vgEnableSMS, $vgCountryCode;
+
+    $prefix = '+'.$vgCountryCode;
+    if(substr($phone,0,strlen($prefix)) == $prefix)
+    {
+        // in Malaysia we are lucky to have prefix 60 which ends with zero
+        $prefix = preg_replace('/0$/', '', $prefix);
+
+        $phone = '<font color=gray>'.substr($phone,0,strlen($prefix)).'</font>'
+                .substr($phone,strlen($prefix));
+    }
+    if(! $vgEnableSMS || ! $colorsms)
+        return $phone;
+    return substr($phone, 0, -$vgSmsChoiceLen)
+            . '<font color=#EE0000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
+}
+/**
  * This is used to connect database.
  */
 include_once("adodb/adodb.inc.php");

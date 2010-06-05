@@ -22,6 +22,7 @@ class SmsReport extends SpecialPage
         wfLoadExtensionMessages('Votapedia');
         $this->includable( false );
         $this->target = Skin::makeSpecialUrl('SmsReport');
+        $this->setGroup('SmsReport', 'votapedia');
     }
     /**
      * Mandatory execute function for a Special Page
@@ -73,6 +74,7 @@ class SmsReport extends SpecialPage
             $number = $sms['number'];
             if(!$admin)
                 $number = substr($number, 0, strlen($number) - 3) . "<font color=gray>XXX</font>";
+            $number = vfColorizePhone($number);
             $out .= "|-\n";
             $out .= "| Pending || $number || $sms[date]";
             if($admin)
@@ -85,6 +87,7 @@ class SmsReport extends SpecialPage
             $number = $sms['number'];
             if(!$admin)
                 $number = substr($number, 0, strlen($number) - 3) . "<font color=gray>XXX</font>";
+            $number = vfColorizePhone($number);
             if( strstr($sms['status'], 'Error') )
                 $statcolor = "style=\"background: #FFA0A0\" | ";
             elseif( strstr($sms['status'], 'OK') )

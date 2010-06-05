@@ -15,6 +15,7 @@ class spCreateSurvey extends SpecialPage
         parent::__construct('CreateSurvey');
         $this->obj = new CreateSurvey();
         $this->includable( true ); //we can include this from other pages
+        $this->setGroup('CreateSurvey', 'votapedia');
     }
     function execute( $par = null )
     {

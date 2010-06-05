@@ -46,4 +46,5 @@ $messages['en'] = array(
 
     'smsnot' => 'Sms is not enabled',
     'smsnot-desc' => 'Sms is not enabled, please contact administrators.',
+    'specialpages-group-votapedia' => 'Votapedia - Audience response system',
 );

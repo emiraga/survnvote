@@ -21,6 +21,7 @@ class ProcessSurvey extends SpecialPage
         parent::__construct('ProcessSurvey');
         wfLoadExtensionMessages('Votapedia');
         $this->includable( false );
+        $this->setGroup('ProcessSurvey', 'votapedia');
     }
     /**
      * Mandatory execute function for a Special Page

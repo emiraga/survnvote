@@ -23,6 +23,7 @@ class MyPhones extends SpecialPage
         parent::__construct('MyPhones');
         wfLoadExtensionMessages('Votapedia');
         $this->includable( false );
+        $this->setGroup('MyPhones', 'votapedia');
         global $vgScript;
         
         $this->target = Skin::makeSpecialUrl('MyPhones');
@@ -40,7 +41,7 @@ class MyPhones extends SpecialPage
                                 ."<input type=\"submit\" name=\"wpSubmit\" value=\"".wfMsg('add-number')."\">"
                                 .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
                                 ."</form>",
-                        //'icon' => $vgScript.'/icons/mobile.png',
+                //'icon' => $vgScript.'/icons/mobile.png',
                 ),
                 'requestcode' => array(
                         'type' => 'html',
@@ -182,9 +183,9 @@ class MyPhones extends SpecialPage
         {
             $id = $phone['id'];
 
-            if($phone['status'] == vPHONE_NEW 
+            if($phone['status'] == vPHONE_NEW
                     || ($phone['status'] == vPHONE_SENT_CODE
-                        && $this->dao->checkConfirmAllowed()))
+                            && $this->dao->checkConfirmAllowed()))
             {
                 $this->items[ $id ] = $this->items[ 'requestcode' ];
                 $this->items[ $id ]['code'] = str_replace('{ID}', $id , $this->items[ $id ]['code']);
@@ -212,11 +213,12 @@ class MyPhones extends SpecialPage
             {
 
                 $this->items[ $id ]['afterall'] = "<form style=\"text-align:center;\"action=\"{$this->target}\" method=\"POST\">"
-                    ."<input type=\"hidden\" name=\"id\" value=\"$id\">"
-                    ."<input onclick=\"return confirm('Are you sure you want to delete this number?');\" title=\"Delete this number\" type=\"image\" src=\"$vgScript/icons/file_delete.png\" name=\"wpSubmit\" value=\"".wfMsg('delete-number')."\">"
-                    .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
-                    ." Delete</form>";
-            }else{
+                        ."<input type=\"hidden\" name=\"id\" value=\"$id\">"
+                        ."<input onclick=\"return confirm('Are you sure you want to delete this number?');\" title=\"Delete this number\" type=\"image\" src=\"$vgScript/icons/file_delete.png\" name=\"wpSubmit\" value=\"".wfMsg('delete-number')."\">"
+                        .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
+                        ." Delete</form>";
+            }else
+            {
                 $this->items[ $id ]['name'] = '';
                 $this->items[ $id ]['aftername'] = "<strike>$phone[number]</strike>";
             }

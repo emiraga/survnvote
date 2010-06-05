@@ -116,7 +116,7 @@ class SurveyBody
                     {
                         $extra='<span style="background-color: #E9F3FE">'
                                 //.'<font color="#AAAAAA">Phone number:</font> '
-                                .''.$this->colorizePhone( $choice->getReceiver() ).''
+                                .''.vfColorizePhone( $choice->getReceiver(), true ).''
                                 .'</span>';
                     }
                     $vote = '';
@@ -258,22 +258,11 @@ class SurveyBody
                 /*alert(document.getElementById('$imgid').src);*/
                 </script>";
                 /*o.responseText*/
+                $script = preg_replace('/^\s*/', '', $script);
                 $output.= str_replace("\n", "", $script);
             }
         }
         return $output;
-    }
-    /**
-     * @param $phone String phone number
-     * @return String HTML code with modified phone
-     */
-    function colorizePhone($phone)
-    {
-        global $vgSmsChoiceLen,$vgEnableSMS;
-        if($vgEnableSMS == false)
-            return $phone;
-        return substr($phone, 0, -$vgSmsChoiceLen)
-                . '<font color=#EE0000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
     }
     /**
      * Parse text with wiki code
@@ -323,8 +312,7 @@ class SurveyBody
  * Body of a questionnaire
  *
  */
-class
-QuestionnaireBody extends SurveyBody
+class QuestionnaireBody extends SurveyBody
 {
     /**
      *
@@ -335,7 +323,7 @@ QuestionnaireBody extends SurveyBody
     {
         parent::__construct($page, $parser);
         $this->type = vQUESTIONNAIRE;
-        
+
         if(count($this->page->getSurveys()) > 1)
         {
             $this->graph->setType('stackpercent'); //stackpercent multipie
