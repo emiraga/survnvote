@@ -57,9 +57,9 @@ class SurveyBody
         $output = "<div style=''>".''."<div style=\"display: block; width: 340px;$style\">";
 
         if($vote)
-            $output .= "<li STYLE=\"list-style: square inside; color: #$color\">$vote";
+            $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">$vote";
         else
-            $output .= "<li STYLE=\"list-style: square inside; color: #$color\">";
+            $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">";
 
         $output .= "<label style=\"color: black\" for=\"$voteid\">$choice $addtext</label></li>";
 
@@ -159,7 +159,7 @@ class SurveyBody
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
                     $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
-                    $percent = sprintf("%.3f",100.0 * $choice->getVote() / $numvotes);
+                    $percent = substr(100.0 * $choice->getVote() / $numvotes, 0, 5);
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
@@ -186,7 +186,7 @@ class SurveyBody
                 global $vgEnableSMS;
                 if($vgEnableSMS)
                 {
-                    $output .= "<li><img src=\"$vgScript/icons/mobile.png\"> Sent SMS to <b>$vgSmsNumber</b> with <font color=red>red digits</font> corresponding to your choice.</li>";
+                    $output .= "<li><img src=\"$vgScript/icons/mobile.png\"> Sent SMS to <b>".vfColorizePhone( $vgSmsNumber )."</b> with <font color=red>red digits</font> corresponding to your choice.</li>";
                 }
             }
             if($this->page->getWebVoting() != 'no')

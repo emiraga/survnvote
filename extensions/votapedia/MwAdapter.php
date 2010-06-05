@@ -14,28 +14,6 @@
 class MwAdapter
 {
     /**
-     * Purge the cache of a page with a given title
-     *
-     * @param $title string title of wiki page
-     * @deprecated
-     */
-    function purgePage($title)
-    {
-        /*$params = new FauxRequest(array('action' => 'purge','titles' => $title));
-		$api = new ApiMain($params, true);
-		$api->execute();
-		$data = & $api->getResultData();
-		if(!isset($data['purge'][0]['purged']))
-			throw new Exception('Page purging has failed');
-        */
-
-        //$article = new Article( Title::newFromText($title) );
-        //$article->doPurge(); // Directly purge and skip the UI part of purge().
-        debug_print_backtrace();
-        does_not_work_an();
-        sdfsd();
-    }
-    /**
      * Get a list of subcategories of a category
      *
      * @param $category Name of a category
@@ -165,9 +143,9 @@ class MwUser
             // Track anonymous users with cookies
             $randnum = rand(10, 2000000000);
             $needcookie = true;
+            // Is there a previous cookie?
             if(isset($_COOKIE['vcName']))
             {
-                // Is there a previous cookie?
                 $name = $_COOKIE['vcName'];
                 list($ip, $num)  = preg_split('/-/', $name);
                 if(intval($num) > 0 && $wgUser->getName() == $ip)

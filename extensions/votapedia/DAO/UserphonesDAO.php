@@ -121,14 +121,14 @@ class UserphonesDAO
     /**
      * Get new code that will be user for phone confirmation via SMS
      * 
-     * @global $vConfirmCodeLen Boolean
+     * @global $vgConfirmCodeLen Boolean
      * @return String confirmation code
      */
     private function getNewCode()
     {
-        global $vConfirmCodeLen;
+        global $vgConfirmCodeLen;
         $code = '';
-        for($i = 0; $i < $vConfirmCodeLen; $i++)
+        for($i = 0; $i < $vgConfirmCodeLen; $i++)
             $code .= rand(0, 9);
         return $code;
     }

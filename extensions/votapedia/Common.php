@@ -80,7 +80,7 @@ class SurveyException extends Exception
  */
 global $vgColors;
 $vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '008001',
-    'FF6833', '330065', '006599', 'CD9933', '006766', '99CCCD', '660066', 'FFFFCB',
+    'FF6833', '882295', '006599', 'CD9933', '006766', '99CCCD', 'CC00CC', 'BBBB9B',
     'CD3301', '272727', '807FFE', '804000', 'FE80FE', '00FF41', 'FFFF00', 'FE0000',
     '808042', '247D9F', 'FE8081', '807FFE', 'FF8041', '427F80', 'C0C0C0', '7F00FF',
     'FF00FE', '800000', '7FFFFE', 'E3A39A', '804000', 'FFFF00', '800000', '007FFF',
@@ -145,16 +145,16 @@ function vfColorizePhone($phone, $colorsms=false)
     $prefix = '+'.$vgCountryCode;
     if(substr($phone,0,strlen($prefix)) == $prefix)
     {
-        // in Malaysia we are lucky to have prefix 60 which ends with zero
+        // in Malaysia we are lucky to have a prefix '60' which ends with zero
         $prefix = preg_replace('/0$/', '', $prefix);
 
-        $phone = '<font color=gray>'.substr($phone,0,strlen($prefix)).'</font>'
+        $phone = '<font color=gray>'.substr($phone,0,strlen($prefix)).'</font>&thinsp;'
                 .substr($phone,strlen($prefix));
     }
     if(! $vgEnableSMS || ! $colorsms)
         return $phone;
     return substr($phone, 0, -$vgSmsChoiceLen)
-            . '<font color=#EE0000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
+            . '<font color=#E00000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
 }
 /**
  * This is used to connect database.

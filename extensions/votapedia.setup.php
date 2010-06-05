@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   title text NOT NULL,
   startTime datetime NOT NULL,
   endTime datetime NOT NULL,
-  duration int(16) NOT NULL,
-  author varchar(20) NOT NULL,
+  duration int NOT NULL,
+  author varchar(255) NOT NULL,
   phone varchar(20) DEFAULT NULL,
   createTime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   smsRequired tinyint(1) NOT NULL DEFAULT '0', 
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   choice text NOT NULL,
   receiver varchar(20) DEFAULT NULL,
   points tinyint(8) NOT NULL DEFAULT '0',
-  SMS varchar(200) DEFAULT NULL,
+  SMS varchar(20) DEFAULT NULL,
   vote int NOT NULL DEFAULT '0',
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}userphones
 (
   id int NOT NULL AUTO_INCREMENT,
   username varchar(255) NOT NULL,
-  phonenumber varchar(30) NOT NULL,
+  phonenumber varchar(20) NOT NULL,
   dateadded datetime NOT NULL,
   status tinyint(4) NOT NULL default 0,
   confirmcode varchar(20),

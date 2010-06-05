@@ -44,7 +44,6 @@ class SkinWaveLover2 extends SkinTemplate {
 		$out->addStyle( 'wavelover2/IE55Fixes.css', 'screen', 'IE 5.5000' );
 		$out->addStyle( 'wavelover2/IE60Fixes.css', 'screen', 'IE 6' );
 		$out->addStyle( 'wavelover2/IE70Fixes.css', 'screen', 'IE 7' );
-
 		$out->addStyle( 'wavelover2/rtl.css', 'screen', '', 'rtl' );
 	}
 }

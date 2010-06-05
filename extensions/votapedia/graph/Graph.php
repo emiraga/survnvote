@@ -4,6 +4,12 @@
  */
 if (!defined('MEDIAWIKI')) die();
 
+function vfCutEncode($str, $maxlen, $elipsis = '...')
+{
+    if(strlen($str) >= $maxlen)
+        $str = substr($str,0,$maxlen-strlen($elipsis)).$elipsis; //@todo remove crazy characters
+    return  urlencode($str);
+}
 /**
  * Graph class for drawing charts
  *
@@ -66,17 +72,18 @@ class Graph
         }
         if($this->type == 'pie')
         {
+            //$maxname = 30;
             $series = $this->series[0];
 
-            $imglink = "cht=p3&chd=t:{$series->getValuesFormat()}"
-                    ."&chs={$this->width}x{$this->height}";
+            $imglink = "cht=p3&chs={$this->width}x{$this->height}";
             $colors = $series->getColorsFormat();
             if($colors)
                 $imglink.="&chco=$colors";
-            $names = $series->getNamesFormat();
-            if($names)
-                $imglink.="&chdl={$series->getNamesFormat()}";
-
+            if($series->getCount())
+            {
+                $imglink.="&chd=t:{$series->getValuesFormat()}";
+                $imglink.="&chdl=".$series->getNamesFormat(30, true);
+            }
             return $imglink;
         }
         if($this->type == 'multipie')
@@ -93,7 +100,7 @@ class Graph
                         $v .= ',0';
                     $data[] = $v;
                     $colors[] = $series->getColorsFormat();
-                    $names[] = $series->getNamesFormat();
+                    $names[] = $series->getNamesFormat(30, true);
                 }
             }
             $data = 't:'.join('|',$data);
@@ -110,13 +117,23 @@ class Graph
         }
         if($this->type == 'stackpercent')
         {
+            $numseries = count($this->series);
+            $labelLength = 3;
+            if($numseries == 2)
+            {
+                $labelLength = 25;
+            }
+            elseif($numseries == 3)
+            {
+                $labelLength = 18;
+            }
             $xlabel = '';
             $chbh = intval(($this->width - 50) / count($this->series));
             $maxv = 0;
             $markers = array();
             foreach($this->series as &$series)
             {
-                $xlabel .= '|'.$series->getTitle();
+                $xlabel .= '|'. vfCutEncode($series->getTitle(),$labelLength);
                 if($series->getCount() > $maxv)
                     $maxv = $series->getCount();
             }
@@ -132,15 +149,15 @@ class Graph
                     $val = $series->getValue($i);
                     if($val === false)
                     {
-                        $barvalues[] = 0;
+                        $barvalues[] = '0';
                         $barcolors[] = '000000';
                     }
                     else
                     {
-                        $barvalues[] = intval(100 * $val / $series->getSum());
+                        $barvalues[] = vfCutEncode(100 * $val / $series->getSum(), 5, '');
                         $barcolors[] = $series->getColor($i);
                         $pos = $maxv-$i-1;
-                        $markers[] = "t".$series->getName($i).",000000,$pos,$s,12,,c";
+                        $markers[] = "t". vfCutEncode( $series->getName($i), $labelLength ).",000000,$pos,$s,12,,c";
                     }
                     $s++;
                 }
@@ -156,8 +173,9 @@ class Graph
             }*/
             $data = 't:'.join('|',$data);
             $colors = join(',', $colors);
-            $imglink = "cht=bvs"
-                    ."&chs={$this->width}x{$this->height}&chd=$data&chbh=$chbh"
+            $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
+            
+            $imglink .="&chd=$data"
                     ."&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
             $maxsize = 1024;
 
@@ -180,10 +198,7 @@ class GraphSeries
 
     public function __construct($title)
     {
-        $maxtitle = 50;
-        if(strlen($title) >= $maxtitle)
-            $title = substr($title,0,$maxtitle-3).'...'; //@todo remove crazy characters
-        $this->title = $title;
+        $this->title = vfCutEncode($title, 50);
     }
     function reverseValues()
     {
@@ -211,18 +226,14 @@ class GraphSeries
     }
     function addItem($name, $value, $color)
     {
-        $maxname = 30;
-        if($value == 0)return;
+        if($value == 0)
+            return;
         $this->sum += $value;
 
         if($this->maxValue < $value)
             $this->maxValue = $value;
 
-        if(strlen($name) >= $maxname)
-            $name = substr($name,0,$maxname-3).'...'; //@todo remove crazy characters
-        $this->names[] = urlencode($name);
-
-        $value = urlencode($value);
+        $this->names[] = $name;
         $this->values[] = $value;
         $this->colors[] = $color;
         $this->count++;
@@ -244,21 +255,29 @@ class GraphSeries
     function getName($index)
     {
         if($index >= $this->count)
-            return 'e';
+            return '';
         else
             return $this->names[$index];
     }
-    function getNamesFormat($glue = "|")
+    function getColorsFormat($glue = '|')
     {
-        return join($glue, $this->names);
+        return join($glue, $this->colors);
     }
-    function getColorsFormat()
+    function getValuesFormat($glue = ',')
     {
-        return join("|", $this->colors);
+        return join($glue, $this->values);
     }
-    function getValuesFormat()
+    function getNamesFormat($maxlen, $addvalues = false, $glue = '|')
     {
-        return join(",", $this->values);
+        $names = array();
+        for($i=0;$i<$this->count;$i++)
+        {
+            $name = vfCutEncode($this->names[$i], $maxlen);
+            if($addvalues)
+                $name .= ' ('. vfCutEncode($this->values[$i], 10, '').')';
+            $names[] = $name;
+        }
+        return join($glue, $names);
     }
 }
 
