@@ -30,9 +30,13 @@ class Graph
     public function getHTMLImage($id = 'graph')
     {
         return "<img id=\"$id\" width=\"{$this->width}\" height=\"{$this->height}\" "
-        ."src=\"http://chart.apis.google.com/chart?{$this->getImageLink()}\">";
+        ."src=\"{$this->getImageLink()}\">";
     }
     public function getImageLink()
+    {
+        return "http://chart.apis.google.com/chart?".$this->getImageParams();
+    }
+    public function getImageParams()
     {
         if($this->type == 'line')
         {

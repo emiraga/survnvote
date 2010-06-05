@@ -40,15 +40,6 @@ class Sms
      */
     static function getNewSms()
     {
-        /* fake votes used for testing
-        return array(
-            array('id' => 1001,'from' => '000','text' => '01',),
-            array('id' => 1001,'from' => '001','text' => '01',),
-            array('id' => 1001,'from' => '002','text' => '02',),
-            array('id' => 1001,'from' => '003','text' => '03',),
-            array('id' => 1001,'from' => '004','text' => '04',),
-        ); /* */
-
         global $vgDB, $vgSmsdDatabasename;
         $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM $vgSmsdDatabasename.inbox "
                 ."WHERE Processed = 'false'");

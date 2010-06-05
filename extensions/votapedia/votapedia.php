@@ -47,6 +47,8 @@ $wgAjaxExportList[] = 'SurveyView::getChoice';
 $wgAjaxExportList[] = 'SurveyBody::ajaxChoice';
 $wgAjaxExportList[] = 'SurveyBody::getChoices';
 
+$wgAjaxExportList[] = 'SurveyBody::ajaxgraph';
+
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser )
 {
@@ -104,7 +106,6 @@ $wgExtensionCredits['other'][] = array(
         'url' => 'http://www.votapedia.net/',
         'description' => 'Votapedia - Audience Response System',
         'descriptionmsg' => 'votapedia-desc',
-        'version' => '1.0.0',
+        'version' => '0.1.3',
 );
 
-?>

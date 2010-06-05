@@ -119,7 +119,6 @@ class ProcessSurvey extends SpecialPage
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
                 $surveydao->stopSurvey($page);
-                $surveydao->releaseReceivers();
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);

@@ -88,5 +88,12 @@ class VoteDAO
         }
         return true;
     }
+    static function countNewVotes($page_id, $timestamp)
+    {
+        global $vgDB, $vgDBPrefix;
+        $datetime = vfDate($timestamp);
+        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}surveyrecord WHERE pageID = ? AND voteDate >= ?",
+                array($page_id, $datetime));
+    }
 }
-?>
+

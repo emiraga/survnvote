@@ -16,11 +16,12 @@ require_once("$vgPath/VO/PageVO.php");
  * (a) Survey(s)' info into or from database system.
  *
  * @author Bai Qifeng
+ * @author Emir Habul
  * @version 2.0 Beta
  */
 class SurveyDAO
 {
-    private function getPages($where, $param, $loadSurveys = true)
+    public function getPages($where, $param, $loadSurveys = true)
     {
         global $vgDB, $vgDBPrefix;
 
@@ -720,13 +721,11 @@ class SurveyDAO
      *
      * @param $page PageVO
      */
-    public function requestReceivers(PageVO &$page)
+    /*public function requestReceivers(PageVO &$page)
     {
-        $this->releaseReceivers(); //try to delete unused receivers if any
-
         $telephone = new Telephone();
         return $telephone->setupReceivers($page);
-    }
+    }*/
     /**
      * Update database and set new receivers and SMS from the PageVo object
      *
@@ -752,29 +751,5 @@ class SurveyDAO
                 $vgDB->Execute($resChoice, $param);
             }
         }
-    }
-    /**
-     * Release receivers which have not been released this far.
-     * Find and mark as receivers pages (surveys) which have expired.
-     *
-     * @return Array array of integers specifying pageID of pages which have been finalized
-     */
-    public function releaseReceivers()
-    {
-        $telephone = new Telephone();
-
-        global $vgDB, $vgDBPrefix;
-        $now = vfDate();
-        $pages = $this->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
-
-        $ret = array();
-        foreach ($pages as $page)
-        {
-            /* @var $page PageVO */
-            $telephone->deleteReceivers($page);
-            $vgDB->Execute("UPDATE {$vgDBPrefix}page SET receivers_released = 1 WHERE pageID = ?", array($page->getPageID()));
-            $ret[] = $page->getPageID();
-        }
-        return $ret;
     }
 }

@@ -167,6 +167,7 @@ class Telephone
      */
     function setupReceivers(PageVO &$page)
     {
+        $this->releaseReceivers(); //first delete unused receivers
         $milisec = 1;
         while(true)
         {
@@ -272,4 +273,28 @@ class Telephone
             throw new SurveyException("Could not mark surveychoice as finished");
         return true;
     }
+
+    /**
+     * Release receivers which have not been released this far.
+     * Find and mark as receivers pages (surveys) which have expired.
+     *
+     * @return Array array of integers specifying pageID of pages which have been finalized
+     */
+    public function releaseReceivers()
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $surveydao = new SurveyDAO();
+        $pages = $surveydao->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
+        $ret = array();
+        foreach ($pages as $page)
+        {
+            /* @var $page PageVO */
+            $this->deleteReceivers($page);
+            $vgDB->Execute("UPDATE {$vgDBPrefix}page SET receivers_released = 1 WHERE pageID = ?", array($page->getPageID()));
+            $ret[] = $page->getPageID();
+        }
+        return $ret;
+    }
 }
+

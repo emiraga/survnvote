@@ -1,4 +1,6 @@
 <?php
+if(isset($_SERVER['HOST'])) die('Must be run from command line.');
+
 //set the path to MediaWiki
 $IP = '/xampp/htdocs/new';
 
@@ -71,19 +73,7 @@ function vfDaemonSmsAction()
             //find page and try to vote
             try
             {
-                //load PageVO
-                $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
-                        array($choice));
-                if($result == false)
-                    throw new SurveyException("SurveyID not found.");
-                $surveyid = $result->fields['surveyID'];
-                $choiceid = $result->fields['choiceID'];
-                $pageid = $result->fields['pageID'];
-                $page =& $surveydao->findByPageID($pageid, false);
-                //vote
-                $votedao = new VoteDAO($page, $username);
-                $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );
-                $votedao->vote($votevo);
+                vfVoteFromDaemon($choice, $username);
             }
             catch(Exception $e)
             {
@@ -95,9 +85,27 @@ function vfDaemonSmsAction()
     }
 }
 
+function vfVoteFromDaemon($choice, $username)
+{
+    global $vgDBPrefix, $vgDB, $surveydao;
+    //load PageVO
+    $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
+            array($choice));
+    if($result == false)
+        throw new SurveyException("SurveyID not found.");
+    $surveyid = $result->fields['surveyID'];
+    $choiceid = $result->fields['choiceID'];
+    $pageid = $result->fields['pageID'];
+    $page =& $surveydao->findByPageID($pageid, false);
+    //vote
+    $votedao = new VoteDAO($page, $username);
+    $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );
+    $votedao->vote($votevo);
+}
+
 //get command line parameters
 $args = $_SERVER['argv'];
-if(in_array('daemon', $args))
+if($args[1] == 'daemon')
 {
     //run as a daemon
     while(1)
@@ -112,6 +120,25 @@ if(in_array('daemon', $args))
             error_log($e->getTraceAsString());
         }
         sleep(2);
+    }
+}
+else if($args[1] == 'fakevote') /*used for testing*/
+{
+    global $vgSmsChoiceLen;
+    for($i=2;$i<count($args);$i++)
+    {
+        $choice = $args[$i];
+        while(strlen($choice) < $vgSmsChoiceLen)
+            $choice = '0' . $choice;
+        try
+        {
+            vfVoteFromDaemon($choice, 'fakevote:'.vfRandStr(20));
+            echo "Fake vote: $choice\n";
+        }
+        catch(Exception $e)
+        {
+            echo $e->getMessage()."\n";
+        }
     }
 }
 else

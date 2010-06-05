@@ -2,6 +2,9 @@
 if (!defined('MEDIAWIKI')) die();
 global $vgPath;
 require_once("$vgPath/Common.php");
+require_once("$vgPath/DAO/SurveyDAO.php");
+require_once("$vgPath/graph/Graph.php");
+require_once("$vgPath/DAO/VoteDAO.php");
 
 /**
  * SurveyBody shows the main part of the survey
@@ -156,7 +159,7 @@ class SurveyBody
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
                     $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
-                    $percent = 100.0 * $choice->getVote() / $numvotes;
+                    $percent = sprintf("%.3f",100.0 * $choice->getVote() / $numvotes);
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
@@ -219,6 +222,7 @@ class SurveyBody
             };
             updateTimeLeft();
             </script>";
+            $script = preg_replace('/^\s+/m', '', $script);
             $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         }
 
@@ -238,31 +242,74 @@ class SurveyBody
         {
             //insert graph image at the beginning
             $imgid = 'gr'.$this->page->getPageID().'_'.rand();
+            //Prepend this image!
             $output = '<div style="float:right">'.$this->graph->getHTMLImage($imgid).'</div>' . $output;
-
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
             {
-                $now = time();
-                $script =
-                        "<script>
-                function refresh$imgid()
-                {
-                    sajax_do_call('SurveyBody::graph', [{$this->page->getPageID()}],function(o) {
-                        graph = document.getElementById('$imgid');
-                        /*alert(graph.src);*/
-                    });
-                }
-                var time$imgid = \"$now\";
-                setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
-                /*alert(document.getElementById('$imgid').src);*/
-                </script>";
-                /*o.responseText*/
-                $script = preg_replace('/^\s*/', '', $script);
-                $output.= str_replace("\n", "", $script);
+                $output .= $this->refreshImage($imgid, $this->page->getPageID());
             }
         }
         return $output;
+    }
+    function refreshImage($imgid, $page_id)
+    {
+        global $vgImageRefresh;
+        $now = time();
+        $script = "<script>
+        function refresh$imgid()
+        {
+            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $page_id],function(o) {
+                graph=document.getElementById('$imgid');
+                if(o.responseText.length)
+                {
+                    resp = o.responseText.split('@');
+                    if(graph.src!=resp[0])
+                    {
+                        time$imgid = resp[1];
+                        graph.src = resp[0];
+                    }
+                }
+                setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
+            });
+        }
+        var time$imgid = \"$now\";
+        setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
+        /*alert(document.getElementById('$imgid').src);*/
+        </script>";
+        /*o.responseText*/
+        $script = preg_replace('/^\s*/m', '', $script);
+        return str_replace("\n", "", $script);
+    }
+    static function ajaxgraph($last_refresh, $page_id)
+    {
+        if(VoteDAO::countNewVotes($page_id, $last_refresh) == 0)
+            return ''; // there are not new votes
+
+        //@todo check permisions
+        $now = time();
+        $sdao = new SurveyDAO();
+        $page = $sdao->findByPageID($page_id);
+        //@todo check permissions
+        $surveys =& $page->getSurveys();
+        $graph = new Graph('pie');
+        if(count($surveys) > 1)
+            $graph->setType('stackpercent');
+
+        foreach($surveys as &$survey)
+        {
+            /* @var $survey SurveyVO */
+            $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) ); //@todo remove extra things
+            $choices = &$survey->getChoices();
+            foreach($choices as &$choice)
+            {
+                /* @var $choice ChoiceVO */
+                $color = vfGetColor();
+                $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
+            }
+            $graph->addSeries($graphseries);
+        }
+        return $graph->getImageLink()."@".$now;
     }
     /**
      * Parse text with wiki code
