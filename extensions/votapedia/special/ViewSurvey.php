@@ -41,7 +41,8 @@ class ViewSurvey extends SpecialPage
             $buttons = new SurveyButtons();
             $buttons->setDetailsButton(false);
             $tag = new SurveyView($page_id, $parser, $buttons);
-
+            $buttons->setType($tag->getPage()->getTypeName());
+            
             $wgOut->addHTML($tag->getHTML());
             $wgOut->returnToMain();
 

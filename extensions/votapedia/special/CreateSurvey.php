@@ -31,6 +31,7 @@ class spCreateSurvey extends SpecialPage
 class CreateSurvey
 {
     protected $formitems;
+    protected $formpages;
     protected $spPageName;
     protected $form;
 
@@ -58,14 +59,10 @@ class CreateSurvey
                         'valid' => function ($v,$i,$js)
                         {
                             if($js) return "";
-                            return strlen($v) > 4;
+                            return strlen($v) > 1;
                         },
                         'explanation' => 'e.g. "What is the capital of '.$vgCountry.'?". This will be the title of your survey page.',
                         'learn_more' => 'Details of Title or Survey Question',
-                        /*'process' => function($v)
-                        {
-                            return FormControl::RemoveSpecialChars($v);
-                        },*/
                 ),
                 'choices' => array(
                         'type' => 'textarea',
@@ -92,11 +89,6 @@ class CreateSurvey
                         'explanation' => 'Your survey then would be added into the chosen category, and would be listed under that category.',
                         'learn_more' => 'Details of Survey Category',
                         'options' => array()
-                ),
-                'label-details' => array(
-                        'type' => 'null',
-                        'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audiences can ring this number, send SMS or visit the survey page to enter their vote.',
-                        'learn_more' => 'Details of Survey Procedure',
                 ),
                 'privacy' => array(
                         'type' => 'radio',
@@ -134,6 +126,7 @@ class CreateSurvey
                         {
                             return intval($v);
                         },
+                        'icon' => $vgScript.'/icons/clock.png',
                 ),
                 'phonevoting' => array(
                         'type' => 'radio',
@@ -144,7 +137,7 @@ class CreateSurvey
                             if($js) return "";
                             return true;
                         },
-                        'explanation' => '',
+                        'explanation' => 'Once you start the survey, each choice will be assigned with a telephone number, audience can ring this number or send SMS to enter their vote.',
                         'learn_more' => 'Details of Phone Voting',
                         'options' => array(
                                 "Enable unidentified voters. Recommended for phone surveys from outside of $vgCountry."=>"anon",
@@ -161,7 +154,7 @@ class CreateSurvey
                             if($js) return "";
                             return true;
                         },
-                        'explanation' => '',
+                        'explanation' => 'Once you start the survey users will be able to enter their votes by opening a page with this survey.',
                         'learn_more' => 'Details of Web Voting',
                         'options' => array(
                                 "Enable anonymous web voting"=>"anon",
@@ -180,7 +173,8 @@ class CreateSurvey
                             return true;
                         },
                         'explanation' => 'If checked, the survey result will only be shown after the survey finishes. Otherwise, voters will see the partial result after they vote.',
-                //'learn_more' => 'Details_of_Anonymous_Voting',
+                        //'learn_more' => 'Details_of_Anonymous_Voting',
+                        'icon' => $vgScript.'/icons/photo.png',
                 ),
                 'showtop' => array(
                         'type' => 'input',
@@ -188,19 +182,20 @@ class CreateSurvey
                         'default' => '',
                         'width' => '10',
                         'textbefore' => 'Show only top ',
-                        'textafter' => ' choices on the graph.',
+                        'textafter' => ' choices on the graph (0 for all).',
                         'valid' => function($v,$i,$js)
                         {
                             if($js) return "";
                             $v=intval($v);
-                            return $v >= 0 and $v < 1000;
+                            return $v >= 0 and $v <= 99;
                         },
-                        'explanation' => 'If a number is specified, the graph will only display the top few choices on the graph. Otherwise, voters will see all the choices no matter how many votes they have got.',
+                        'explanation' => 'If a number is not zero, the graph will only display the top few choices on the graph. Otherwise, voters will see all the choices.',
                         //'learn_more' => 'Details_of_Duration',
                         'process' => function($v)
                         {
                             return intval($v);
                         },
+                        'icon' => $vgScript.'/icons/star.png',
                 ),
                 /*'voteridentity' => array(
                         'type' => 'checkbox',
@@ -221,9 +216,16 @@ class CreateSurvey
                         'learn_more' => 'Changing Title of a survey',
                 ),
         );
+        //Fill the list of subcategories
         $subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
         $subcat = $this->removePrefSufCategories($subcat);
         $this->formitems['category']['options'] = $subcat;
+        //List of pages
+        $this->formpages = array(
+            0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
+            1=>array('title'=>'Voting options','items'=>array('privacy', 'duration', 'phonevoting','webvoting' )),
+            2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop')),
+        );
     }
     /**
      * Remove prefix and suffix from category list
@@ -278,17 +280,28 @@ class CreateSurvey
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
-        $page->setDisplayTop($values['showtop']);
-        if(isset($values['showresultsend']) && $values['showresultsend'])
-            $page->setShowGraphEnd(true);
-        else
-            $page->setShowGraphEnd(false);
         $page->setDuration( $values['duration'] );
         $page->setVotesAllowed(1);
         $page->setSMSRequired(false); //@todo SMS sending to the users
         $page->setPrivacyByName($values['privacy']);
         $page->setPhoneVoting($values['phonevoting']);
         $page->setWebVoting($values['webvoting']);
+        
+        $this->setPageVOvaluesSmall($page, $values);
+    }
+    /**
+     * Only set values for things related to graphing
+     * 
+     * @param $page PageVO
+     * @param $values Array
+     */
+    protected function setPageVOvaluesSmall(PageVO &$page, &$values)
+    {
+        $page->setDisplayTop($values['showtop']);
+        if(isset($values['showresultsend']) && $values['showresultsend'])
+            $page->setShowGraphEnd(true);
+        else
+            $page->setShowGraphEnd(false);
     }
     /**
      *
@@ -402,7 +415,6 @@ class CreateSurvey
         $this->form->setValue('privacy', $page->getPrivacyByName());
         $this->form->setValue('phonevoting', $page->getPhoneVoting());
         $this->form->setValue('webvoting', $page->getWebVoting());
-
         $this->fillValuesFromSurveys($page->getSurveys());
     }
     function processNewSurveySubmit()
@@ -431,12 +443,12 @@ class CreateSurvey
                 return;
             }
         }
-        $this->preDrawForm();
-        $this->drawFormNew($error);
+        $this->preDrawForm($error);
+        $this->drawFormNew();
+        $this->postDrawForm();
     }
     function processEditSurvey()
     {
-
         global $wgRequest, $wgOut;
         //user wants to edit the existing survey
         $this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
@@ -459,17 +471,23 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        if($page->getStatus() != 'ready')
+        if($page->getStatus() == 'ended')
         {
             $wgOut->setPageTitle("Error");
-            $wgOut->addWikiText( vfErrorBox( 'Survey is either active or finished, therefore cannot be edited.') );
+            $wgOut->addWikiText( vfErrorBox( 'Survey is finished, therefore cannot be edited.') );
             $wgOut->returnToMain();
             return;
         }
+        else if($page->getStatus() == 'active')
+        {
+            unset($this->formpages[0]);
+            unset($this->formpages[1]);
+        }
         $this->fillFormValuesFromPage($page);
         //draw form
-        $this->preDrawForm();
+        $this->preDrawForm('');
         $this->drawFormEdit($page_id);
+        $this->postDrawForm();
     }
     function processEditSurveySubmit()
     {
@@ -480,35 +498,57 @@ class CreateSurvey
         $this->returnTo = htmlspecialchars_decode( $wgRequest->getVal('returnto') );
         $page_id = intval($wgRequest->getVal('id'));
 
-        $this->form->loadValuesFromRequest();
-
-        $error = $this->Validate();
+        try
+        {
+            $surveydao = new SurveyDAO();
+            $page_old = $surveydao->findByPageID( $page_id );
+            $this->fillFormValuesFromPage($page_old);
+            $this->form->loadValuesFromRequest();
+            $error = $this->Validate();
+        }
+        catch(SurveyException $e)
+        {
+            $wgOut->setPageTitle("Error");
+            $wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
+            $wgOut->returnToMain();
+            return;
+        }
+        if( ! vfUser()->canControlSurvey($page_old) )
+        {
+            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+            return;
+        }
+        $smallupdate = false;
+        if($page_old->getStatus() == 'ended')
+        {
+            $wgOut->setPageTitle("Error");
+            $wgOut->addWikiText( vfErrorBox( 'Survey is finished, therefore cannot be edited.') );
+            $wgOut->returnToMain();
+            return;
+        }
+        else if($page_old->getStatus() == 'active')
+        {
+            unset($this->formpages[0]);
+            unset($this->formpages[1]);
+            $smallupdate = true;
+        }
+        echo $smallupdate.'<br>';
         if(! $error)
         {
             try
             {
-                $surveydao = new SurveyDAO();
-                $page_old = $surveydao->findByPageID( $page_id );
-            }
-            catch(SurveyException $e)
-            {
-                $wgOut->setPageTitle("Error");
-                $wgOut->addWikiText( vfErrorBox( 'No such page identifier (id)') );
-                $wgOut->returnToMain();
-                return;
-            }
-            if( ! vfUser()->canControlSurvey($page_old) )
-            {
-                $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
-                return;
-            }
-            
-            $page = $this->generatePageVO($this->form->getValuesArray());
-            $page->setPageID($page_id);
-
-            try
-            {
-                $surveydao->updatePage($page);
+                if($smallupdate)
+                {
+                    $page =& $page_old;
+                    $this->setPageVOvaluesSmall($page, $this->form->getValuesArray());
+                    $surveydao->updatePage($page, false);
+                }
+                else
+                {
+                    $page = $this->generatePageVO($this->form->getValuesArray());
+                    $page->setPageID($page_id);
+                    $surveydao->updatePage($page);
+                }
             }
             catch(SurveyException $e)
             {
@@ -521,8 +561,9 @@ class CreateSurvey
             $wgOut->redirect($title->escapeLocalURL(), 302);
             return;
         }
-        $this->preDrawForm();
-        $this->drawFormEdit($page_id, $error);
+        $this->preDrawForm($error);
+        $this->drawFormEdit($page_id);
+        $this->postDrawForm();
     }
     function processNewSurvey()
     {
@@ -532,8 +573,9 @@ class CreateSurvey
             return;
         }
         //fresh new form
-        $this->preDrawForm();
+        $this->preDrawForm('');
         $this->drawFormNew();
+        $this->postDrawForm();
     }
     /**
      * Mandatory execute function for a Special Page
@@ -550,16 +592,17 @@ class CreateSurvey
             $wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
+        
         global $wgRequest;
-        if($wgRequest->getVal('wpSubmit') == wfMsg('edit-survey'))
+        if($wgRequest->getVal('vpAction') == 'editcontinue' )
         {
             $this->processEditSurveySubmit();
         }
-        else if( $wgRequest->getVal('wpEditButton') == wfMsg('edit-survey'))
+        else if( $wgRequest->getVal('vpAction') == 'editstart' )
         {
             $this->processEditSurvey();
         }
-        else if($wgRequest->getVal('wpSubmit') == wfMsg('create-survey'))
+        else if( $wgRequest->getVal('vpAction') == 'createnew' )
         {
             $this->processNewSurveySubmit();
         }
@@ -571,34 +614,38 @@ class CreateSurvey
     function Validate()
     {
         $error = $this->form->Validate();
+
         if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
             $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
         return $error;
     }
-    function preDrawForm()
+    function preDrawForm($errors)
     {
         global $wgOut, $vgScript;
         $wgOut->setArticleFlag(false);
+        $wgOut->returnToMain();
         $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/survey.js"></script>');
         $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/jquery-1.4.2.min.js"></script>');
+        if($errors)
+            $wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
+        $crform = Title::newFromText($this->spPageName);
+        $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
     }
     /**
      * Draw form for new survey using FormControl
      *
      * @param $errors string containing potential errors
      */
-    protected function drawFormNew( $errors=null )
+    protected function drawFormNew()
     {
         global $wgOut;
         $wgOut->setPageTitle(wfMsg('title-new-survey'));
-        if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-        $crform = Title::newFromText($this->spPageName);
-        $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
-
-        $this->form->AddPage ( 'New Survey', array('titleorquestion', 'choices', 'category', 'label-details') );
-        $this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
-        $this->form->AddPage ( 'Graph settings', array('showresultsend', 'showtop') );
-        $this->form->EndForm(wfMsg('create-survey'));
+        foreach($this->formpages as $fpage)
+        {
+            $this->form->AddPage($fpage['title'], $fpage['items']);
+        }
+        $wgOut->addHTML('<input type="hidden" name="vpAction" value="createnew">');
+        $this->formButton = wfMsg('create-survey');
     }
     /**
      * Draw form for editing surveys using FormControl
@@ -606,29 +653,34 @@ class CreateSurvey
      * @param $page_id
      * @param $errors string containing potential errors
      */
-    protected function drawFormEdit( $page_id, $errors=null )
+    protected function drawFormEdit( $page_id )
     {
-        $this->formitems['titleorquestion']['explanation'] = '';
-        $this->formitems['titleorquestion']['learn_more'] = '';
+        #unset($this->formitems['titleorquestion']['explanation']);
+        #unset($this->formitems['titleorquestion']['learn_more']);
 
         global $wgOut, $vgScript;
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
-        
-        $wgOut->returnToMain();
-        if($errors)	$wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
-
-        $crform = Title::newFromText($this->spPageName);
-        $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
 
         $wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
         $wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
 
-        $this->form->AddPage ( 'Edit Survey', array('titleorquestion', 'titlewarning' , 'choices', 'label-details') );
-        $this->form->AddPage ( 'Voting options', array('privacy', 'duration', 'phonevoting','webvoting' ) );
-        $this->form->AddPage ( 'Graph settings', array('showresultsend', 'showtop') );
-        $this->form->EndForm(wfMsg('edit-survey'));
+        if(isset($this->formpages[0]))
+        {
+            $this->formpages[0]['title'] = 'Edit Survey';
+            $key = array_search('category', $this->formpages[0]['items']);
+            unset($this->formpages[0]['items'][$key]);
+        }
 
+        foreach($this->formpages as $fpage)
+        {
+            $this->form->AddPage($fpage['title'], $fpage['items']);
+        }
+        $wgOut->addHTML('<input type="hidden" name="vpAction" value="editcontinue">');
+        $this->formButton = wfMsg('edit-survey');
+    }
+    protected function postDrawForm()
+    {
+        $this->form->EndForm($this->formButton);
     }
 }// End of class CreateSurvey
 
-?>

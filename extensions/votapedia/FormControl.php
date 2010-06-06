@@ -98,8 +98,19 @@ class FormControl
             if($wgRequest->getCheck($id))
             {
                 $this->setValue( $id, $wgRequest->getVal($id) );
-                if(isset($element['process'])) //@todo there is a bug here
+                if(isset($element['process']))
+                {
                     $this->setValue( $id , $element['process']( $this->getValue( $id ) ));
+                }
+            }
+            else
+            {
+                if($this->items[$id]['type'] == 'checkbox')
+                {
+                    #var_dump($this->items[$id]);
+                    #die('');
+                    $this->setValue( $id , false );
+                }
             }
         }
     }

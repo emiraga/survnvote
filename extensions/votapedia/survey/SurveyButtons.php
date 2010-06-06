@@ -3,6 +3,7 @@ if (!defined('MEDIAWIKI')) die();
 
 class SurveyButtons
 {
+    /** @var String */ protected $type;
     /** @var Integer */protected $page_id;
     /** @var String */ protected $page_status;
     /** @var String */ protected $page_author;
@@ -13,9 +14,12 @@ class SurveyButtons
     /** @var Boolean */protected $show_details = true;
     /** @var Boolean */protected $show_vote = false;
     /** @var Boolean */protected $has_control = false;
-
     public function __construct()
     {
+    }
+    public function setType($type)
+    {
+        $this->type = strtolower( $type );
     }
     function setPageID($page_id)
     {
@@ -44,7 +48,8 @@ class SurveyButtons
     function setHasControl($control)
     {
         $this->has_control = $control;
-    }    /*
+    }
+    /*
      * @return HTML code of buttons
     */
     function getHTML($show_details = false)
@@ -53,25 +58,25 @@ class SurveyButtons
         $output = "<div id='$divname'>";
 
         //Edit button
-        if($this->has_control && $this->page_status == 'ready' )
+        if($this->has_control && $this->page_status != 'ended' )
         {
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-survey').'">';
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-'.$this->type).'">';
         }
 
         if($this->show_vote)
         {
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-survey').'">';
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-'.$this->type).'">';
         }
 
         if($this->has_control)
         {
             if($this->page_status == 'ready')
             {
-                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-survey').'" />';
+                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-'.$this->type).'" />';
             }
             elseif($this->page_status == 'active')
             {
-                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-survey').'" onClick="return confirm(\'Are you sure you want to stop this survey? This operation cannot be undone.\')" />';
+                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-'.$this->type).'" onClick="return confirm(\'Are you sure you want to stop this survey? This operation cannot be undone.\')" />';
             }
         }
         //$output.= '<div style="float: right;">';

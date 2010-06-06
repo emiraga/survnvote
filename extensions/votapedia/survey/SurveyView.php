@@ -104,7 +104,8 @@ class SurveyView
         $this->buttons->setWikiTitle($this->wikititle->getFullText());
         $this->buttons->setPageID($this->page_id);
         $this->buttons->setPageStatus($this->page->getStatus());
-
+        $this->buttons->setType($this->page->getTypeName());
+        
         //Configure body and buttons for different types
         switch($this->page->getType())
         {

@@ -34,7 +34,7 @@ class CreateQuestionnaire extends CreateSurvey
         parent::__construct();
         global $vgScript;
         $this->formitems['titleorquestion']['name'] = 'Title';
-        $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire page.';
+        $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire.';
         $this->formitems['choices']['type'] = 'html';
         $this->formitems['choices']['code'] = '<script>writeHTML()</script>';
         $this->formitems['choices']['name'] = 'Questions';
@@ -322,17 +322,19 @@ END_SCRIPT;
         $script = str_replace("\n",'',$script);
         $wgOut->prependHTML($script);
     }
-    protected function drawFormNew( $errors=null )
+    protected function drawFormNew()
     {
-        parent::drawFormNew($errors);
+        parent::drawFormNew();
         global $wgOut;
         $wgOut->setPageTitle(wfMsg('title-new-questionnaire'));
+        $this->formButton = wfMsg('create-questionnaire');
     }
-    protected function drawFormEdit( $page_id, $errors=null )
+    protected function drawFormEdit( $page_id)
     {
-        parent:: drawFormEdit( $page_id, $errors );
+        parent:: drawFormEdit( $page_id );
         global $wgOut;
         $wgOut->setPageTitle(wfMsg('title-edit-questionnaire'));
+        $this->formButton = wfMsg('edit-questionnaire');
     }
 }
-?>
+

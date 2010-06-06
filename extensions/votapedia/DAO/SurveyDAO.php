@@ -173,7 +173,7 @@ class SurveyDAO
      *
      * @param $pageVO PageVO
      */
-    public function updatePage(PageVO &$pageVO)
+    public function updatePage(PageVO &$pageVO, $update_surveys = true)
     {
         global $vgDB, $vgDBPrefix;
         // Check wether the page exists
@@ -206,19 +206,22 @@ class SurveyDAO
         //@todo some fields here are missing
         $vgDB->Execute($resPage,$param);
 
-        $this->deleteSurveys($pageID);
-
-        $refsurveys =& $pageVO->getSurveys();
-        foreach ($refsurveys as &$survey)
+        if($update_surveys)
         {
-            $survey->setPageID($pageVO->getPageID());
-            $this->insertSurvey($survey);
+            $this->deleteSurveys($pageID);
+
+            $refsurveys =& $pageVO->getSurveys();
+            foreach ($refsurveys as &$survey)
+            {
+                $survey->setPageID($pageVO->getPageID());
+                $this->insertSurvey($survey);
+            }
         }
 
         $vgDB->CompleteTrans();
         if ($vgDB->HasFailedTrans())
         {
-            throw new SurveyException("ODBC Commit error: ".$vgDB->ErrorMsg(),400);
+            throw new SurveyException("Commit error: ".$vgDB->ErrorMsg(),400);
         }
         return true;
     }

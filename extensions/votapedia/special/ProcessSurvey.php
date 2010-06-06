@@ -39,7 +39,7 @@ class ProcessSurvey extends SpecialPage
         {
             $surveydao = new SurveyDAO();
             $page = $surveydao->findByPageID($page_id);
-            if($action == wfMsg('start-survey'))
+            if($action == wfMsg('start-survey') || $action == wfMsg('start-questionnaire'))
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
@@ -48,10 +48,10 @@ class ProcessSurvey extends SpecialPage
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
                 }
-
                 if($page->getStatus() != 'ready')
+                {
                     throw new SurveyException('Survey is either running or finished and cannot be started');
-
+                }
                 if($page->getPhoneVoting() != 'no')
                 {
                     $tel = new Telephone();
@@ -74,14 +74,14 @@ class ProcessSurvey extends SpecialPage
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;
             }
-            elseif ($action == wfMsg('edit-survey'))
+            elseif ($action == wfMsg('edit-survey') || $action == wfMsg('edit-questionnaire'))
             {
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 if($page->getType() == vSIMPLE_SURVEY)
                     $title = Title::newFromText('Special:CreateSurvey');
                 elseif($page->getType() == vQUESTIONNAIRE)
                     $title = Title::newFromText('Special:CreateQuestionnaire');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}&wpEditButton=".wfMsg('edit-survey'), 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}&vpAction=editstart", 302);
             }
             elseif ($action == wfMsg('view-details'))
             {
@@ -114,7 +114,7 @@ class ProcessSurvey extends SpecialPage
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;
             }
-            elseif ($action ==  wfMsg('stop-survey'))
+            elseif ($action ==  wfMsg('stop-survey') || $action == wfMsg('stop-questionnaire'))
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
