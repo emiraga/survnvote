@@ -210,18 +210,19 @@ END_SCRIPT;
     function Validate()
     {
         $error = parent::Validate();
-
-        global $wgRequest;
-        $ordernum = $wgRequest->getIntArray('orderNum', array());
-        foreach($ordernum as $index)
+        if($this->page->getStatus() == 'ready')
         {
-            $choices = $wgRequest->getArray("q{$index}choices", array());
-
-            if(count($choices) < 2)
-                $error .= "<li>Question must have at least two choices.</li>";
+            global $wgRequest;
+            $ordernum = $wgRequest->getIntArray('orderNum', array());
+            foreach($ordernum as $index)
+            {
+                $choices = $wgRequest->getArray("q{$index}choices", array());
+                if(count($choices) < 2)
+                    $error .= "<li>Question must have at least two choices.</li>";
+            }
+            if(count($ordernum) == 0)
+                $error .= "<li>There must be at least one question.</li>";
         }
-        if(count($ordernum) == 0)
-            $error .= "<li>There must be at least one question.</li>";
         return $error;
     }
     function makeSurveysFromRequest()

@@ -501,8 +501,8 @@ class CreateSurvey
         try
         {
             $surveydao = new SurveyDAO();
-            $page_old = $surveydao->findByPageID( $page_id );
-            $this->fillFormValuesFromPage($page_old);
+            $this->page = $surveydao->findByPageID( $page_id );
+            $this->fillFormValuesFromPage($this->page);
             $this->form->loadValuesFromRequest();
             $error = $this->Validate();
         }
@@ -513,20 +513,20 @@ class CreateSurvey
             $wgOut->returnToMain();
             return;
         }
-        if( ! vfUser()->canControlSurvey($page_old) )
+        if( ! vfUser()->canControlSurvey($this->page) )
         {
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
         $smallupdate = false;
-        if($page_old->getStatus() == 'ended')
+        if($this->page->getStatus() == 'ended')
         {
             $wgOut->setPageTitle("Error");
             $wgOut->addWikiText( vfErrorBox( 'Survey is finished, therefore cannot be edited.') );
             $wgOut->returnToMain();
             return;
         }
-        else if($page_old->getStatus() == 'active')
+        else if($this->page->getStatus() == 'active')
         {
             unset($this->formpages[0]);
             unset($this->formpages[1]);
@@ -539,7 +539,7 @@ class CreateSurvey
             {
                 if($smallupdate)
                 {
-                    $page =& $page_old;
+                    $page =& $this->page;
                     $this->setPageVOvaluesSmall($page, $this->form->getValuesArray());
                     $surveydao->updatePage($page, false);
                 }
