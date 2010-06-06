@@ -115,6 +115,9 @@ class SurveyView
             case vQUESTIONNAIRE:
                 $this->body = new QuestionnaireBody($this->page, $this->parser);
                 break;
+            case vQUIZ:
+                $this->body = new QuizBody($this->page, $this->parser);
+                break;
             default:
                 throw new Exception('Unknown survey type');
         }

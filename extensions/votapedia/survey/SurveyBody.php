@@ -387,3 +387,21 @@ class QuestionnaireBody extends SurveyBody
     }
 }
 
+/**
+ *
+ * Body of a questionnaire
+ */
+class QuizBody extends QuestionnaireBody
+{
+    /**
+     *
+     * @param  $page PageVO
+     * @param  $parser MwParser
+     */
+    function  __construct(PageVO &$page, MwParser &$parser)
+    {
+        parent::__construct($page, $parser);
+        $this->type = vQUIZ;
+    }
+}
+

@@ -21,7 +21,6 @@ $messages['en'] = array(
     'notauthorized' => 'Not authorized',
     'notauthorized-desc' => 'You are not authorized to perform this action.',
 
-    'survey-created' => 'New Survey succesfully created ($1)',
     'id-not-found' => 'Survey identifier "$1" was not found.',
     'id-not-present' => 'Survey identifier is not specified.',
 
@@ -45,15 +44,22 @@ $messages['en'] = array(
     'stop-quiz' => 'Stop Quiz',
 
     'vote-survey' => 'Vote',
+    'vote-questionnaire' => 'Vote',
+    'vote-quiz' => 'Vote',
+    
     'view-details' => 'View details',
     'control-survey' => 'Control Survey',
     'cat-survey-name' => 'Category:Pages with survey id $1',
     'mobile-phone' => 'Mobile Phone:',
+    
     'title-view-survey'	=> 'View survey',
     'title-new-survey'	=> 'Create New Simple Survey',
     'title-edit-survey'	=> 'Edit Simple Survey',
     'title-new-questionnaire' => 'Create New Questionnaire',
     'title-edit-questionnaire' => 'Edit Questionnaire',
+    'title-new-quiz' => 'Create New Quiz',
+    'title-edit-quiz' => 'Edit Quiz',
+
     'pages-include' => 'Following pages include this survey:',
     'page-links' => 'Page links',
     'request-code' => 'Request confirmation code',
@@ -61,7 +67,7 @@ $messages['en'] = array(
     'add-number' => 'Add number',
     'delete-number' => 'Delete',
 
-    'smsnot' => 'Sms is not enabled',
-    'smsnot-desc' => 'Sms is not enabled, please contact administrators.',
+    'smsnot' => 'SMS is not enabled',
+    'smsnot-desc' => 'SMS is not enabled, please contact administrators.',
 );
 

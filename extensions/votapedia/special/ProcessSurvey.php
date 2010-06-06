@@ -39,7 +39,10 @@ class ProcessSurvey extends SpecialPage
         {
             $surveydao = new SurveyDAO();
             $page = $surveydao->findByPageID($page_id);
-            if($action == wfMsg('start-survey') || $action == wfMsg('start-questionnaire'))
+            if(    $action == wfMsg('start-survey')
+                || $action == wfMsg('start-questionnaire')
+                || $action == wfMsg('start-quiz')
+              )
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
@@ -74,13 +77,20 @@ class ProcessSurvey extends SpecialPage
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;
             }
-            elseif ($action == wfMsg('edit-survey') || $action == wfMsg('edit-questionnaire'))
+            elseif (   $action == wfMsg('edit-survey')
+                    || $action == wfMsg('edit-questionnaire')
+                    || $action == wfMsg('edit-quiz')
+                )
             {
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 if($page->getType() == vSIMPLE_SURVEY)
                     $title = Title::newFromText('Special:CreateSurvey');
                 elseif($page->getType() == vQUESTIONNAIRE)
                     $title = Title::newFromText('Special:CreateQuestionnaire');
+                elseif($page->getType() == vQUIZ)
+                    $title = Title::newFromText('Special:CreateQuiz');
+                else
+                    throw new Exception('Unknown survey type.');
                 $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}&vpAction=editstart", 302);
             }
             elseif ($action == wfMsg('view-details'))
@@ -89,7 +99,10 @@ class ProcessSurvey extends SpecialPage
                 $title = Title::newFromText('Special:ViewSurvey');
                 $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}", 302);
             }
-            elseif ($action == wfMsg('vote-survey'))
+            elseif (   $action == wfMsg('vote-survey')
+                    || $action == wfMsg('vote-questionnaire')
+                    || $action == wfMsg('vote-quiz')
+                )
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
@@ -114,7 +127,10 @@ class ProcessSurvey extends SpecialPage
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;
             }
-            elseif ($action ==  wfMsg('stop-survey') || $action == wfMsg('stop-questionnaire'))
+            elseif ($action ==  wfMsg('stop-survey')
+                    || $action == wfMsg('stop-questionnaire')
+                    || $action == wfMsg('stop-quiz')
+                )
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');

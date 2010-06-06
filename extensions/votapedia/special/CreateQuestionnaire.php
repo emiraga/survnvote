@@ -56,7 +56,6 @@ class CreateQuestionnaire extends CreateSurvey
     }
     function generateTemplates()
     {
-        echo $this->isQuiz.':<br>';
         global $vgScript;
         $this->question_t = '<div class="questionBox" id="question%1$s">'
                 . '<fieldset id="questions" style="float: none; margin: 0em;">'
@@ -166,7 +165,7 @@ class CreateQuestionnaire extends CreateSurvey
 
 		var newQuestion = $("#newQuestion"); 
 		$("#questions").append( generateQuestion( newQuestion.val(), numQuestions ) );
-		sajax_do_call('SurveyView::getChoice', [newQuestion.val()], function(o) { $("#q"+numQuestions+"legend").html('Question: '+o.responseText); });
+		sajax_do_call('SurveyView::getChoice', [newQuestion.val()], function(o) { $("#q"+numQuestions+"legend").html(o.responseText); });
 
 		newQuestion.val("");
 		$("#question"+numQuestions).show(0, function() {

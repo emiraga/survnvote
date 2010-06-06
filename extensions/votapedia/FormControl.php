@@ -320,20 +320,5 @@ class FormControl
 	<input type='hidden' name='wpEditToken' value=\"{$token}\" />" );
         $wgOut->addHTML('</div></form>');
     }
-
-    /**
-     * Remove Special Character from a string
-     *
-     * @param $str
-     * @return string
-     */
-    public static function RemoveSpecialChars($str)
-    {
-        $str = str_replace("<math>", " ", $str);
-        $str = str_replace("</math>", " ", $str);
-
-        $invalidChars  = array('<','>','|','/');
-        return trim(str_replace($invalidChars, " ", $str));
-    }
 }
 ?>

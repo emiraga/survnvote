@@ -132,7 +132,9 @@ function vfWikiToText($wiki)
     $text = str_replace("'''",' ',$text);
     $text = str_replace("''",' ',$text);
     $text = preg_replace('/\s+/', ' ', $text); //@todo use mb_ereg_replace
-    return trim($text);
+    $invalidChars  = array('<','>','|','/',':');
+    $text = trim(str_replace($invalidChars, " ", $text));
+    return $text;
 }
 /**
  * @param $phone String phone number

@@ -68,8 +68,23 @@ class SurveyVO
         }
         else
         {
-            throw new SurveyException("SurveyVO: Answer of a question must be an Integer!",101);
+            throw new SurveyException("SurveyVO: Answer of a question must be an integer");
         }
+    }
+    function setAnswerByChoice($answer)
+    {
+        $choiceid = 1;
+        foreach($this->choices as &$choice)
+        {
+            /* @var $choice ChoiceVO */
+            if($answer == $choice->getChoice())
+            {
+                $this->answer = $choiceid;
+                return ;
+            }
+            $choiceid++;
+        }
+        throw new SurveyException("SurveyVO: Answer of question choice not found.");
     }
     /**
      * Set points of the question/survey

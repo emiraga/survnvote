@@ -31,12 +31,21 @@ class CreateQuiz extends CreateQuestionnaire
         $this->spPageName = 'Special:CreateQuiz';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Quiz.';
         $this->isQuiz = true;
-        echo $this->isQuiz.'<br>';
+        $this->tagname = vtagQUIZ;
     }
-    /*function generateSurveysArray($values)
+    function generateSurveysArray($values)
     {
-        parent::generateSurveysArray($values);
-    }*/
+        $surveys =& parent::generateSurveysArray($values);
+        $i = 0;
+        global $wgRequest;
+        foreach($wgRequest->getIntArray('orderNum', array()) as $index)
+        {
+            $surveys[$i]->setAnswerByChoice( $wgRequest->getVal("q{$index}correct",'') );
+            $surveys[$i]->setType( vQUIZ );
+            $i++;
+        }
+        return $surveys;
+    }
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
         parent::setPageVOvalues($page, $values);
@@ -45,7 +54,35 @@ class CreateQuiz extends CreateQuestionnaire
     function Validate()
     {
         $error = parent::Validate();
+        if(!isset($this->page) || $this->page->getStatus() == 'ready')
+        {
+            global $wgRequest;
+            $ordernum = $wgRequest->getIntArray('orderNum', array());
+            foreach($ordernum as $index)
+            {
+                if(! $wgRequest->getCheck("q{$index}correct"))
+                {
+                    $error .= "<li>You must provide correct answer to question.</li>";
+                }
+            }
+        }
         return $error;
+    }
+    function makeSurveysFromRequest()
+    {
+        $surveys =& parent::makeSurveysFromRequest();
+        $i=0;
+        global $wgRequest;
+        foreach($wgRequest->getIntArray('orderNum', array()) as $index)
+        {
+            if($wgRequest->getCheck("q{$index}correct"))
+            {
+                $surveys[$i]->setAnswerByChoice($wgRequest->getVal("q{$index}correct"));
+                $surveys[$i]->setType(vQUIZ);
+            }
+            $i++;
+        }
+        return $surveys;
     }
     function processNewSurveySubmit()
     {

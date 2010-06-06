@@ -322,10 +322,11 @@ class PageVO
         {
             case vSIMPLE_SURVEY:      return vtagSIMPLE_SURVEY;
             case vQUESTIONNAIRE:      return vtagQUESTIONNAIRE;
-            case vtagQUIZ:            return vtagQUIZ;
+            case vQUIZ:               return vtagQUIZ;
             case vRANK_EXPOSITIONS:   return vtagRANK_EXPOSITIONS;
             case vTEXT_RESPONSE:      return vtagTEXT_RESPONSE;
         }
+        throw new SurveyException("Unknown survey type");
     }
     /**
      * Get how many top presentations would be displayed

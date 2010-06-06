@@ -349,7 +349,7 @@ class CreateSurvey
         if(strlen($values['category']) > 5)
             $wikiText.="[[".htmlspecialchars($values['category'])."]]\n";
 
-        $wikititle = FormControl::RemoveSpecialChars($wikititle);
+        $wikititle = vfWikiToText($wikititle);
         $this->insertWikiPage($wikititle, $wikiText, true);
 
         //Add an appropriate hidden category, don't show in recent changes
