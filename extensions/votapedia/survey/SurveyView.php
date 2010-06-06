@@ -31,10 +31,8 @@ class SurveyView
      * @param  $parser Parser of Mediawiki
      * @param  $frame
      */
-    static function executeTag( $input, $args, $parser, $frame = NULL ) //do not change arguments
-
+    static function executeTag( $input, $args, $parser, $frame = NULL )
     {
-        vfGetColor(true);
         $page_id = intval(trim($input));
         try
         {
@@ -178,6 +176,10 @@ class SurveyView
             $output .= "This survey has ended.";
         }
         return $output;
+    }
+    function getDetailsHTML()
+    {
+        return $this->body->getDetailsHTML();
     }
     /**
      * AJAX call for choices preview

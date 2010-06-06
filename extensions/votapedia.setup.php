@@ -198,12 +198,12 @@ else
 
     echo <<<END_HTML
 <h1>Welcome to votapedia installation.</h1>
-<p>This script <b>votapedia.setup.php</b> is very dangerous and must be deleted after installation has been completed</p>
+<p>This script <b>votapedia.setup.php</b> is very dangerous and must be deleted after installation is complete.</p>
 <p>Do not run this script if you have already installed votapedia, it will <b>delete</b> tables from database related to votapedia.</p>
 Installation Steps:
 <ol>
-<li>Configure MediaWiki by editing file <b>LocalSettings.php</b>.</li>
 <li>Make sure that MediaWiki is working properly.</li>
+<li>Add following line to <b>LocalSettings.php</b><br /><code>require_once("\$IP/extensions/votapedia/votapedia.php");</code></li>
 <li>Edit file <b>extensions/votapedia/config.php</b> to configure votapedia settings.</li>
 <li>Edit file <b>extensions/votapedia.setup.php</b> to set the master user/password.</li>
 <li>Open this script in browser (you are doing it right now)</li>

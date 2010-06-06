@@ -177,14 +177,16 @@ class Graph
                 $s++;
             }*/
             $data = 't:'.join('|',$data);
+            if($data == 't:')
+                return '';
             $colors = join(',', $colors);
             $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
+            $imglink .= "&chd=$data&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
             
-            $imglink .="&chd=$data"
-                    ."&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
-            $maxsize = 1024;
+            $imglink2 = $imglink . "&chm=".join('|', $markers);
+            if(strlen($imglink2) < 1500)
+                $imglink = $imglink2;
 
-            $imglink .= "&chm=".join('|', $markers);
             return $imglink;
         }
         throw new Exception("Unknown graph type");

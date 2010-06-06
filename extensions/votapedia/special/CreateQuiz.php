@@ -30,6 +30,7 @@ class CreateQuiz extends CreateQuestionnaire
         parent::__construct();
         $this->spPageName = 'Special:CreateQuiz';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Quiz.';
+        $this->formitems['showresultsend']['default'] = true;
         $this->isQuiz = true;
         $this->tagname = vtagQUIZ;
     }
@@ -84,6 +85,19 @@ class CreateQuiz extends CreateQuestionnaire
         }
         return $surveys;
     }
+    public function generatePrevQuestions(&$surveys)
+    {
+        parent::generatePrevQuestions($surveys);
+        $num = 1;
+        foreach($surveys as &$survey)
+        {
+            /* @var $survey SurveyVO */
+            $search = "<input type=\"radio\" name=\"q{$num}correct\" id=\"q{$num}c{$survey->getAnswer()}\" ";
+            $this->prev_questions = str_replace($search, $search.'checked ', $this->prev_questions);
+            $num++;
+        }
+    }
+/*
     function processNewSurveySubmit()
     {
         parent::processNewSurveySubmit();
@@ -99,7 +113,7 @@ class CreateQuiz extends CreateQuestionnaire
     public function processEditSurveySubmit()
     {
         parent::processEditSurveySubmit();
-    }
+    }*/
     function execute($par = null)
     {
         parent::execute($par);

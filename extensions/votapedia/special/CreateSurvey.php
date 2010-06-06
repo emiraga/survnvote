@@ -495,7 +495,7 @@ class CreateSurvey
         {
             $surveydao = new SurveyDAO();
             $this->page = $surveydao->findByPageID( $page_id );
-            $this->fillFormValuesFromPage($this->page);
+            /*$this->fillFormValuesFromPage($this->page);*/
             $this->form->loadValuesFromRequest();
             $error = $this->Validate();
         }
@@ -543,8 +543,9 @@ class CreateSurvey
                 $wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
                 return;
             }
-            //It is no longer neede to purge all pages that have this survey included.
-            //vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+            //Purge all pages that have this survey included.
+            vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+            
             $title = Title::newFromText($this->returnTo);
             $wgOut->redirect($title->escapeLocalURL(), 302);
             return;
@@ -602,9 +603,12 @@ class CreateSurvey
     function Validate()
     {
         $error = $this->form->Validate();
-
-        if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
-            $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
+        global $wgRequest;
+        if($wgRequest->getCheck('phonevoting'))
+        {
+            if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
+                $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
+        }
         return $error;
     }
     function preDrawForm($errors)

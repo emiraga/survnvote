@@ -14,6 +14,23 @@
 class MwAdapter
 {
     /**
+     * Purge the cache of a page with a given title
+     *
+     * @param $title string title of wiki page
+     */
+    function purgePage($title)
+    {
+        /*$params = new FauxRequest(array('action' => 'purge','titles' => $title));
+            $api = new ApiMain($params, true);
+            $api->execute();
+            $data = & $api->getResultData();
+            if(!isset($data['purge'][0]['purged']))
+                    throw new Exception('Page purging has failed');
+        */
+        $article = new Article( Title::newFromText($title) );
+        $article->doPurge(); // Directly purge and skip the UI part of purge().
+    }
+    /**
      * Get a list of subcategories of a category
      *
      * @param $category Name of a category

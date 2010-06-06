@@ -73,10 +73,7 @@ class SurveyException extends Exception
     //
 }
 /**
- * Rotates color images for a choice.
- *
- * @param $reset Boolean should colors be reset
- * @return String a path to image
+ * Colors a survey choice.
  */
 global $vgColors;
 $vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '008001',
@@ -86,16 +83,18 @@ $vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '0
     'FF00FE', '800000', '7FFFFE', 'E3A39A', '804000', 'FFFF00', '800000', '007FFF',
     '7F00FF', 'FE0000', '81FF81', '47064A', 'B8D2D3', 'DBC1B0', '008001', 'FE8DA1',
     '47064A', '804000', 'FF0080');
-
-function vfGetColor($reset = false)
+/**
+ * Rotates color images for a choice.
+ *
+ * @param $index Integer current position in colors, vfGetColor updates it's value
+ *
+ */
+function vfGetColor(&$index)
 {
-    static $c = 0;
-    if($reset)
-        return $c = 0;
-
     global $vgColors;
-    $c = ($c + 1) % count($vgColors);
-    return $vgColors[$c];
+    $res = $vgColors[$index];
+    $index = ($index + 1) % count($vgColors);
+    return $res;
 }
 /**
  * Get a singleton of MediaWiki adapter

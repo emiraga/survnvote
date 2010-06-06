@@ -31,7 +31,6 @@ class ViewSurvey extends SpecialPage
         global $wgOut, $wgParser, $wgRequest;
         $wgOut->setPageTitle( wfMsg('title-view-survey') );
         $wgOut->setArticleFlag(false);
-        vfGetColor(true);
 
         try
         {
@@ -45,6 +44,7 @@ class ViewSurvey extends SpecialPage
             
             $wgOut->addHTML($tag->getHTML());
             $wgOut->returnToMain();
+            $wgOut->addHTML($tag->getDetailsHTML());
 
             $author = MwUser::displayName($tag->getPage()->getAuthor());
 

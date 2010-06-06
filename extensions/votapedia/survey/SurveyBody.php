@@ -70,12 +70,12 @@ class SurveyBody
      */
     function getHTML()
     {
-        global $wgOut;
+        global $wgOut, $vgColors;
         $output = '';
         $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
         $pagestatus = $this->page->getStatus();
-        vfGetColor(true);
+        $colorindex = 1;
         
         foreach ($surveys as &$survey)
         {
@@ -94,7 +94,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $name = $this->parser->run($choice->getChoice());
-                    $output.=SurveyBody::getChoiceHTML($name, vfGetColor());
+                    $output.=SurveyBody::getChoiceHTML($name, vfGetColor($colorindex) );
                 }
             }
             elseif($pagestatus == 'active')
@@ -107,7 +107,7 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $color = vfGetColor();
+                    $color = vfGetColor($colorindex);
                     $name = $this->parser->run($choice->getChoice());
                     $extra='';
                     if($this->show_phones)
@@ -155,7 +155,7 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $color = vfGetColor();
+                    $color = vfGetColor($colorindex);
                     $percent = substr(100.0 * $choice->getVote() / $numvotes, 0, 5);
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
@@ -242,23 +242,30 @@ class SurveyBody
             //insert graph image at the beginning
             $imgid = 'gr'.$this->page->getPageID().'_'.rand();
             //Prepend this image!
-            $output = '<div style="float:right">'.$this->getGraphHTML($imgid).'</div>' . $output;
+            $tmpvar = 1;
+            $output = '<div style="float:right">'
+                    .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $imgid)
+                    .'</div>' . $output;
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
             {
-                $output .= $this->refreshImage($imgid, $this->page->getPageID());
+                $output .= $this->refreshImage($imgid, 1, $this->page->getPageID());
             }
         }
         return $output;
     }
-    function refreshImage($imgid, $page_id)
+    function refreshImage($imgid, $colorindex, $page_id, $survey_id = null)
     {
+        if($survey_id)
+        {
+            $page_id .= ", $survey_id";
+        }
         global $vgImageRefresh;
         $now = time();
         $script = "<script>
         function refresh$imgid()
         {
-            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $page_id],function(o) {
+            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, $page_id],function(o) {
                 graph=document.getElementById('$imgid');
                 if(o.responseText.length)
                 {
@@ -280,10 +287,13 @@ class SurveyBody
         $script = preg_replace('/^\s*/m', '', $script);
         return str_replace("\n", "", $script);
     }
-    public function getGraphHTML($imgid = '')
+    public function getDetailsHTML()
     {
-        vfGetColor(true);
-        $surveys =& $this->page->getSurveys();
+        $output = '';
+        return $output;
+    }
+    public function getGraphHTML(&$colorindex, $surveys, $imgid = '')
+    {
         $graph = new Graph('pie');
         if(count($surveys) > 1)
             $graph->setType('stackpercent');
@@ -296,7 +306,7 @@ class SurveyBody
             foreach($choices as &$choice)
             {
                 /* @var $choice ChoiceVO */
-                $color = vfGetColor();
+                $color = vfGetColor($colorindex);
                 $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
             }
             if($this->page->getDisplayTop())
@@ -314,29 +324,24 @@ class SurveyBody
             return $graph->getHTMLImage($imgid);
         return $graph->getImageLink();
     }
-    static function ajaxgraph($last_refresh, $page_id)
+    static function ajaxgraph($last_refresh, $colorindex, $page_id, $survey_id = null)
     {
         if(VoteDAO::countNewVotes($page_id, intval($last_refresh)) == 0)
             return ''; // there are no new votes
-
         //@todo check permisions
         $now = time();
         $sdao = new SurveyDAO();
         $page = $sdao->findByPageID($page_id);
         $surveybody = new SurveyBody($page, new MwParser(new Parser()));
-        return $surveybody->getGraphHTML()."@".$now;
-    }
-    /**
-     * Parse text with wiki code
-     *
-     * @param $line string
-     * @return String HTML code
-     */
-    static function ajaxChoice($line)
-    {
-        global $wgParser;
-        $p = new MwParser($wgParser);
-        return SurveyBody::getChoiceHTML( $p->run(trim($line), false), vfGetColor());
+
+        if($survey_id)
+        {
+            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)))."@".$now;
+        }
+        else
+        {
+            return $surveybody->getGraphHTML($colorindex, $page->getSurveys())."@".$now;
+        }
     }
     /**
      * Parse multiline wiki code
@@ -352,6 +357,7 @@ class SurveyBody
         $p = new MwParser($pars);
         $lines = preg_split("/\n/",$text);
         $output = '';
+        $colorindex = 1;
         if($title)
         {
             $output .= $p->run($title, false);
@@ -362,7 +368,7 @@ class SurveyBody
             $line = trim($line);
             if($line)
             {
-                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColor());
+                $output .= SurveyBody::getChoiceHTML( $p->run($line, false) , vfGetColor($colorindex));
             }
         }
         $output .= '</ul>';
@@ -385,8 +391,34 @@ class QuestionnaireBody extends SurveyBody
         parent::__construct($page, $parser);
         $this->type = vQUESTIONNAIRE;
     }
+    public function getDetailsHTML()
+    {
+        $output = parent::getDetailsHTML();
+        $pagestatus = $this->page->getStatus();
+        $colorindex = 1; /* for showing items */
+        $surveys =& $this->page->getSurveys();
+        if($this->show_graph && count($surveys) > 1)
+        {
+            foreach($surveys as &$survey)
+            {
+                /* @var $survey SurveyVO */
+                $tmpcolor = $colorindex;
+                $question = wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ));
+                $output .= "<h2>$question</h2>";
+                //insert graph image at the beginning
+                $imgid = 'gr'.$this->page->getPageID().'_'.$survey->getSurveyID().'_'.rand();
+                //Prepend this image!
+                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $imgid).'</div>';
+                global $vgImageRefresh;
+                if($pagestatus == 'active' && $vgImageRefresh)
+                {
+                    $output .= $this->refreshImage($imgid, $tmpcolor, $this->page->getPageID(), $survey->getSurveyID());
+                }
+            }
+        }
+        return $output;
+    }
 }
-
 /**
  *
  * Body of a questionnaire
