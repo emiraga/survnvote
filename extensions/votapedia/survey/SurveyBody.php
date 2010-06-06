@@ -75,7 +75,8 @@ class SurveyBody
         $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
         $pagestatus = $this->page->getStatus();
-
+        vfGetColor(true);
+        
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
@@ -147,7 +148,10 @@ class SurveyBody
                     /* @var $choice ChoiceVO */
                     $numvotes += $choice->getVote();
                 }
-                if($numvotes == 0) $numvotes = 1;
+                if($numvotes == 0)
+                    $numvotes = 1;
+                $choicesout = array();
+                $votesout = array();
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
@@ -159,8 +163,11 @@ class SurveyBody
                         $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$choice->getVote()})";
                     else
                         $extra = '';
-                    $output.=SurveyBody::getChoiceHTML($name, $color, $extra);
+                    $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra);
+                    $votesout[] = $choice->getVote();
                 }
+                array_multisort($votesout, SORT_DESC, SORT_NUMERIC, $choicesout);
+                $output .= join('',$choicesout);
             }
             $output.='</ul>';
         } // foreach Survey
@@ -275,6 +282,7 @@ class SurveyBody
     }
     public function getGraphHTML($imgid = '')
     {
+        vfGetColor(true);
         $surveys =& $this->page->getSurveys();
         $graph = new Graph('pie');
         if(count($surveys) > 1)
@@ -359,7 +367,6 @@ class SurveyBody
 /**
  *
  * Body of a questionnaire
- *
  */
 class QuestionnaireBody extends SurveyBody
 {

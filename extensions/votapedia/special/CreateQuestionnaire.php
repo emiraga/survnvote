@@ -210,7 +210,7 @@ END_SCRIPT;
     function Validate()
     {
         $error = parent::Validate();
-        if($this->page->getStatus() == 'ready')
+        if(!isset($this->page) || $this->page->getStatus() == 'ready')
         {
             global $wgRequest;
             $ordernum = $wgRequest->getIntArray('orderNum', array());

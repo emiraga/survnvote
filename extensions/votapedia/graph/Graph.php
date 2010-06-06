@@ -283,6 +283,7 @@ class GraphSeries
     }
     function sortOnlyTop($num)
     {
+        /*
         for($i=0;$i<$this->count;$i++)
         {
             for($j=0;$j<$i;$j++)
@@ -294,7 +295,9 @@ class GraphSeries
                     swap( $this->colors[$j] , $this->colors[$i] );
                 }
             }
-        }
+        }*/
+        array_multisort($this->values, SORT_NUMERIC, SORT_DESC, $this->names, $this->colors);
+        
         $this->values = array_slice($this->values, 0, $num);
         $this->names = array_slice($this->names, 0, $num);
         $this->colors = array_slice($this->colors, 0, $num);
