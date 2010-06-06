@@ -471,14 +471,7 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        if($page->getStatus() == 'ended')
-        {
-            $wgOut->setPageTitle("Error");
-            $wgOut->addWikiText( vfErrorBox( 'Survey is finished, therefore cannot be edited.') );
-            $wgOut->returnToMain();
-            return;
-        }
-        else if($page->getStatus() == 'active')
+        if($page->getStatus() != 'ready')
         {
             unset($this->formpages[0]);
             unset($this->formpages[1]);
@@ -518,21 +511,16 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        $smallupdate = false;
-        if($this->page->getStatus() == 'ended')
-        {
-            $wgOut->setPageTitle("Error");
-            $wgOut->addWikiText( vfErrorBox( 'Survey is finished, therefore cannot be edited.') );
-            $wgOut->returnToMain();
-            return;
-        }
-        else if($this->page->getStatus() == 'active')
+        if($this->page->getStatus() != 'ready')
         {
             unset($this->formpages[0]);
             unset($this->formpages[1]);
             $smallupdate = true;
         }
-        echo $smallupdate.'<br>';
+        else
+        {
+            $smallupdate = false;
+        }
         if(! $error)
         {
             try

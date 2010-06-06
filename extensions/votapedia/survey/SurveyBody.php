@@ -207,7 +207,7 @@ class SurveyBody
                 $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
             $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
             $script=
-                    "<script>
+            "<script>
             var vTimeleft=$timeleft;
             function updateTimeLeft(){
                 if(vTimeleft<=0)
@@ -303,6 +303,11 @@ class SurveyBody
             {
                 $graphseries->sortOnlyTop($this->page->getDisplayTop());
             }
+            else
+            if($this->page->getStatus() == 'ended')
+            {
+                $graphseries->sort();
+            }
             $graph->addSeries($graphseries);
         }
         if($imgid)
@@ -311,7 +316,7 @@ class SurveyBody
     }
     static function ajaxgraph($last_refresh, $page_id)
     {
-        if(VoteDAO::countNewVotes($page_id, $last_refresh) == 0)
+        if(VoteDAO::countNewVotes($page_id, intval($last_refresh)) == 0)
             return ''; // there are no new votes
 
         //@todo check permisions
@@ -381,3 +386,4 @@ class QuestionnaireBody extends SurveyBody
         $this->type = vQUESTIONNAIRE;
     }
 }
+

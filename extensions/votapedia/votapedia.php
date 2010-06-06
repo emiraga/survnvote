@@ -16,8 +16,13 @@ $wgAutoloadClasses['MwUser'] = "$vgPath/MwAdapter.php";
 $wgAutoloadClasses['spCreateSurvey'] = "$vgPath/special/CreateSurvey.php";
 $wgSpecialPages['CreateSurvey'] = 'spCreateSurvey';
 
+//Special page CreateQuestionnaire
 $wgAutoloadClasses['spCreateQuestionnaire'] = "$vgPath/special/CreateQuestionnaire.php";
 $wgSpecialPages['CreateQuestionnaire'] = 'spCreateQuestionnaire';
+
+//Special page CreateQuiz
+$wgAutoloadClasses['spCreateQuiz'] = "$vgPath/special/CreateQuiz.php";
+$wgSpecialPages['CreateQuiz'] = 'spCreateQuiz';
 
 //Special page ViewSurvey
 $wgAutoloadClasses['ViewSurvey'] = "$vgPath/special/ViewSurvey.php";

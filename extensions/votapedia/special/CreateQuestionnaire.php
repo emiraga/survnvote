@@ -22,12 +22,12 @@ class spCreateQuestionnaire extends SpecialPage
 
 class CreateQuestionnaire extends CreateSurvey
 {
-    /** @var String */ private $script;
-    /** @var Boolean */ private $isQuiz;
-    /** @var PageVO */ var $page;
+    /** @var String */  private   $script;
+    /** @var Boolean */ protected $isQuiz;
+    /** @var PageVO */  protected $page;
 
     /**
-     * Constructor for CreateSurvey
+     * Constructor for CreateQuestionnaire
      */
     function __construct()
     {
@@ -56,10 +56,11 @@ class CreateQuestionnaire extends CreateSurvey
     }
     function generateTemplates()
     {
+        echo $this->isQuiz.':<br>';
         global $vgScript;
         $this->question_t = '<div class="questionBox" id="question%1$s">'
                 . '<fieldset id="questions" style="float: none; margin: 0em;">'
-                . '<legend id="q%1$slegend">Question: %2$s</legend>'
+                . '<legend id="lq%1$slegend">Question:</legend>'
                 . '<div style="float: right; top: -23px; position: relative;">'
                 . '<input type="image" title="Move up question" src="'.$vgScript.'/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
                 . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
@@ -67,6 +68,7 @@ class CreateQuestionnaire extends CreateSurvey
                 . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
                 . '<input type="image" title="Delete question" src="'.$vgScript.'/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
                 . '</div>'
+                . '<div id="q%1$slegend">%2$s</div>'
                 . '<input id="orderNum" type="hidden" name="orderNum[]" value="%1$s">'
                 . '<input type="hidden" name="q%1$sname" value="%3$s">'
                 . '<div class="prefsectiontip" style="padding: 0">Choices:</div>'

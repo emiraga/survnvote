@@ -58,7 +58,7 @@ class SurveyButtons
         $output = "<div id='$divname'>";
 
         //Edit button
-        if($this->has_control && $this->page_status != 'ended' )
+        if($this->has_control)
         {
             $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-'.$this->type).'">';
         }

@@ -4,11 +4,13 @@
  */
 if (!defined('MEDIAWIKI')) die();
 
-function vfCutEncode($str, $maxlen, $elipsis = '...')
+function vfCutEncode($str, $maxlen, $elipsis = '...', $encode = true)
 {
     if(strlen($str) >= $maxlen)
         $str = substr($str,0,$maxlen-strlen($elipsis)).$elipsis; //@todo remove crazy characters
-    return  urlencode($str);
+    if($encode)
+        $str = urlencode($str);
+    return $str;
 }
 /**
  * Graph class for drawing charts
@@ -135,7 +137,7 @@ class Graph
             $markers = array();
             foreach($this->series as &$series)
             {
-                $xlabel .= '|'. vfCutEncode($series->getTitle(),$labelLength);
+                $xlabel .= '|'. vfCutEncode($series->getTitle(),$labelLength, '...', false);
                 if($series->getCount() > $maxv)
                     $maxv = $series->getCount();
             }
@@ -159,7 +161,8 @@ class Graph
                         $barvalues[] = vfCutEncode(100 * $val / $series->getSum(), 5, '');
                         $barcolors[] = $series->getColor($i);
                         $pos = $maxv-$i-1;
-                        $markers[] = "t". vfCutEncode( $series->getName($i), $labelLength ).",000000,$pos,$s,12,,c";
+                        $markers[] = "t". vfCutEncode( $series->getName($i), $labelLength, '' )
+                                .' ('.$val.')'.",000000,$pos,$s,12,,c";
                     }
                     $s++;
                 }
@@ -281,23 +284,13 @@ class GraphSeries
         }
         return join($glue, $names);
     }
+    function sort()
+    {
+        array_multisort($this->values, SORT_NUMERIC, SORT_DESC, $this->names, $this->colors);
+    }
     function sortOnlyTop($num)
     {
-        /*
-        for($i=0;$i<$this->count;$i++)
-        {
-            for($j=0;$j<$i;$j++)
-            {
-                if($this->values[$j] < $this->values[$i])
-                {
-                    swap( $this->values[$j] , $this->values[$i] );
-                    swap( $this->names[$j] , $this->names[$i] );
-                    swap( $this->colors[$j] , $this->colors[$i] );
-                }
-            }
-        }*/
-        array_multisort($this->values, SORT_NUMERIC, SORT_DESC, $this->names, $this->colors);
-        
+        $this->sort();
         $this->values = array_slice($this->values, 0, $num);
         $this->names = array_slice($this->names, 0, $num);
         $this->colors = array_slice($this->colors, 0, $num);

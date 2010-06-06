@@ -4,13 +4,17 @@ if (!defined('MEDIAWIKI')) die();
 $messages = array();
 
 $messages['en'] = array( 
+    'votapedia-desc' => 'Votapedia - Audience Response System. This extension includes special pages, tags, etc.',
+    'specialpages-group-votapedia' => 'Votapedia - Audience response system',
+
     'createsurvey' => 'Create Survey',
     'createquestionnaire' => 'Create Questionnaire',
+    'createquiz' => 'Create Quiz',
+
     'processsurvey' => 'Process Survey',
     'viewsurvey' => 'View Survey',
     'myphones' => 'My Phones',
     'smsreport' => 'Sms Report',
-    'specialpages-group-votapedia' => 'Votapedia - Audience response system',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
@@ -20,17 +24,26 @@ $messages['en'] = array(
     'survey-created' => 'New Survey succesfully created ($1)',
     'id-not-found' => 'Survey identifier "$1" was not found.',
     'id-not-present' => 'Survey identifier is not specified.',
-    'votapedia-desc' => 'Votapedia - Audience Response System. This extension includes special pages, tags, etc.',
+
     'create-survey' => 'Create Survey',
     'create-questionnaire' => 'Create Questionnaire',
+    'create-quiz' => 'Create Quiz',
+
     'edit-survey' => 'Edit Survey',
     'edit-questionnaire' => 'Edit Questionnaire',
+    'edit-quiz' => 'Edit Quiz',
+
     'survey-question' => 'Question: $1',
     'survey-caption' => 'Title: $1',
+
     'start-survey' => 'Start Survey',
     'start-questionnaire' => 'Start Questionnaire',
+    'start-quiz' => 'Start Quiz',
+
     'stop-survey' => 'Stop Survey',
     'stop-questionnaire' => 'Stop Questionnaire',
+    'stop-quiz' => 'Stop Quiz',
+
     'vote-survey' => 'Vote',
     'view-details' => 'View details',
     'control-survey' => 'Control Survey',
@@ -51,3 +64,4 @@ $messages['en'] = array(
     'smsnot' => 'Sms is not enabled',
     'smsnot-desc' => 'Sms is not enabled, please contact administrators.',
 );
+
