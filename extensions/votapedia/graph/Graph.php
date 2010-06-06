@@ -281,6 +281,37 @@ class GraphSeries
         }
         return join($glue, $names);
     }
+    function sortOnlyTop($num)
+    {
+        for($i=0;$i<$this->count;$i++)
+        {
+            for($j=0;$j<$i;$j++)
+            {
+                if($this->values[$j] < $this->values[$i])
+                {
+                    swap( $this->values[$j] , $this->values[$i] );
+                    swap( $this->names[$j] , $this->names[$i] );
+                    swap( $this->colors[$j] , $this->colors[$i] );
+                }
+            }
+        }
+        $this->values = array_slice($this->values, 0, $num);
+        $this->names = array_slice($this->names, 0, $num);
+        $this->colors = array_slice($this->colors, 0, $num);
+        $this->count = count($this->values);
+
+        if($this->count)
+        {
+            $this->maxValue = $this->values[0];
+            $this->sum = 0;
+            foreach($this->values as $value)
+            {
+                $this->sum += $value;
+                if($this->maxValue < $value)
+                    $this->maxValue = $value;
+            }
+        }
+    }
 }
 
 class GraphXY

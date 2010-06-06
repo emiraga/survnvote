@@ -20,11 +20,9 @@ class SurveyBody
     /** @var Boolean */  protected $show_phones = false;
     /** @var Boolean */  protected $show_graph = false;
     /** @var Boolean */  protected $has_control = false;
-    /** @var Graph */    protected $graph;
 
     function  __construct(PageVO &$page, MwParser &$parser)
     {
-        $this->graph = new Graph('pie');
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
@@ -83,8 +81,6 @@ class SurveyBody
             /* @var $survey SurveyVO */
             $choices = $survey->getChoices();
 
-            $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) ); //@todo remove extra things
-
             if($this->type != vSIMPLE_SURVEY)
             {
                 $output .= '<h5>'. wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ) ).'</h5>';
@@ -111,8 +107,6 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
-                    $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
-
                     $name = $this->parser->run($choice->getChoice());
                     $extra='';
                     if($this->show_phones)
@@ -158,7 +152,6 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor();
-                    $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
                     $percent = substr(100.0 * $choice->getVote() / $numvotes, 0, 5);
                     $width = 290.0 * $choice->getVote() / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
@@ -170,7 +163,6 @@ class SurveyBody
                 }
             }
             $output.='</ul>';
-            $this->graph->addSeries($graphseries);
         } // foreach Survey
 
         //Show help message
@@ -243,7 +235,7 @@ class SurveyBody
             //insert graph image at the beginning
             $imgid = 'gr'.$this->page->getPageID().'_'.rand();
             //Prepend this image!
-            $output = '<div style="float:right">'.$this->graph->getHTMLImage($imgid).'</div>' . $output;
+            $output = '<div style="float:right">'.$this->getGraphHTML($imgid).'</div>' . $output;
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
             {
@@ -281,17 +273,9 @@ class SurveyBody
         $script = preg_replace('/^\s*/m', '', $script);
         return str_replace("\n", "", $script);
     }
-    static function ajaxgraph($last_refresh, $page_id)
+    public function getGraphHTML($imgid = '')
     {
-        if(VoteDAO::countNewVotes($page_id, $last_refresh) == 0)
-            return ''; // there are not new votes
-
-        //@todo check permisions
-        $now = time();
-        $sdao = new SurveyDAO();
-        $page = $sdao->findByPageID($page_id);
-        //@todo check permissions
-        $surveys =& $page->getSurveys();
+        $surveys =& $this->page->getSurveys();
         $graph = new Graph('pie');
         if(count($surveys) > 1)
             $graph->setType('stackpercent');
@@ -307,9 +291,27 @@ class SurveyBody
                 $color = vfGetColor();
                 $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
             }
+            if($this->page->getDisplayTop())
+            {
+                $graphseries->sortOnlyTop($this->page->getDisplayTop());
+            }
             $graph->addSeries($graphseries);
         }
-        return $graph->getImageLink()."@".$now;
+        if($imgid)
+            return $graph->getHTMLImage($imgid);
+        return $graph->getImageLink();
+    }
+    static function ajaxgraph($last_refresh, $page_id)
+    {
+        if(VoteDAO::countNewVotes($page_id, $last_refresh) == 0)
+            return ''; // there are no new votes
+
+        //@todo check permisions
+        $now = time();
+        $sdao = new SurveyDAO();
+        $page = $sdao->findByPageID($page_id);
+        $surveybody = new SurveyBody($page, new MwParser(new Parser()));
+        return $surveybody->getGraphHTML()."@".$now;
     }
     /**
      * Parse text with wiki code
@@ -370,10 +372,5 @@ class QuestionnaireBody extends SurveyBody
     {
         parent::__construct($page, $parser);
         $this->type = vQUESTIONNAIRE;
-
-        if(count($this->page->getSurveys()) > 1)
-        {
-            $this->graph->setType('stackpercent'); //stackpercent multipie
-        }
     }
 }

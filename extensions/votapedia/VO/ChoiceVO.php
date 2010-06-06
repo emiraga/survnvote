@@ -155,6 +155,16 @@ class ChoiceVO
     {
         $this->points = $points;
     }
+    /**
+     * Function for comparison of two choices based on number of votes.
+     *
+     * @param $a ChoiceVO
+     * @param $b ChoiceVO
+     * @return Integer result of comparison
+     */
+    static public function cmp_votes(ChoiceVO $a, ChoiceVO $b)
+    {
+        return $a->getVote() - $b->getVote();
+    }
 }
 
-?>
