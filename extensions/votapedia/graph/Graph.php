@@ -112,6 +112,10 @@ abstract class Graph
  */
 class GraphLine extends Graph
 {
+    /**
+     * Parameters of image URL
+     * @return string
+     */
     public function getImageParams()
     {
         $imglink = "cht=lc&chs={$this->width}x{$this->height}";
@@ -133,6 +137,10 @@ class GraphLine extends Graph
  */
 class GraphLineXY extends Graph
 {
+    /**
+     * Parameters of image URL
+     * @return string
+     */
     public function getImageParams()
     {
         $imglink = "cht=lxy&chs={$this->width}x{$this->height}";
@@ -154,6 +162,10 @@ class GraphLineXY extends Graph
  */
 class GraphPie extends Graph
 {
+    /**
+     * Parameters of image URL
+     * @return string
+     */
     public function getImageParams()
     {
         $values = $this->graphvalues[0];
@@ -179,6 +191,10 @@ class GraphPie extends Graph
  */
 class GraphMultiPie extends Graph
 {
+    /**
+     * Parameters of image URL
+     * @return string
+     */
     public function getImageParams()
     {
         $data = array();
@@ -216,6 +232,10 @@ class GraphMultiPie extends Graph
  */
 class GraphStackPercent extends Graph
 {
+    /**
+     * Parameters of image URL
+     * @return string
+     */
     public function getImageParams()
     {
         $numvalues = count($this->graphvalues);
@@ -297,14 +317,26 @@ abstract class GraphValues
     protected $title;
     protected $count = 0;
 
+    /**
+     *
+     * @param String $title
+     */
     public function __construct($title)
     {
         $this->title = vfCutEncode($title, 50);
     }
+    /**
+     * 
+     * @return String
+     */
     function getTitle()
     {
         return $this->title;
     }
+    /**
+     *
+     * @return Integer
+     */
     function getCount()
     {
         return $this->count;
@@ -325,22 +357,39 @@ class GraphSeries extends GraphValues
     protected $sum = 0;
     protected $maxValue = 0;
 
+    /**
+     *
+     */
     function reverseValues()
     {
         $this->names = array_reverse($this->names);
         $this->values = array_reverse($this->values);
         $this->colors = array_reverse($this->colors);
     }
+    /**
+     *
+     * @return Integer
+     */
     function getSum()
     {
         if($this->sum)
             return $this->sum;
         return 1;
     }
+    /**
+     *
+     * @return Integer
+     */
     function getMaxValue()
     {
         return $this->maxValue;
     }
+    /**
+     *
+     * @param String $name
+     * @param String $value
+     * @param String $color
+     */
     function addItem($name, $value, $color)
     {
         if($value == 0)
@@ -355,6 +404,11 @@ class GraphSeries extends GraphValues
         $this->colors[] = $color;
         $this->count++;
     }
+    /**
+     *
+     * @param Integer $index
+     * @return String
+     */
     function getValue($index)
     {
         if($index >= $this->count)
@@ -362,6 +416,11 @@ class GraphSeries extends GraphValues
         else
             return $this->values[$index];
     }
+    /**
+     *
+     * @param Integer $index
+     * @return String
+     */
     function getColor($index)
     {
         if($index >= $this->count)
@@ -369,6 +428,11 @@ class GraphSeries extends GraphValues
         else
             return $this->colors[$index];
     }
+    /**
+     *
+     * @param Integer $index
+     * @return String
+     */
     function getName($index)
     {
         if($index >= $this->count)
@@ -376,14 +440,31 @@ class GraphSeries extends GraphValues
         else
             return $this->names[$index];
     }
+    /**
+     *
+     * @param String $glue
+     * @return String
+     */
     function getColorsFormat($glue = '|')
     {
         return join($glue, $this->colors);
     }
+    /**
+     *
+     * @param String $glue
+     * @return String
+     */
     function getValuesFormat($glue = ',')
     {
         return join($glue, $this->values);
     }
+    /**
+     *
+     * @param Integer $maxlen
+     * @param Boolean $addvalues
+     * @param String $glue
+     * @return String
+     */
     function getNamesFormat($maxlen, $addvalues = false, $glue = '|')
     {
         $names = array();
@@ -396,10 +477,17 @@ class GraphSeries extends GraphValues
         }
         return join($glue, $names);
     }
+    /**
+     *
+     */
     function sort()
     {
         array_multisort($this->values, SORT_NUMERIC, SORT_DESC, $this->names, $this->colors);
     }
+    /**
+     *
+     * @param Integer $num
+     */
     function sortOnlyTop($num)
     {
         $this->sort();
@@ -437,14 +525,27 @@ class GraphXY extends GraphValues
     protected $xmax;
     protected $ymin;
     protected $ymax;
+    /**
+     *
+     * @param String $title
+     */
     public function __construct($title)
     {
         $this->title = $title;
     }
+    /**
+     *
+     * @return Integer
+     */
     public function getCount()
     {
         return $this->count;
     }
+    /**
+     *
+     * @param Integer $x
+     * @param Integer $y
+     */
     public function addPoint($x, $y)
     {
         if($this->count == 0)
@@ -463,43 +564,84 @@ class GraphXY extends GraphValues
         $this->y[] = $y;
         $this->count++;
     }
+    /**
+     * @return Array
+     */
     public function getX()
     {
         throw new Exception('not implemented');
     }
+    /**
+     *
+     * @param String $glue
+     * @return String
+     */
     public function getXFormat($glue = ',')
     {
         return join($glue, $this->getX());
     }
+    /**
+     *
+     * @param String $glue
+     * @return String
+     */
     public function getYFormat($glue = ',')
     {
         return join($glue, $this->getY());
     }
+    /**
+     *
+     * @return Array
+     */
     public function getY()
     {
         return $this->y;
     }
+    /**
+     *
+     * @return Integer
+     */
     public function getYMax()
     {
         return $this->ymax;
     }
+    /**
+     *
+     * @return Integer
+     */
     public function getYMin()
     {
         return 0;
     }
+    /**
+     *
+     * @return Integer
+     */
     public function getXMax()
     {
         return $this->xmax;
     }
+    /**
+     *
+     * @return Integer
+     */
     public function getXMin()
     {
         return $this->xmin;
     }
+    /**
+     *
+     * @return String
+     */
     public function getYlabel()
     {
         $y2 = $this->ymax / 2;
         return "|$y2|{$this->getYMax()}";
     }
+    /**
+     * 
+     * @return String
+     */
     public function getXlabel()
     {
         throw new Exception('not implemented');
@@ -516,10 +658,18 @@ class GraphXY extends GraphValues
  */
 class GraphXYdate extends GraphXY
 {
+    /**
+     *
+     * @param String $title
+     */
     public function __construct($title)
     {
         parent::__construct($title);
     }
+    /**
+     *
+     * @return Array
+     */
     public function getX()
     {
         $result = array();
@@ -533,6 +683,11 @@ class GraphXYdate extends GraphXY
         }
         return $result;
     }
+    /**
+     *
+     * @param String $glue
+     * @return String
+     */
     public function getXlabel($glue = '|')
     {
         $tmin = strtotime($this->xmin);

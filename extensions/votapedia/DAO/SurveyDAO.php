@@ -11,12 +11,8 @@ require_once("$vgPath/DAO/Telephone.php");
 require_once("$vgPath/VO/PageVO.php");
 
 /**
- * This page includes class SurveyDAO which is used to
- * save/retreive data of a Survey. It contains Read/Create/Update/Delete
- * and other relevant funtionalities
- *
- * SurveyDAO includes functions which can access and set
- * (a) Survey(s)' info into or from database system.
+ * Class SurveyDAO is used to save/retreive data of a Survey.
+ * It contains Read/Create/Update/Delete and other relevant funtionalities
  *
  * @author Bai Qifeng
  * @author Emir Habul
@@ -25,6 +21,14 @@ require_once("$vgPath/VO/PageVO.php");
  */
 class SurveyDAO
 {
+    /**
+     * Get Pages by SQL
+     * 
+     * @param String $where SQL where statement ex: "WHERE A = B"
+     * @param Array $param
+     * @param Boolean $loadSurveys
+     * @return Array of PageVO
+     */
     public function getPages($where, $param, $loadSurveys = true)
     {
         global $vgDB, $vgDBPrefix;

@@ -27,10 +27,18 @@ class FormControl
         $this->values = array();
         $this->onFormSubmit = "return true;";
     }
+    /**
+     *
+     * @return String javascript
+     */
     public function getOnFormSubmit()
     {
         return $this->onFormSubmit;
     }
+    /**
+     *
+     * @param String $code javascript
+     */
     public function setOnFormSubmit($code)
     {
         $this->onFormSubmit = $code;

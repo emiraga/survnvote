@@ -78,7 +78,6 @@ class CreateQuestionnaire extends CreateSurvey
     /**
      * Generate templates which will be used by PHP and Javascript
      * 
-     * @global String $vgScript
      */
     function generateTemplates()
     {
@@ -216,7 +215,6 @@ END_SCRIPT;
     /**
      * Generate array of SurveyVO based on the values provided.
      * 
-     * @global WebRequest $wgRequest
      * @param Array $values
      * @return Array of SurveyVO
      */
@@ -275,7 +273,6 @@ END_SCRIPT;
     /**
      * Generate array of SurveyVO based on the $wgRequest values
      *
-     * @global WebRequest $wgRequest
      * @return Array of SurveyVO
      */
     function makeSurveysFromRequest()
@@ -384,7 +381,6 @@ END_SCRIPT;
     }
     /**
      *
-     * @global OutputPage $wgOut
      * @param String $par
      */
     function execute($par = null)
@@ -400,7 +396,6 @@ END_SCRIPT;
     }
     /**
      * New form
-     * @global OutputPage $wgOut
      */
     protected function drawFormNew()
     {
@@ -411,7 +406,7 @@ END_SCRIPT;
     }
     /**
      * Edit form
-     * @global OutputPage $wgOut
+     * 
      * @param Integer $page_id
      */
     protected function drawFormEdit( $page_id)

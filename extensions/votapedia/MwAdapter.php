@@ -88,6 +88,8 @@ class MwParser
     /** @var Boolean */       private $isTag;
 
     /**
+     * Construct MwParser
+     * 
      * @param Parser $parser
      * @param ParserOptions $options
      * @param Title $title
@@ -149,8 +151,6 @@ class MwUser
 
     /**
      * Construct a MwUser object. Try to get username of anonymous users from cookie.
-     *
-     * @global User $wgUser
      */
     public function  __construct()
     {
@@ -232,6 +232,11 @@ class MwUser
         global $wgUser;
         return $wgUser->isAnon();
     }
+    /**
+     * Is this user admin?
+     * 
+     * @return Boolean
+     */
     public function isAdmin()
     {
         global $wgUser;

@@ -22,44 +22,81 @@ class SurveyButtons
     /** @var Boolean */protected $show_details = true;
     /** @var Boolean */protected $show_vote = false;
     /** @var Boolean */protected $has_control = false;
+    /**
+     * Construct class
+     */
     public function __construct()
     {
     }
+    /**
+     * Set type of survey
+     *
+     * @param String $type type of this tag
+     */
     public function setType($type)
     {
         $this->type = strtolower( $type );
     }
+    /**
+     *
+     * @param Integer $page_id
+     */
     function setPageID($page_id)
     {
         $this->page_id = $page_id;
     }
+    /**
+     * Set status
+     * @param String $status
+     */
     function setPageStatus($status)
     {
         $this->page_status = $status;
     }
+    /**
+     * Set author
+     * @param String $author
+     */
     function setPageAuthor($author)
     {
         $this->page_author = $author;
     }
+    /**
+     * Set title
+     * @param String $title 
+     */
     function setWikiTitle($title)
     {
         $this->wikititle = $title;
     }
+    /**
+     * Should it show button "details"
+     * @param Boolean $show
+     */
     function setDetailsButton($show)
     {
         $this->show_details = $show;
     }
+    /**
+     * Should it show button "vote"
+     * @param Boolean $show
+     */
     function setVoteButton($show)
     {
         $this->show_vote = $show;
     }
+    /**
+     * Does this user has control over survey.
+     * 
+     * @param Boolean $control
+     */
     function setHasControl($control)
     {
         $this->has_control = $control;
     }
-    /*
+    /**
      * @return String HTML code of buttons
-    */
+     */
     function getHTML($show_details = false)
     {
         $divname = "btnsSurvey{$this->page_id}-".rand();

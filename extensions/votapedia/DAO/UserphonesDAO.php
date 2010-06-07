@@ -17,10 +17,10 @@ class UserphonesDAO
 {
     /** @var MwUser */ private $user;
     private $statusdesc = array(
-        vPHONE_NEW => 'New phone number',
-        vPHONE_SENT_CODE => 'Confirmation code send by SMS',
-        vPHONE_VERIFIED => 'Phone verified',
-        vPHONE_DELETED => 'Phone has been cancelled',
+            vPHONE_NEW => 'New phone number',
+            vPHONE_SENT_CODE => 'Confirmation code send by SMS',
+            vPHONE_VERIFIED => 'Phone verified',
+            vPHONE_DELETED => 'Phone has been cancelled',
     );
     /**
      * Construct this class
@@ -49,7 +49,7 @@ class UserphonesDAO
     }
     /**
      * Get a list of phones for this user.
-     * 
+     *
      * @return Array that contains associative arrays
      * with keys 'id', 'dateadded', 'number', 'status', 'description'
      */
@@ -61,11 +61,11 @@ class UserphonesDAO
         foreach($p as $phone)
         {
             $result[] = array(
-                'id' => $phone['id'],
-                'dateadded' => $phone['dateadded'],
-                'number' => $phone['phonenumber'],
-                'status' => $phone['status'],
-                'description' => $this->statusdesc [ $phone['status'] ],
+                    'id' => $phone['id'],
+                    'dateadded' => $phone['dateadded'],
+                    'number' => $phone['phonenumber'],
+                    'status' => $phone['status'],
+                    'description' => $this->statusdesc [ $phone['status'] ],
             );
         }
         return $result;
@@ -107,7 +107,7 @@ class UserphonesDAO
     }
     /**
      * Get phone number
-     * 
+     *
      * @param Integer $id record ID
      * @return String phone number
      */
@@ -121,9 +121,8 @@ class UserphonesDAO
         return $number;
     }
     /**
-     * Get new code that will be user for phone confirmation via SMS
-     * 
-     * @global Boolean $vgConfirmCodeLen
+     * Get new code that will be user for phone confirmation via SMS.
+     *
      * @return String confirmation code
      */
     private function getNewCode()
@@ -187,12 +186,12 @@ class UserphonesDAO
     {
         global $vgDB, $vgDBPrefix;
         return $vgDB->GetOne("SELECT username FROM {$vgDBPrefix}userphones WHERE phonenumber = ? AND status >= ?",
-            array($phone, vPHONE_VERIFIED));
+                array($phone, vPHONE_VERIFIED));
     }
     /**
      * Add a phone number to the user and
      * automatically mark this phone number as verified.
-     * 
+     *
      * @param String $username
      * @param String $phone
      */

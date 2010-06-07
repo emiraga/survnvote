@@ -17,6 +17,9 @@ require_once("$vgPath/DAO/SurveyDAO.php");
 class spCreateSurvey extends SpecialPage
 {
     private $obj;
+    /**
+     * Construct spCreateSurvey
+     */
     public function __construct()
     {
         parent::__construct('CreateSurvey');
@@ -24,6 +27,10 @@ class spCreateSurvey extends SpecialPage
         $this->includable( true ); //we can include this from other pages
         $this->setGroup('CreateSurvey', 'votapedia');
     }
+    /**
+     *
+     * @param String $par
+     */
     function execute( $par = null )
     {
         $this->obj->execute($par);
@@ -55,7 +62,9 @@ class CreateSurvey
         $this->spPageName = 'Special:CreateSurvey';
         $this->tagname = vtagSIMPLE_SURVEY;
     }
-    
+    /**
+     * Set default values for $this->formitems
+     */
     function setFormItems()
     {
         global $vgCountry, $vgScript, $vgAllowedTags;
@@ -386,6 +395,11 @@ class CreateSurvey
             throw new Exception('Error has occured while creating a new page');
         }
     }
+    /**
+     * Fill Values From Surveys
+     *
+     * @param PageVO $page
+     */
     function fillValuesFromSurveys(&$surveys)
     {
         $surchoice = $surveys[0]->getChoices();
@@ -412,6 +426,9 @@ class CreateSurvey
         $this->form->setValue('webvoting', $page->getWebVoting());
         $this->fillValuesFromSurveys($page->getSurveys());
     }
+    /**
+     * Process New Survey Submit
+     */
     function processNewSurveySubmit()
     {
         global $wgRequest, $wgOut;
@@ -442,6 +459,9 @@ class CreateSurvey
         $this->drawFormNew();
         $this->postDrawForm();
     }
+    /**
+     * Process Edit Survey
+     */
     function processEditSurvey()
     {
         global $wgRequest, $wgOut;
@@ -477,6 +497,9 @@ class CreateSurvey
         $this->drawFormEdit($page_id);
         $this->postDrawForm();
     }
+    /**
+     * Process Edit Survey Submit
+     */
     function processEditSurveySubmit()
     {
         global $wgRequest, $wgOut;
@@ -549,6 +572,9 @@ class CreateSurvey
         $this->drawFormEdit($page_id);
         $this->postDrawForm();
     }
+    /**
+     * Process New Survey
+     */
     function processNewSurvey()
     {
         if( ! vfUser()->canCreateSurveys() )
@@ -595,6 +621,11 @@ class CreateSurvey
             $this->processNewSurvey();
         }
     }
+    /**
+     * Check if user input is correct.
+     *
+     * @return String error if any
+     */
     function Validate()
     {
         $error = $this->form->Validate();
@@ -606,6 +637,11 @@ class CreateSurvey
         }
         return $error;
     }
+    /**
+     * Before drawing form
+     * 
+     * @param String $errors
+     */
     function preDrawForm($errors)
     {
         global $wgOut, $vgScript;
@@ -663,6 +699,9 @@ class CreateSurvey
         $wgOut->addHTML('<input type="hidden" name="vpAction" value="editcontinue">');
         $this->formButton = wfMsg('edit-survey');
     }
+    /**
+     * After drawing form
+     */
     protected function postDrawForm()
     {
         $this->form->EndForm($this->formButton);

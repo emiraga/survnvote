@@ -27,30 +27,56 @@ class SurveyBody
     /** @var Boolean */  protected $show_graph = false;
     /** @var Boolean */  protected $has_control = false;
 
+    /**
+     *
+     * @param PageVO $page
+     * @param MwParser $parser
+     */
     function  __construct(PageVO &$page, MwParser &$parser)
     {
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
     }
+    /**
+     * Should show voting options
+     * 
+     * @param Boolean $show
+     */
     function setShowVoting($show)
     {
         $this->show_voting = $show;
     }
+    /**
+     * Should show phone numbers
+     * 
+     * @param Boolean $show 
+     */
     function setShowNumbers($show)
     {
         $this->show_phones = $show;
     }
+    /**
+     * Does this user have control.
+     * 
+     * @param Boolean $control
+     */
     function setHasControl($control)
     {
         $this->has_control = $control;
     }
+    /**
+     * Should show the graph on the survey.
+     * 
+     * @param Boolean $show
+     */
     function setShowGraph($show)
     {
         $this->show_graph = $show;
     }
     /**
-     *
+     * Get HTML code for one choice
+     * 
      * @param String $choice value of choice
      * @param String $image path to image used as bullet
      * @param String $addtext Put Extra HTML after this choice
@@ -70,8 +96,8 @@ class SurveyBody
         return $output.'</div>';
     }
     /**
-     *
-     * @global OutputPage $wgOut
+     * Get Body HTML
+     * 
      * @return String html code
      */
     function getHTML()
@@ -267,6 +293,15 @@ class SurveyBody
         }
         return $output;
     }
+    /**
+     * Get HTML code that will refresh image every $vgImageRefresh seconds
+     *
+     * @param String $imgid
+     * @param Integer $colorindex
+     * @param Integer $page_id
+     * @param Integer $survey_id
+     * @return String
+     */
     function refreshImage($imgid, $colorindex, $page_id, $survey_id = null)
     {
         if($survey_id)
@@ -300,11 +335,24 @@ class SurveyBody
         $script = preg_replace('/^\s*/m', '', $script);
         return str_replace("\n", "", $script);
     }
+    /**
+     * Get more details about Survey.
+     * 
+     * @return String
+     */
     public function getDetailsHTML()
     {
         $output = '';
         return $output;
     }
+    /**
+     * Get HTML code that holds a graph
+     *
+     * @param Integer $colorindex
+     * @param Array $surveys
+     * @param String $imgid
+     * @return String
+     */
     public function getGraphHTML(&$colorindex, $surveys, $imgid = '')
     {
         if(count($surveys) > 1)
@@ -338,6 +386,15 @@ class SurveyBody
             return $graph->getHTMLImage($imgid);
         return $graph->getImageLink();
     }
+    /**
+     * Get link to graph from ajax
+     *
+     * @param Integer $last_refresh
+     * @param Integer $colorindex
+     * @param Integer $page_id
+     * @param Integer $survey_id
+     * @return String
+     */
     static function ajaxgraph($last_refresh, $colorindex, $page_id, $survey_id = null)
     {
         if(VoteDAO::countNewVotes($page_id, intval($last_refresh)) == 0)
@@ -406,6 +463,11 @@ class QuestionnaireBody extends SurveyBody
         parent::__construct($page, $parser);
         $this->type = vQUESTIONNAIRE;
     }
+    /**
+     * Get more details about Questionnaire.
+     * 
+     * @return String
+     */
     public function getDetailsHTML()
     {
         $output = parent::getDetailsHTML();
@@ -442,7 +504,8 @@ class QuestionnaireBody extends SurveyBody
 class QuizBody extends QuestionnaireBody
 {
     /**
-     *
+     * Construct QuizBody
+     * 
      * @param PageVO $page
      * @param MwParser $parser
      */

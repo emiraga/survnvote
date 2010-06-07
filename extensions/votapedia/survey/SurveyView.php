@@ -182,6 +182,11 @@ class SurveyView
         }
         return $output;
     }
+    /**
+     * Get more details about Survey.
+     *
+     * @return String
+     */
     function getDetailsHTML()
     {
         return $this->body->getDetailsHTML();

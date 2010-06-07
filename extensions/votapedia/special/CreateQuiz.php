@@ -14,6 +14,9 @@ require_once("$vgPath/special/CreateQuestionnaire.php" );
 class spCreateQuiz extends SpecialPage
 {
     /** @var CreateQuestionnaire */ private $obj;
+    /**
+     * Construct spCreateQuiz
+     */
     public function __construct()
     {
         parent::__construct('CreateQuiz');
@@ -21,6 +24,10 @@ class spCreateQuiz extends SpecialPage
         $this->includable( true ); //we can include this from other pages
         $this->setGroup('CreateQuiz', 'votapedia');
     }
+    /**
+     *
+     * @param String $par
+     */
     function execute( $par = null )
     {
         $this->obj->execute($par);
@@ -59,6 +66,12 @@ class CreateQuiz extends CreateQuestionnaire
         $this->isQuiz = true;
         $this->tagname = vtagQUIZ;
     }
+    /**
+     * Generate array of SurveyVO based on the values provided.
+     *
+     * @param Array $values
+     * @return Array of SurveyVO
+     */
     function generateSurveysArray($values)
     {
         $surveys =& parent::generateSurveysArray($values);
@@ -73,6 +86,12 @@ class CreateQuiz extends CreateQuestionnaire
         }
         return $surveys;
     }
+    /**
+     * Specify values for PageVO, specific for Quiz.
+     *
+     * @param PageVO $page
+     * @param Array $values
+     */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
         parent::setPageVOvalues($page, $values);
@@ -82,6 +101,11 @@ class CreateQuiz extends CreateQuestionnaire
         else
             $page->setSubtractWrong( false );
     }
+    /**
+     * Check if user input is correct.
+     *
+     * @return String error if any
+     */
     function Validate()
     {
         $error = parent::Validate();
@@ -104,6 +128,11 @@ class CreateQuiz extends CreateQuestionnaire
         }
         return $error;
     }
+    /**
+     * Generate array of SurveyVO based on the $wgRequest values
+     *
+     * @return Array of SurveyVO
+     */
     function makeSurveysFromRequest()
     {
         $surveys =& parent::makeSurveysFromRequest();
@@ -121,6 +150,11 @@ class CreateQuiz extends CreateQuestionnaire
         }
         return $surveys;
     }
+    /**
+     * Generate Javascript code for previously added questions and choices.
+     *
+     * @param Array $surveys
+     */
     public function generatePrevQuestions(&$surveys)
     {
         parent::generatePrevQuestions($surveys);
@@ -133,6 +167,11 @@ class CreateQuiz extends CreateQuestionnaire
             $num++;
         }
     }
+    /**
+     * Fill Values From Surveys
+     *
+     * @param PageVO $page
+     */
     public function fillFormValuesFromPage(PageVO &$page)
     {
         parent::fillFormValuesFromPage($page);
@@ -155,10 +194,18 @@ class CreateQuiz extends CreateQuestionnaire
     {
         parent::processEditSurveySubmit();
     }*/
+    
+    /**
+     *
+     * @param String $par
+     */
     function execute($par = null)
     {
         parent::execute($par);
     }
+    /**
+     * New form
+     */
     protected function drawFormNew()
     {
         parent::drawFormNew();
@@ -166,6 +213,11 @@ class CreateQuiz extends CreateQuestionnaire
         $wgOut->setPageTitle(wfMsg('title-new-quiz'));
         $this->formButton = wfMsg('create-quiz');
     }
+    /**
+     * Edit form
+     * 
+     * @param Integer $page_id
+     */
     protected function drawFormEdit( $page_id )
     {
         parent:: drawFormEdit( $page_id );

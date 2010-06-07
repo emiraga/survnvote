@@ -38,6 +38,9 @@ class PageVO
     private $phonevoting = 'anon';
     private $webvoting = 'anon';
 
+    /**
+     * Construct PageVO
+     */
     function __construct()
     {
         $this->endTime = $this->renewEndTime();

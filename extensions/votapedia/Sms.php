@@ -162,7 +162,9 @@ class Sms
     /**
      * My provider gives me option to check balance by sending SMS.
      * If you are lucky as me, you can try to configure this
-     * balance checking to work. Otherwise leave it be.
+     * balance checking to work.
+     *
+     * Otherwise, delete Sms::sendSMS statement below.
      */
     static function requestCheckBalance()
     {

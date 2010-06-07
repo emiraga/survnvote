@@ -91,6 +91,13 @@ class VoteDAO
         }
         return true;
     }
+    /**
+     * Count new votes since certain datetime.
+     * 
+     * @param Integer $page_id
+     * @param Integer $timestamp
+     * @return Integer number of new votes
+     */
     static function countNewVotes($page_id, $timestamp)
     {
         global $vgDB, $vgDBPrefix;
