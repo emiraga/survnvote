@@ -1,5 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package SurveyView
+ */
 
 /**
  * Display HTML buttons for the view of surveys.

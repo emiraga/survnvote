@@ -1,15 +1,25 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package ControlSurvey
+ */
 
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/special/CreateSurvey.php" );
 
 /**
+ * Special page CreateQuestionnaire
+ *
  * @package MediaWikiInterface
  */
 class spCreateQuestionnaire extends SpecialPage
 {
     /** @var CreateQuestionnaire */ private $obj;
+
+    /**
+     * Construct this class
+     */
     public function __construct()
     {
         parent::__construct('CreateQuestionnaire');
@@ -17,6 +27,11 @@ class spCreateQuestionnaire extends SpecialPage
         $this->includable( true ); //we can include this from other pages
         $this->setGroup('CreateQuestionnaire', 'votapedia');
     }
+    /**
+     * Execute tag
+     * 
+     * @param String $par
+     */
     function execute( $par = null )
     {
         $this->obj->execute($par);
@@ -60,6 +75,11 @@ class CreateQuestionnaire extends CreateSurvey
         $this->prev_num_q = 0;
         $this->prev_num_ch = '';
     }
+    /**
+     * Generate templates which will be used by PHP and Javascript
+     * 
+     * @global String $vgScript
+     */
     function generateTemplates()
     {
         global $vgScript;
@@ -107,7 +127,9 @@ class CreateQuestionnaire extends CreateSurvey
                 .'<input type="button" id="btnAddQuestion" value="Add question" onClick="return addQuestion();" />'
                 .'</div>';
     }
-
+    /**
+     * Generate Javascript code
+     */
     function generateScript()
     {
         $this->script = <<<END_SCRIPT
@@ -191,6 +213,13 @@ class CreateQuestionnaire extends CreateSurvey
 </script>
 END_SCRIPT;
     }
+    /**
+     * Generate array of SurveyVO based on the values provided.
+     * 
+     * @global WebRequest $wgRequest
+     * @param Array $values
+     * @return Array of SurveyVO
+     */
     function generateSurveysArray($values)
     {
         global $wgRequest;
@@ -209,14 +238,20 @@ END_SCRIPT;
         }
         return $surveys;
     }
+    /**
+     * Specify values for PageVO, specific for Questionnaire.
+     * 
+     * @param PageVO $page
+     * @param Array $values
+     */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
         parent::setPageVOvalues($page, $values);
         $page->setType(vQUESTIONNAIRE);
     }
     /**
-     *
-     * @global $wgRequest WebRequest
+     * Check if user input is correct.
+     * 
      * @return String error if any
      */
     function Validate()
@@ -237,6 +272,12 @@ END_SCRIPT;
         }
         return $error;
     }
+    /**
+     * Generate array of SurveyVO based on the $wgRequest values
+     *
+     * @global WebRequest $wgRequest
+     * @return Array of SurveyVO
+     */
     function makeSurveysFromRequest()
     {
         global $wgRequest;
@@ -263,6 +304,11 @@ END_SCRIPT;
         }
         return $surveys;
     }
+    /**
+     * Generate Javascript code for previously added questions and choices.
+     *
+     * @param Array $surveys
+     */
     function generatePrevQuestions(&$surveys)
     {
         $num = 1;
@@ -294,35 +340,53 @@ END_SCRIPT;
         $this->generateScript();
     }
     /**
-     *
+     * Fill Values From Surveys
+     * 
      * @param PageVO $page
      */
     function fillValuesFromSurveys(&$surveys)
     {
         $this->generatePrevQuestions($surveys);
     }
+    /**
+     * Process New Survey Submit
+     */
     function processNewSurveySubmit()
     {
         $this->generatePrevQuestions($this->makeSurveysFromRequest());
 
         parent::processNewSurveySubmit();
     }
+    /**
+     * Process New Survey
+     */
     function processNewSurvey()
     {
         parent::processNewSurvey(); //there are not previous questions
 
         $this->generateScript();
     }
+    /**
+     * Process Edit Survey
+     */
     public function processEditSurvey()
     {
         parent::processEditSurvey(); //this method will call generatePrevQuestions
     }
+    /**
+     * Process Edit Survey Submit
+     */
     public function processEditSurveySubmit()
     {
         $this->generatePrevQuestions($this->makeSurveysFromRequest());
 
         parent::processEditSurveySubmit();
     }
+    /**
+     *
+     * @global OutputPage $wgOut
+     * @param String $par
+     */
     function execute($par = null)
     {
         global $wgOut;
@@ -334,6 +398,10 @@ END_SCRIPT;
         $script = str_replace("\n",'',$script);
         $wgOut->prependHTML($script);
     }
+    /**
+     * New form
+     * @global OutputPage $wgOut
+     */
     protected function drawFormNew()
     {
         parent::drawFormNew();
@@ -341,6 +409,11 @@ END_SCRIPT;
         $wgOut->setPageTitle(wfMsg('title-new-questionnaire'));
         $this->formButton = wfMsg('create-questionnaire');
     }
+    /**
+     * Edit form
+     * @global OutputPage $wgOut
+     * @param Integer $page_id
+     */
     protected function drawFormEdit( $page_id)
     {
         parent:: drawFormEdit( $page_id );

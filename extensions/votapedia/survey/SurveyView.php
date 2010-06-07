@@ -1,6 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package SurveyView
+ */
 
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/SurveyDAO.php");

@@ -1,6 +1,8 @@
 <?php
+/**
+ * @package VotapediaCommon
+ */
 $aliases = array();
-
 /** English */
 $aliases['en'] = array(
         'CreateSurvey' => array( 'CreateSurvey' ),

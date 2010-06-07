@@ -150,7 +150,7 @@ class MwUser
     /**
      * Construct a MwUser object. Try to get username of anonymous users from cookie.
      *
-     * @global $wgUser User
+     * @global User $wgUser
      */
     public function  __construct()
     {

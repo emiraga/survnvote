@@ -1,5 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package Graphing
+ */
 
 /**
  * function vfCutEncode
@@ -10,7 +13,6 @@ if (!defined('MEDIAWIKI')) die();
  * @param String $elipsis append to the end of long messages
  * @param Boolean $encode do URL encoding
  * @return String processed string
- * @package Graphing
  */
 function vfCutEncode($str, $maxlen, $elipsis = '...', $encode = true)
 {

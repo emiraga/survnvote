@@ -1,7 +1,9 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 /**
- *  Rename this file to config.php after you are done editing
+ * Rename this file to config.php after you are done editing
+ *
+ * @package VotapediaCommon
  */
 
 // Votapedia script path, and extensions.

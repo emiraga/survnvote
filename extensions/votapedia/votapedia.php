@@ -1,6 +1,11 @@
 <?php
 if (!defined('MEDIAWIKI')) die('Cannot access this file.');
 
+/**
+ * @package VotapediaCommon
+ */
+
+/** Configure votapedia */
 require_once("config.php");
 
 //International Texts and Aliases

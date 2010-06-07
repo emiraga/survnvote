@@ -3,6 +3,8 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * @package DataAccessObject
  */
+
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/Telephone.php");

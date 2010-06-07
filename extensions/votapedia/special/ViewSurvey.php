@@ -1,6 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package ControlSurvey
+ */
 
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php" );
 

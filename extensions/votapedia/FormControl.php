@@ -1,5 +1,8 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package HTML_Display
+ */
 
 /**
  * Class used for drawing tabbed form similar to "Preferences" form in MediaWiki

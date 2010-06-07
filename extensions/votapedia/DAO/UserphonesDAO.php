@@ -123,7 +123,7 @@ class UserphonesDAO
     /**
      * Get new code that will be user for phone confirmation via SMS
      * 
-     * @global $vgConfirmCodeLen Boolean
+     * @global Boolean $vgConfirmCodeLen
      * @return String confirmation code
      */
     private function getNewCode()

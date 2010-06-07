@@ -4,6 +4,7 @@ if (!defined('MEDIAWIKI')) die();
  * @package ValueObject
  */
 
+/** Include dependencies */
 global $vpPath;
 require_once("$vpPath/ChoiceVO.php");
 

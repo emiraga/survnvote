@@ -1,6 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
 /**
+ * @package SmsIntegration
+ */
+
+/**
  * This is example class that provides SMS integration with external source.
  *
  * This Sms Integration class implements a working interface to gammu-smsd

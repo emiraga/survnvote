@@ -1,8 +1,9 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
-
+/**
+ * @package VotapediaCommon
+ */
 $messages = array();
-
 $messages['en'] = array( 
     'votapedia-desc' => 'Votapedia - Audience Response System. This extension includes special pages, tags, etc.',
     'specialpages-group-votapedia' => 'Votapedia - Audience response system',

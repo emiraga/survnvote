@@ -1,5 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package SurveyView
+ */
+
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/SurveyDAO.php");
@@ -66,7 +71,7 @@ class SurveyBody
     }
     /**
      *
-     * @global $wgOut OutputPage
+     * @global OutputPage $wgOut
      * @return String html code
      */
     function getHTML()
@@ -387,6 +392,7 @@ class SurveyBody
 /**
  *
  * Body of a questionnaire
+ * @package SurveyView
  */
 class QuestionnaireBody extends SurveyBody
 {
@@ -431,6 +437,7 @@ class QuestionnaireBody extends SurveyBody
 /**
  *
  * Body of a questionnaire
+ * @package SurveyView
  */
 class QuizBody extends QuestionnaireBody
 {

@@ -1,6 +1,12 @@
 <?php
 if(isset($_SERVER['HOST'])) die('Must be run from command line.');
+/**
+ * Background process which monitors the incoming SMS and CALLS
+ * 
+ * @package Daemon
+ */
 
+/** Configuration */
 //Set this path to MediaWiki
 $IP = '/xampp/htdocs/new';
 
@@ -11,6 +17,7 @@ define('MEDIAWIKI',true);
 $vgDBUserName = $wgDBadminuser; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = $wgDBadminpassword;
 
+/** Include dependencies */
 require_once("$vgPath/Common.php");
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
@@ -25,7 +32,6 @@ $surveydao = new SurveyDAO();
  * This is a very ugly hack. Needs to be improved.
  *
  * @return Boolean success true of false
- * @package Daemon
  */
 function vfRequestNewUser($username, $password, $realname)
 {
@@ -52,7 +58,6 @@ function vfRequestNewUser($username, $password, $realname)
  * Pick a new username, create that account and send an SMS.
  *
  * @param String $phonenumber
- * @package Daemon
  */
 function vfDaemonNewUser($phonenumber)
 {
@@ -81,7 +86,6 @@ function vfDaemonNewUser($phonenumber)
 }
 /**
  * Do whatever is needed to process new incoming SMS.
- * @package Daemon
  */
 function vfDaemonSmsAction()
 {
@@ -129,7 +133,6 @@ function vfDaemonSmsAction()
  *
  * @param String $choice choice that user has coosen
  * @param String $username name of user
- * @package Daemon
  */
 function vfVoteFromDaemon($choice, $username)
 {
@@ -155,7 +158,6 @@ function vfVoteFromDaemon($choice, $username)
  * @param Integer $length length of output string
  * @param String $chars used characters, default: all alpha-numeric characters
  * @return String random string
- * @package Daemon
  */
 function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
 {
@@ -170,7 +172,7 @@ function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk
 $args = $_SERVER['argv'];
 if(!isset($args[1]))
 {
-    die("Usage: php $args[0] daemon | fakevote [votes]+");
+    die("\nUsage: php $args[0] daemon | fakevote [votes]+ | checkbalance | reportbalance\n");
 }
 
 if($args[1] == 'daemon')
@@ -210,3 +212,15 @@ else if($args[1] == 'fakevote') /*used for testing*/
         }
     }
 }
+elseif($args[1] == 'checkbalance')
+{
+    Sms::requestCheckBalance();
+    echo "Done with request check balance.\n";
+}
+elseif($args[1] == 'reportbalance')
+{
+    Sms::getReport();
+    echo (Sms::getLatestBalance())."\n";
+    echo "Reporting done.\n";
+}
+

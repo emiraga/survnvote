@@ -1,6 +1,10 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
+/**
+ * @package SmsIntegration
+ */
 
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
@@ -10,6 +14,7 @@ require_once("$vgPath/FormControl.php");
  * Special page Create Survey
  *
  * @author Emir Habul
+ * @package SmsIntegration
  */
 class MyPhones extends SpecialPage
 {

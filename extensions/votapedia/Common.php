@@ -1,19 +1,22 @@
 <?php
-if (!defined('MEDIAWIKI') && !defined('VOTAPEDIA_DAEMON')) die();
+if(!defined('MEDIAWIKI')) die();
+/**
+ * @package VotapediaCommon
+ */
 
-/* Types of surveys. */
+/** Types of surveys. */
 define('vSIMPLE_SURVEY',   1);
 define('vQUIZ',            2);
 define('vRANK_EXPOSITIONS',3);
 define('vQUESTIONNAIRE',   4);
 define('vTEXT_RESPONSE',   5);
 
-/* Privacy levels. */
+/** Privacy levels. */
 define('vPRIVACY_LOW',    1);
 define('vPRIVACY_MEDIUM', 2);
 define('vPRIVACY_HIGH',   3);
 
-/* User phone status */
+/** User phone status */
 define('vPHONE_NEW', 0);
 define('vPHONE_SENT_CODE', 1);
 define('vPHONE_DELETED', 2);
@@ -69,7 +72,7 @@ function vfSuccessBox($message)
 }
 /**
  * Custom Exception class for surveys
- *
+ * @package VotapediaCommon
  */
 class SurveyException extends Exception
 {

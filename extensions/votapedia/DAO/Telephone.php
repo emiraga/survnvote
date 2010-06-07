@@ -5,6 +5,8 @@ if (!defined('MEDIAWIKI')) die();
  *
  * @package DataAccessObject
  */
+
+/** Include dependencies */
 global $vgPath;
 require_once("$vgPath/VO/SurveyVO.php");
 
