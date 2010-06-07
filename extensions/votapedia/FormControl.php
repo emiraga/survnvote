@@ -16,7 +16,7 @@ class FormControl
     /**
      * Constructor of FormControl
      *
-     * @param $items associative array of form items
+     * @param $items Array associative array of form items
      */
     public function __construct(&$items)
     {
@@ -34,10 +34,10 @@ class FormControl
     }
     /**
      * Helper function for user information panel
-     * @param $td1 label for an item
-     * @param $td2 item or null
-     * @param $td3 optional help or null
-     * @return xhtml block
+     * @param $td1 String label for an item
+     * @param $td2 String item or null
+     * @param $td3 String optional help or null
+     * @return String xhtml block
      */
     private function TableRow( $td1, $td2 = null, $td3 = null, $td4=null )
     {
@@ -73,7 +73,7 @@ class FormControl
     /**
      * Check whether values in form pass the tests.
      *
-     * @return error string if any error
+     * @return String error if any error
      */
     public function Validate()
     {
@@ -116,8 +116,8 @@ class FormControl
     }
     /**
      * Set the value in form with given key(name)
-     * @param $name the key
-     * @param $value
+     * @param $name String the key
+     * @param $value String
      */
     public function setValue($name, $value)
     {
@@ -126,8 +126,8 @@ class FormControl
     /**
      * Read the value of form with given key(name)
      *
-     * @param $name the key
-     * @return values[$name]
+     * @param $name String the key
+     * @return String values[$name]
      */
     public function getValue($name)
     {
@@ -135,13 +135,16 @@ class FormControl
     }
     /**
      * Returns an entire associative array of form values
-     * @return array
+     * @return Array
      */
     public function getValuesArray()
     {
         return $this->values;
     }
-
+    /**
+     *
+     * @param $id String
+     */
     public function showItem($id)
     {
         global $wgOut, $vgScript, $wgScriptPath;
@@ -252,8 +255,8 @@ class FormControl
     /**
      * Adds a new tab to the output form
      *
-     * @param $title tab name
-     * @param $add_items names of form items to be shown in this tab
+     * @param $title String tab name
+     * @param $add_items Array of names of form items to be shown in this tab
      */
     public function AddPage($title, $add_items)
     {
@@ -284,8 +287,8 @@ class FormControl
     /**
      * Start drawing the form
      *
-     * @param $action target of a HTML form
-     * @param $id id inside HTML of form
+     * @param $action String target of a HTML form
+     * @param $id Integer id inside HTML of form
      */
     public function StartForm($action, $id='')
     {
@@ -302,7 +305,7 @@ class FormControl
     /**
      * End drawing the form
      *
-     * @param $submit value of submit button in the form
+     * @param $submit String value of submit button in the form
      */
     public function EndForm($submit)
     {

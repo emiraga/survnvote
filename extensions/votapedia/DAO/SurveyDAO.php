@@ -64,8 +64,9 @@ class SurveyDAO
     /**
      * Execute query and return one result PageVO
      *
-     * @param $where where statement in SQL
-     * @param $param array ov values which will be included in sql query
+     * @param $where String where statement in SQL
+     * @param $param Array ov values which will be included in sql query
+     * @param $loadSurveys Boolean
      * @return PageVO on success, false in does not exist
      */
     private function getOnePage($where, $param, $loadSurveys = true)
@@ -79,9 +80,8 @@ class SurveyDAO
     /**
      * Find surveys which are related with wiki page
      *
-     * @param $title title of wiki page
-     * @return PageVO $page an Instance of PageVO
-     * @version 2.0
+     * @param $title String title of wiki page
+     * @return PageVO an Instance of PageVO
      */
     function findByPage($title)
     {
@@ -93,9 +93,9 @@ class SurveyDAO
     /**
      * Find surveys which are related with wiki page
      *
-     * @param $id IntegerID of wiki page
+     * @param $id Integer IntegerID of wiki page
      * @param $loadsurveys Boolean should we load all surveys
-     * @return PageVO $page An instance of PageVO
+     * @return PageVO An instance of PageVO
      * @version 2.0
      */
     function findByPageID($id, $loadsurveys = true)
@@ -120,7 +120,7 @@ class SurveyDAO
      * survey /surveys, choices,and presentations (if survey type is Presentation)
      *
      * @param $pageVO PageVO
-     * @param $insertSurveys should surveys be inserted as well
+     * @param $insertSurveys Boolean should surveys be inserted as well
      */
     public function insertPage(PageVO &$pageVO, $insertSurveys = true)
     {
@@ -233,7 +233,7 @@ class SurveyDAO
      * All survey records would be deleted.
      *
      * @param $pageVO PageVO
-     * @return boolean true
+     * @return Boolean true
      */
     function resetSurveys(PageVO $pageVO)
     {
@@ -256,7 +256,7 @@ class SurveyDAO
      * All survey records would be deleted.
      *
      * @param $surveyVO SurveyVO
-     * @return boolean true
+     * @return Boolean true
      */
     function resetSurvey(SurveyVO $surveyVO)
     {
@@ -333,8 +333,7 @@ class SurveyDAO
      * Delete a page which includes tables of page,
      * Survey,SuveyChoice,Presentation,SurveyRecord.
      *
-     * @param $id id of a page
-     * @version 2.0
+     * @param $id Integer id of a page
      */
     function deletePage($id)
     {
@@ -348,7 +347,7 @@ class SurveyDAO
      * Survey,SuveyChoice,Presentation,SurveyRecord.
      * Page table would still be saved.
      *
-     * @param $id id of a wiki page
+     * @param $id Integer id of a page
      */
     function deleteSurveys($id)
     {
@@ -383,7 +382,6 @@ class SurveyDAO
      *
      * @param $page PageVO page object
      * @return Array $surveys
-     * @version 2.0
      */
     private function loadSurveys(&$page)
     {
@@ -422,9 +420,9 @@ class SurveyDAO
     /**
      * Private function. Get choices of a survey.
      *
-     * @param $surveyID
-     * @param $pageID
-     * @return array $choices
+     * @param $surveyID Integer
+     * @param $pageID Integer
+     * @return Array choices
      * @version 2.0
      */
     private function getChoices($surveyID, $pageID)
@@ -458,8 +456,8 @@ class SurveyDAO
     /**
      * Private function.Get presentations of a survey
      *
-     * @param $surveyID
-     * @return array $presentations
+     * @param $surveyID Integer
+     * @return Array $presentations
      * @version 2.0
      */
     private function getPresentations($surveyID)
@@ -507,8 +505,8 @@ class SurveyDAO
     /**
      * Calcuate the mark which choice gets
      *
-     * @param $choiceID
-     * @param $numberOfChoices
+     * @param $choiceID Integer
+     * @param $numberOfChoices Integer
      */
     private function evaluatePoints($choiceID, $numberOfChoices)
     {
@@ -518,8 +516,8 @@ class SurveyDAO
     /**
      * Activate a presentation in a survey
      *
-     * @param $surveyID
-     * @param $presentationID
+     * @param $surveyID Integer
+     * @param $presentationID Integer
      */
     function activatePresentation($surveyID,$presentationID)
     {
@@ -539,8 +537,7 @@ class SurveyDAO
     /**
      * This is function is to start a survey. It will set the start time in PageVO
      *
-     * @param $pageVO PageVO;
-     * @version 2.0
+     * @param $pageVO PageVO
      */
     function startSurvey(PageVO &$pageVO)
     {
@@ -558,7 +555,6 @@ class SurveyDAO
      * It requires the time which the survey continue to run.
      *
      * @param $pageVO PageVO
-     * @version 2.0
      */
     function continueSurvey(PageVO $pageVO)
     {
@@ -588,7 +584,7 @@ class SurveyDAO
     /**
      * Update database and set new receivers and SMS from the PageVO object
      *
-     * @param PageVO $page
+     * @param $page PageVO
      */
     public function updateReceiversSMS(PageVO &$page)
     {

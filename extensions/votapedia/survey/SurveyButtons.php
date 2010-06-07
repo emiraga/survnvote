@@ -55,7 +55,7 @@ class SurveyButtons
         $this->has_control = $control;
     }
     /*
-     * @return HTML code of buttons
+     * @return String HTML code of buttons
     */
     function getHTML($show_details = false)
     {

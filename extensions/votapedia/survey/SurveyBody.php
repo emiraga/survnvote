@@ -392,8 +392,8 @@ class QuestionnaireBody extends SurveyBody
 {
     /**
      *
-     * @param  $page PageVO
-     * @param  $parser MwParser
+     * @param $page PageVO
+     * @param $parser MwParser
      */
     function  __construct(PageVO &$page, MwParser &$parser)
     {
@@ -436,8 +436,8 @@ class QuizBody extends QuestionnaireBody
 {
     /**
      *
-     * @param  $page PageVO
-     * @param  $parser MwParser
+     * @param $page PageVO
+     * @param $parser MwParser
      */
     function  __construct(PageVO &$page, MwParser &$parser)
     {

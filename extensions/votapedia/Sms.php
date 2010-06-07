@@ -74,7 +74,6 @@ class Sms
      * they are not retrieved twice by the function getNewSms()
      *
      * @param $id Integer id of previous sms
-     * @return None
      */
     static function processed($id)
     {
@@ -88,8 +87,8 @@ class Sms
      * 
      * Action which is performed when votapedia wants to send an SMS to certain number
      *
-     * @param $destination destination number
-     * @param $message message text
+     * @param $destination String destination number
+     * @param $message String message text
      */
     static function sendSMS($destination, $message)
     {
@@ -168,7 +167,7 @@ class Sms
     /**
      * function getLatestBalance()
      * 
-     * @return Float balance
+     * @return String balance
      */
     static function getLatestBalance()
     {

@@ -17,7 +17,7 @@ class MwAdapter
     /**
      * Purge the cache of a page with a given title
      *
-     * @param $title string title of wiki page
+     * @param $title String title of wiki page
      */
     function purgePage($title)
     {
@@ -34,8 +34,8 @@ class MwAdapter
     /**
      * Get a list of subcategories of a category
      * 
-     * @param $category Name of a category
-     * @return array with a list of categories
+     * @param $category String Name of a category
+     * @return Array with a list of categories
      */
     function getSubCategories($category) // = )
 
@@ -60,7 +60,7 @@ class MwAdapter
     /**
      * Purge all members that belong to one category
      *
-     * @param $category name of category
+     * @param $category String name of category
      */
     function purgeCategoryMembers( $category )
     {
@@ -242,7 +242,7 @@ class MwUser
      * Get user preferences and options
      *
      * @param $option String option name
-     * @return <type>
+     * @return String
      */
     public function getOption($option)
     {
@@ -281,7 +281,7 @@ class MwUser
      * Remove unnecessary information from anonymous usernames
      *
      * @param $name String name of user
-     * @return prepare name of user to be displayed
+     * @return String prepare name of user to be displayed
      */
     static function displayName($name)
     {

@@ -20,21 +20,21 @@ class VoteVO
     private $voteType;
     private $votesAllowed = 1;
     /**
-     * @return integer survey ID
+     * @return Integer survey ID
      */
     public function getSurveyID()
     {
         return $this->surveyID;
     }
     /**
-     * @return integer page ID
+     * @return Integer page ID
      */
     public function getPageID()
     {
         return $this->pageID;
     }
     /**
-     * @return integer choice ID
+     * @return Integer choice ID
      */
     public function getChoiceID()
     {
@@ -43,49 +43,49 @@ class VoteVO
     /**
      * Return the presentation ID
      *
-     * @return integer presentation ID
+     * @return Integer presentation ID
      */
     public function getPresentationID()
     {
         return $this->presentationID;
     }
     /**
-     * @return integer voter ID
+     * @return Integer voter ID
      */
     public function getVoterID()
     {
         return $this->voterID;
     }
     /**
-     * @return DateTime vot date
+     * @return String vote date
      */
     public function getVoteDate()
     {
         return $this->voteDate;
     }
     /**
-     * @return string vote type
+     * @return String vote type
      */
     public function getVoteType()
     {
         return $this->voteType;
     }
     /**
-     * @return integer number of votes allowed per user
+     * @return Integer number of votes allowed per user
      */
     public function getVotesAllowed()
     {
         return $this->votesAllowed;
     }
     /**
-     * @param $pageid
+     * @param $pageid Integer
      */
     public function setPageID($pageid)
     {
         $this->pageID = $pageid;
     }
     /**
-     * @param $surveyid
+     * @param $surveyid Integer
      */
     public function setSurveyID($surveyid)
     {
@@ -93,7 +93,7 @@ class VoteVO
     }
     /**
      *
-     * @param $choiceid
+     * @param $choiceid Integer
      */
     public function setChoiceID($choiceid)
     {
@@ -101,7 +101,7 @@ class VoteVO
     }
     /**
      *
-     * @param $presentationid
+     * @param $presentationid Integer
      */
     public function setPresentationID ($presentationid)
     {
@@ -109,7 +109,7 @@ class VoteVO
     }
     /**
      *
-     * @param $voterid
+     * @param $voterid String
      */
     public function setVoterID($voterid)
     {
@@ -117,7 +117,7 @@ class VoteVO
     }
     /**
      *
-     * @param $votedate
+     * @param $votedate String
      */
     public function setVoteDate($votedate)
     {
@@ -125,7 +125,7 @@ class VoteVO
     }
     /**
      *
-     * @param $votetype usually voters vote by CAL,WEB or SMS
+     * @param $votetype String 'CALL', 'WEB' or 'SMS'
      */
     public function setVoteType($votetype)
     {
@@ -136,7 +136,7 @@ class VoteVO
     }
     /**
      * Set number of allowed votes per user
-     * @param $numvotes
+     * @param $numvotes Integer
      */
     public function setVotesAllowed($numvotes)
     {

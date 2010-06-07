@@ -27,10 +27,10 @@ class VoteDAO
     }
     /**
      * @param $page PageVO
-     * @param $type of a vote, CALL, SMS or WEB
-     * @param $surveyID surveyID of a survey which want to be voted
-     * @param $choiceID choice of a survey which voter wants to vote
-     * @param $presentationID presentationID of a survey, could be NULL
+     * @param $type String of a vote, CALL, SMS or WEB
+     * @param $surveyID Integer of a survey which want to be voted
+     * @param $choiceID Integer of a survey which voter wants to vote
+     * @param $presentationID Integer of a survey, could be NULL
      * @return SurveyVO object
      */
     function newFromPage($type, $pageID, $surveyID, $choiceID, $presentationID = 0)
@@ -52,7 +52,7 @@ class VoteDAO
      * Check for validity of vote and add this vote to database
      *
      * @param $vote VoteVO object
-     * @return true on success
+     * @return Boolean true on success
      */
     function vote(VoteVO &$vote)
     {

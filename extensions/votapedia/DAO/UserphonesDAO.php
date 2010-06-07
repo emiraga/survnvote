@@ -89,7 +89,7 @@ class UserphonesDAO
      * another code.
      *
      * @param $id Integer id of record
-     * @return Strign conformation code
+     * @return String conformation code
      */
     public function getConfirmCode($id)
     {
@@ -138,8 +138,8 @@ class UserphonesDAO
      * Verify if suplied code is valid
      *
      * @param $id Integer id of a record
-     * @param $code supplied code
-     * @return true
+     * @param $code String supplied code
+     * @return Boolean true
      */
     public function verifyCode($id, $code)
     {

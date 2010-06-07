@@ -35,7 +35,8 @@ function vfDate($date = NULL)
 /**
  * Convert page title into a friendly form, shorter and trimmed
  *
- * @param $mytitle
+ * @param $mytitle String
+ * @return String processed title
  */
 function vfGetPageTitle($mytitle)
 {
@@ -49,7 +50,8 @@ function vfGetPageTitle($mytitle)
 /**
  * Return a message in error box, will show as red in HTML
  *
- * @param $message
+ * @param $message String
+ * @return String HTML code for error box.
  */
 function vfErrorBox($message)
 {
@@ -58,7 +60,8 @@ function vfErrorBox($message)
 /**
  * Return a message in error box, will show as red in HTML
  *
- * @param $message
+ * @param $message String
+ * @return String HTML code
  */
 function vfSuccessBox($message)
 {
@@ -164,7 +167,7 @@ include_once("adodb/adodb.inc.php");
 include_once("adodb/adodb-exceptions.inc.php");
 /**
  * Connect database without parameters
- * @return $cn ADOConnection
+ * @return ADOConnection
  */
 function vfConnectDatabase()
 {

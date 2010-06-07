@@ -1,5 +1,8 @@
 <?php
-if (!defined('MEDIAWIKI') && !defined('VOTAPEDIA_DAEMON')) die();
+if (!defined('MEDIAWIKI')) die();
+/**
+ *  Rename this file to config.php after you are done editing
+ */
 
 // Votapedia script path, and extensions.
 $vgPath = "$IP/extensions/votapedia";
@@ -10,8 +13,8 @@ $vgDBserver         = $wgDBserver;
 $vgDBName           = $wgDBname;
 $vgDBUserName       = $wgDBuser;
 $vgDBUserPassword   = $wgDBpassword;
+$vgDBType           = $wgDBtype;
 $vgDBPrefix         = "v_";
-$vgDBType           = 'mysql';
 
 // Configure phone numbers of PBX
 #$vgNumberCallerID = '82315772';
@@ -46,7 +49,7 @@ $vgAnonSurveyCreation = true;
 $vgImageRefresh = 3; //@todo increase this value
 
 /**
- * @return array containing all phone numbers that can be used for voting
+ * @return Array containing all phone numbers that can be dialed for voting
  */
 function vfGetAllNumbers()
 {
@@ -59,15 +62,15 @@ function vfGetAllNumbers()
 }
 /**
  * @param $number String input number from user
- * @return processed number
+ * @return String processed number
  */
 function vfProcessNumber($number)
 {
     global $vgCountryCode;
-    $number = preg_replace('/[^0-9]/','',$number);
-    $number = preg_replace('/^0*/', '', $number);
+    $number = preg_replace('/[^0-9]/','',$number);//remove other characters
+    $number = preg_replace('/^0*/', '', $number);//remove leading zeroes
     if(strlen($number) <= 9)
-        $number = $vgCountryCode . $number;
+        $number = $vgCountryCode . $number;//add country code
     return "+".$number;
 }
 

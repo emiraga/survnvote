@@ -90,7 +90,7 @@ class MyPhones extends SpecialPage
     /**
      * Mandatory execute function for a Special Page
      *
-     * @param $par
+     * @param $par String
      */
     function execute( $par = null )
     {
@@ -170,6 +170,9 @@ class MyPhones extends SpecialPage
             return;
         }
     }
+    /**
+     * 
+     */
     function listPhones()
     {
         $list = $this->dao->getList();

@@ -25,7 +25,7 @@ class ChoiceVO
     /**
      * Get the choice content of this choice
      *
-     * @return string choice content of this coice
+     * @return String choice content of this coice
      */
     public function getChoice()
     {
@@ -33,7 +33,7 @@ class ChoiceVO
     }
     /**
      * Get the choice ID of this choice
-     * @return integer the ID of this choice
+     * @return Integer the ID of this choice
      */
     public function getChoiceID()
     {
@@ -41,7 +41,7 @@ class ChoiceVO
     }
     /**
      * Get the survey ID which contains this choice
-     * @return integer the ID of a survey which contains this choice
+     * @return Integer the ID of a survey which contains this choice
      */
     public function getSurveyID()
     {
@@ -49,7 +49,7 @@ class ChoiceVO
     }
     /**
      * Get the page ID which contains this choice
-     * @return integer the ID of a page which contains this choice
+     * @return Integer the ID of a page which contains this choice
      */
     public function getPageID()
     {
@@ -58,16 +58,16 @@ class ChoiceVO
     /**
      * Get the SMS content for this choice
      * The last two digitals of the receiver.
-     * @return string SMS content which indicates this choice
-     * EE represents error
+     * @return String SMS content which indicates this choice
      */
     public function getSMS()
     {
         return $this->SMS;
     }
     /**
-     * Get the receiving telephone number for this choice
-     * @return string the receiving telephone number for this choice
+     * Get the receiving telephone number for this choice.
+     * 
+     * @return String the receiving telephone number for this choice
      */
     public function getReceiver()
     {
@@ -76,7 +76,7 @@ class ChoiceVO
     /**
      * Get how many votes this choice got
      *
-     * @return integer $vote the number of votes
+     * @return Integer $vote the number of votes
      */
     public function getVote()
     {
@@ -84,7 +84,7 @@ class ChoiceVO
     }
     /**
      * Get how many points this choice has
-     * @return integer $points the number of pointss
+     * @return Integer the number of points
      */
     public function getPoints()
     {
@@ -92,7 +92,7 @@ class ChoiceVO
     }
     /**
      * Set choice ID
-     * @param $choiceID
+     * @param $choiceID Integer
      */
     public function setChoiceID($choiceID)
     {
@@ -100,7 +100,8 @@ class ChoiceVO
     }
     /**
      * Set choice content of this choice
-     * @param $choice
+     * 
+     * @param $choice String
      */
     public function setChoice($choice)
     {
@@ -108,7 +109,8 @@ class ChoiceVO
     }
     /**
      * Set survey ID which includes this choice
-     * @param $surveyID
+     *
+     * @param $surveyID Integer
      */
     public function setSurveyID($surveyID)
     {
@@ -116,7 +118,7 @@ class ChoiceVO
     }
     /**
      * Set page ID which includes this survey with choice
-     * @param $pageID
+     * @param $pageID Integer
      */
     public function setPageID($pageID)
     {
@@ -124,24 +126,25 @@ class ChoiceVO
     }
     /**
      * Set receiving telepone number for this choice
-     * @param $receiver
+     * @param $receiver String
      */
     public function setReceiver($receiver)
     {
         $this->receiver = $receiver;
     }
     /**
-     * Set SMS for this choice
-     * @param $SMS
+     * Set SMS for this choice.
+     * 
+     * @param $SMS String
      */
     public function setSMS($SMS)
     {
         $this->SMS = $SMS;
     }
     /**
-     * Set vote for this choice
+     * Set number of votes for this choice
      *
-     * @param $vote
+     * @param $vote Integer
      */
     public function setVote($vote)
     {
@@ -149,7 +152,8 @@ class ChoiceVO
     }
     /**
      * Set points for this choice
-     * @param $points
+     *
+     * @param $points Integer
      */
     public function setPoints($points)
     {

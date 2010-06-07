@@ -27,10 +27,10 @@ class SurveyView
     /**
      * Function called for the &lt;SurveyChoice&gt; tag
      *
-     * @param  $input String text between tags
-     * @param  $args Array tag arguments
-     * @param  $parser Parser of Mediawiki
-     * @param  $frame
+     * @param $input String text between tags
+     * @param $args Array tag arguments
+     * @param $parser Parser of Mediawiki
+     * @param $frame Unknown
      */
     static function executeTag( $input, $args, $parser, $frame = NULL )
     {
@@ -207,7 +207,7 @@ class SurveyView
     /**
      * AJAX call to get preview of choioe
      *
-     * @param  $line String wiki code for choice
+     * @param $line String wiki code for choice
      * @return String HTML code of preview of choice
      */
     static function getChoice($line)

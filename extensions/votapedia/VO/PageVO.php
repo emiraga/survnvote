@@ -43,7 +43,7 @@ class PageVO
     }
     /**
      * Set an ID of this survey
-     * @param $id
+     * @param $id Integer
      */
     function setPageID($id)
     {
@@ -52,7 +52,7 @@ class PageVO
     /**
      * Set question of this survey
      *
-     * @param $title
+     * @param $title String
      */
     function setTitle($title)
     {
@@ -65,7 +65,7 @@ class PageVO
     /**
      * Set start time of this survey, must match the required date format
      *
-     * @param $startTime yyyy-mm-dd hh:mm:ss
+     * @param $startTime String yyyy-mm-dd hh:mm:ss
      */
     function setStartTime($startTime)
     {
@@ -74,7 +74,7 @@ class PageVO
     }
     /**
      * Set end time of this survey
-     * @param $endTime
+     * @param $endTime String
      */
     function setEndTime($endTime)
     {
@@ -83,7 +83,7 @@ class PageVO
     }
     /**
      * Set duration of this survey, must be Integer
-     * @param $duration
+     * @param $duration Integer
      */
     function setDuration($duration)
     {
@@ -92,7 +92,7 @@ class PageVO
     }
     /**
      * get created time of this survey
-     * @param $createTime create time of this survey
+     * @param $createTime String create time of this survey
      */
     function setCreateTime($createTime)
     {
@@ -100,7 +100,7 @@ class PageVO
     }
     /**
      * Set author of this survey
-     * @param $author
+     * @param $author String
      */
     function setAuthor($author)
     {
@@ -108,7 +108,7 @@ class PageVO
     }
     /**
      * Set phone of this survey , which is used to activate/deactivate survey
-     * @param $phone
+     * @param $phone String
      */
     function setPhone($phone)
     {
@@ -116,7 +116,7 @@ class PageVO
     }
     /**
      * set whether the suvey needs to sms back to the voters
-     * @param $smsRequired
+     * @param $smsRequired Boolean
      */
     function setSMSRequired($smsRequired)
     {
@@ -124,7 +124,7 @@ class PageVO
     }
     /**
      * set whether allow graph is shown in voting
-     * @param $showGraph
+     * @param $showGraph Boolean
      */
     function setShowGraphEnd($showGraph)
     {
@@ -133,7 +133,7 @@ class PageVO
     /**
      * Set Top n presentations would be displayed
      *
-     * @param top
+     * @param $top Integer
      */
     function setDisplayTop($top)
     {
@@ -141,7 +141,7 @@ class PageVO
     }
     /**
      * Set how many times of multi-votes
-     * @param $times
+     * @param $times Integer
      */
     function setVotesAllowed($times)
     {
@@ -149,7 +149,7 @@ class PageVO
     }
     /**
      * set type of Survey
-     * @param $surveyType
+     * @param $surveyType Integer
      */
     function setType($surveyType)
     {
@@ -158,7 +158,7 @@ class PageVO
     /**
      * Set multi choices of this survey
      *
-     * @param $surveys
+     * @param $surveys Array
      */
     function setSurveys(array $surveys)
     {
@@ -166,7 +166,7 @@ class PageVO
     }
     /**
      * Subtract wrong answers from points
-     * @param $subtractWrong boolean
+     * @param $subtractWrong Boolean
      */
     function setSubtractWrong($subtractWrong)
     {
@@ -233,7 +233,7 @@ class PageVO
     }
     /**
      * get starting time of this survey
-     * @return datetime start time of this survey
+     * @return String start time of this survey
      */
     function getStartTime()
     {
@@ -241,7 +241,7 @@ class PageVO
     }
     /**
      * get finishing time of this survey
-     * @return datetime finishing time of this survey
+     * @return String finishing time of this survey
      */
     function getEndTime()
     {
@@ -249,7 +249,7 @@ class PageVO
     }
     /**
      * get duration of this survey
-     * @return int duration of this survey
+     * @return Integer duration of this survey
      */
     function getDuration()
     {
@@ -273,7 +273,7 @@ class PageVO
     }
     /**
      * get created time of this survey
-     * @return datatime created time of this survey
+     * @return String created time of this survey
      */
     function getCreateTime()
     {
@@ -281,7 +281,7 @@ class PageVO
     }
     /**
      * Check wether the survey needs to sms back to voters
-     * @return allow as 1, forbid as 0
+     * @return Boolean
      *
      */
     function isSMSRequired()
@@ -290,7 +290,7 @@ class PageVO
     }
     /**
      * Check wether the survey allows to show graph in voting
-     * @return allow as 1, forbid as 0
+     * @return Boolean
      *
      */
     function getShowGraphEnd()
@@ -299,14 +299,11 @@ class PageVO
     }
     /**
      * Should incorrect answers be subtracted from points
-     * @return boolean
+     * @return Boolean
      */
     function getSubtractWrong()
     {
-        if($this->subtractWrong)
-            return '1';
-        else
-            return '0';
+        return $this->subtractWrong;
     }
     /**
      * @return Integer $type Type of survey
@@ -348,7 +345,7 @@ class PageVO
     }
     /**
      * Get privacy level of this Page
-     * @return integer
+     * @return Integer
      */
     function getPrivacy()
     {
@@ -390,7 +387,7 @@ class PageVO
     }
     /**
      * get mulit choices in this survey
-     * @return array(SurveyVO) a array of choices in this survey
+     * @return Array of SurveyVO
      */
     function &getSurveys()
     {
@@ -406,7 +403,7 @@ class PageVO
     }
     /**
      * get one survey by its surveyID
-     * @param $id id of the survey
+     * @param $id Integer id of the survey
      * @return SurveyVO $surveyVO
      */
     function getSurveyBySurveyID($id)
@@ -421,7 +418,7 @@ class PageVO
     /**
      * Validate whether matchs the requried data format
      * @param $date String date
-     * @return return date if true, tigger a error if false
+     * @return String date if true, tigger a error if false
      */
     function validateDate($date)
     {
@@ -433,7 +430,7 @@ class PageVO
     /**
      * Get the status of the survey/page
      *
-     * @return values of 'ready', 'active' or 'ended'
+     * @return String values of 'ready', 'active' or 'ended'
      */
     function getStatus()
     {
@@ -456,7 +453,7 @@ class PageVO
      * If current unix time cannot fit into an integer,
      * end time will be equal to start time.
      *
-     * @return new value of end time
+     * @return String new value of end time
      */
     private function renewEndTime()
     {

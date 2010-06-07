@@ -27,7 +27,7 @@ class ProcessSurvey extends SpecialPage
     /**
      * Mandatory execute function for a Special Page
      *
-     * @param $par
+     * @param $par String
      */
     function execute( $par = null )
     {

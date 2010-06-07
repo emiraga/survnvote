@@ -295,7 +295,7 @@ END_SCRIPT;
     }
     /**
      *
-     * @param  $page PageVO
+     * @param $page PageVO
      */
     function fillValuesFromSurveys(&$surveys)
     {

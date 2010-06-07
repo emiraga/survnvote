@@ -19,7 +19,7 @@ class PresentationVO
     /**
      * set Survey ID of presentation
      *
-     * @param $surveyID
+     * @param $surveyID Integer
      */
     public function setSurveyID($surveyID)
     {
@@ -28,24 +28,25 @@ class PresentationVO
     /**
      * set presentation ID
      *
-     * @param $presentationID
+     * @param $presentationID Integer
      */
     public function setPresentationID($presentationID)
     {
         $this->presentationID = $presentationID;
     }
     /**
-     * set presentation
-     * @param $presentation
+     * Set presentation
+     *
+     * @param $presentation String
      */
     public function setPresentation($presentation)
     {
         $this->presentation = $presentation;
     }
     /**
-     * set whether the presentation is active
+     * Set whether the presentation is active
      *
-     * @param $active
+     * @param $active Boolean
      */
     public function setActive($active)
     {
@@ -53,14 +54,14 @@ class PresentationVO
     }
     /**
      * set how many points the presentation gets
-     * @param $mark
+     * @param $mark Integer
      */
     public function setMark($mark)
     {
         $this->mark = $mark;
     }
     /**
-     * @return integer $surveyID
+     * @return Integer $surveyID
      */
     public function getSurveyID()
     {
@@ -69,7 +70,7 @@ class PresentationVO
     /**
      * get ID of presentation
      *
-     * @return integer $presentationID
+     * @return Integer $presentationID
      */
     public function getPresentationID()
     {
@@ -78,7 +79,7 @@ class PresentationVO
     /**
      * get the presentation content
      *
-     * @return string $presentation
+     * @return String $presentation
      */
     public function getPresentation()
     {
@@ -87,19 +88,16 @@ class PresentationVO
     /**
      * get whether the presentation is acitved
      *
-     * @return bool $active
+     * @return Boolean $active
      */
     public function getActive()
     {
-        if ($this->active)
-            return '1';
-        else
-            return '0';
+        return $this->active;
     }
     /**
      * get how many marks this presentation gets
      *
-     * @return integer marks
+     * @return Integer marks
      */
     public function getMark()
     {

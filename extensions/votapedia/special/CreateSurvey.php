@@ -222,8 +222,8 @@ class CreateSurvey
      * Remove prefix and suffix from category list
      * $vgCatRemovePrefix, $vgCatRemoveSuffix
      *
-     * @param $cats array of category names
-     * @return array without prefixes and suffixes
+     * @param $cats Array of category names
+     * @return Array without prefixes and suffixes
      */
     function removePrefSufCategories($cats)
     {
@@ -312,7 +312,7 @@ class CreateSurvey
     /**
      * Insert new page in mediawiki and votapedia database
      *
-     * @param $values associative array with values from form
+     * @param $values Array associative array with values from form
      */
     function insertPage($values)
     {
@@ -350,10 +350,10 @@ class CreateSurvey
     /**
      * Insert wiki page, optionaly resolve duplicates
      *
-     * @param $newtitle Title of wiki page
-     * @param $wikiText text which will be written to wiki page
-     * @param $resolveDuplicates Should script rename page if it already exists
-     * @return error string if there are duplicates
+     * @param $newtitle String Title of wiki page
+     * @param $wikiText String text which will be written to wiki page
+     * @param $resolveDuplicates Boolean Should script rename page if it already exists
+     * @return String error string if there are duplicates
      */
     function insertWikiPage($newtitle, $wikiText, $resolveDuplicates = false)
     {
@@ -395,7 +395,7 @@ class CreateSurvey
     }
     /**
      *
-     * @param  $page PageVO
+     * @param $page PageVO
      */
     function fillFormValuesFromPage(PageVO &$page)
     {
@@ -560,7 +560,7 @@ class CreateSurvey
     /**
      * Mandatory execute function for a Special Page
      * 
-     * @param $par
+     * @param $par String
      */
     function execute( $par = null )
     {
@@ -616,8 +616,6 @@ class CreateSurvey
     }
     /**
      * Draw form for new survey using FormControl
-     *
-     * @param $errors string containing potential errors
      */
     protected function drawFormNew()
     {
@@ -633,8 +631,8 @@ class CreateSurvey
     /**
      * Draw form for editing surveys using FormControl
      *
-     * @param $page_id
-     * @param $errors string containing potential errors
+     * @param $page_id Integer
+     * @param $errors String containing potential errors
      */
     protected function drawFormEdit( $page_id )
     {

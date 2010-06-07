@@ -22,7 +22,6 @@ class SurveyVO
     private $points = 0;
     private $choices = array();
     private $presentations = array();
-    //private $isUpdated = false;
     private $votesAllowed=1;
 
     //Reduntant info from PageVO
@@ -30,7 +29,7 @@ class SurveyVO
 
     /**
      * Set pageID
-     * @param $id
+     * @param $id Integer
      */
     function setPageID($id)
     {
@@ -38,7 +37,7 @@ class SurveyVO
     }
     /**
      * Set an ID of this survey
-     * @param $id
+     * @param $id Integer
      */
     function setSurveyID($id)
     {
@@ -46,7 +45,7 @@ class SurveyVO
     }
     /**
      * Set question of this survey
-     * @param $question
+     * @param $question String
      */
     function setQuestion($question)
     {
@@ -57,8 +56,9 @@ class SurveyVO
             throw new SurveyException("SurveyVO: Question cannot be a empty!",102);
     }
     /**
-     * set the answer of survey
-     * @param $answer
+     * Set the answer of survey
+     * 
+     * @param $answer Integer
      */
     function setAnswer($answer)
     {
@@ -71,6 +71,10 @@ class SurveyVO
             throw new SurveyException("SurveyVO: Answer of a question must be an integer");
         }
     }
+    /**
+     * Set the answer of survey
+     * @param $answer String
+     */
     function setAnswerByChoice($answer)
     {
         $choiceid = 1;
@@ -89,7 +93,7 @@ class SurveyVO
     /**
      * Set points of the question/survey
      *
-     * @param $points
+     * @param $points Integer
      */
     function setPoints($points)
     {
@@ -101,8 +105,9 @@ class SurveyVO
             throw new SurveyException("SurveyVO: Points of a question must be an Integer!",101);
     }
     /**
-     * Set mulit choices of this survey
-     * @param $choices
+     * Set multi choices of this survey
+     *
+     * @param $choices Array of ChoiceVO
      */
     function setChoices(array $choices)
     {
@@ -111,7 +116,7 @@ class SurveyVO
     /**
      * Generate choices from the array of strings
      *
-     * @param $values array of strings
+     * @param $values Array of strings
      */
     function generateChoices(array $values, $urldecode = false)
     {
@@ -136,16 +141,16 @@ class SurveyVO
     /**
      * Set multiple presentations of this survey
      *
-     * @param $presentations
+     * @param $presentations Array of PresentationVO
      */
-    function setPresentations(array $presentations)
+    function setPresentations($presentations)
     {
         $this->presentations = $presentations;
     }
     /**
      * Set type of Survey
      *
-     * @param $surveyType
+     * @param $surveyType Integer
      */
     function setType($surveyType)
     {
@@ -154,14 +159,15 @@ class SurveyVO
     /**
      * Set number of votes allowed per one user
      *
-     * @param $votesAllowed
+     * @param $votesAllowed Integer
      */
     function setVotesAllowed($votesAllowed)
     {
         $this->votesAllowed = $votesAllowed;
     }
     /**
-     * get page ID
+     * Get page ID
+     * 
      * @return Integer $pageID
      */
     function getPageID()
@@ -169,8 +175,9 @@ class SurveyVO
         return $this->pageID;
     }
     /**
-     * get survey ID of this survey
-     * @return integer ID of the survey which contains this choice
+     * Get survey ID of this survey
+     * 
+     * @return Integer ID of the survey which contains this choice
      */
     function getSurveyID()
     {
@@ -178,7 +185,7 @@ class SurveyVO
     }
     /**
      * get question of this survey
-     * @return string quesion of this survey
+     * @return String quesion of this survey
      */
     function getQuestion()
     {
@@ -187,7 +194,7 @@ class SurveyVO
     /**
      * Get the answer of survey
      *
-     * @return integer $answer
+     * @return Integer $answer
      */
     function getAnswer()
     {
@@ -196,7 +203,7 @@ class SurveyVO
     /**
      * get the points of this survey
      *
-     * @return integer $points
+     * @return Integer $points
      */
     function getPoints()
     {
@@ -204,7 +211,7 @@ class SurveyVO
     }
 
     /**
-     * @return integer $type Type of survey
+     * @return Integer $type Type of survey
      */
     function getType()
     {
@@ -212,7 +219,7 @@ class SurveyVO
     }
     /**
      * get mulit choices in this survey
-     * @return array $choices
+     * @return Array $choices
      */
     function &getChoices()
     {
@@ -220,15 +227,16 @@ class SurveyVO
     }
     /**
      * get the number of choices in this survey
-     * @return integer the number of choices included in this survey
+     * @return Integer the number of choices included in this survey
      */
     function getNumOfChoices()
     {
         return count($this->choices);
     }
     /**
-     * get one choice in this survey based on ID of this choice
-     * @param $i id of the choice which want to be retrieved
+     * Get one choice in this survey based on ID of this choice.
+     * 
+     * @param $i Integer id of the choice which want to be retrieved
      * @return ChoiceVO a choice
      */
     function getChoiceByNum($i)
@@ -239,8 +247,8 @@ class SurveyVO
             return false;
     }
     /**
-     * @param $receiver telephone number of the receiver
-     * @return integer choiceID
+     * @param $receiver String telephone number of the receiver
+     * @return Integer choiceID
      */
     /*function getChoiceIDByReceiver($receiver)
     {
@@ -253,24 +261,27 @@ class SurveyVO
         return null;
     }*/
     /**
-     * get multi presentations in this survey
-     * @return array a array of presentations in this survey
+     * Get multi presentations in this survey.
+     * 
+     * @return Array of presentations in this survey
      */
     function getPresentations()
     {
         return $this->presentations;
     }
     /**
-     * get the number of presentations in this survey
-     * @return integer the number of presentations included in this survey
+     * Get the number of presentations in this survey.
+     * 
+     * @return Integer the number of presentations included in this survey
      */
     function getNumOfPresentations()
     {
         return count($this->presentations);
     }
     /**
-     * get one choice in this survey based on ID of this choice
-     * @param $i id of the choice which want to be retrieved
+     * Get one choice in this survey based on ID of this choice.
+     * 
+     * @param $i Integer id of the choice which want to be retrieved
      * @return PresentationVO a presentation
      */
     function getPresentationByNum($i)
@@ -281,7 +292,7 @@ class SurveyVO
             return false;
     }
     /**
-     * @return integer number of votes allowed
+     * @return Integer number of votes allowed
      */
     function getVotesAllowed()
     {
@@ -290,7 +301,7 @@ class SurveyVO
     /**
      * Get the current active presentation
      *
-     * @return PresentationVO $presentation
+     * @return PresentationVO presentation
      */
     function getActivePresentationID()
     {
@@ -302,7 +313,9 @@ class SurveyVO
         return 0;
     }
     /**
-     * Convert to XML
+     * Convert to XML.
+     * 
+     * @return String
      */
     function toXML()
     {

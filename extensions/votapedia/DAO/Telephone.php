@@ -61,7 +61,7 @@ class Telephone
     /**
      * Get a list of all phones from database
      *
-     * @return list of all phones
+     * @return Array list of all phones
      */
     function getAllPhones()
     {
@@ -70,8 +70,8 @@ class Telephone
     /**
      * Calculate next sequential phone number
      *
-     * @param $phone string phone
-     * @return next phone in sequene
+     * @param $phone String phone
+     * @return String next phone in sequence
      */
     private function nextPhone($phone)
     {
@@ -89,8 +89,8 @@ class Telephone
     /**
      * Categorize sequential telephones to groups
      *
-     * @param $telephones a list of phones
-     * @return a list of groups of sequential phones
+     * @param $telephones Array a list of phones
+     * @return Array a list of groups of sequential phones
      */
     function makeGroups($telephones)
     {
@@ -117,10 +117,8 @@ class Telephone
     /**
      * For a given survey allocate available phones.
      *
-     * @param $survey
-     * @param $listedPhones represents the history of used phones history by the author
-     * @param $history represents the history of used block
-     * @param $availablePhones  available phones now
+     * @param $survey SurveyVO
+     * @param $groups Array
      */
     public function allocatePhonesSequence(SurveyVO &$survey, &$groups)
     {
@@ -144,10 +142,8 @@ class Telephone
     /**
      * For a given survey allocate available phones.
      *
-     * @param $survey
-     * @param $listedPhones represents the history of used phones history by the author
-     * @param $history represents the history of used block
-     * @param $availablePhones  available phones now
+     * @param $survey SurveyVO
+     * @param $availablePhones Array available phones
      */
     public function allocatePhones(SurveyVO &$survey, &$availablePhones)
     {

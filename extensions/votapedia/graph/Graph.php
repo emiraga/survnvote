@@ -45,7 +45,7 @@ abstract class Graph
     /**
      * Get link to image;
      *
-     * @return link to the image of graph
+     * @return String link to the image of graph
      */
     public function getImageLink()
     {
@@ -59,11 +59,11 @@ abstract class Graph
     /**
      * Get HTML code that contains graph image.
      *
-     * @param $id String HTML value of ID for image
+     * @param $imgid String HTML value of ID for image
      */
-    public function getHTMLImage($id)
+    public function getHTMLImage($imgid)
     {
-        return "<img id=\"$id\" width=\"{$this->width}\" height=\"{$this->height}\" "
+        return "<img id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
                 ."src=\"{$this->getImageLink()}\">";
     }
     /**
