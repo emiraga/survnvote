@@ -78,14 +78,14 @@ class VoteVO
         return $this->votesAllowed;
     }
     /**
-     * @param $pageid Integer
+     * @param Integer $pageid
      */
     public function setPageID($pageid)
     {
         $this->pageID = $pageid;
     }
     /**
-     * @param $surveyid Integer
+     * @param Integer $surveyid
      */
     public function setSurveyID($surveyid)
     {
@@ -93,7 +93,7 @@ class VoteVO
     }
     /**
      *
-     * @param $choiceid Integer
+     * @param Integer $choiceid
      */
     public function setChoiceID($choiceid)
     {
@@ -101,7 +101,7 @@ class VoteVO
     }
     /**
      *
-     * @param $presentationid Integer
+     * @param Integer $presentationid
      */
     public function setPresentationID ($presentationid)
     {
@@ -109,7 +109,7 @@ class VoteVO
     }
     /**
      *
-     * @param $voterid String
+     * @param String $voterid
      */
     public function setVoterID($voterid)
     {
@@ -117,7 +117,7 @@ class VoteVO
     }
     /**
      *
-     * @param $votedate String
+     * @param String $votedate
      */
     public function setVoteDate($votedate)
     {
@@ -125,7 +125,7 @@ class VoteVO
     }
     /**
      *
-     * @param $votetype String 'CALL', 'WEB' or 'SMS'
+     * @param String $votetype 'CALL', 'WEB' or 'SMS'
      */
     public function setVoteType($votetype)
     {
@@ -136,7 +136,7 @@ class VoteVO
     }
     /**
      * Set number of allowed votes per user
-     * @param $numvotes Integer
+     * @param Integer $numvotes
      */
     public function setVotesAllowed($numvotes)
     {

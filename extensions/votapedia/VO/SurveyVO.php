@@ -29,7 +29,7 @@ class SurveyVO
 
     /**
      * Set pageID
-     * @param $id Integer
+     * @param Integer $id
      */
     function setPageID($id)
     {
@@ -37,7 +37,7 @@ class SurveyVO
     }
     /**
      * Set an ID of this survey
-     * @param $id Integer
+     * @param Integer $id
      */
     function setSurveyID($id)
     {
@@ -45,7 +45,7 @@ class SurveyVO
     }
     /**
      * Set question of this survey
-     * @param $question String
+     * @param String $question
      */
     function setQuestion($question)
     {
@@ -58,7 +58,7 @@ class SurveyVO
     /**
      * Set the answer of survey
      * 
-     * @param $answer Integer
+     * @param Integer $answer
      */
     function setAnswer($answer)
     {
@@ -73,7 +73,7 @@ class SurveyVO
     }
     /**
      * Set the answer of survey
-     * @param $answer String
+     * @param String $answer
      */
     function setAnswerByChoice($answer)
     {
@@ -93,7 +93,7 @@ class SurveyVO
     /**
      * Set points of the question/survey
      *
-     * @param $points Integer
+     * @param Integer $points
      */
     function setPoints($points)
     {
@@ -107,7 +107,7 @@ class SurveyVO
     /**
      * Set multi choices of this survey
      *
-     * @param $choices Array of ChoiceVO
+     * @param Array $choices of ChoiceVO
      */
     function setChoices(array $choices)
     {
@@ -116,7 +116,7 @@ class SurveyVO
     /**
      * Generate choices from the array of strings
      *
-     * @param $values Array of strings
+     * @param Array $values of strings
      */
     function generateChoices(array $values, $urldecode = false)
     {
@@ -141,7 +141,7 @@ class SurveyVO
     /**
      * Set multiple presentations of this survey
      *
-     * @param $presentations Array of PresentationVO
+     * @param Array $presentations of PresentationVO
      */
     function setPresentations($presentations)
     {
@@ -150,7 +150,7 @@ class SurveyVO
     /**
      * Set type of Survey
      *
-     * @param $surveyType Integer
+     * @param Integer $surveyType
      */
     function setType($surveyType)
     {
@@ -159,7 +159,7 @@ class SurveyVO
     /**
      * Set number of votes allowed per one user
      *
-     * @param $votesAllowed Integer
+     * @param Integer $votesAllowed
      */
     function setVotesAllowed($votesAllowed)
     {
@@ -236,7 +236,7 @@ class SurveyVO
     /**
      * Get one choice in this survey based on ID of this choice.
      * 
-     * @param $i Integer id of the choice which want to be retrieved
+     * @param Integer $i id of the choice which want to be retrieved
      * @return ChoiceVO a choice
      */
     function getChoiceByNum($i)
@@ -247,7 +247,7 @@ class SurveyVO
             return false;
     }
     /**
-     * @param $receiver String telephone number of the receiver
+     * @param String $receiver telephone number of the receiver
      * @return Integer choiceID
      */
     /*function getChoiceIDByReceiver($receiver)
@@ -281,7 +281,7 @@ class SurveyVO
     /**
      * Get one choice in this survey based on ID of this choice.
      * 
-     * @param $i Integer id of the choice which want to be retrieved
+     * @param Integer $i id of the choice which want to be retrieved
      * @return PresentationVO a presentation
      */
     function getPresentationByNum($i)

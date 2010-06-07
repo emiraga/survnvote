@@ -43,7 +43,7 @@ class PageVO
     }
     /**
      * Set an ID of this survey
-     * @param $id Integer
+     * @param Integer $id
      */
     function setPageID($id)
     {
@@ -52,7 +52,7 @@ class PageVO
     /**
      * Set question of this survey
      *
-     * @param $title String
+     * @param String $title
      */
     function setTitle($title)
     {
@@ -65,7 +65,7 @@ class PageVO
     /**
      * Set start time of this survey, must match the required date format
      *
-     * @param $startTime String yyyy-mm-dd hh:mm:ss
+     * @param String $startTime yyyy-mm-dd hh:mm:ss
      */
     function setStartTime($startTime)
     {
@@ -74,7 +74,7 @@ class PageVO
     }
     /**
      * Set end time of this survey
-     * @param $endTime String
+     * @param String $endTime
      */
     function setEndTime($endTime)
     {
@@ -83,7 +83,7 @@ class PageVO
     }
     /**
      * Set duration of this survey, must be Integer
-     * @param $duration Integer
+     * @param Integer $duration
      */
     function setDuration($duration)
     {
@@ -92,7 +92,7 @@ class PageVO
     }
     /**
      * get created time of this survey
-     * @param $createTime String create time of this survey
+     * @param String $createTime create time of this survey
      */
     function setCreateTime($createTime)
     {
@@ -100,7 +100,7 @@ class PageVO
     }
     /**
      * Set author of this survey
-     * @param $author String
+     * @param String $author
      */
     function setAuthor($author)
     {
@@ -108,7 +108,7 @@ class PageVO
     }
     /**
      * Set phone of this survey , which is used to activate/deactivate survey
-     * @param $phone String
+     * @param String $phone
      */
     function setPhone($phone)
     {
@@ -116,7 +116,7 @@ class PageVO
     }
     /**
      * set whether the suvey needs to sms back to the voters
-     * @param $smsRequired Boolean
+     * @param Boolean $smsRequired
      */
     function setSMSRequired($smsRequired)
     {
@@ -124,7 +124,7 @@ class PageVO
     }
     /**
      * set whether allow graph is shown in voting
-     * @param $showGraph Boolean
+     * @param Boolean $showGraph
      */
     function setShowGraphEnd($showGraph)
     {
@@ -133,7 +133,7 @@ class PageVO
     /**
      * Set Top n presentations would be displayed
      *
-     * @param $top Integer
+     * @param Integer $top
      */
     function setDisplayTop($top)
     {
@@ -141,7 +141,7 @@ class PageVO
     }
     /**
      * Set how many times of multi-votes
-     * @param $times Integer
+     * @param Integer $times
      */
     function setVotesAllowed($times)
     {
@@ -149,7 +149,7 @@ class PageVO
     }
     /**
      * set type of Survey
-     * @param $surveyType Integer
+     * @param Integer $surveyType
      */
     function setType($surveyType)
     {
@@ -158,7 +158,7 @@ class PageVO
     /**
      * Set multi choices of this survey
      *
-     * @param $surveys Array
+     * @param Array $surveys
      */
     function setSurveys(array $surveys)
     {
@@ -166,7 +166,7 @@ class PageVO
     }
     /**
      * Subtract wrong answers from points
-     * @param $subtractWrong Boolean
+     * @param Boolean $subtractWrong
      */
     function setSubtractWrong($subtractWrong)
     {
@@ -175,7 +175,7 @@ class PageVO
     /**
      * Privacy level of this Page
      *
-     * @param $privacy Integer
+     * @param Integer $privacy
      */
     function setPrivacy($privacy)
     {
@@ -184,7 +184,7 @@ class PageVO
     /**
      * Privacy level of this Page
      *
-     * @param $privacy Integer
+     * @param Integer $privacy
      */
     function setPrivacyByName($privacy)
     {
@@ -200,7 +200,7 @@ class PageVO
     /**
      * Set the voting options, 'anon', 'yes' or 'no'
      *
-     * @param $vote String
+     * @param String $vote
      */
     function setPhoneVoting($vote)
     {
@@ -209,7 +209,7 @@ class PageVO
     /**
      * Set the voting options, 'anon', 'yes' or 'no'
      *
-     * @param $vote String
+     * @param String $vote
      */
     function setWebVoting($vote)
     {
@@ -403,7 +403,7 @@ class PageVO
     }
     /**
      * get one survey by its surveyID
-     * @param $id Integer id of the survey
+     * @param Integer $id id of the survey
      * @return SurveyVO $surveyVO
      */
     function getSurveyBySurveyID($id)
@@ -417,7 +417,7 @@ class PageVO
     }
     /**
      * Validate whether matchs the requried data format
-     * @param $date String date
+     * @param String $date date
      * @return String date if true, tigger a error if false
      */
     function validateDate($date)

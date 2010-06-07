@@ -92,7 +92,7 @@ class ChoiceVO
     }
     /**
      * Set choice ID
-     * @param $choiceID Integer
+     * @param Integer $choiceID
      */
     public function setChoiceID($choiceID)
     {
@@ -101,7 +101,7 @@ class ChoiceVO
     /**
      * Set choice content of this choice
      * 
-     * @param $choice String
+     * @param String $choice
      */
     public function setChoice($choice)
     {
@@ -110,7 +110,7 @@ class ChoiceVO
     /**
      * Set survey ID which includes this choice
      *
-     * @param $surveyID Integer
+     * @param Integer $surveyID
      */
     public function setSurveyID($surveyID)
     {
@@ -118,7 +118,7 @@ class ChoiceVO
     }
     /**
      * Set page ID which includes this survey with choice
-     * @param $pageID Integer
+     * @param Integer $pageID
      */
     public function setPageID($pageID)
     {
@@ -126,7 +126,7 @@ class ChoiceVO
     }
     /**
      * Set receiving telepone number for this choice
-     * @param $receiver String
+     * @param String $receiver
      */
     public function setReceiver($receiver)
     {
@@ -135,7 +135,7 @@ class ChoiceVO
     /**
      * Set SMS for this choice.
      * 
-     * @param $SMS String
+     * @param String $SMS
      */
     public function setSMS($SMS)
     {
@@ -144,7 +144,7 @@ class ChoiceVO
     /**
      * Set number of votes for this choice
      *
-     * @param $vote Integer
+     * @param Integer $vote
      */
     public function setVote($vote)
     {
@@ -153,7 +153,7 @@ class ChoiceVO
     /**
      * Set points for this choice
      *
-     * @param $points Integer
+     * @param Integer $points
      */
     public function setPoints($points)
     {
@@ -162,8 +162,8 @@ class ChoiceVO
     /**
      * Function for comparison of two choices based on number of votes.
      *
-     * @param $a ChoiceVO
-     * @param $b ChoiceVO
+     * @param ChoiceVO $a
+     * @param ChoiceVO $b
      * @return Integer result of comparison
      */
     static public function cmp_votes(ChoiceVO $a, ChoiceVO $b)

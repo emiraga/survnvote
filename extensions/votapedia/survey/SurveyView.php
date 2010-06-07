@@ -27,10 +27,10 @@ class SurveyView
     /**
      * Function called for the &lt;SurveyChoice&gt; tag
      *
-     * @param $input String text between tags
-     * @param $args Array tag arguments
-     * @param $parser Parser of Mediawiki
-     * @param $frame Unknown
+     * @param String $input text between tags
+     * @param Array $args tag arguments
+     * @param Parser $parser of Mediawiki
+     * @param Unknown $frame
      */
     static function executeTag( $input, $args, $parser, $frame = NULL )
     {
@@ -52,8 +52,8 @@ class SurveyView
     /**
      * Function called for the Survey magic tag.
      *
-     * @param $parser Parser mediawiki type
-     * @param $page_id Integer page identifier
+     * @param Parser $parser mediawiki type
+     * @param Integer $page_id page identifier
      */
     static function executeMagic($parser, $page_id) //do not change arguments
 
@@ -64,9 +64,9 @@ class SurveyView
         return array($output, 'noparse' => false);
     }
     /**
-     * @param $page_id Integer
-     * @param $parser MwParser
-     * @param $surveybuttons SurveyButtons
+     * @param Integer $page_id
+     * @param MwParser $parser
+     * @param SurveyButtons $surveybuttons
      */
     function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
     {
@@ -185,7 +185,7 @@ class SurveyView
     /**
      * AJAX call for choices preview
      *
-     * @param $text String multiline choices wiki code
+     * @param String $text multiline choices wiki code
      * @return String HTML code for choices
      */
     static function getChoices($text)
@@ -207,7 +207,7 @@ class SurveyView
     /**
      * AJAX call to get preview of choioe
      *
-     * @param $line String wiki code for choice
+     * @param String $line wiki code for choice
      * @return String HTML code of preview of choice
      */
     static function getChoice($line)

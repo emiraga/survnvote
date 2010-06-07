@@ -19,7 +19,7 @@ class PresentationVO
     /**
      * set Survey ID of presentation
      *
-     * @param $surveyID Integer
+     * @param Integer $surveyID
      */
     public function setSurveyID($surveyID)
     {
@@ -28,7 +28,7 @@ class PresentationVO
     /**
      * set presentation ID
      *
-     * @param $presentationID Integer
+     * @param Integer $presentationID
      */
     public function setPresentationID($presentationID)
     {
@@ -37,7 +37,7 @@ class PresentationVO
     /**
      * Set presentation
      *
-     * @param $presentation String
+     * @param String $presentation
      */
     public function setPresentation($presentation)
     {
@@ -46,7 +46,7 @@ class PresentationVO
     /**
      * Set whether the presentation is active
      *
-     * @param $active Boolean
+     * @param Boolean $active
      */
     public function setActive($active)
     {
@@ -54,7 +54,7 @@ class PresentationVO
     }
     /**
      * set how many points the presentation gets
-     * @param $mark Integer
+     * @param Integer $mark
      */
     public function setMark($mark)
     {

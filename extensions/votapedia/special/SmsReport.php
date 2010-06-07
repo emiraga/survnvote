@@ -28,7 +28,7 @@ class SmsReport extends SpecialPage
     /**
      * Mandatory execute function for a Special Page
      *
-     * @param $par String
+     * @param String $par
      */
     function execute( $par = null )
     {

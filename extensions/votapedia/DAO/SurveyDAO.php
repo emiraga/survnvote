@@ -64,9 +64,9 @@ class SurveyDAO
     /**
      * Execute query and return one result PageVO
      *
-     * @param $where String where statement in SQL
-     * @param $param Array ov values which will be included in sql query
-     * @param $loadSurveys Boolean
+     * @param String $where where statement in SQL
+     * @param Array $param ov values which will be included in sql query
+     * @param Boolean $loadSurveys
      * @return PageVO on success, false in does not exist
      */
     private function getOnePage($where, $param, $loadSurveys = true)
@@ -80,7 +80,7 @@ class SurveyDAO
     /**
      * Find surveys which are related with wiki page
      *
-     * @param $title String title of wiki page
+     * @param String $title title of wiki page
      * @return PageVO an Instance of PageVO
      */
     function findByPage($title)
@@ -93,8 +93,8 @@ class SurveyDAO
     /**
      * Find surveys which are related with wiki page
      *
-     * @param $id Integer IntegerID of wiki page
-     * @param $loadsurveys Boolean should we load all surveys
+     * @param Integer $id IntegerID of wiki page
+     * @param Boolean $loadsurveys should we load all surveys
      * @return PageVO An instance of PageVO
      * @version 2.0
      */
@@ -108,7 +108,7 @@ class SurveyDAO
     /**
      * Find a page object based on the vote from SMS
      * Assume that SMS is properly formated.
-     * @param $sms String properly formated SMS voting string
+     * @param String $sms properly formated SMS voting string
      * @return PageVO PageVO object, or Boolean false if error.
      */
     function findPageBySMS($sms)
@@ -119,8 +119,8 @@ class SurveyDAO
      * Insert Page into database, optionally it includes
      * survey /surveys, choices,and presentations (if survey type is Presentation)
      *
-     * @param $pageVO PageVO
-     * @param $insertSurveys Boolean should surveys be inserted as well
+     * @param PageVO $pageVO
+     * @param Boolean $insertSurveys should surveys be inserted as well
      */
     public function insertPage(PageVO &$pageVO, $insertSurveys = true)
     {
@@ -173,7 +173,7 @@ class SurveyDAO
      * survey /surveys, which survey type is Quiz),
      * choices,and presentations(if survey type is Presentation)
      *
-     * @param $pageVO PageVO
+     * @param PageVO $pageVO
      */
     public function updatePage(PageVO &$pageVO, $update_surveys = true)
     {
@@ -232,7 +232,7 @@ class SurveyDAO
      * Votes on choices,marks on presentation will be set to 0
      * All survey records would be deleted.
      *
-     * @param $pageVO PageVO
+     * @param PageVO $pageVO
      * @return Boolean true
      */
     function resetSurveys(PageVO $pageVO)
@@ -255,7 +255,7 @@ class SurveyDAO
      * Votes on choices,marks on presentation will be set to 0
      * All survey records would be deleted.
      *
-     * @param $surveyVO SurveyVO
+     * @param SurveyVO $surveyVO
      * @return Boolean true
      */
     function resetSurvey(SurveyVO $surveyVO)
@@ -269,7 +269,7 @@ class SurveyDAO
     /**
      * Insert a new survey contains multi choices,presentations
      *
-     * @param $survey SurveyVO an instance of SurveyVO
+     * @param SurveyVO $survey an instance of SurveyVO
      * @version 2.0
      */
     private function insertSurvey(SurveyVO &$survey)
@@ -333,7 +333,7 @@ class SurveyDAO
      * Delete a page which includes tables of page,
      * Survey,SuveyChoice,Presentation,SurveyRecord.
      *
-     * @param $id Integer id of a page
+     * @param Integer $id id of a page
      */
     function deletePage($id)
     {
@@ -347,7 +347,7 @@ class SurveyDAO
      * Survey,SuveyChoice,Presentation,SurveyRecord.
      * Page table would still be saved.
      *
-     * @param $id Integer id of a page
+     * @param Integer $id id of a page
      */
     function deleteSurveys($id)
     {
@@ -380,7 +380,7 @@ class SurveyDAO
     /**
      * private method. Using database record to fill in a SurveyVO.
      *
-     * @param $page PageVO page object
+     * @param PageVO $page page object
      * @return Array $surveys
      */
     private function loadSurveys(&$page)
@@ -420,8 +420,8 @@ class SurveyDAO
     /**
      * Private function. Get choices of a survey.
      *
-     * @param $surveyID Integer
-     * @param $pageID Integer
+     * @param Integer $surveyID
+     * @param Integer $pageID
      * @return Array choices
      * @version 2.0
      */
@@ -456,7 +456,7 @@ class SurveyDAO
     /**
      * Private function.Get presentations of a survey
      *
-     * @param $surveyID Integer
+     * @param Integer $surveyID
      * @return Array $presentations
      * @version 2.0
      */
@@ -505,8 +505,8 @@ class SurveyDAO
     /**
      * Calcuate the mark which choice gets
      *
-     * @param $choiceID Integer
-     * @param $numberOfChoices Integer
+     * @param Integer $choiceID
+     * @param Integer $numberOfChoices
      */
     private function evaluatePoints($choiceID, $numberOfChoices)
     {
@@ -516,8 +516,8 @@ class SurveyDAO
     /**
      * Activate a presentation in a survey
      *
-     * @param $surveyID Integer
-     * @param $presentationID Integer
+     * @param Integer $surveyID
+     * @param Integer $presentationID
      */
     function activatePresentation($surveyID,$presentationID)
     {
@@ -537,7 +537,7 @@ class SurveyDAO
     /**
      * This is function is to start a survey. It will set the start time in PageVO
      *
-     * @param $pageVO PageVO
+     * @param PageVO $pageVO
      */
     function startSurvey(PageVO &$pageVO)
     {
@@ -554,7 +554,7 @@ class SurveyDAO
      * This is function is to continue a survey.
      * It requires the time which the survey continue to run.
      *
-     * @param $pageVO PageVO
+     * @param PageVO $pageVO
      */
     function continueSurvey(PageVO $pageVO)
     {
@@ -571,7 +571,7 @@ class SurveyDAO
     /**
      * In finishing procedure, we automatically set current time as finishing time.
      *
-     * @param $pageVO PageVO
+     * @param PageVO $pageVO
      */
     function stopSurvey(PageVO $pageVO)
     {
@@ -584,7 +584,7 @@ class SurveyDAO
     /**
      * Update database and set new receivers and SMS from the PageVO object
      *
-     * @param $page PageVO
+     * @param PageVO $page
      */
     public function updateReceiversSMS(PageVO &$page)
     {

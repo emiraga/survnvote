@@ -222,7 +222,7 @@ class CreateSurvey
      * Remove prefix and suffix from category list
      * $vgCatRemovePrefix, $vgCatRemoveSuffix
      *
-     * @param $cats Array of category names
+     * @param Array $cats of category names
      * @return Array without prefixes and suffixes
      */
     function removePrefSufCategories($cats)
@@ -248,7 +248,7 @@ class CreateSurvey
     /**
      * Generate PageVO object from the values
      *
-     * @param $values Array associative array with values
+     * @param Array $values associative array with values
      * @return PageVO
      */
     protected function generatePageVO($values)
@@ -261,8 +261,8 @@ class CreateSurvey
     }
     /**
      *
-     * @param $page PageVO
-     * @param $values Array
+     * @param PageVO $page
+     * @param Array $values
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
@@ -283,8 +283,8 @@ class CreateSurvey
     /**
      * Only set values for things related to graphing
      * 
-     * @param $page PageVO
-     * @param $values Array
+     * @param PageVO $page
+     * @param Array $values
      */
     protected function setPageVOvaluesSmall(PageVO &$page, &$values)
     {
@@ -296,7 +296,7 @@ class CreateSurvey
     }
     /**
      *
-     * @param $values Array associative array
+     * @param Array $values associative array
      * @return Array array of SurveyVO
      */
     protected function generateSurveysArray($values)
@@ -312,7 +312,7 @@ class CreateSurvey
     /**
      * Insert new page in mediawiki and votapedia database
      *
-     * @param $values Array associative array with values from form
+     * @param Array $values associative array with values from form
      */
     function insertPage($values)
     {
@@ -350,9 +350,9 @@ class CreateSurvey
     /**
      * Insert wiki page, optionaly resolve duplicates
      *
-     * @param $newtitle String Title of wiki page
-     * @param $wikiText String text which will be written to wiki page
-     * @param $resolveDuplicates Boolean Should script rename page if it already exists
+     * @param String $newtitle Title of wiki page
+     * @param String $wikiText text which will be written to wiki page
+     * @param Boolean $resolveDuplicates Should script rename page if it already exists
      * @return String error string if there are duplicates
      */
     function insertWikiPage($newtitle, $wikiText, $resolveDuplicates = false)
@@ -395,7 +395,7 @@ class CreateSurvey
     }
     /**
      *
-     * @param $page PageVO
+     * @param PageVO $page
      */
     function fillFormValuesFromPage(PageVO &$page)
     {
@@ -560,7 +560,7 @@ class CreateSurvey
     /**
      * Mandatory execute function for a Special Page
      * 
-     * @param $par String
+     * @param String $par
      */
     function execute( $par = null )
     {
@@ -631,8 +631,8 @@ class CreateSurvey
     /**
      * Draw form for editing surveys using FormControl
      *
-     * @param $page_id Integer
-     * @param $errors String containing potential errors
+     * @param Integer $page_id
+     * @param String $errors containing potential errors
      */
     protected function drawFormEdit( $page_id )
     {

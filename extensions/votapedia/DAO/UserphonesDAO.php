@@ -25,7 +25,7 @@ class UserphonesDAO
     /**
      * Construct this class
      *
-     * @param $user MwUser
+     * @param MwUser $user
      */
     public function __construct(MwUser &$user)
     {
@@ -36,7 +36,7 @@ class UserphonesDAO
     /**
      * Add new phone number for this user
      *
-     * @param $number String
+     * @param String $number
      * @return Integer New insert ID
      */
     public function addNewPhone($number)
@@ -88,7 +88,7 @@ class UserphonesDAO
      * You should call checkConfirmAllowed() to see if it is allowed to request
      * another code.
      *
-     * @param $id Integer id of record
+     * @param Integer $id id of record
      * @return String conformation code
      */
     public function getConfirmCode($id)
@@ -108,7 +108,7 @@ class UserphonesDAO
     /**
      * Get phone number
      * 
-     * @param $id Integer record ID
+     * @param Integer $id record ID
      * @return String phone number
      */
     public function getPhoneNumber($id)
@@ -137,8 +137,8 @@ class UserphonesDAO
     /**
      * Verify if suplied code is valid
      *
-     * @param $id Integer id of a record
-     * @param $code String supplied code
+     * @param Integer $id id of a record
+     * @param String $code supplied code
      * @return Boolean true
      */
     public function verifyCode($id, $code)
@@ -163,7 +163,7 @@ class UserphonesDAO
     /**
      * Mark phone as deleted.
      *
-     * @param $id Integer record id
+     * @param Integer $id record id
      * @return Boolean true
      */
     public function deletePhone($id)
@@ -180,7 +180,7 @@ class UserphonesDAO
     /**
      * Resolve a username from given phone number.
      *
-     * @param $phone String telephone number
+     * @param String $phone telephone number
      * @return String username, or Boolean false if it does not exist.
      */
     static function getNameFromPhone($phone)
@@ -193,8 +193,8 @@ class UserphonesDAO
      * Add a phone number to the user and
      * automatically mark this phone number as verified.
      * 
-     * @param $username String
-     * @param $phone String
+     * @param String $username
+     * @param String $phone
      */
     static function addVerifiedPhone($username, $phone)
     {

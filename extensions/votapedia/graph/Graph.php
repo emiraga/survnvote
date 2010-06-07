@@ -5,10 +5,10 @@ if (!defined('MEDIAWIKI')) die();
  * function vfCutEncode
  * Cut long messages and URL encode them
  *
- * @param $str String message
- * @param $maxlen Integer maximum length of the message
- * @param $elipsis String append to the end of long messages
- * @param $encode Boolean do URL encoding
+ * @param String $str message
+ * @param Integer $maxlen maximum length of the message
+ * @param String $elipsis append to the end of long messages
+ * @param Boolean $encode do URL encoding
  * @return String processed string
  * @package Graphing
  */
@@ -36,7 +36,7 @@ abstract class Graph
     /**
      * Add values object GraphValues to the graph.
      *
-     * @param $val GraphValues
+     * @param GraphValues $val
      */
     function addValues(GraphValues $val)
     {
@@ -59,7 +59,7 @@ abstract class Graph
     /**
      * Get HTML code that contains graph image.
      *
-     * @param $imgid String HTML value of ID for image
+     * @param String $imgid HTML value of ID for image
      */
     public function getHTMLImage($imgid)
     {
@@ -87,7 +87,7 @@ abstract class Graph
     /**
      * Set width of an image.
      *
-     * @param $w Integer width
+     * @param Integer $w width
      */
     function setWidth($w)
     {
@@ -96,7 +96,7 @@ abstract class Graph
     /**
      * Set height of image
      *
-     * @param $h Integer height
+     * @param Integer $h height
      */
     function setHeight($h)
     {

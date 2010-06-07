@@ -73,7 +73,7 @@ class Sms
      * This allows you to delete or mark as processed old SMS, so that
      * they are not retrieved twice by the function getNewSms()
      *
-     * @param $id Integer id of previous sms
+     * @param Integer $id id of previous sms
      */
     static function processed($id)
     {
@@ -87,8 +87,8 @@ class Sms
      * 
      * Action which is performed when votapedia wants to send an SMS to certain number
      *
-     * @param $destination String destination number
-     * @param $message String message text
+     * @param String $destination destination number
+     * @param String $message message text
      */
     static function sendSMS($destination, $message)
     {

@@ -61,7 +61,7 @@ function vfGetAllNumbers()
     return $out;
 }
 /**
- * @param $number String input number from user
+ * @param String $number input number from user
  * @return String processed number
  */
 function vfProcessNumber($number)

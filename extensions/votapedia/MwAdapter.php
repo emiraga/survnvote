@@ -17,7 +17,7 @@ class MwAdapter
     /**
      * Purge the cache of a page with a given title
      *
-     * @param $title String title of wiki page
+     * @param String $title title of wiki page
      */
     function purgePage($title)
     {
@@ -34,7 +34,7 @@ class MwAdapter
     /**
      * Get a list of subcategories of a category
      * 
-     * @param $category String Name of a category
+     * @param String $category Name of a category
      * @return Array with a list of categories
      */
     function getSubCategories($category) // = )
@@ -60,7 +60,7 @@ class MwAdapter
     /**
      * Purge all members that belong to one category
      *
-     * @param $category String name of category
+     * @param String $category name of category
      */
     function purgeCategoryMembers( $category )
     {
@@ -88,9 +88,9 @@ class MwParser
     /** @var Boolean */       private $isTag;
 
     /**
-     * @param $parser Parser
-     * @param $options ParserOptions
-     * @param $title Title
+     * @param Parser $parser
+     * @param ParserOptions $options
+     * @param Title $title
      */
     public function __construct(Parser &$parser, ParserOptions &$options = NULL, Title $title = NULL)
     {
@@ -109,7 +109,7 @@ class MwParser
     /**
      * Parse the wiki text while removing untrusted tags from the code
      *
-     * @param $text String
+     * @param String $text
      */
     public function run($text, $linestart = false)
     {
@@ -241,7 +241,7 @@ class MwUser
     /**
      * Get user preferences and options
      *
-     * @param $option String option name
+     * @param String $option option name
      * @return String
      */
     public function getOption($option)
@@ -280,7 +280,7 @@ class MwUser
     /**
      * Remove unnecessary information from anonymous usernames
      *
-     * @param $name String name of user
+     * @param String $name name of user
      * @return String prepare name of user to be displayed
      */
     static function displayName($name)

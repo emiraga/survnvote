@@ -43,7 +43,7 @@ class Telephone
      * Initiate connection before using this function
      * Gets available telephones
      *
-     * @param $locked Boolean is this table locked, default false
+     * @param Boolean $locked is this table locked, default false
      * @return Array $telephone the array of available telephone numbers
      */
     function getAvailablePhones()
@@ -70,7 +70,7 @@ class Telephone
     /**
      * Calculate next sequential phone number
      *
-     * @param $phone String phone
+     * @param String $phone phone
      * @return String next phone in sequence
      */
     private function nextPhone($phone)
@@ -89,7 +89,7 @@ class Telephone
     /**
      * Categorize sequential telephones to groups
      *
-     * @param $telephones Array a list of phones
+     * @param Array $telephones a list of phones
      * @return Array a list of groups of sequential phones
      */
     function makeGroups($telephones)
@@ -117,8 +117,8 @@ class Telephone
     /**
      * For a given survey allocate available phones.
      *
-     * @param $survey SurveyVO
-     * @param $groups Array
+     * @param SurveyVO $survey
+     * @param Array $groups
      */
     public function allocatePhonesSequence(SurveyVO &$survey, &$groups)
     {
@@ -142,8 +142,8 @@ class Telephone
     /**
      * For a given survey allocate available phones.
      *
-     * @param $survey SurveyVO
-     * @param $availablePhones Array available phones
+     * @param SurveyVO $survey
+     * @param Array $availablePhones available phones
      */
     public function allocatePhones(SurveyVO &$survey, &$availablePhones)
     {
@@ -160,7 +160,7 @@ class Telephone
      * Request receivers for choices in surveys contained in PageVO.
      * Updates database as well.
      *
-     * @param $page PageVO
+     * @param PageVO $page
      * @return Boolean true
      */
     function setupReceivers(PageVO &$page)
@@ -190,7 +190,7 @@ class Telephone
      * Updates database as well.
      * Throws TelephoneException in case of collision.
      *
-     * @param $page PageVO
+     * @param PageVO $page
      * @return Boolean true
      */
     private function setupReceiversTryOnce(PageVO &$page)
@@ -241,7 +241,7 @@ class Telephone
     /**
      * Delete receivers from a given PageVO
      *
-     * @param $page PageVO
+     * @param PageVO $page
      * @return Boolean true
      */
     function deleteReceivers(PageVO &$page)

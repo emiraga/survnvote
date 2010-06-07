@@ -18,7 +18,7 @@ class VoteDAO
     /** @var String */ private $name;
     
     /**
-     * @param $page PageVO
+     * @param PageVO $page
      */
     public function __construct(PageVO &$page, $username)
     {
@@ -26,11 +26,11 @@ class VoteDAO
         $this->name = $username;
     }
     /**
-     * @param $page PageVO
-     * @param $type String of a vote, CALL, SMS or WEB
-     * @param $surveyID Integer of a survey which want to be voted
-     * @param $choiceID Integer of a survey which voter wants to vote
-     * @param $presentationID Integer of a survey, could be NULL
+     * @param PageVO $page
+     * @param String $type of a vote, CALL, SMS or WEB
+     * @param Integer $surveyID of a survey which want to be voted
+     * @param Integer $choiceID of a survey which voter wants to vote
+     * @param Integer $presentationID of a survey, could be NULL
      * @return SurveyVO object
      */
     function newFromPage($type, $pageID, $surveyID, $choiceID, $presentationID = 0)
@@ -51,7 +51,7 @@ class VoteDAO
     /**
      * Check for validity of vote and add this vote to database
      *
-     * @param $vote VoteVO object
+     * @param VoteVO $vote object
      * @return Boolean true on success
      */
     function vote(VoteVO &$vote)

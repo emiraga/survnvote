@@ -51,7 +51,7 @@ function vfRequestNewUser($username, $password, $realname)
 /**
  * Pick a new username, create that account and send an SMS.
  *
- * @param $phonenumber String
+ * @param String $phonenumber
  * @package Daemon
  */
 function vfDaemonNewUser($phonenumber)
@@ -127,8 +127,8 @@ function vfDaemonSmsAction()
 /**
  * Find if such choice exists and vote for it.
  *
- * @param $choice String choice that user has coosen
- * @param $username String name of user
+ * @param String $choice choice that user has coosen
+ * @param String $username name of user
  * @package Daemon
  */
 function vfVoteFromDaemon($choice, $username)
@@ -152,8 +152,8 @@ function vfVoteFromDaemon($choice, $username)
 /**
  * Generate a random character string
  * 
- * @param $length Integer length of output string
- * @param $chars String used characters, default: all alpha-numeric characters
+ * @param Integer $length length of output string
+ * @param String $chars used characters, default: all alpha-numeric characters
  * @return String random string
  * @package Daemon
  */

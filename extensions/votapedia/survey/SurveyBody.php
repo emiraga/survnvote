@@ -46,9 +46,9 @@ class SurveyBody
     }
     /**
      *
-     * @param $choice String value of choice
-     * @param $image String path to image used as bullet
-     * @param $addtext String Put Extra HTML after this choice
+     * @param String $choice value of choice
+     * @param String $image path to image used as bullet
+     * @param String $addtext Put Extra HTML after this choice
      * @return String HTML code
      */
     static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
@@ -355,8 +355,8 @@ class SurveyBody
     /**
      * Parse multiline wiki code
      *
-     * @param $title String title of question
-     * @param $text String multiline string
+     * @param String $title title of question
+     * @param String $text multiline string
      *
      * @return String HTML code
      */
@@ -392,8 +392,8 @@ class QuestionnaireBody extends SurveyBody
 {
     /**
      *
-     * @param $page PageVO
-     * @param $parser MwParser
+     * @param PageVO $page
+     * @param MwParser $parser
      */
     function  __construct(PageVO &$page, MwParser &$parser)
     {
@@ -436,8 +436,8 @@ class QuizBody extends QuestionnaireBody
 {
     /**
      *
-     * @param $page PageVO
-     * @param $parser MwParser
+     * @param PageVO $page
+     * @param MwParser $parser
      */
     function  __construct(PageVO &$page, MwParser &$parser)
     {

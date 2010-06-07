@@ -42,7 +42,7 @@ def convert(file):
 			output += line2
 		else:
 			output += line
-	print output
+	open(file,"w").write(output)
 
 top = "c:\\xampp\\htdocs\\new\\extensions\\votapedia"
 for root, dirs, files in os.walk(top, topdown=False):

@@ -16,7 +16,7 @@ class FormControl
     /**
      * Constructor of FormControl
      *
-     * @param $items Array associative array of form items
+     * @param Array $items associative array of form items
      */
     public function __construct(&$items)
     {
@@ -34,9 +34,9 @@ class FormControl
     }
     /**
      * Helper function for user information panel
-     * @param $td1 String label for an item
-     * @param $td2 String item or null
-     * @param $td3 String optional help or null
+     * @param String $td1 label for an item
+     * @param String $td2 item or null
+     * @param String $td3 optional help or null
      * @return String xhtml block
      */
     private function TableRow( $td1, $td2 = null, $td3 = null, $td4=null )
@@ -116,8 +116,8 @@ class FormControl
     }
     /**
      * Set the value in form with given key(name)
-     * @param $name String the key
-     * @param $value String
+     * @param String $name the key
+     * @param String $value
      */
     public function setValue($name, $value)
     {
@@ -126,7 +126,7 @@ class FormControl
     /**
      * Read the value of form with given key(name)
      *
-     * @param $name String the key
+     * @param String $name the key
      * @return String values[$name]
      */
     public function getValue($name)
@@ -143,7 +143,7 @@ class FormControl
     }
     /**
      *
-     * @param $id String
+     * @param String $id
      */
     public function showItem($id)
     {
@@ -255,8 +255,8 @@ class FormControl
     /**
      * Adds a new tab to the output form
      *
-     * @param $title String tab name
-     * @param $add_items Array of names of form items to be shown in this tab
+     * @param String $title tab name
+     * @param Array $add_items of names of form items to be shown in this tab
      */
     public function AddPage($title, $add_items)
     {
@@ -287,8 +287,8 @@ class FormControl
     /**
      * Start drawing the form
      *
-     * @param $action String target of a HTML form
-     * @param $id Integer id inside HTML of form
+     * @param String $action target of a HTML form
+     * @param Integer $id id inside HTML of form
      */
     public function StartForm($action, $id='')
     {
@@ -305,7 +305,7 @@ class FormControl
     /**
      * End drawing the form
      *
-     * @param $submit String value of submit button in the form
+     * @param String $submit value of submit button in the form
      */
     public function EndForm($submit)
     {

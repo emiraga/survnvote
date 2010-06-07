@@ -35,7 +35,7 @@ function vfDate($date = NULL)
 /**
  * Convert page title into a friendly form, shorter and trimmed
  *
- * @param $mytitle String
+ * @param String $mytitle
  * @return String processed title
  */
 function vfGetPageTitle($mytitle)
@@ -50,7 +50,7 @@ function vfGetPageTitle($mytitle)
 /**
  * Return a message in error box, will show as red in HTML
  *
- * @param $message String
+ * @param String $message
  * @return String HTML code for error box.
  */
 function vfErrorBox($message)
@@ -60,7 +60,7 @@ function vfErrorBox($message)
 /**
  * Return a message in error box, will show as red in HTML
  *
- * @param $message String
+ * @param String $message
  * @return String HTML code
  */
 function vfSuccessBox($message)
@@ -89,7 +89,7 @@ $vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '0
 /**
  * Rotates color images for a choice.
  *
- * @param $index Integer current position in colors, vfGetColor updates it's value
+ * @param Integer $index current position in colors, vfGetColor updates it's value
  *
  */
 function vfGetColor(&$index)
@@ -125,7 +125,7 @@ function &vfUser()
  *  3. Replace ''italic'' -> Italic
  *  4. Remove duplicate whitespace
  * 
- * @param $wiki String wiki text
+ * @param String $wiki wiki text
  * @return String regular text
  */
 function vfWikiToText($wiki)
@@ -139,7 +139,7 @@ function vfWikiToText($wiki)
     return $text;
 }
 /**
- * @param $phone String phone number
+ * @param String $phone phone number
  * @return String HTML code with modified phone
  */
 function vfColorizePhone($phone, $colorsms=false)
