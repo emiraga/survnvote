@@ -1,18 +1,17 @@
 <?php
 if(isset($_SERVER['HOST'])) die('Must be run from command line.');
-
+//Set this path to Mediawiki
 $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_TEST', true);
 define('MEDIAWIKI', true);
 @require_once("$IP/LocalSettings.php");
-
-echo "Starting unit testing.\n";
-
+@require_once("$IP/AdminSettings.php");
 $vgDBName = "unittest_setup";
-$vgDBUserName       = 'root';
-$vgDBUserPassword   = '';
+$vgDBUserName       = $wgDBadminuser;
+$vgDBUserPassword   = $wgDBadminpassword;
 $vgDBPrefix = '';
 
+echo "Starting unit testing.\n";
 require_once("$vgPath/Common.php");
 require_once("$vgPath/../votapedia.setup.php");
 
@@ -213,7 +212,7 @@ if( true ) /* test PageVO */
     assert( $page->getType() == 1 );
     assert( $page->getDisplayTop() == 0 );
     assert( $page->getVotesAllowed() == 1 );
-    assert( $page->isSubtractWrong() == '0' );
+    assert( $page->getSubtractWrong() == '0' );
     assert( ! $page->getSurveys() );
     assert( $page->getPrivacy() == 1);
     // @todo test getSurveyBySurveyID()
@@ -259,7 +258,7 @@ if( true ) /* test PageVO */
     assert($page->getVotesAllowed() == 7);
     assert($page->isSMSRequired() == '1');
     assert( $page->getShowGraphEnd() == false );
-    assert( $page->isSubtractWrong() == '1' );
+    assert( $page->getSubtractWrong() == '1' );
     assert( $page->getType() == 2 );
     assert( $page->getPhoneVoting() == 'no' );
     assert( $page->getWebVoting() == 'no' );
@@ -271,111 +270,6 @@ if( true ) /* test PageVO */
     $page->setPrivacyByName( $page->getPrivacyByName() );
     $page->setPrivacy(vPRIVACY_HIGH);
     $page->setPrivacyByName( $page->getPrivacyByName() );
-}
-
-if( true ) /* testing SurveyRecordVO */
-{
-    echo '.';
-    require_once("$vgPath/VO/SurveyRecordVO.php");
-    $sr = new SurveyRecordVO();
-    assert( ! $sr->getChoiceID() );
-    assert( $sr->getPresentationID() == 1 );
-    assert( ! $sr->getSurveyID()  );
-    assert( strlen($sr->getVoteDate())>10 ); // vfDate()
-    assert( ! $sr->getVoteType() );
-    assert( ! $sr->getVoterID() );
-
-    $sr->setChoiceID( 45);
-    $sr->setPresentationID( 235);
-    $sr->setSurveyID( 2356 );
-    $sr->setVoteDate( '2002' );
-    $sr->setVoteType('CALL');
-    $sr->setVoterID( 'Admin' );
-
-    assert(45 == $sr->getChoiceID());
-    assert(235 == $sr->getPresentationID());
-    assert(2356 == $sr->getSurveyID());
-    assert('2002' == $sr->getVoteDate());
-    assert('CALL' == $sr->getVoteType());
-    assert('Admin' == $sr->getVoterID());
-
-    try
-    {
-        $sr->setVoteType('KJS');
-        assert(false);
-    }
-    catch(Exception $e)
-    {
-
-    }
-    assert('CALL' == $sr->getVoteType());
-}
-
-if( true ) /* testing SurveyRecordDAO */
-{
-    echo '.';
-    require_once("$vgPath/DAO/SurveyRecordDAO.php");
-    $srdao = new SurveyRecordDAO();
-
-    $sr = new SurveyRecordVO();
-    $sr->setPageID(2);
-    $sr->setChoiceID(1);
-    $sr->setPresentationID(1);
-    $sr->setSurveyID(1);
-    $sr->setVoteType('SMS');
-    $sr->setVoterID( 'Admin' );
-    assert( $srdao->isMultipleVote( $sr->getSurveyID(), $sr->getVoterID() ) == false  );
-    $srdao->insertRecord($sr);
-    assert( $srdao->isMultipleVote( $sr->getSurveyID(), $sr->getVoterID() ) == true  );
-    #@todo $srdao->isFirstVoting();
-}
-
-if( true ) /* testing CallVO */
-{
-    echo '.';
-    require_once("$vgPath/VO/CallVO.php");
-    $call = new CallVO();
-    assert( !$call->getCallID() );
-    assert( !$call->getDate() );
-    assert( !$call->getFrom() );
-    assert( !$call->getErrorCode() );
-    assert( !$call->getTo() );
-
-    $call->setCallID(2);
-    $call->setDate('2001-01-01 04:00:00');
-    $call->setFrom('01023456');
-    $call->setErrorCode(3);
-    $call->setTo('032434');
-
-    assert(2 == $call->getCallID() );
-    assert('2001-01-01 04:00:00' == $call->getDate() );
-    assert('01023456' == $call->getFrom() );
-    assert(3 == $call->getErrorCode() );
-    assert('032434' == $call->getTo() );
-}
-
-if( true ) /* testing SmsVO */
-{
-    echo ".";
-    require_once("$vgPath/VO/SmsVO.php");
-    $sms = new SmsVO();
-    assert(! $sms->getDate() );
-    assert(! $sms->getErrorCode() );
-    assert(! $sms->getSmsID() );
-    assert(! $sms->getFrom() );
-    assert(! $sms->getText() );
-
-    $sms->setDate('2001-01-01 04:00:00');
-    $sms->setErrorCode(34);
-    $sms->setFrom('8768768');
-    $sms->setSmsID(67);
-    $sms->setText('text test text');
-
-    assert('2001-01-01 04:00:00' == $sms->getDate() );
-    assert(34 == $sms->getErrorCode() );
-    assert(67 == $sms->getSmsID() );
-    assert('8768768' == $sms->getFrom() );
-    assert('text test text' == $sms->getText() );
 }
 
 if( true ) /* testing Telephone */
@@ -433,14 +327,19 @@ if( true ) /* testing Telephone */
 
     assert( count($t->getAvailablePhones()) == count($t->getAllPhones()) );
     global $vgDB;
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911310')");
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911319')");
+    
+    //from config.php
+    $phoneprefix = vfGetAllNumbers();
+    $phoneprefix = substr($phoneprefix[0], 0, strlen($phoneprefix[0]) - 2);
+
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999910')");
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999919')");
     assert( count($t->getAvailablePhones()) == count($t->getAllPhones())-2 );
     $g = $t->makeGroups($t->getAvailablePhones());
 
     assert(count($g) == 3 && count($g[0]) == 10 && count($g[1]) == 8);
     assert(count($g[2]) == count($t->getAllPhones()) - 2 - 10 - 8);
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60102911305')");
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999905')");
 
     $g = $t->makeGroups($t->getAvailablePhones());
     assert(count($g) == 4);
@@ -451,13 +350,6 @@ if( true ) /* testing Telephone */
     $g = $t->makeGroups($t->getAvailablePhones());
     assert(count($g) == 3);
     assert( count($t->getAvailablePhones()) == count($t->getAllPhones())-3-2-5 );
-}
-
-if( false ) /* testing Usr */
-{
-    echo '.';
-    require_once("$vgPath/DAO/Usr.php");
-    $user = new Usr('TestUser');
 }
 
 if( true ) /* testing DAO/UserphonesDAO */
@@ -529,6 +421,127 @@ die("\nDone with testing.\n");
 /* ********************************************************************************** */
 /* ********************************************************************************** */
 /* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+/* ********************************************************************************** */
+
+if( false ) /* testing SmsVO DELETED */
+{
+    echo ".";
+    require_once("$vgPath/VO/SmsVO.php");
+    $sms = new SmsVO();
+    assert(! $sms->getDate() );
+    assert(! $sms->getErrorCode() );
+    assert(! $sms->getSmsID() );
+    assert(! $sms->getFrom() );
+    assert(! $sms->getText() );
+
+    $sms->setDate('2001-01-01 04:00:00');
+    $sms->setErrorCode(34);
+    $sms->setFrom('8768768');
+    $sms->setSmsID(67);
+    $sms->setText('text test text');
+
+    assert('2001-01-01 04:00:00' == $sms->getDate() );
+    assert(34 == $sms->getErrorCode() );
+    assert(67 == $sms->getSmsID() );
+    assert('8768768' == $sms->getFrom() );
+    assert('text test text' == $sms->getText() );
+}
+
+
+
+if( false ) /* testing SurveyRecordVO DELETED! */
+{
+    echo '.';
+    require_once("$vgPath/VO/SurveyRecordVO.php");
+    $sr = new SurveyRecordVO();
+    assert( ! $sr->getChoiceID() );
+    assert( $sr->getPresentationID() == 1 );
+    assert( ! $sr->getSurveyID()  );
+    assert( strlen($sr->getVoteDate())>10 ); // vfDate()
+    assert( ! $sr->getVoteType() );
+    assert( ! $sr->getVoterID() );
+
+    $sr->setChoiceID( 45);
+    $sr->setPresentationID( 235);
+    $sr->setSurveyID( 2356 );
+    $sr->setVoteDate( '2002' );
+    $sr->setVoteType('CALL');
+    $sr->setVoterID( 'Admin' );
+
+    assert(45 == $sr->getChoiceID());
+    assert(235 == $sr->getPresentationID());
+    assert(2356 == $sr->getSurveyID());
+    assert('2002' == $sr->getVoteDate());
+    assert('CALL' == $sr->getVoteType());
+    assert('Admin' == $sr->getVoterID());
+
+    try
+    {
+        $sr->setVoteType('KJS');
+        assert(false);
+    }
+    catch(Exception $e)
+    {
+
+    }
+    assert('CALL' == $sr->getVoteType());
+}
+
+if( false ) /* testing SurveyRecordDAO DELETED */
+{
+    echo '.';
+    require_once("$vgPath/DAO/SurveyRecordDAO.php");
+    $srdao = new SurveyRecordDAO();
+
+    $sr = new SurveyRecordVO();
+    $sr->setPageID(2);
+    $sr->setChoiceID(1);
+    $sr->setPresentationID(1);
+    $sr->setSurveyID(1);
+    $sr->setVoteType('SMS');
+    $sr->setVoterID( 'Admin' );
+    assert( $srdao->isMultipleVote( $sr->getSurveyID(), $sr->getVoterID() ) == false  );
+    $srdao->insertRecord($sr);
+    assert( $srdao->isMultipleVote( $sr->getSurveyID(), $sr->getVoterID() ) == true  );
+    #@todo $srdao->isFirstVoting();
+}
+
+if( false ) /* testing CallVO DELETED */
+{
+    echo '.';
+    require_once("$vgPath/VO/CallVO.php");
+    $call = new CallVO();
+    assert( !$call->getCallID() );
+    assert( !$call->getDate() );
+    assert( !$call->getFrom() );
+    assert( !$call->getErrorCode() );
+    assert( !$call->getTo() );
+
+    $call->setCallID(2);
+    $call->setDate('2001-01-01 04:00:00');
+    $call->setFrom('01023456');
+    $call->setErrorCode(3);
+    $call->setTo('032434');
+
+    assert(2 == $call->getCallID() );
+    assert('2001-01-01 04:00:00' == $call->getDate() );
+    assert('01023456' == $call->getFrom() );
+    assert(3 == $call->getErrorCode() );
+    assert('032434' == $call->getTo() );
+}
+
+
+
 /*
  * These are scenario testing
  */
