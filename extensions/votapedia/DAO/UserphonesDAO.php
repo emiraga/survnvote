@@ -182,4 +182,13 @@ class UserphonesDAO
         return $vgDB->GetOne("SELECT username FROM {$vgDBPrefix}userphones WHERE phonenumber = ? AND status >= ?",
             array($phone, vPHONE_VERIFIED));
     }
+
+    static function addVerifiedPhone($username, $phone)
+    {
+        global $vgDB, $vgDBPrefix;
+        $now = vfDate();
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
+                array($username, $phone, vPHONE_VERIFIED, $now));
+    }
 }
+

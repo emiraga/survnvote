@@ -1,4 +1,6 @@
 <?php
+if(isset($_SERVER['HOST'])) die('Must be run from command line.');
+
 //set the path to MediaWiki
 $IP = '/xampp/htdocs/new';
 
@@ -29,3 +31,4 @@ if($args[1] == 'report')
     echo (Sms::getLatestBalance())."\n";
     echo "Reporting done.\n";
 }
+
