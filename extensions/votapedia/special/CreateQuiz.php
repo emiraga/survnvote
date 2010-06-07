@@ -31,6 +31,21 @@ class CreateQuiz extends CreateQuestionnaire
         $this->spPageName = 'Special:CreateQuiz';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Quiz.';
         $this->formitems['showresultsend']['default'] = true;
+
+        $this->formitems['subtractwrong'] = array(
+                        'type' => 'checkbox',
+                        'name' => 'Marking',
+                        'default' => 'on',
+                        'checklabel' => 'Subtract wrong answers.',
+                        'valid' => function($v,$i,$js)
+                        {
+                            if($js) return "";
+                            return true;
+                        },
+                        'explanation' => ' If checked, each wrong answer will get minus point. The subtracted point is calculated based on the point of that question divided by the number of choices.',
+                        'learn_more' => 'Details of Quiz Marking',
+                );
+        $this->formpages[0]['items'][] = 'subtractwrong';
         $this->isQuiz = true;
         $this->tagname = vtagQUIZ;
     }
@@ -41,6 +56,7 @@ class CreateQuiz extends CreateQuestionnaire
         global $wgRequest;
         foreach($wgRequest->getIntArray('orderNum', array()) as $index)
         {
+            $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
             $surveys[$i]->setAnswerByChoice( $wgRequest->getVal("q{$index}correct",'') );
             $surveys[$i]->setType( vQUIZ );
             $i++;
@@ -51,6 +67,10 @@ class CreateQuiz extends CreateQuestionnaire
     {
         parent::setPageVOvalues($page, $values);
         $page->setType(vQUIZ);
+        if(isset($values['subtractwrong']) && $values['subtractwrong'])
+            $page->setSubtractWrong( true );
+        else
+            $page->setSubtractWrong( false );
     }
     function Validate()
     {
@@ -66,6 +86,11 @@ class CreateQuiz extends CreateQuestionnaire
                     $error .= "<li>You must provide correct answer to question.</li>";
                 }
             }
+            $points = intval($wgRequest->getVal("q{$index}points"));
+            if($points <= 0)
+            {
+                $error .= "<li>Number ov points for question must be positive.</li>";
+            }
         }
         return $error;
     }
@@ -80,6 +105,7 @@ class CreateQuiz extends CreateQuestionnaire
             {
                 $surveys[$i]->setAnswerByChoice($wgRequest->getVal("q{$index}correct"));
                 $surveys[$i]->setType(vQUIZ);
+                $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
             }
             $i++;
         }
@@ -96,6 +122,11 @@ class CreateQuiz extends CreateQuestionnaire
             $this->prev_questions = str_replace($search, $search.'checked ', $this->prev_questions);
             $num++;
         }
+    }
+    public function fillFormValuesFromPage(PageVO &$page)
+    {
+        parent::fillFormValuesFromPage($page);
+        $this->form->setValue('subtractwrong', $page->getSubtractWrong());
     }
 /*
     function processNewSurveySubmit()

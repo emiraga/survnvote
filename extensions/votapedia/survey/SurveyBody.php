@@ -152,6 +152,7 @@ class SurveyBody
                     $numvotes = 1;
                 $choicesout = array();
                 $votesout = array();
+                global $vgScript;
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
@@ -163,6 +164,10 @@ class SurveyBody
                         $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$choice->getVote()})";
                     else
                         $extra = '';
+                    if($survey->getAnswer() == $choice->getChoiceID())
+                    {
+                        $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
+                    }
                     $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra);
                     $votesout[] = $choice->getVote();
                 }

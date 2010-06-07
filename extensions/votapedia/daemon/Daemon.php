@@ -174,6 +174,7 @@ if($args[1] == 'daemon')
 else if($args[1] == 'fakevote') /*used for testing*/
 {
     global $vgSmsChoiceLen;
+    $name = 'fake:'.vfRandStr(8);
     for($i=2;$i<count($args);$i++)
     {
         $choice = $args[$i];
@@ -181,7 +182,7 @@ else if($args[1] == 'fakevote') /*used for testing*/
             $choice = '0' . $choice;
         try
         {
-            vfVoteFromDaemon($choice, 'fake:'.vfRandStr(8));
+            vfVoteFromDaemon($choice, $name);
             echo "Fake vote: $choice\n";
         }
         catch(Exception $e)

@@ -111,7 +111,7 @@ class Graph
             $data = 't:'.join('|',$data);
             $colors = join(',', $colors);
             $names = join('|', $names);
-            echo "$data<br>$colors<br>$names<br>";
+
             $imglink = "cht=pc"
                     ."&chs={$this->width}x{$this->height}&chd=$data";
             if($colors)

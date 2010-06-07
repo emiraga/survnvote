@@ -70,12 +70,17 @@ class CreateQuestionnaire extends CreateSurvey
                 . '<div id="q%1$slegend">%2$s</div>'
                 . '<input id="orderNum" type="hidden" name="orderNum[]" value="%1$s">'
                 . '<input type="hidden" name="q%1$sname" value="%3$s">'
+                .($this->isQuiz ?
+                '<div>Points: <input size="2" type="text" name="q%1$spoints" value="%4$s" /></div>'
+                :
+                ''
+                )
                 . '<div class="prefsectiontip" style="padding: 0">Choices:</div>'
                 . '<div id="q%1$schoices" style="padding-right: 30px;"><!--PREV_CHOICES--></div>'
                 . '<div><input type=text id="choice" size="50" onkeypress="if((event.keyCode||event.which)==13) return addChoice(this, %1$s);" />'
                 . '<input type=button onClick="return addChoice(this, %1$s);" value="Add choice" class="btnAddChoice"></div>'
                 .'</fieldset></div>';
-        //Arguments: num , htmlspecialchars(question), escape(question)
+        //Arguments: num , htmlspecialchars(question), escape(question), escape(points)
 
         $this->choice_t = '<div class="choiceItem" id="%2$sdiv">'
                 .($this->isQuiz?'<input type="radio" name="q%1$scorrect" id="%2$s" value="%4$s">':'&bull; ')
@@ -119,7 +124,7 @@ class CreateQuestionnaire extends CreateSurvey
 	function generateQuestion(question, num)
 	{
 		if(question.length < 1)	return '';
-		return sprintf('{$this->question_t}', num, htmlspecialchars(question), escape(question));
+		return sprintf('{$this->question_t}', num, htmlspecialchars(question), escape(question), '10');
 	}
 	function deleteQuestion(buttonElement)
 	{
@@ -234,11 +239,9 @@ END_SCRIPT;
         {
             $question = urldecode($wgRequest->getVal("q{$index}name"));
             $strchoices = $wgRequest->getArray("q{$index}choices", array());
-
             $survey = new SurveyVO();
             $survey->setQuestion($question);
             $survey->setType(vQUESTIONNAIRE);
-
             $choices = array();
             foreach($strchoices as $choice)
             {
@@ -275,7 +278,8 @@ END_SCRIPT;
                 $cnum++;
             }
             $this->prev_num_ch .= 'numChoices['.$num.'] = '.$cnum.";\n";
-            $questionhtml = sprintf($this->question_t, $num , $parser->run(trim($question), false), urlencode($question) );
+            $questionhtml = sprintf($this->question_t, $num , $parser->run(trim($question), false),
+                    urlencode($question), urlencode($survey->getPoints()) );
             $questionhtml = str_replace('<!--PREV_CHOICES-->',  $choiceshtml, $questionhtml);
             $this->prev_questions .= $questionhtml;
             $num++;

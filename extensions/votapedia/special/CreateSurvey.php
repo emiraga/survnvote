@@ -197,19 +197,6 @@ class CreateSurvey
                         },
                         'icon' => $vgScript.'/icons/star.png',
                 ),
-                /*'voteridentity' => array(
-                        'type' => 'checkbox',
-                        'name' => 'Voter Identity',
-                        'default' => 'on',
-                        'checklabel' => ' Enable unidentified voters. Compulsory for phone surveys from outside '.$vgCountry.'.',
-                        'valid' => function($v,$i,$js)
-                        {
-                            if($js) return "";
-                            return true;
-                        },
-                        'explanation' => 'CallerID is used to stop multiple voting. Only the calls with a CallerID is regarded as a valid vote. Phones with CallerID disabled or calling from outside Australia will not be able to vote if unchecked.',
-                        'learn_more' => 'Details of Multiple Voting',
-                ),*/
                 'titlewarning' => array(
                         'type' => 'infobox',
                         'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',

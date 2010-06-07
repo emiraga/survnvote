@@ -299,7 +299,7 @@ class PageVO
      * Should incorrect answers be subtracted from points
      * @return boolean
      */
-    function isSubtractWrong()
+    function getSubtractWrong()
     {
         if($this->subtractWrong)
             return '1';
