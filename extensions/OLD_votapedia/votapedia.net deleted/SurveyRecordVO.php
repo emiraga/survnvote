@@ -18,7 +18,6 @@ class SurveyRecordVO
     private $voterID;
     private $voteDate;
     private $voteType;
-
     /**
      * Construct an object survey record VO
      *
@@ -159,4 +158,3 @@ class SurveyRecordVO
     }
 }
 
-?>

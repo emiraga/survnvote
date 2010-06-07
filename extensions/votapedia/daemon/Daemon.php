@@ -7,7 +7,6 @@ $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
 @require_once("$IP/LocalSettings.php");
-
 @require_once("$IP/AdminSettings.php");
 $vgDBUserName = $wgDBadminuser; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = $wgDBadminpassword;
@@ -154,6 +153,12 @@ function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk
 
 //get command line parameters
 $args = $_SERVER['argv'];
+if(!isset($args[1]))
+{
+    echo "Usage: php $args[0] daemon|fakevote";
+    die('');
+}
+
 if($args[1] == 'daemon')
 {
     //run as a daemon
