@@ -1,9 +1,17 @@
 <?php
-/**
- * @package Graphing
- */
 if (!defined('MEDIAWIKI')) die();
 
+/**
+ * function vfCutEncode
+ * Cut long messages and URL encode them
+ *
+ * @param $str String message
+ * @param $maxlen Integer maximum length of the message
+ * @param $elipsis String append to the end of long messages
+ * @param $encode Boolean do URL encoding
+ * @return String processed string
+ * @package Graphing
+ */
 function vfCutEncode($str, $maxlen, $elipsis = '...', $encode = true)
 {
     if(strlen($str) >= $maxlen)
@@ -13,209 +21,313 @@ function vfCutEncode($str, $maxlen, $elipsis = '...', $encode = true)
     return $str;
 }
 /**
- * Graph class for drawing charts
+ * class Graph
+ * Used for drawing charts. It provides an image with chart.
  *
  * @author Emir Habul <emiraga@gmail.com>
+ * @package Graphing
+ * @abstract
  */
-class Graph
+abstract class Graph
 {
-    /** @var GraphSeries */ protected $series = array();
-    /** @var GraphSeries */ protected $width = 400;
-    /** @var GraphSeries */ protected $height = 200;
-
-    public function __construct($type)
+    protected $width = 400;
+    protected $height = 200;
+    protected $graphvalues = array();
+    /**
+     * Add values object GraphValues to the graph.
+     *
+     * @param $val GraphValues
+     */
+    function addValues(GraphValues $val)
     {
-        $this->type = $type;
+        $this->graphvalues[] = $val;
     }
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-    public function addSeries($series)
-    {
-        $this->series[] = $series;
-    }
-    public function getHTMLImage($id = 'graph')
-    {
-        return "<img id=\"$id\" width=\"{$this->width}\" height=\"{$this->height}\" "
-        ."src=\"{$this->getImageLink()}\">";
-    }
+    /**
+     * Get link to image;
+     *
+     * @return link to the image of graph
+     */
     public function getImageLink()
     {
         return "http://chart.apis.google.com/chart?".$this->getImageParams();
     }
-    public function getImageParams()
+    /**
+     * Get image parameters
+     *
+     */
+    abstract protected function getImageParams();
+    /**
+     * Get HTML code that contains graph image.
+     *
+     * @param $id String HTML value of ID for image
+     */
+    public function getHTMLImage($id)
     {
-        if($this->type == 'line')
-        {
-            $imglink = "cht=lc&chs={$this->width}x{$this->height}";
-            $series = $this->series[0];
-            if($series->getCount())
-            {
-                $maxv = $series->getMaxValue();
-                $imglink .= "&chd=t:".$series->getValuesFormat();
-                $imglink .= "&chds=0,".($maxv);
-                $imglink .= "&chxt=y&chxl=0:|RM0|RM$maxv";
-            }
-            return $imglink;
-        }
-        if($this->type == 'linexy')
-        {
-            $imglink = "cht=lxy&chs={$this->width}x{$this->height}";
-            $series = $this->series[0];
-            if($series->getCount())
-            {
-                $imglink .= "&chd=t:".$series->getXFormat(',').'|'.$series->getYFormat(',');
-                $imglink .= "&chds={$series->getYMin()},{$series->getYMax()}";
-                $imglink .= "&chxt=y,x&chxl=0:|{$series->getYlabel()}|1:|{$series->getXlabel()}";
-                $imglink .= "&chm=s,000000,0,-1,3";
-            }
-            return $imglink;
-        }
-        if($this->type == 'pie')
-        {
-            //$maxname = 30;
-            $series = $this->series[0];
-
-            $imglink = "cht=p3&chs={$this->width}x{$this->height}";
-            $colors = $series->getColorsFormat();
-            if($colors)
-                $imglink.="&chco=$colors";
-            if($series->getCount())
-            {
-                $imglink.="&chd=t:{$series->getValuesFormat()}";
-                if($series->getCount() <= 11)
-                    $imglink.="&chdl=".$series->getNamesFormat(30, true);
-                else
-                    $imglink.="&chl=".$series->getNamesFormat(30, true);
-            }
-            return $imglink;
-        }
-        if($this->type == 'multipie')
-        {
-            $data = array();
-            $colors = array();
-            $names = array();
-            foreach($this->series as $series)
-            {
-                $v = $series->getValuesFormat();
-                if($v)
-                {
-                    if($series->getCount() == 1)
-                        $v .= ',0';
-                    $data[] = $v;
-                    $colors[] = $series->getColorsFormat();
-                    $names[] = $series->getNamesFormat(30, true);
-                }
-            }
-            $data = 't:'.join('|',$data);
-            $colors = join(',', $colors);
-            $names = join('|', $names);
-
-            $imglink = "cht=pc"
-                    ."&chs={$this->width}x{$this->height}&chd=$data";
-            if($colors)
-                $imglink .= "&chco=$colors";
-            if($names)
-                $imglink .= "&chdl=$names";
-            return $imglink;
-        }
-        if($this->type == 'stackpercent')
-        {
-            $numseries = count($this->series);
-            $labelLength = 3;
-            if($numseries == 2)     $labelLength = 25;
-            elseif($numseries == 3) $labelLength = 18;
-            elseif($numseries == 4) $labelLength = 13;
-            elseif($numseries == 5) $labelLength = 10;
-            elseif($numseries == 6) $labelLength = 8;
-            elseif($numseries == 7) $labelLength = 7;
-            elseif($numseries == 8) $labelLength = 6;
-            $xlabel = '';
-            $chbh = intval(($this->width - 60) / count($this->series));
-            $maxv = 0;
-            $markers = array();
-            foreach($this->series as &$series)
-            {
-                $xlabel .= '|'. vfCutEncode($series->getTitle(),$labelLength, '...', false);
-                if($series->getCount() > $maxv)
-                    $maxv = $series->getCount();
-            }
-            $data = array();
-            $colors = array();
-            for($i = $maxv-1; $i>=0; $i--)
-            {
-                $barvalues = array();
-                $barcolors = array();
-                $s = 0;
-                foreach($this->series as &$series)
-                {
-                    $val = $series->getValue($i);
-                    if($val === false)
-                    {
-                        $barvalues[] = '0';
-                        $barcolors[] = '000000';
-                    }
-                    else
-                    {
-                        $barvalues[] = vfCutEncode(100 * $val / $series->getSum(), 5, '');
-                        $barcolors[] = $series->getColor($i);
-                        $pos = $maxv-$i-1;
-                        $markers[] = "t". vfCutEncode( $series->getName($i), $labelLength, '' )
-                                .' ('.$val.')'.",000000,$pos,$s,12,,c";
-                    }
-                    $s++;
-                }
-                $data[] = join(',', $barvalues);
-                $colors[] = join('|', $barcolors);
-            }
-            /*$s = 0;
-            foreach($this->series as &$series)
-            {
-                $pos = $maxv-1;
-                $markers[] = "t".$series->getTitle().",000000,$pos,$s,12,,e::15";
-                $s++;
-            }*/
-            $data = 't:'.join('|',$data);
-            if($data == 't:')
-                return '';
-            $colors = join(',', $colors);
-            $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
-            $imglink .= "&chd=$data&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
-            
-            $imglink2 = $imglink . "&chm=".join('|', $markers);
-            if(strlen($imglink2) < 1500)
-                $imglink = $imglink2;
-
-            return $imglink;
-        }
-        throw new Exception("Unknown graph type");
+        return "<img id=\"$id\" width=\"{$this->width}\" height=\"{$this->height}\" "
+                ."src=\"{$this->getImageLink()}\">";
+    }
+    /**
+     * Get width of an image
+     *
+     * @return Integer
+     */
+    function getWidth()
+    {
+        return $this->width;
+    }
+    /**
+     * Get height of an image.
+     *
+     * @return Integer
+     */
+    function getHeight()
+    {
+        return $this->height;
+    }
+    /**
+     * Set width of an image.
+     *
+     * @param $w Integer width
+     */
+    function setWidth($w)
+    {
+        $this->width = $w;
+    }
+    /**
+     * Set height of image
+     *
+     * @param $h Integer height
+     */
+    function setHeight($h)
+    {
+        $this->height = $h;
     }
 }
+/**
+ * class GraphLine
+ *
+ * @package Graphing
+ */
+class GraphLine extends Graph
+{
+    public function getImageParams()
+    {
+        $imglink = "cht=lc&chs={$this->width}x{$this->height}";
+        $values = $this->graphvalues[0];
+        if($values->getCount())
+        {
+            $maxv = $values->getMaxValue();
+            $imglink .= "&chd=t:".$values->getValuesFormat();
+            $imglink .= "&chds=0,".($maxv);
+            $imglink .= "&chxt=y&chxl=0:|RM0|RM$maxv";
+        }
+        return $imglink;
+    }
+}
+/**
+ * class GraphLineXY
+ *
+ * @package Graphing
+ */
+class GraphLineXY extends Graph
+{
+    public function getImageParams()
+    {
+        $imglink = "cht=lxy&chs={$this->width}x{$this->height}";
+        $values = $this->graphvalues[0];
+        if($values->getCount())
+        {
+            $imglink .= "&chd=t:".$values->getXFormat(',').'|'.$values->getYFormat(',');
+            $imglink .= "&chds={$values->getYMin()},{$values->getYMax()}";
+            $imglink .= "&chxt=y,x&chxl=0:|{$values->getYlabel()}|1:|{$values->getXlabel()}";
+            $imglink .= "&chm=s,000000,0,-1,3";
+        }
+        return $imglink;
+    }
+}
+/**
+ * class GraphPie
+ *
+ * @package Graphing
+ */
+class GraphPie extends Graph
+{
+    public function getImageParams()
+    {
+        $values = $this->graphvalues[0];
+        $imglink = "cht=p3&chs={$this->width}x{$this->height}";
+        $colors = $values->getColorsFormat();
+        if($colors)
+            $imglink.="&chco=$colors";
+        if($values->getCount())
+        {
+            $imglink.="&chd=t:{$values->getValuesFormat()}";
+            if($values->getCount() <= 11)
+                $imglink.="&chdl=".$values->getNamesFormat(30, true);
+            else
+                $imglink.="&chl=".$values->getNamesFormat(30, true);
+        }
+        return $imglink;
+    }
+}
+/**
+ * class GraphMultiPie
+ *
+ * @package Graphing
+ */
+class GraphMultiPie extends Graph
+{
+    public function getImageParams()
+    {
+        $data = array();
+        $colors = array();
+        $names = array();
+        foreach($this->graphvalues as $values)
+        {
+            $v = $values->getValuesFormat();
+            if($v)
+            {
+                if($values->getCount() == 1)
+                    $v .= ',0';
+                $data[] = $v;
+                $colors[] = $values->getColorsFormat();
+                $names[] = $values->getNamesFormat(30, true);
+            }
+        }
+        $data = 't:'.join('|',$data);
+        $colors = join(',', $colors);
+        $names = join('|', $names);
 
-class GraphSeries
+        $imglink = "cht=pc"
+                ."&chs={$this->width}x{$this->height}&chd=$data";
+        if($colors)
+            $imglink .= "&chco=$colors";
+        if($names)
+            $imglink .= "&chdl=$names";
+        return $imglink;
+    }
+}
+/**
+ * class GraphStackPercent
+ *
+ * @package Graphing
+ */
+class GraphStackPercent extends Graph
+{
+    public function getImageParams()
+    {
+        $numvalues = count($this->graphvalues);
+        $labelLength = 3;
+        if($numvalues == 2)     $labelLength = 25;
+        elseif($numvalues == 3) $labelLength = 18;
+        elseif($numvalues == 4) $labelLength = 13;
+        elseif($numvalues == 5) $labelLength = 10;
+        elseif($numvalues == 6) $labelLength = 8;
+        elseif($numvalues == 7) $labelLength = 7;
+        elseif($numvalues == 8) $labelLength = 6;
+        $xlabel = '';
+        $chbh = intval(($this->width - 60) / $numvalues);
+        $maxv = 0;
+        $markers = array();
+        foreach($this->graphvalues as &$values)
+        {
+            $xlabel .= '|'. vfCutEncode($values->getTitle(),$labelLength, '...', false);
+            if($values->getCount() > $maxv)
+                $maxv = $values->getCount();
+        }
+        $data = array();
+        $colors = array();
+        for($i = $maxv-1; $i>=0; $i--)
+        {
+            $barvalues = array();
+            $barcolors = array();
+            $s = 0;
+            foreach($this->graphvalues as &$values)
+            {
+                $val = $values->getValue($i);
+                if($val === false)
+                {
+                    $barvalues[] = '0';
+                    $barcolors[] = '000000';
+                }
+                else
+                {
+                    $barvalues[] = vfCutEncode(100 * $val / $values->getSum(), 5, '');
+                    $barcolors[] = $values->getColor($i);
+                    $pos = $maxv-$i-1;
+                    $markers[] = "t". vfCutEncode( $values->getName($i), $labelLength, '' )
+                            .' ('.$val.')'.",000000,$pos,$s,12,,c";
+                }
+                $s++;
+            }
+            $data[] = join(',', $barvalues);
+            $colors[] = join('|', $barcolors);
+        }
+        /*$s = 0;
+        foreach($this->graphvalues as &$values)
+        {
+            $pos = $maxv-1;
+            $markers[] = "t".$values->getTitle().",000000,$pos,$s,12,,e::15";
+            $s++;
+        }*/
+        $data = 't:'.join('|',$data);
+        if($data == 't:')
+            return '';
+        $colors = join(',', $colors);
+        $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
+        $imglink .= "&chd=$data&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
+
+        $imglink2 = $imglink . "&chm=".join('|', $markers);
+        if(strlen($imglink2) < 1500)
+            $imglink = $imglink2;
+
+        return $imglink;
+    }
+}
+/**
+ * class GraphValues
+ * 
+ * @package Graphing
+ * @abstract
+ */
+abstract class GraphValues
 {
     protected $title;
-    protected $names = array();
-    protected $values = array();
-    protected $colors = array();
     protected $count = 0;
-    protected $sum = 0;
-    protected $maxValue = 0;
 
     public function __construct($title)
     {
         $this->title = vfCutEncode($title, 50);
     }
+    function getTitle()
+    {
+        return $this->title;
+    }
+    function getCount()
+    {
+        return $this->count;
+    }
+}
+/**
+ * class GraphSeries
+ * Stores data for graphing used by Graph class
+ *
+ * @author Emir Habul <emiraga@gmail.com>
+ * @package Graphing
+ */
+class GraphSeries extends GraphValues
+{
+    protected $names = array();
+    protected $values = array();
+    protected $colors = array();
+    protected $sum = 0;
+    protected $maxValue = 0;
+
     function reverseValues()
     {
         $this->names = array_reverse($this->names);
         $this->values = array_reverse($this->values);
         $this->colors = array_reverse($this->colors);
-    }
-    function getCount()
-    {
-        return $this->count;
     }
     function getSum()
     {
@@ -226,10 +338,6 @@ class GraphSeries
     function getMaxValue()
     {
         return $this->maxValue;
-    }
-    function getTitle()
-    {
-        return $this->title;
     }
     function addItem($name, $value, $color)
     {
@@ -311,8 +419,14 @@ class GraphSeries
         }
     }
 }
-
-class GraphXY
+/**
+ * class GraphXY
+ * Stores a (X, Y) coordinates of points that are plotted by Graph class.
+ *
+ * @author Emir Habul <emiraga@gmail.com>
+ * @package Graphing
+ */
+class GraphXY extends GraphValues
 {
     protected $title;
     protected $x = array();
@@ -327,11 +441,11 @@ class GraphXY
     }
     public function getCount()
     {
-        return count($this->x);
+        return $this->count;
     }
     public function addPoint($x, $y)
     {
-        if(count($this->x) == 0)
+        if($this->count == 0)
         {
             $this->xmin = $this->xmax = $x;
             $this->ymin = $this->ymax = $y;
@@ -345,6 +459,7 @@ class GraphXY
         }
         $this->x[] = $x;
         $this->y[] = $y;
+        $this->count++;
     }
     public function getX()
     {
@@ -389,6 +504,14 @@ class GraphXY
     }
 }
 
+/**
+ * class GraphXYdate
+ * Stores a X,Y coordinates of points where X coordinate is a datetime value.
+ * These points are plotted by Graph class.
+ *
+ * @author Emir Habul <emiraga@gmail.com>
+ * @package Graphing
+ */
 class GraphXYdate extends GraphXY
 {
     public function __construct($title)
@@ -417,3 +540,4 @@ class GraphXYdate extends GraphXY
                 .$glue.date('Y-m-d',$tmax);
     }
 }
+

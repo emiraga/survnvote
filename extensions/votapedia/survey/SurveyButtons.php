@@ -1,6 +1,11 @@
 <?php
 if (!defined('MEDIAWIKI')) die();
 
+/**
+ * Display HTML buttons for the view of surveys.
+ *
+ * @package SurveyView
+ */
 class SurveyButtons
 {
     /** @var String */ protected $type;

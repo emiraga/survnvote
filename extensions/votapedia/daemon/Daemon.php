@@ -25,6 +25,7 @@ $surveydao = new SurveyDAO();
  * This is a very ugly hack. Needs to be improved.
  *
  * @return Boolean success true of false
+ * @package Daemon
  */
 function vfRequestNewUser($username, $password, $realname)
 {
@@ -51,7 +52,7 @@ function vfRequestNewUser($username, $password, $realname)
  * Pick a new username, create that account and send an SMS.
  *
  * @param $phonenumber String
- * @return nothing
+ * @package Daemon
  */
 function vfDaemonNewUser($phonenumber)
 {
@@ -80,6 +81,7 @@ function vfDaemonNewUser($phonenumber)
 }
 /**
  * Do whatever is needed to process new incoming SMS.
+ * @package Daemon
  */
 function vfDaemonSmsAction()
 {
@@ -122,7 +124,13 @@ function vfDaemonSmsAction()
         Sms::processed($sms['id']);
     }
 }
-
+/**
+ * Find if such choice exists and vote for it.
+ *
+ * @param $choice String choice that user has coosen
+ * @param $username String name of user
+ * @package Daemon
+ */
 function vfVoteFromDaemon($choice, $username)
 {
     global $vgDBPrefix, $vgDB, $surveydao;
@@ -141,7 +149,14 @@ function vfVoteFromDaemon($choice, $username)
     $votedao->vote($votevo);
 }
 
-// Generate a random character string
+/**
+ * Generate a random character string
+ * 
+ * @param $length Integer length of output string
+ * @param $chars String used characters, default: all alpha-numeric characters
+ * @return String random string
+ * @package Daemon
+ */
 function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
 {
     $chars_length = strlen($chars) - 1;
@@ -151,17 +166,16 @@ function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk
     return $string;
 }
 
-//get command line parameters
+/* get command line parameters */
 $args = $_SERVER['argv'];
 if(!isset($args[1]))
 {
-    echo "Usage: php $args[0] daemon|fakevote";
-    die('');
+    die("Usage: php $args[0] daemon | fakevote [votes]+");
 }
 
 if($args[1] == 'daemon')
 {
-    //run as a daemon
+    /* Run as a daemon */
     while(1)
     {
         try

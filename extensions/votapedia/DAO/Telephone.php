@@ -5,22 +5,24 @@ if (!defined('MEDIAWIKI')) die();
  *
  * @package DataAccessObject
  */
+global $vgPath;
+require_once("$vgPath/VO/SurveyVO.php");
 
+/**
+ * Exception type for Telephone
+ *
+ * @package DataAccessObject
+ */
 class TelephoneException extends Exception
 {
 
 }
-
-global $vgPath;
-require_once("$vgPath/VO/SurveyVO.php");
 /**
  * This page includes class TeleNumber which is in care of
  * allocating available telephones to surveys based on
  * diffent stategies.
- *
- * Blocks are groups of phones,
- * dynamic block is a separate group
- *
+ * 
+ * @package DataAccessObject
  */
 class Telephone
 {

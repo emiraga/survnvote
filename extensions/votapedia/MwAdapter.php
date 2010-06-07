@@ -3,13 +3,14 @@
  * Interface to MediaWiki classes. It consists of Adapter classes
  * which follow adapter design pattern.
  *
- * @package Interface
+ * @package MediaWikiInterface
  */
 
 /**
  * MediaWiki Adapter desing pattern.
  * Idea is to have all functions related to MediaWiki in one place
- *
+ * 
+ * @package MediaWikiInterface
  */
 class MwAdapter
 {
@@ -28,11 +29,11 @@ class MwAdapter
                     throw new Exception('Page purging has failed');
         */
         $article = new Article( Title::newFromText($title) );
-        $article->doPurge(); // Directly purge and skip the UI part of purge().
+        $article->doPurge(); // Directly purge
     }
     /**
      * Get a list of subcategories of a category
-     *
+     * 
      * @param $category Name of a category
      * @return array with a list of categories
      */
@@ -77,7 +78,7 @@ class MwAdapter
  * Adapter design pattern.
  *
  * @author Emir Habul
- *
+ * @package MediaWikiInterface
  */
 class MwParser
 {
@@ -140,6 +141,7 @@ class MwParser
  * Interface to MediaWiki User object.
  *
  * Adapter design pattern.
+ * @package MediaWikiInterface
  */
 class MwUser
 {

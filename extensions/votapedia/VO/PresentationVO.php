@@ -6,6 +6,8 @@ if (!defined('MEDIAWIKI')) die();
 
 /**
  * Value Object of Presentation
+ *
+ * @package ValueObject
  */
 class PresentationVO
 {

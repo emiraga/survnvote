@@ -11,6 +11,7 @@ if (!defined('MEDIAWIKI')) die();
  * One user can have multiple phones assigned.
  *
  * @author Emir Habul <emiraga@gmail.com>
+ * @package DataAccessObject
  */
 class UserphonesDAO
 {

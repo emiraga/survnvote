@@ -46,12 +46,8 @@ $wgSpecialPages['SmsReport'] = 'SmsReport';
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$vgPath/survey/SurveyView.php";
 
-$wgAjaxExportList[] = 'SurveyView::getChoices';
 $wgAjaxExportList[] = 'SurveyView::getChoice';
-
-$wgAjaxExportList[] = 'SurveyBody::ajaxChoice';
 $wgAjaxExportList[] = 'SurveyBody::getChoices';
-
 $wgAjaxExportList[] = 'SurveyBody::ajaxgraph';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';

@@ -4,6 +4,9 @@ if (!defined('MEDIAWIKI')) die();
 global $vgPath;
 require_once("$vgPath/special/CreateSurvey.php" );
 
+/**
+ * @package MediaWikiInterface
+ */
 class spCreateQuestionnaire extends SpecialPage
 {
     /** @var CreateQuestionnaire */ private $obj;
@@ -20,6 +23,9 @@ class spCreateQuestionnaire extends SpecialPage
     }
 }
 
+/**
+ * @package ControlSurvey
+ */
 class CreateQuestionnaire extends CreateSurvey
 {
     /** @var String */  private   $script;

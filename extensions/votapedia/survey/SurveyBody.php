@@ -7,9 +7,10 @@ require_once("$vgPath/graph/Graph.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 
 /**
- * SurveyBody shows the main part of the survey
+ * SurveyBody shows the main part of the survey.
  *
  * @author Emir Habul
+ * @package SurveyView
  */
 class SurveyBody
 {
@@ -301,9 +302,10 @@ class SurveyBody
     }
     public function getGraphHTML(&$colorindex, $surveys, $imgid = '')
     {
-        $graph = new Graph('pie');
         if(count($surveys) > 1)
-            $graph->setType('stackpercent');
+            $graph = new GraphStackPercent();
+        else
+            $graph = new GraphPie();
 
         foreach($surveys as &$survey)
         {
@@ -325,7 +327,7 @@ class SurveyBody
             {
                 $graphseries->sort();
             }
-            $graph->addSeries($graphseries);
+            $graph->addValues($graphseries);
         }
         if($imgid)
             return $graph->getHTMLImage($imgid);

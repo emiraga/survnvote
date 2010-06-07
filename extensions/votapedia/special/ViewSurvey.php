@@ -8,6 +8,7 @@ require_once("$vgPath/Common.php" );
  * Special page View Survey
  *
  * @author Emir Habul
+ * @package ControlSurvey
  */
 class ViewSurvey extends SpecialPage
 {

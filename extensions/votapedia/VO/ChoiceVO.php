@@ -9,7 +9,7 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * An value object of a choice which follows PHP MVC suggestion.
  * @author Bai Qifeng
- * @version 1.0
+ * @package ValueObject
  */
 class ChoiceVO
 {

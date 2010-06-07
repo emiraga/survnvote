@@ -10,6 +10,7 @@ require_once("$vgPath/graph/Graph.php");
  * Special page Create Survey
  *
  * @author Emir Habul
+ * @package SmsIntegration
  */
 class SmsReport extends SpecialPage
 {
@@ -119,17 +120,19 @@ class SmsReport extends SpecialPage
         $wgOut->addWikiText($out);
         if($admin && count($bal)>1)
         {
-            $gs = new GraphXYdate('');
+            $values = new GraphXYdate('');
             foreach($bal as $sms)
             {
                 $balance = preg_replace("/RM/", '', $sms['balance']);
-                $gs->addPoint($sms['date'], $balance);
+                $values->addPoint($sms['date'], $balance);
             }
             # echo $gs->getXMax().','.$gs->getXMin().'<br>';
             # echo $gs->getYMax().','.$gs->getYMin().'<br>';
-            $gr = new Graph('linexy');
-            $gr->addSeries($gs);
-            $wgOut->addHTML('<center>'.$gr->getHTMLImage().'</center>');
+            $gr = new GraphLineXY('linexy');
+            $gr->setWidth(750);
+            $gr->addValues($values);
+            $wgOut->addHTML('<center>'.$gr->getHTMLImage('imgsmsreport').'</center>');
         }
     }
 }
+

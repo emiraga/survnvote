@@ -9,6 +9,8 @@ require_once("$vgPath/VO/VoteVO.php");
 
 /**
  * Class for managing votes in database
+ * 
+ * @package DataAccessObject
  */
 class VoteDAO
 {

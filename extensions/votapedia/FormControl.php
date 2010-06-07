@@ -5,7 +5,7 @@ if (!defined('MEDIAWIKI')) die();
  * Class used for drawing tabbed form similar to "Preferences" form in MediaWiki
  *
  * @author Emir Habul
- *
+ * @package HTML_Display
  */
 class FormControl
 {

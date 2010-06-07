@@ -7,9 +7,10 @@ require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 
 /**
- * Special page Create Survey
+ * Special page Create Survey.
  *
  * @author Emir Habul
+ * @package ControlSurvey
  */
 class ProcessSurvey extends SpecialPage
 {
@@ -172,3 +173,4 @@ class ProcessSurvey extends SpecialPage
         return "OK\n".$extra;
     }
 }
+

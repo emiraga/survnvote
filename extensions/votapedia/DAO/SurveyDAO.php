@@ -19,6 +19,7 @@ require_once("$vgPath/VO/PageVO.php");
  * @author Bai Qifeng
  * @author Emir Habul
  * @version 2.0 Beta
+ * @package DataAccessObject
  */
 class SurveyDAO
 {

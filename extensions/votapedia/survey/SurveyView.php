@@ -9,9 +9,10 @@ require_once("$vgPath/survey/SurveyBody.php");
 require_once("$vgPath/Graph/Graph.php");
 
 /**
- * Class used to display parts of HTML related to the viewing of survey
+ * Class used to display parts of HTML related to the viewing of survey.
  *
  * @author Emir Habul
+ * @package SurveyView
  */
 class SurveyView
 {

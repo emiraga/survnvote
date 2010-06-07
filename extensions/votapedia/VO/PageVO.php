@@ -12,6 +12,8 @@ require_once("$vpPath/SurveyVO.php");
  * Page 1-->1..* survey
  * survey 1-->1..* choice
  * survey 1-->0..* presentation.
+ *
+ * @package ValueObject
  */
 class PageVO
 {

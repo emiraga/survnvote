@@ -7,6 +7,7 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * Vote value object
  *
+ * @package ValueObject
  */
 class VoteVO
 {

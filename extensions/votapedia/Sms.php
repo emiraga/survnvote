@@ -3,7 +3,7 @@ if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
 /**
  * This is example class that provides SMS integration with external source.
  *
- * This SmsIntegration class implements a working interface to gammu-smsd
+ * This Sms Integration class implements a working interface to gammu-smsd
  * link: http://www.gammu.org/wiki/index.php?title=Gammu:SMSD
  *
  * If you have another source of SMS, please modify this script accordingly
@@ -11,12 +11,13 @@ if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
  *
  * This class is being called by the Daemon.php.
  *
+ * @package SmsIntegration
  */
-global $vgSmsdDatabasename;
-$vgSmsdDatabasename = 'smsd';
-
 class Sms
 {
+    /* Configure the name of GAMMU-SMSD database */
+    static private $smsdDBname = 'smsd';
+
     /* Message used for sending confirmation code. */
     static public $msgConfim = 'Confirmation code is %s. Thank you for using www.votapedia.net.';
     /* Message used when user is using votapedia for the first time */
@@ -42,8 +43,10 @@ class Sms
      */
     static function getNewSms()
     {
-        global $vgDB, $vgSmsdDatabasename;
-        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM $vgSmsdDatabasename.inbox "
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
+        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM $smsdDBname.inbox "
                 ."WHERE Processed = 'false'");
         $list = array();
         foreach($new as $sms)
@@ -75,8 +78,10 @@ class Sms
      */
     static function processed($id)
     {
-        global $vgDB, $vgSmsdDatabasename;
-        $vgDB->Execute("UPDATE $vgSmsdDatabasename.inbox SET Processed = 'true' WHERE ID = ?", array($id));
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
+        $vgDB->Execute("UPDATE $smsdDBname.inbox SET Processed = 'true' WHERE ID = ?", array($id));
     }
     /**
      * function sendSMS($destination, $message)
@@ -95,8 +100,10 @@ class Sms
         $valid="255";
         $sender = 'Gammu 1.27.0';
         $phone = '';
-        global $vgDB, $vgSmsdDatabasename;
-        $vgDB->Execute("INSERT INTO $vgSmsdDatabasename.outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
+        $vgDB->Execute("INSERT INTO $smsdDBname.outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
                 ."RelativeValidity,SenderID,CreatorID) VALUES(?,?,?,NOW(),?,?,?)",
                 array($text,$destination,$message, $valid,'',$sender));
     }
@@ -107,9 +114,10 @@ class Sms
      */
     static function getPending()
     {
-        global $vgDB, $vgSmsdDatabasename;
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
         $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, TextDecoded "
-                ."FROM $vgSmsdDatabasename.outbox ORDER BY InsertIntoDB");
+                ."FROM $smsdDBname.outbox ORDER BY InsertIntoDB");
         $result = array();
         foreach($rec as $message)
         {
@@ -128,9 +136,11 @@ class Sms
      */
     static function getReport()
     {
-        global $vgDB, $vgSmsdDatabasename;
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
         $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded "
-                ."FROM $vgSmsdDatabasename.sentitems ORDER BY InsertIntoDB");
+                ."FROM $smsdDBname.sentitems ORDER BY InsertIntoDB");
         $result = array();
         foreach($rec as $message)
         {
@@ -162,8 +172,10 @@ class Sms
      */
     static function getLatestBalance()
     {
-        global $vgDB, $vgSmsdDatabasename;
-        $text = $vgDB->GetOne("SELECT TextDecoded FROM $vgSmsdDatabasename.inbox "
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
+        $text = $vgDB->GetOne("SELECT TextDecoded FROM $smsdDBname.inbox "
                 ."WHERE SenderNumber = ? ORDER BY ID DESC",
                 array('2888'));
         preg_match('@RM([^,]+)@i', $text, $matches);
@@ -176,8 +188,10 @@ class Sms
      */
     static function getBalanceReports()
     {
-        global $vgDB, $vgSmsdDatabasename;
-        $bal = $vgDB->GetAll("SELECT TextDecoded, ReceivingDateTime FROM $vgSmsdDatabasename.inbox "
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        
+        $bal = $vgDB->GetAll("SELECT TextDecoded, ReceivingDateTime FROM $smsdDBname.inbox "
                 ."WHERE SenderNumber = ? ORDER BY ID DESC",
                 array('2888'));
         $result = array();

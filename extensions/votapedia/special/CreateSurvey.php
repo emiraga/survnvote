@@ -7,6 +7,9 @@ require_once("$vgPath/FormControl.php");
 require_once("$vgPath/VO/PageVO.php");
 require_once("$vgPath/DAO/SurveyDAO.php");
 
+/**
+ * @package MediaWikiInterface
+ */
 class spCreateSurvey extends SpecialPage
 {
     private $obj;
@@ -27,6 +30,7 @@ class spCreateSurvey extends SpecialPage
  * Special page Create Survey
  *
  * @author Emir Habul
+ * @package ControlSurvey
  */
 class CreateSurvey
 {

@@ -11,7 +11,7 @@ require_once("$vpPath/ChoiceVO.php");
  * An value object of a survey.
  *
  * @author Bai Qifeng
- * @version 2.0
+ * @package ValueObject
  */
 class SurveyVO
 {
