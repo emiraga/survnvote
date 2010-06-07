@@ -32,8 +32,7 @@ class SmsReport extends SpecialPage
     function execute( $par = null )
     {
         global $wgUser, $vgEnableSMS, $wgOut, $wgRequest;
-        $gr = $wgUser->getGroups();
-        $admin = $wgUser->isLoggedIn() && in_array("bureaucrat", $gr) || in_array("sysop", $gr);
+        $admin = vfUser()->isAdmin();
 
         if(! $vgEnableSMS)
         {

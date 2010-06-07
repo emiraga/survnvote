@@ -52,7 +52,7 @@ class SurveyBody
      */
     static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
-        $output = "<div style=''>".''."<div style=\"display: block; width: 340px;$style\">";
+        $output = "<div style=\"display: block; width: 340px;$style\">";
 
         if($vote)
             $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">$vote";
@@ -61,7 +61,7 @@ class SurveyBody
 
         $output .= "<label style=\"color: black\" for=\"$voteid\">$choice $addtext</label></li>";
 
-        return $output.'</div></div>';
+        return $output.'</div>';
     }
     /**
      *
@@ -167,8 +167,10 @@ class SurveyBody
                     if($survey->getAnswer() == $choice->getChoiceID())
                     {
                         $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
-                    }
-                    $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra);
+                        $style = "border:0px dashed gray; background-color:#CFFFCF; padding-left: 9px;";
+                    }else
+                        $style = '';
+                    $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra, '', '', $style);
                     $votesout[] = $choice->getVote();
                 }
                 array_multisort($votesout, SORT_DESC, SORT_NUMERIC, $choicesout);

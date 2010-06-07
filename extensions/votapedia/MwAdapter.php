@@ -230,6 +230,12 @@ class MwUser
         global $wgUser;
         return $wgUser->isAnon();
     }
+    public function isAdmin()
+    {
+        global $wgUser;
+        $gr = $wgUser->getGroups();
+        return $wgUser->isLoggedIn() && in_array("bureaucrat", $gr) || in_array("sysop", $gr);
+    }
     /**
      * Get user preferences and options
      *
@@ -267,7 +273,7 @@ class MwUser
      */
     function canControlSurvey(&$page)
     {
-        return $this->isAuthor($page);
+        return $this->isAuthor($page) || $this->isAdmin();
     }
     /**
      * Remove unnecessary information from anonymous usernames

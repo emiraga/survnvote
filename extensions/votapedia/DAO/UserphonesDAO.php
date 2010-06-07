@@ -47,7 +47,7 @@ class UserphonesDAO
         return $vgDB->Insert_ID();
     }
     /**
-     * Get a list of phones for this user
+     * Get a list of phones for this user.
      * 
      * @return Array that contains associative arrays
      * with keys 'id', 'dateadded', 'number', 'status', 'description'
@@ -70,7 +70,8 @@ class UserphonesDAO
         return $result;
     }
     /**
-     * 
+     * Check if user is allowed to request a confirmation code send to SMS.
+     *
      * @return Boolean if user is allowed to request confirmation code
      */
     public function checkConfirmAllowed()
@@ -175,14 +176,25 @@ class UserphonesDAO
                 array(vPHONE_DELETED, $id));
         return true;
     }
-
+    /**
+     * Resolve a username from given phone number.
+     *
+     * @param $phone String telephone number
+     * @return String username, or Boolean false if it does not exist.
+     */
     static function getNameFromPhone($phone)
     {
         global $vgDB, $vgDBPrefix;
         return $vgDB->GetOne("SELECT username FROM {$vgDBPrefix}userphones WHERE phonenumber = ? AND status >= ?",
             array($phone, vPHONE_VERIFIED));
     }
-
+    /**
+     * Add a phone number to the user and
+     * automatically mark this phone number as verified.
+     * 
+     * @param $username String
+     * @param $phone String
+     */
     static function addVerifiedPhone($username, $phone)
     {
         global $vgDB, $vgDBPrefix;
