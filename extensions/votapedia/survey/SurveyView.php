@@ -11,6 +11,7 @@ require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/survey/SurveyButtons.php");
 require_once("$vgPath/survey/SurveyBody.php");
 require_once("$vgPath/Graph/Graph.php");
+require_once("$vgPath/FormControl.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey.
@@ -154,11 +155,30 @@ class SurveyView
         }
     }
     /**
-     * Get HTML of survey
+     * Get HTML of a one page of survey
      *
      * @return String html code
      */
     function getHTML()
+    {
+        $items = array();
+        $form = new FormControl($items);
+        
+        global $vgScript;
+        $output = $form->getScriptsIncluded(false);
+
+        $output .= $form->StartFormLite();
+        $output .= $form->pageContents('Run # 1', $this->getHTMLOnePage());
+        $output .= $form->pageContents('Run # 2', '<h1>HAMO</h1>');
+        $output .= $form->EndForm();
+        return $output;
+    }
+    /**
+     * Get HTML of a one page of survey
+     *
+     * @return String html code
+     */
+    function getHTMLOnePage()
     {
         global $vgScript;
         $output = '';

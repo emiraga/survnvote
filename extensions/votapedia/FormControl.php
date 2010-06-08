@@ -158,8 +158,8 @@ class FormControl
      */
     public function showItem($id)
     {
-        global $wgOut, $vgScript, $wgScriptPath;
-        
+        global $vgScript, $wgScriptPath;
+        $output = '';
         $item = $this->items[$id];
 
         if(isset($this->values[$id]))
@@ -252,16 +252,16 @@ class FormControl
         else
             $explanation = '';
 
-        $wgOut->addHTML(
+        $output = 
                 $this->TableRow(
                 $label,
                 $form_element,
                 Xml::tags('div', array( 'class' => 'prefsectiontip' ), $explanation ),
                 isset($item['afterall'])?$item['afterall']:null
-                )
         );
         if(isset($item['html']))
-            $wgOut->addHTML('<tr><td colspan=2>'. $item['html'] .'</tr>');
+            $output .= '<tr><td colspan=2>'. $item['html'] .'</tr>';
+        return $output;
     }
     /**
      * Adds a new tab to the output form
@@ -271,68 +271,98 @@ class FormControl
      */
     public function AddPage($title, $add_items)
     {
-        global $wgOut, $vgScript, $wgScriptPath;
-
-        //opentab tab
-        $wgOut->addHTML(
-                Xml::fieldset( $title ) .
-                Xml::openElement( 'table' )
-        );
-
+        $output = '';
         foreach($add_items as $id)
         {
-            $this->showItem($id);
+            $output .= $this->showItem($id);
         }
-        $wgOut->addHTML( Xml::closeElement( 'table' ) );
-
-        /* next prev buttons
-		$wgOut->addHTML( '<table id=\'prefsubmit\' cellpadding=\'0\' width=\'100%\' style=\'background:none;\'><tr>
-		<td width=100%></td>
-		<td align="left"><input type=button name=next_page onclick=\'javascript:alert( preftoc )\' value=\'Previous\'></td>
-		<td align="right"><input type=button name=next_page onclick=\'javascript:alert(45)\' value=\'Next Page\'></td>
-		</table>' );*/
-
-        //close tab
-        $wgOut->addHTML( Xml::closeElement( 'fieldset' ) );
+        
+        return $this->pageContents($title, $output);
+    }
+    /**
+     * Returns a HTML code for one page in Form.
+     *
+     * @param String $title title of a page
+     * @param String $contents contents of this page as HTML
+     */
+    public function pageContents($title, $contents)
+    {
+        $output = Xml::fieldset( $title ) . Xml::openElement( 'table' );
+        $output .= $contents;
+        $output .= Xml::closeElement( 'table' ).Xml::closeElement( 'fieldset' );
+        return $output;
     }
     /**
      * Start drawing the form
      *
      * @param String $action target of a HTML form
      * @param Integer $id id inside HTML of form
+     * @return String HTML code
      */
-    public function StartForm($action, $id='')
+    public function StartForm($action='', $id='')
     {
-        global $wgOut;
-        $wgOut->addHTML(
-                Xml::openElement( 'form', array(
-                'action' => $action,
-                'method' => 'post',
-                'id'     => $id,
-                ) ) .
-                Xml::openElement( 'div', array( 'id' => 'preferences' ) )
-        );
+        $output = '';
+        if($action)
+        {
+            $output .= Xml::openElement( 'form', array(
+            'action' => $action,
+            'method' => 'post',
+            'id'     => $id,
+            ) );
+        }
+        $output .= Xml::openElement( 'div', array( 'id' => 'preferences' ) );
+        return $output;
+    }
+    /**
+     * Start drawing the form
+     *
+     * @param String $action target of a HTML form
+     * @param Integer $id id inside HTML of form
+     * @return String HTML code
+     */
+    public function StartFormLite()
+    {
+        $output = '<div id="preferences" style="margin: 0; padding: 0.5em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
+        return $output;
     }
     /**
      * End drawing the form
      *
      * @param String $submit value of submit button in the form
+     * @return String HTML code
      */
-    public function EndForm($submit)
+    public function EndForm($submit = '')
     {
-        global $vgPath;
-        require_once("$vgPath/MwAdapter.php");
-
-        global $wgOut;
-        $token = vfUser()->editToken();
-        $wgOut->addHTML( "
-	<table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
-		<td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onClick='{$this->onFormSubmit}' />
-		</td>
-		<td></td>
-	</tr></table>
-	<input type='hidden' name='wpEditToken' value=\"{$token}\" />" );
-        $wgOut->addHTML('</div></form>');
+        $output = '';
+        if($submit)
+        {
+            global $vgPath;
+            require_once("$vgPath/MwAdapter.php");
+            $token = vfUser()->editToken();
+            $output .= "
+            <table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
+                    <td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onClick='{$this->onFormSubmit}' />
+                    </td>
+                    <td></td>
+            </tr></table>
+            <input type='hidden' name='wpEditToken' value=\"{$token}\" />";
+        }
+        $output .= '</div></form>';
+        return $output;
+    }
+    /**
+     * Return HTML code that includes javascript codes
+     */
+    function getScriptsIncluded($jquery = false)
+    {
+        global $vgScript;
+        $output = '<script type="text/javascript" src="'.$vgScript.'/survey.js"></script>';
+        if($jquery)
+        {
+            $output .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/'
+                .'jquery/1.4.2/jquery.min.js"></script>';
+        }
+        return $output;
     }
 }
-?>
+

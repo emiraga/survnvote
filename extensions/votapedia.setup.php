@@ -43,13 +43,16 @@ else
     echo <<<END_HTML
 <h1>Welcome to votapedia installation.</h1>
 <p>This script <b>votapedia.setup.php</b> is very dangerous and must be deleted after installation is complete.</p>
-<p>Do not run this script if you have already installed votapedia, it will <b>delete</b> tables from database related to votapedia.</p>
+<p>Do not run this script if you have already installed votapedia, it will <b>truncate</b> tables from database.</p>
 Installation Steps:
 <ol>
 <li>Make sure that MediaWiki is working properly.</li>
-<li>Add following line to <b>LocalSettings.php</b><br /><code>require_once("\$IP/extensions/votapedia/votapedia.php");</code></li>
-<li>Edit file <b>extensions/votapedia/config.php</b> to configure votapedia settings.</li>
-<li>Edit file <b>extensions/votapedia.setup.php</b> to set the master user/password.</li>
+<li>Rename <code>extensions/votapedia/config.sample</code> to <code>config.php</code>, and configure votapedia settings.</li>
+<li>Add following line to <a href="http://www.mediawiki.org/wiki/Manual:LocalSettings.php"><b>LocalSettings.php</b></a><br />
+    <code><br>require_once("\$IP/extensions/votapedia/votapedia.php");<br><br></code></li>
+<li>Set <a href="http://www.mediawiki.org/wiki/Manual:\$wgDBadminuser">\$wgDBadminuser</a>
+    and <a href="http://www.mediawiki.org/wiki/Manual:\$wgDBadminpassword">\$wgDBadminpassword</a> in
+    <a href="http://www.mediawiki.org/wiki/Manual:Maintenance_scripts"><b>AdminSettings.php</b></a></li>
 <li>Open this script in browser (you are doing it right now)</li>
 <li>
 <form action="$vgScript/../votapedia.setup.php" method="POST">

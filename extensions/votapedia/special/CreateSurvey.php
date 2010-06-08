@@ -644,15 +644,17 @@ class CreateSurvey
      */
     function preDrawForm($errors)
     {
-        global $wgOut, $vgScript;
+        global $wgOut;
         $wgOut->setArticleFlag(false);
         $wgOut->returnToMain();
-        $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/survey.js"></script>');
-        $wgOut->addHTML('<script type="text/javascript" src="'.$vgScript.'/jquery-1.4.2.min.js"></script>');
+
+        $output = $this->form->getScriptsIncluded(true);
         if($errors)
-            $wgOut->addWikiText( vfErrorBox( '<ul>'.$errors.'</ul>') );
+            $output .=  vfErrorBox( '<ul>'.$errors.'</ul>');
         $crform = Title::newFromText($this->spPageName);
-        $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
+        $output .= $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
+        
+        $wgOut->addHTML($output);
     }
     /**
      * Draw form for new survey using FormControl
@@ -661,12 +663,16 @@ class CreateSurvey
     {
         global $wgOut;
         $wgOut->setPageTitle(wfMsg('title-new-survey'));
+
+        $output = '';
         foreach($this->formpages as $fpage)
         {
-            $this->form->AddPage($fpage['title'], $fpage['items']);
+            $output .= $this->form->AddPage($fpage['title'], $fpage['items']);
         }
-        $wgOut->addHTML('<input type="hidden" name="vpAction" value="createnew">');
+        $output .= '<input type="hidden" name="vpAction" value="createnew">';
         $this->formButton = wfMsg('create-survey');
+
+        $wgOut->addHTML($output);
     }
     /**
      * Draw form for editing surveys using FormControl
@@ -682,8 +688,9 @@ class CreateSurvey
         global $wgOut, $vgScript;
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
 
-        $wgOut->addHTML('<input type="hidden" name="id" value="'.$page_id.'">');
-        $wgOut->addHTML('<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">');
+        $output = '';
+        $output .= '<input type="hidden" name="id" value="'.$page_id.'">';
+        $output .= '<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">';
 
         if(isset($this->formpages[0]))
         {
@@ -694,17 +701,21 @@ class CreateSurvey
 
         foreach($this->formpages as $fpage)
         {
-            $this->form->AddPage($fpage['title'], $fpage['items']);
+            $output .= $this->form->AddPage($fpage['title'], $fpage['items']);
         }
-        $wgOut->addHTML('<input type="hidden" name="vpAction" value="editcontinue">');
+        $output .= '<input type="hidden" name="vpAction" value="editcontinue">';
         $this->formButton = wfMsg('edit-survey');
+
+        $wgOut->addHTML($output);
     }
     /**
      * After drawing form
      */
     protected function postDrawForm()
     {
-        $this->form->EndForm($this->formButton);
+        $output = $this->form->EndForm($this->formButton);
+        global $wgOut;
+        $wgOut->addHTML($output);
     }
 }// End of class CreateSurvey
 
