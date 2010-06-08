@@ -322,7 +322,7 @@ class FormControl
      */
     public function StartFormLite()
     {
-        $output = '<div id="preferences" style="margin: 0; padding: 0.5em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
+        $output = '<div class="lite"><div id="preferences" style="margin: 0; padding: 0.5em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
         return $output;
     }
     /**
@@ -349,6 +349,15 @@ class FormControl
         }
         $output .= '</div></form>';
         return $output;
+    }
+    /**
+     * End drawing the form
+     * 
+     * @return String
+     */
+    public function EndFormLite()
+    {
+        return '</div></div></form>';
     }
     /**
      * Return HTML code that includes javascript codes

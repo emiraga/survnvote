@@ -1653,3 +1653,12 @@ table.prettytable caption {
 	margin-left:inherit;
 	margin-right:inherit;
 }
+
+.lite #preftoc li
+{
+    float: right;
+}
+.lite #preftoc ul
+{
+    margin-right: 10px;
+}

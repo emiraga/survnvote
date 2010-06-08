@@ -168,9 +168,10 @@ class SurveyView
         $output = $form->getScriptsIncluded(false);
 
         $output .= $form->StartFormLite();
-        $output .= $form->pageContents('Run # 1', $this->getHTMLOnePage());
+        $output .= $form->pageContents('Run # 3', $this->getHTMLOnePage());
         $output .= $form->pageContents('Run # 2', '<h1>HAMO</h1>');
-        $output .= $form->EndForm();
+        $output .= $form->pageContents('Run # 1', '<h1>HAMO</h1>');
+        $output .= $form->EndFormLite();
         return $output;
     }
     /**
@@ -184,7 +185,7 @@ class SurveyView
         $output = '';
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
-        $output.= '<h2>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</h2>';
+        $output.= '<h3>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</h3>';
         //$output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
