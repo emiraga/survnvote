@@ -7,11 +7,11 @@ if (!defined('MEDIAWIKI')) die();
 /** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
-require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/survey/SurveyButtons.php");
 require_once("$vgPath/survey/SurveyBody.php");
 require_once("$vgPath/Graph/Graph.php");
 require_once("$vgPath/FormControl.php");
+require_once("$vgPath/DAO/PageDAO.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey.
@@ -86,8 +86,8 @@ class SurveyView
         if(! $this->page_id)
             throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
 
-        $surveydao = new SurveyDAO();
-        $this->page = $surveydao->findByPageID( $page_id );
+        $pagedao = new PageDAO();
+        $this->page = $pagedao->findByPageID( $page_id );
 
         if($wgRequest->getVal('returnto'))
             $this->wikititle = Title::newFromText($wgRequest->getVal('returnto'));

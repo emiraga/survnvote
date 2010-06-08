@@ -8,8 +8,7 @@ if (!defined('MEDIAWIKI')) die();
 global $vgPath;
 require_once("$vgPath/Common.php" );
 require_once("$vgPath/FormControl.php");
-require_once("$vgPath/VO/PageVO.php");
-require_once("$vgPath/DAO/SurveyDAO.php");
+require_once("$vgPath/DAO/PageDAO.php");
 
 /**
  * @package MediaWikiInterface
@@ -317,8 +316,6 @@ class CreateSurvey
         $surveyVO = new SurveyVO();
         $surveyVO->generateChoices( preg_split("/\n/", $values['choices']) );
         $surveyVO->setQuestion('#see page title');
-        $surveyVO->setType(vSIMPLE_SURVEY);
-        $surveyVO->setVotesAllowed(1);
         $surveyVO->setPoints(0);
         return array($surveyVO);
     }
@@ -335,11 +332,9 @@ class CreateSurvey
 
         try
         {
-            $surveyDAO = new SurveyDAO();
+            $pageDAO = new PageDAO();
             $page = $this->generatePageVO($values);
-            $databaseWritten= $surveyDAO->insertPage($page, true);
-            if(! $databaseWritten)
-                throw new Exception("Error while writing to voting database.");
+            $pageDAO->insertPage($page, true);
         }
         catch( Exception $e )
         {
@@ -471,8 +466,8 @@ class CreateSurvey
 
         try
         {
-            $surveydao = new SurveyDAO();
-            $page = $surveydao->findByPageID( $page_id );
+            $pagedao = new PageDAO();
+            $page = $pagedao->findByPageID( $page_id );
         }
         catch(SurveyException $e)
         {
@@ -511,8 +506,8 @@ class CreateSurvey
 
         try
         {
-            $surveydao = new SurveyDAO();
-            $this->page = $surveydao->findByPageID( $page_id );
+            $pagedao = new PageDAO();
+            $this->page = $pagedao->findByPageID( $page_id );
             /*$this->fillFormValuesFromPage($this->page);*/
             $this->form->loadValuesFromRequest();
             $error = $this->Validate();
@@ -547,13 +542,13 @@ class CreateSurvey
                 {
                     $page =& $this->page;
                     $this->setPageVOvaluesSmall($page, $this->form->getValuesArray());
-                    $surveydao->updatePage($page, false);
+                    $pagedao->updatePage($page, false, false);
                 }
                 else
                 {
                     $page = $this->generatePageVO($this->form->getValuesArray());
                     $page->setPageID($page_id);
-                    $surveydao->updatePage($page);
+                    $pagedao->updatePage($page);
                 }
             }
             catch(SurveyException $e)

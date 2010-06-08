@@ -11,19 +11,20 @@ if (!defined('MEDIAWIKI')) die();
  */
 class PresentationVO
 {
-    private $surveyID;
+    private $pageID;
     private $presentationID = 0;
-    private $presentation;
+    private $name;
     private $active = 0;
-    private $mark = 0;
+    private $startTime = "2999-01-01 00:00:00";
+    private $endTime = "2999-01-01 00:00:00";
     /**
-     * set Survey ID of presentation
+     * set Page ID of presentation
      *
      * @param Integer $surveyID
      */
-    public function setSurveyID($surveyID)
+    public function setPageID($pageID)
     {
-        $this->surveyID = $surveyID;
+        $this->pageID = $pageID;
     }
     /**
      * set presentation ID
@@ -37,11 +38,11 @@ class PresentationVO
     /**
      * Set presentation
      *
-     * @param String $presentation
+     * @param String $name
      */
-    public function setPresentation($presentation)
+    public function setName($name)
     {
-        $this->presentation = $presentation;
+        $this->name = $name;
     }
     /**
      * Set whether the presentation is active
@@ -53,19 +54,11 @@ class PresentationVO
         $this->active = $active;
     }
     /**
-     * set how many points the presentation gets
-     * @param Integer $mark
-     */
-    public function setMark($mark)
-    {
-        $this->mark = $mark;
-    }
-    /**
      * @return Integer $surveyID
      */
-    public function getSurveyID()
+    public function getPageID()
     {
-        return $this->surveyID;
+        return $this->pageID;
     }
     /**
      * get ID of presentation
@@ -77,13 +70,13 @@ class PresentationVO
         return $this->presentationID;
     }
     /**
-     * get the presentation content
+     * Get the presentation content
      *
-     * @return String $presentation
+     * @return String name
      */
-    public function getPresentation()
+    public function getName()
     {
-        return $this->presentation;
+        return $this->name;
     }
     /**
      * get whether the presentation is acitved
@@ -95,14 +88,49 @@ class PresentationVO
         return $this->active;
     }
     /**
-     * get how many marks this presentation gets
+     * Set start time of this presentation, must match the required date format
      *
-     * @return Integer marks
+     * @param String $startTime yyyy-mm-dd hh:mm:ss
      */
-    public function getMark()
+    function setStartTime($startTime)
     {
-        return $this->mark;
+        $this->startTime = $this->validateDate($startTime);
     }
-
+    /**
+     * Set end time of this presentation
+     * @param String $endTime
+     */
+    function setEndTime($endTime)
+    {
+        $this->endTime = $endTime;
+    }
+    /**
+     * get starting time of this survey
+     * @return String start time of this survey
+     */
+    function getStartTime()
+    {
+        return $this->startTime;
+    }
+    /**
+     * get finishing time of this survey
+     * @return String finishing time of this survey
+     */
+    function getEndTime()
+    {
+        return $this->endTime;
+    }
+    /**
+     * Validate whether matchs the requried data format
+     * @param String $date date
+     * @return String date if true, tigger a error if false
+     */
+    function validateDate($date)
+    {
+        if (preg_match("/^[0-9]{4}\-[0|1][0-9]\-[0-3][0-9]\040[0-9]{2}\:[0-9]{2}:[0-9]{2}/", $date))
+            return $date;
+        else
+            throw new SurveyException("Date/Time must follow yyyy-mm-dd hh:mm:ss format!",100);
+    }
 }
 

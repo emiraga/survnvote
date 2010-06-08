@@ -284,8 +284,8 @@ class Telephone
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
-        $surveydao = new SurveyDAO();
-        $pages = $surveydao->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
+        $pagedao = new PageDAO();
+        $pages = $pagedao->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
         $ret = array();
         foreach ($pages as $page)
         {

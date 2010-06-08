@@ -7,8 +7,8 @@ if (!defined('MEDIAWIKI')) die();
 /** Include dependencies */
 global $vgPath;
 require_once("$vgPath/MwAdapter.php");
-require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/DAO/VoteDAO.php");
+require_once("$vgPath/DAO/PageDAO.php");
 
 /**
  * Special page Create Survey.
@@ -42,8 +42,8 @@ class ProcessSurvey extends SpecialPage
         $action = $wgRequest->getVal( 'wpSubmit' );
         try
         {
-            $surveydao = new SurveyDAO();
-            $page = $surveydao->findByPageID($page_id);
+            $pagedao = new PageDAO();
+            $page = $pagedao->findByPageID($page_id);
             if(    $action == wfMsg('start-survey')
                 || $action == wfMsg('start-questionnaire')
                 || $action == wfMsg('start-quiz')
@@ -67,8 +67,8 @@ class ProcessSurvey extends SpecialPage
                     {
                         //Setup receivers
                         $tel->setupReceivers($page);
-                        $surveydao->updateReceiversSMS($page);
-                        $surveydao->startSurvey($page);
+                        $pagedao->updateReceiversSMS($page);
+                        $pagedao->startPageSurvey($page);
                     }
                     catch(Exception $e)
                     {
@@ -139,7 +139,7 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
-                $surveydao->stopSurvey($page);
+                $pagedao->stopPageSurvey($page);
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);
@@ -152,29 +152,6 @@ class ProcessSurvey extends SpecialPage
             $wgOut->addReturnTo(Title::newFromText($wgRequest->getVal('returnto')));
             return;
         }
-    }
-    /**
-     * Perform maintenace operations related to Surveys
-     * 1. Mark surveys as finished
-     * 2. Invalidate cache of pages which include these surveys
-     * @deprecated survey tags are no longer cache-able
-     */
-    static function maintenance()
-    {
-        die('@deprecated');
-
-        wfLoadExtensionMessages('Votapedia');
-        $s = new SurveyDAO();
-        //stop expired surveys/pages
-        $finished = $s->processFinished();
-        $extra = '';
-        //invalidate cache of all finished pages
-        foreach($finished as $page_id)
-        {
-            vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-            $extra .= "Finished $page_id\n";
-        }
-        return "OK\n".$extra;
     }
 }
 

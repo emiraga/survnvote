@@ -81,7 +81,6 @@ class CreateQuiz extends CreateQuestionnaire
         {
             $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
             $surveys[$i]->setAnswerByChoice( $wgRequest->getVal("q{$index}correct",'') );
-            $surveys[$i]->setType( vQUIZ );
             $i++;
         }
         return $surveys;
@@ -143,7 +142,6 @@ class CreateQuiz extends CreateQuestionnaire
             if($wgRequest->getCheck("q{$index}correct"))
             {
                 $surveys[$i]->setAnswerByChoice($wgRequest->getVal("q{$index}correct"));
-                $surveys[$i]->setType(vQUIZ);
                 $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
             }
             $i++;

@@ -22,14 +22,9 @@ class SurveyVO
     private $answer = 0;
     private $points = 0;
     private $choices = array();
-    private $presentations = array();
-    private $votesAllowed=1;
-
-    //Reduntant info from PageVO
-    private $surveyType = 1;
-
     /**
      * Set pageID
+     * 
      * @param Integer $id
      */
     function setPageID($id)
@@ -38,6 +33,7 @@ class SurveyVO
     }
     /**
      * Set an ID of this survey
+     * 
      * @param Integer $id
      */
     function setSurveyID($id)
@@ -46,6 +42,7 @@ class SurveyVO
     }
     /**
      * Set question of this survey
+     *
      * @param String $question
      */
     function setQuestion($question)
@@ -74,6 +71,7 @@ class SurveyVO
     }
     /**
      * Set the answer of survey
+     * 
      * @param String $answer
      */
     function setAnswerByChoice($answer)
@@ -140,33 +138,6 @@ class SurveyVO
         $this->setChoices($choices);
     }
     /**
-     * Set multiple presentations of this survey
-     *
-     * @param Array $presentations of PresentationVO
-     */
-    function setPresentations($presentations)
-    {
-        $this->presentations = $presentations;
-    }
-    /**
-     * Set type of Survey
-     *
-     * @param Integer $surveyType
-     */
-    function setType($surveyType)
-    {
-        $this->surveyType = $surveyType;
-    }
-    /**
-     * Set number of votes allowed per one user
-     *
-     * @param Integer $votesAllowed
-     */
-    function setVotesAllowed($votesAllowed)
-    {
-        $this->votesAllowed = $votesAllowed;
-    }
-    /**
      * Get page ID
      * 
      * @return Integer $pageID
@@ -185,7 +156,8 @@ class SurveyVO
         return $this->surveyID;
     }
     /**
-     * get question of this survey
+     * Get question of this survey
+     * 
      * @return String quesion of this survey
      */
     function getQuestion()
@@ -202,7 +174,7 @@ class SurveyVO
         return $this->answer;
     }
     /**
-     * get the points of this survey
+     * Get the points of this survey
      *
      * @return Integer $points
      */
@@ -210,16 +182,9 @@ class SurveyVO
     {
         return $this->points;
     }
-
     /**
-     * @return Integer $type Type of survey
-     */
-    function getType()
-    {
-        return $this->surveyType;
-    }
-    /**
-     * get mulit choices in this survey
+     * Get multi choices in this survey
+     *
      * @return Array $choices
      */
     function &getChoices()
@@ -227,7 +192,8 @@ class SurveyVO
         return $this->choices;
     }
     /**
-     * get the number of choices in this survey
+     * Get the number of choices in this survey
+     *
      * @return Integer the number of choices included in this survey
      */
     function getNumOfChoices()
@@ -262,58 +228,6 @@ class SurveyVO
         return null;
     }*/
     /**
-     * Get multi presentations in this survey.
-     * 
-     * @return Array of presentations in this survey
-     */
-    function getPresentations()
-    {
-        return $this->presentations;
-    }
-    /**
-     * Get the number of presentations in this survey.
-     * 
-     * @return Integer the number of presentations included in this survey
-     */
-    function getNumOfPresentations()
-    {
-        return count($this->presentations);
-    }
-    /**
-     * Get one choice in this survey based on ID of this choice.
-     * 
-     * @param Integer $i id of the choice which want to be retrieved
-     * @return PresentationVO a presentation
-     */
-    function getPresentationByNum($i)
-    {
-        if(isset($this->presentations[$i]))
-            return $this->presentations[$i];
-        else
-            return false;
-    }
-    /**
-     * @return Integer number of votes allowed
-     */
-    function getVotesAllowed()
-    {
-        return $this->votesAllowed;
-    }
-    /**
-     * Get the current active presentation
-     *
-     * @return PresentationVO presentation
-     */
-    function getActivePresentationID()
-    {
-        foreach($this->presentations as $presentation)
-        {
-            if ($presentation->getActive() == '1' )
-                return  $presentation->getPresentationID();
-        }
-        return 0;
-    }
-    /**
      * Convert to XML.
      * 
      * @return String
@@ -324,7 +238,6 @@ class SurveyVO
         $xml="<survey>";
         $xml=$xml."<id>".$this->surveyID."</id>";
         $xml=$xml."<question>".str_ireplace('+',' ',urldecode($this->question))."</question>";
-        $xml=$xml."<votesAllowed>".$this->votesAllowed."</votesAllowed>";
 
         $xml=$xml."<choices>";
         $votes  = 0;
@@ -355,4 +268,3 @@ class SurveyVO
     }
 }
 
-?>

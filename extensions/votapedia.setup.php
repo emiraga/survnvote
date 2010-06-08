@@ -3,10 +3,8 @@ if(!defined('MEDIAWIKI')) define('MEDIAWIKI',true);
 define('VOTAPEDIA_SETUP',true);
 
 @require_once('../LocalSettings.php');
-
-global $vgDBUserName, $vgDBUserPassword;
-@require_once("../AdminSettings.php");
-//Enter user/pass of a admin account for mysql that has priviledges for CREATE and DELETE of tables.
+@include_once("../AdminSettings.php");
+//user/pass of a admin account for mysql that has priviledges for CREATE and DELETE of tables.
 $vgDBUserName = $wgDBadminuser;
 $vgDBUserPassword = $wgDBadminpassword;
 
@@ -156,11 +154,12 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
 --
 
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
-  surveyID int NOT NULL,
+  pageID int NOT NULL,
   presentationID int NOT NULL,
-  presentation varchar(1000) NOT NULL,
-  active tinyint(1) NOT NULL DEFAULT '0',
-  mark tinyint(8) NOT NULL DEFAULT '0'
+  name varchar(50) NOT NULL,
+  startTime datetime NOT NULL,
+  endTime datetime NOT NULL,
+  active tinyint(1) NOT NULL DEFAULT '0'
 );
 
 -- --------------------------------------------------------
@@ -302,3 +301,4 @@ END_SQL;
     }
     /* END OF function vfDoSetup */
 }
+

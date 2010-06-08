@@ -229,8 +229,6 @@ END_SCRIPT;
             $surveyVO = new SurveyVO();
             $surveyVO->generateChoices($choices, true);
             $surveyVO->setQuestion($question);
-            $surveyVO->setType(vQUESTIONNAIRE);
-            $surveyVO->setVotesAllowed(1);
             $surveyVO->setPoints(0);
             $surveys[] = $surveyVO;
         }
@@ -285,7 +283,6 @@ END_SCRIPT;
             $strchoices = $wgRequest->getArray("q{$index}choices", array());
             $survey = new SurveyVO();
             $survey->setQuestion($question);
-            $survey->setType(vQUESTIONNAIRE);
             $choices = array();
             foreach($strchoices as $choice)
             {

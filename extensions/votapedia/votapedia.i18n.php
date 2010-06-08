@@ -53,7 +53,7 @@ $messages['en'] = array(
     'cat-survey-name' => 'Category:Pages with survey id $1',
     'mobile-phone' => 'Mobile Phone:',
     
-    'title-view-survey'	=> 'View survey',
+    'title-view-survey'	=> 'View survey details',
     'title-new-survey'	=> 'Create New Simple Survey',
     'title-edit-survey'	=> 'Edit Simple Survey',
     'title-new-questionnaire' => 'Create New Questionnaire',

@@ -1,7 +1,7 @@
 <?php
 if(isset($_SERVER['HOST'])) die('Must be run from command line.');
 /**
- * Background process which monitors the incoming SMS and CALLS
+ * Background process which monitors the incoming SMS and CALLS.
  * 
  * @package Daemon
  */
@@ -13,7 +13,7 @@ $IP = '/xampp/htdocs/new';
 define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
 @require_once("$IP/LocalSettings.php");
-@require_once("$IP/AdminSettings.php");
+@include_once("$IP/AdminSettings.php");
 $vgDBUserName = $wgDBadminuser; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = $wgDBadminpassword;
 
@@ -21,11 +21,11 @@ $vgDBUserPassword = $wgDBadminpassword;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
-require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
+require_once("$vgPath/DAO/PageDAO.php");
 
 $page_cache = array();
-$surveydao = new SurveyDAO();
+$pagedao = new PageDAO();
 
 /**
  * Create a new user by performing a POST request to the MediaWiki.
@@ -89,7 +89,7 @@ function vfDaemonNewUser($phonenumber)
  */
 function vfDaemonSmsAction()
 {
-    global $surveydao, $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS;
+    global $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS;
 
     if(! $vgEnableSMS)
         return;
@@ -136,7 +136,7 @@ function vfDaemonSmsAction()
  */
 function vfVoteFromDaemon($choice, $username)
 {
-    global $vgDBPrefix, $vgDB, $surveydao;
+    global $vgDBPrefix, $vgDB, $pagedao;
     //load PageVO
     $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
         array($choice));
@@ -145,7 +145,7 @@ function vfVoteFromDaemon($choice, $username)
     $surveyid = $result->fields['surveyID'];
     $choiceid = $result->fields['choiceID'];
     $pageid = $result->fields['pageID'];
-    $page =& $surveydao->findByPageID($pageid, false);
+    $page =& $pagedao->findByPageID($pageid, false);
     //Save vote
     $votedao = new VoteDAO($page, $username);
     $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );

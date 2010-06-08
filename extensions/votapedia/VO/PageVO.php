@@ -11,9 +11,9 @@ require_once("$vpPath/SurveyVO.php");
 /**
  * Value Object of Page which contains survey array etc.
  *
- * Page 1-->1..* survey
- * survey 1-->1..* choice
- * survey 1-->0..* presentation.
+ * Page 1-->0..* PresentationVO
+ * Page 1-->1..* SurveyVO
+ * SurveyVO 1-->1..* ChoiceVO
  *
  * @package ValueObject
  */
@@ -33,10 +33,11 @@ class PageVO
     private $displayTop = 0;
     private $votesAllowed = 1;
     private $subtractWrong = 0;
-    private $surveys = array();
     private $privacy = 1;
     private $phonevoting = 'anon';
     private $webvoting = 'anon';
+    private $surveys = array();
+    private $presentations = array();
 
     /**
      * Construct PageVO
@@ -468,5 +469,59 @@ class PageVO
         else
             return vfDate($start + $this->duration*60);
     }
+    /**
+     * Set multiple presentations of this page
+     *
+     * @param Array $presentations of PresentationVO
+     */
+    function setPresentations(&$presentations)
+    {
+        $this->presentations =& $presentations;
+    }
+    /**
+     * Get multi presentations in this survey.
+     *
+     * @return Array of presentations in this survey
+     */
+    function getPresentations()
+    {
+        return $this->presentations;
+    }
+    /**
+     * Get the number of presentations in this survey.
+     *
+     * @return Integer the number of presentations included in this survey
+     */
+    function getNumOfPresentations()
+    {
+        return count($this->presentations);
+    }
+    /**
+     * Get one choice in this survey based on ID of this choice.
+     *
+     * @param Integer $i id of the choice which want to be retrieved
+     * @return PresentationVO a presentation
+     */
+    function getPresentationByNum($i)
+    {
+        if(isset($this->presentations[$i]))
+            return $this->presentations[$i];
+        else
+            return false;
+    }
+    /**
+     * Get the current active presentation
+     *
+     * @return PresentationVO presentation
+     */
+    function getActivePresentationID()
+    {
+        foreach($this->presentations as $presentation)
+        {
+            if ($presentation->getActive())
+                return  $presentation->getPresentationID();
+        }
+        return 0;
+    }
 }
-?>
+

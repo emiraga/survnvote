@@ -151,3 +151,6 @@ $wgFbSecret      = '956d1c6e0572c973647155bbd066ae63';
 
 $wgUseSiteCss = false;
 $wgUseSiteJs = false;
+
+$wgLocaltimezone = "Asia/Kuala_Lumpur";
+

@@ -7,9 +7,9 @@ if (!defined('MEDIAWIKI')) die();
 /** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php");
-require_once("$vgPath/DAO/SurveyDAO.php");
 require_once("$vgPath/graph/Graph.php");
 require_once("$vgPath/DAO/VoteDAO.php");
+require_once("$vgPath/DAO/PageDAO.php");
 
 /**
  * SurveyBody shows the main part of the survey.
@@ -401,8 +401,8 @@ class SurveyBody
             return ''; // there are no new votes
         //@todo check permisions
         $now = time();
-        $sdao = new SurveyDAO();
-        $page = $sdao->findByPageID($page_id);
+        $pagedao = new PageDAO();
+        $page = $pagedao->findByPageID($page_id);
         $surveybody = new SurveyBody($page, new MwParser(new Parser()));
 
         if($survey_id)

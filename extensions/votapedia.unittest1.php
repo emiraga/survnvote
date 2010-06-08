@@ -2,10 +2,11 @@
 if(isset($_SERVER['HOST'])) die('Must be run from command line.');
 //Set this path to Mediawiki
 $IP = '/xampp/htdocs/new';
+
 define('VOTAPEDIA_TEST', true);
 define('MEDIAWIKI', true);
 @require_once("$IP/LocalSettings.php");
-@require_once("$IP/AdminSettings.php");
+@include_once("$IP/AdminSettings.php");
 $vgDBName = "unittest_setup";
 $vgDBUserName       = $wgDBadminuser;
 $vgDBUserPassword   = $wgDBadminpassword;
@@ -24,6 +25,73 @@ function pointTime($msg = '')
     $a = microtime(true);
 }
 
+if(true) /* test PresentationVO */
+{
+    echo 'P';
+    require_once("$vgPath/VO/PresentationVO.php");
+    $survey = new PresentationVO();
+
+    assert(! $survey->getPageID() );
+    assert( $survey->getPresentationID() == 0 ); /* default value is 0 */
+    assert(! $survey->getName() );
+    assert(! $survey->getActive() );
+    assert( $survey->getStartTime() == "2999-01-01 00:00:00" );
+    assert( $survey->getEndTime() == "2999-01-01 00:00:00" );
+
+    $survey->setPageID(4);
+    $survey->setPresentationID(5);
+    $survey->setName('presentation name');
+    $survey->setActive(true);
+    $survey->setStartTime("2010-05-06 15:21:22");
+    $survey->setEndTime("2010-05-06 16:21:22");
+
+    assert( $survey->getPageID() == 4 );
+    assert( $survey->getPresentationID() == 5 );
+    assert( $survey->getName() == 'presentation name' );
+    assert( $survey->getActive() == '1' );
+    assert( $survey->getStartTime() == '2010-05-06 15:21:22' );
+    assert( $survey->getEndTime() == '2010-05-06 16:21:22' );
+
+    $survey->setActive(false);
+    assert( $survey->getActive() == '0' );
+}
+
+if(true) /* test PresentationDAO */
+{
+    require_once("$vgPath/DAO/PresentationDAO.php");
+    echo '.';
+
+    $survey = new PresentationVO();
+    $survey->setPresentationID(100);
+    $survey->setName('P1');
+    $survey->setActive(true);
+    $survey->setPageID(11);
+    PresentationDAO::insert($survey);
+    $survey->setName('P2');
+    $survey->setPageID(12);
+    $survey->setStartTime('2010-05-06 14:21:22');
+    $survey->setEndTime('2010-05-06 15:21:22');
+    $survey->setActive(true);
+    $survey->setPresentationID(101);
+    PresentationDAO::insert($survey);
+    $survey->setName('P3');
+    $survey->setPageID(11);
+    PresentationDAO::insert($survey);
+    $presnts =& PresentationDAO::getFromPage( 11 );
+    assert(count($presnts) == 2);
+    $presnts =& PresentationDAO::getFromPage( 12 );
+    assert(count($presnts) == 1);
+
+    $survey = $presnts[0];
+
+    assert( $survey->getPageID() == 12 );
+    assert( $survey->getActive() == true );
+    assert( $survey->getEndTime() == '2010-05-06 15:21:22' );
+    assert( $survey->getName() == 'P2' );
+    assert( $survey->getPresentationID() == 101 );
+    assert( $survey->getStartTime() == '2010-05-06 14:21:22' );
+}
+
 if(true) /* Test choiceVO */
 {
     echo '.';
@@ -34,7 +102,7 @@ if(true) /* Test choiceVO */
     assert(! $choice->getChoice() );
     assert(! $choice->getPoints() );
     assert(! $choice->getReceiver() );
-    assert(! $choice->getSMS() ); //what? EE represents error
+    assert(! $choice->getSMS() );
     assert(! $choice->getSurveyID() );
     assert(! $choice->getVote() );
 
@@ -53,125 +121,47 @@ if(true) /* Test choiceVO */
     assert( $choice->getSMS() == '25' );
     assert( $choice->getVote() == 3  );
     assert( $choice->getPoints() == 4  );
-
-}
-if(true) /* test PresentationVO */
-{
-    echo '.';
-    require_once("$vgPath/VO/PresentationVO.php");
-    $present = new PresentationVO();
-
-    assert(! $present->getSurveyID() );
-    assert( $present->getPresentationID() == 0 ); /* default value is 0 */
-    assert(! $present->getPresentation() );
-    assert(! $present->getActive() );
-    assert(! $present->getMark() );
-
-    $present->setSurveyID(4);
-    $present->setPresentationID(5);
-    $present->setPresentation('presentation name');
-    $present->setActive(true);
-    $present->setMark(8);
-
-    assert( $present->getSurveyID() == 4 );
-    assert( $present->getPresentationID() == 5 );
-    assert( $present->getPresentation() == 'presentation name' );
-    assert( $present->getActive() == '1' );
-    assert( $present->getMark() == 8 );
-
-    $present->setActive(false);
-    assert( $present->getActive() == '0' );
-}
-
-if(true) /* test VoteVO */
-{
-    echo '.';
-    require_once("$vgPath/VO/VoteVO.php");
-    $vote = new VoteVO();
-    assert( ! $vote->getChoiceID() );
-    assert( 0 == $vote->getPresentationID() );
-    assert( ! $vote->getSurveyID() );
-    assert( ! $vote->getVoteDate() );
-    assert( ! $vote->getVoteType() );
-    assert( ! $vote->getVoterID() );
-    assert( 1 == $vote->getVotesAllowed() );
-
-    $vote->setChoiceID(34);
-    $vote->setPresentationID(34);
-    $vote->setSurveyID(978);
-    $vote->setVoteDate('2001');
-    $vote->setVoteType('WEB');
-    $vote->setVoterID(3);
-    $vote->setVotesAllowed(6);
-
-    assert( 34 == $vote->getChoiceID() );
-    assert( 34 == $vote->getPresentationID() );
-    assert( 978 == $vote->getSurveyID() );
-    assert( '2001' == $vote->getVoteDate() );
-    assert( 'WEB' == $vote->getVoteType() );
-    assert( 3 == $vote->getVoterID() );
-    assert( 6 == $vote->getVotesAllowed() );
-    try
-    {
-        $vote->setVoteType('GHE');
-        assert(false);
-    }
-    catch(SurveyException $e)
-    {
-        assert( $e->getMessage() == "Invalid vote type" );
-    }
 }
 
 if(true) /* test SurveyVO */
 {
-    echo '.';
+    echo 'S';
     require_once("$vgPath/VO/surveyVO.php");
     $survey = new SurveyVO();
-    assert( 0 == $survey->getActivePresentationID() );
     assert( 0 ==  $survey->getAnswer() );
     assert(!  $survey->getChoiceByNum(0) );
     assert( array() ==  $survey->getChoices() );
     assert( 0 ==  $survey->getNumOfChoices() );
-    assert( 0 == $survey->getNumOfPresentations() );
     assert( 0 ==  $survey->getPoints() );
     assert(!  $survey->getPageID() );
-    assert(!  $survey->getPresentationByNum(0) );
-    assert( array() ==  $survey->getPresentations() );
     assert(!  $survey->getQuestion() );
-    assert(!  $survey->getSurveyID() );
-    assert( 1 ==  $survey->getType() );
-    assert( 1 == $survey->getVotesAllowed() );
 
     $survey->setPageID(34);
     $survey->setSurveyID(45);
     $survey->setQuestion(" test ");
     $survey->setAnswer("34");
     $survey->setPoints("73");
-    $survey->setType( 2 );
     //@todo setChoices are for scenario testing
-    //@todo setPresentations are for scenario testing
-    $survey->setVotesAllowed(1923);
 
     assert( $survey->getPageID() == 34 );
     assert( $survey->getSurveyID() == 45 );
     assert( $survey->getQuestion() == 'test'  );
     assert( $survey->getAnswer() == '34'  );
     assert( $survey->getPoints() == '73'  );
-    assert( $survey->getType() == '2'  );
-    assert( 1923 == $survey->getVotesAllowed() );
 
     try
     {
         $survey->setQuestion("  ");
         assert(false);
-    } catch (Exception $e)
+    }
+    catch (Exception $e)
     {
 
     }
     assert( $survey->getQuestion() == 'test'  );
     try
     {
-        $survey->setAnswer("34a");
+        $survey->setAnswer("35a");
         assert(false);
     } catch (Exception $e)
     {
@@ -188,14 +178,75 @@ if(true) /* test SurveyVO */
     }
     assert( $survey->getPoints() == '73'  );
     assert( strlen($survey->toXML()) > 10);
+}
 
-    //@todo test getChoiceIDByReceiver
-    //@todo test getActivePresentationID
+if(true) /* test SurveyDAO */
+{
+    require_once("$vgPath/DAO/SurveyDAO.php");
+    echo '.';
+
+    $survey = new SurveyVO();
+    $survey->setPageID(100);
+    $survey->setQuestion("Q1");
+    SurveyDAO::insert($survey);
+    $survey->setQuestion("Q2");
+    $survey->setPageID(101);
+    $survey->setAnswer(2);
+    $survey->setPoints(25);
+
+    SurveyDAO::insert($survey);
+    $survey->setQuestion("Q3");
+    $survey->setPageID(100);
+    SurveyDAO::insert($survey);
+    $srvys =& SurveyDAO::getFromPage( 100 );
+    assert(count($srvys) == 2);
+    $srvys =& SurveyDAO::getFromPage( 101 );
+    assert(count($srvys) == 1);
+
+    $survey = $srvys[0];
+
+    assert( $survey->getPageID() == 101 );
+    assert( $survey->getQuestion() == 'Q2' );
+    assert( $survey->getSurveyID() == 2 );
+    assert( $survey->getPoints() == 25 );
+    assert( $survey->getAnswer() == 2);
+    assert( $survey->getNumOfChoices() == 0);
+
+    SurveyDAO::delete(101);
+    $srvys =& SurveyDAO::getFromPage( 101 );
+    assert(count($srvys) == 0);
+
+    $choices = array();
+    $choice = new ChoiceVO();
+    $choice->setChoice('AA');
+    $choices[] = $choice;
+    $choice->setChoice('BB');
+    $choices[] = $choice;
+    $choice->setChoice('CC');
+    $choices[] = $choice;
+
+    $survey->setChoices( $choices );
+    SurveyDAO::insert($survey);
+    $srvys =& SurveyDAO::getFromPage( 101 );
+    assert(count($srvys) == 1);
+    $survey = $srvys[0];
+
+    assert( $survey->getNumOfChoices() == 3 );
+    $choices = $survey->getChoices();
+    assert($choices[2]->getChoice() == 'CC');
+    assert( $survey->getChoiceByNum(3) == false);
+    
+    assert( $choices[0]->getPoints() == 3 );
+    assert( $choices[0]->getChoiceID() == 1 );
+    assert( $choices[1]->getPoints() == 2 );
+    assert( $choices[1]->getChoiceID() == 2 );
+    assert( $choices[2]->getPoints() == 1 );
+    assert( $choices[2]->getChoiceID() == 3 );
 }
 
 if( true ) /* test PageVO */
 {
-    echo '.';
+    echo 'P';
     require_once("$vgPath/VO/PageVO.php");
     $page = new PageVO();
     assert( ! $page->getPageID() );
@@ -263,19 +314,66 @@ if( true ) /* test PageVO */
     assert( $page->getPhoneVoting() == 'no' );
     assert( $page->getWebVoting() == 'no' );
 
-    //This will throw exception if something is wrong
-    $page->setPrivacy(vPRIVACY_LOW);
-    $page->setPrivacyByName( $page->getPrivacyByName() );
-    $page->setPrivacy(vPRIVACY_MEDIUM);
-    $page->setPrivacyByName( $page->getPrivacyByName() );
-    $page->setPrivacy(vPRIVACY_HIGH);
-    $page->setPrivacyByName( $page->getPrivacyByName() );
+    try
+    {
+        $page->setPrivacy(vPRIVACY_LOW);
+        $page->setPrivacyByName( $page->getPrivacyByName() );
+        $page->setPrivacy(vPRIVACY_MEDIUM);
+        $page->setPrivacyByName( $page->getPrivacyByName() );
+        $page->setPrivacy(vPRIVACY_HIGH);
+        $page->setPrivacyByName( $page->getPrivacyByName() );
+    }
+    catch (Exception $e)
+    {
+        assert(false);
+    }
+    assert( 0 == $page->getActivePresentationID() );
+    assert( 0 == $page->getNumOfPresentations() );
+    assert(!  $page->getPresentationByNum(0) );
+    assert( array() ==  $page->getPresentations() );
+}
+
+if(true) /* test VoteVO */
+{
+    echo '.';
+    require_once("$vgPath/VO/VoteVO.php");
+    $vote = new VoteVO();
+    assert( ! $vote->getChoiceID() );
+    assert( 0 == $vote->getPresentationID() );
+    assert( ! $vote->getSurveyID() );
+    assert( ! $vote->getVoteDate() );
+    assert( ! $vote->getVoteType() );
+    assert( ! $vote->getVoterID() );
+    assert( 1 == $vote->getVotesAllowed() );
+
+    $vote->setChoiceID(34);
+    $vote->setPresentationID(34);
+    $vote->setSurveyID(978);
+    $vote->setVoteDate('2001');
+    $vote->setVoteType('WEB');
+    $vote->setVoterID(3);
+    $vote->setVotesAllowed(6);
+
+    assert( 34 == $vote->getChoiceID() );
+    assert( 34 == $vote->getPresentationID() );
+    assert( 978 == $vote->getSurveyID() );
+    assert( '2001' == $vote->getVoteDate() );
+    assert( 'WEB' == $vote->getVoteType() );
+    assert( 3 == $vote->getVoterID() );
+    assert( 6 == $vote->getVotesAllowed() );
+    try
+    {
+        $vote->setVoteType('GHE');
+        assert(false);
+    }
+    catch(SurveyException $e)
+    {
+        assert( $e->getMessage() == "Invalid vote type" );
+    }
 }
 
 if( true ) /* testing Telephone */
 {
-    require_once("$vgPath/DAO/Telephone.php");
-
     $p = new PageVO();
     $p->setTitle('Question 1');
     $p->setStartTime(vfDate());
@@ -305,10 +403,13 @@ if( true ) /* testing Telephone */
 
         $p->setSurveys(array($s1, $s2));
     }
-    require_once("$vgPath/DAO/surveyDAO.php");
+    require_once("$vgPath/DAO/PageDAO.php");
 
-    $surdao = new SurveyDAO();
-    $surdao->insertPage($p);
+    //delete from previous tests
+    $vgDB->Execute("TRUNCATE {$vgDBPrefix}survey");
+
+    $pagedao = new PageDAO();
+    $pagedao->insertPage($p);
     $s = $p->getSurveys();
     assert(count($s) == 2);
     assert($s[0]->getSurveyID() == 1 && $s[1]->getSurveyID() == 2);
@@ -319,6 +420,7 @@ if( true ) /* testing Telephone */
     assert($c1[0]->getChoiceID() == 1);
     assert($c2[4]->getChoiceID() == 5);
 
+    require_once("$vgPath/DAO/Telephone.php");
     $t = new Telephone();
     $g = $t->makeGroups(array('11','12','24','37','38','39'));
     assert(count($g) == 3 && count($g[0]) == 2 && count($g[1]) == 1 && count($g[2]) == 3);
@@ -345,7 +447,7 @@ if( true ) /* testing Telephone */
     assert(count($g) == 4);
 
     $t->setupReceivers($p);
-    $surdao->updateReceiversSMS($p);
+    $pagedao->updateReceiversSMS($p);
 
     $g = $t->makeGroups($t->getAvailablePhones());
     assert(count($g) == 3);
@@ -696,11 +798,6 @@ $page2->setSurveys($questions);
 //print_r($page);
 $surveyDAO->updatePage($page2);
 
-/*
-	 * User "User1"
-*/
-$user = new Usr("User1");
-//$user->vote(  );
 $p2surveys = $page2->getSurveys();
 assert($p2surveys[0]->getSurveyID() == 3);
 assert( count( $p2surveys[0]->getChoices() ) == 2 );
@@ -708,4 +805,3 @@ $p2choices = $p2surveys[0]->getChoices();
 
 assert(true);
 
-?>

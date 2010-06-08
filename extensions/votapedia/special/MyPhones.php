@@ -164,7 +164,7 @@ class MyPhones extends SpecialPage
             $this->listPhones();
             $form = new FormControl($this->items);
             $this->display[] = 'newnumber';
-            $form->AddPage('', $this->display);
+            $wgOut->addHTML( $form->AddPage('', $this->display) );
         }
         catch(Exception $e)
         {
