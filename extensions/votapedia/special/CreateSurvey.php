@@ -137,7 +137,7 @@ class CreateSurvey
                             return $v > 0 && $v < 11*60;
                         },
                         'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
-                        'learn_more' => 'Details of Duration',
+                        //'learn_more' => 'Details of Duration',
                         'process' => function($v)
                         {
                             return intval($v);
@@ -283,12 +283,12 @@ class CreateSurvey
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
-        $page->setDuration( $values['duration'] );
         $page->setVotesAllowed(1);
         $page->setSMSRequired(false); //@todo SMS sending to the users
         $page->setPrivacyByName($values['privacy']);
         $page->setPhoneVoting($values['phonevoting']);
         $page->setWebVoting($values['webvoting']);
+        $page->setDuration( $values['duration'] );
         
         $this->setPageVOvaluesSmall($page, $values);
     }
@@ -297,9 +297,14 @@ class CreateSurvey
      * 
      * @param PageVO $page
      * @param Array $values
+     * @param Boolean $surveyended did this survey end?
      */
-    protected function setPageVOvaluesSmall(PageVO &$page, &$values)
+    protected function setPageVOvaluesSmall(PageVO &$page, &$values, $surveyended = true)
     {
+        if(! $surveyended)
+        {
+            $page->setDuration( $values['duration'] );
+        }
         $page->setDisplayTop($values['showtop']);
         if(isset($values['showresultsend']) && $values['showresultsend'])
             $page->setShowGraphEnd(true);
@@ -483,14 +488,27 @@ class CreateSurvey
         }
         if($page->getStatus() != 'ready')
         {
-            unset($this->formpages[0]);
-            unset($this->formpages[1]);
+            $surveyended = $page->getStatus() == 'ended';
+            $this->setLimitedFormPages( $surveyended );
         }
         $this->fillFormValuesFromPage($page);
         //draw form
         $this->preDrawForm('');
         $this->drawFormEdit($page_id);
         $this->postDrawForm();
+    }
+    /**
+     * Set to Show only limited items in form pages
+     *
+     * @param Boolean $finished is survey finished
+     */
+    function setLimitedFormPages($finished)
+    {
+        unset($this->formpages[0]);
+        if($finished)
+            unset($this->formpages[1]);
+        else
+            $this->formpages[1]['items'] = array('duration');
     }
     /**
      * Process Edit Survey Submit
@@ -526,14 +544,15 @@ class CreateSurvey
         }
         if($this->page->getStatus() != 'ready')
         {
-            unset($this->formpages[0]);
-            unset($this->formpages[1]);
+            $surveyended = $this->page->getStatus() == 'ended';
+            $this->setLimitedFormPages( $surveyended );
             $smallupdate = true;
         }
         else
         {
             $smallupdate = false;
         }
+        
         if(! $error)
         {
             try
@@ -541,7 +560,7 @@ class CreateSurvey
                 if($smallupdate)
                 {
                     $page =& $this->page;
-                    $this->setPageVOvaluesSmall($page, $this->form->getValuesArray());
+                    $this->setPageVOvaluesSmall($page, $this->form->getValuesArray(), $surveyended);
                     $pagedao->updatePage($page, false, false);
                 }
                 else
@@ -712,5 +731,6 @@ class CreateSurvey
         global $wgOut;
         $wgOut->addHTML($output);
     }
-}// End of class CreateSurvey
+}
+// End of class CreateSurvey
 

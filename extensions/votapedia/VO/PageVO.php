@@ -85,7 +85,6 @@ class PageVO
     function setEndTime($endTime)
     {
         $this->endTime = $endTime;
-        //$this->duration = $this->renewDuration();
     }
     /**
      * Set duration of this survey, must be Integer

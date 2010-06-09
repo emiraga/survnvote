@@ -10,7 +10,13 @@ if (!defined('MEDIAWIKI')) die();
  * @author Emir Habul
  * @package DataAccessObject
  */
-class PresentationDAO {
+class PresentationDAO
+{
+    /**
+     * Insert presentation object to database.
+     * 
+     * @param PresentationVO $presentation
+     */
     static function insert(PresentationVO $presentation)
     {
         global $vgDB, $vgDBPrefix;
