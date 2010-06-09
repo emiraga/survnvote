@@ -225,9 +225,9 @@ class CreateSurvey
         $this->formitems['category']['options'] = $subcat;
         //List of pages
         $this->formpages = array(
-            0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
-            1=>array('title'=>'Voting options','items'=>array('privacy', 'duration', 'phonevoting','webvoting' )),
-            2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop')),
+                0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
+                1=>array('title'=>'Voting options','items'=>array('privacy', 'duration', 'phonevoting','webvoting' )),
+                2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop')),
         );
     }
     /**
@@ -289,12 +289,12 @@ class CreateSurvey
         $page->setPhoneVoting($values['phonevoting']);
         $page->setWebVoting($values['webvoting']);
         $page->setDuration( $values['duration'] );
-        
+
         $this->setPageVOvaluesSmall($page, $values);
     }
     /**
      * Only set values for things related to graphing
-     * 
+     *
      * @param PageVO $page
      * @param Array $values
      * @param Boolean $surveyended did this survey end?
@@ -303,7 +303,8 @@ class CreateSurvey
     {
         if(! $surveyended)
         {
-            $page->setDuration( $values['duration'] );
+            if($page->setDuration( $values['duration'], true ) == false)
+                throw new SurveyException('Value of set in the "Duration" field will cause this survey to stop.');
         }
         $page->setDisplayTop($values['showtop']);
         if(isset($values['showresultsend']) && $values['showresultsend'])
@@ -438,13 +439,13 @@ class CreateSurvey
             die('Edit token is wrong, please try again. Edit token is missing');
         $this->form->loadValuesFromRequest();
         $error = $this->Validate();
-        
+
         if( ! vfUser()->canCreateSurveys() )
         {
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        
+
         if(! $error)
         {
             $error = $this->insertPage($this->form->getValuesArray());
@@ -552,7 +553,7 @@ class CreateSurvey
         {
             $smallupdate = false;
         }
-        
+
         if(! $error)
         {
             try
@@ -577,7 +578,7 @@ class CreateSurvey
             }
             //Purge all pages that have this survey included.
             vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-            
+
             $title = Title::newFromText($this->returnTo);
             $wgOut->redirect($title->escapeLocalURL(), 302);
             return;
@@ -603,20 +604,20 @@ class CreateSurvey
     }
     /**
      * Mandatory execute function for a Special Page
-     * 
+     *
      * @param String $par
      */
     function execute( $par = null )
     {
         global $wgTitle, $wgOut, $vgAnonSurveyCreation;
         $wgOut->setArticleBodyOnly(false);
-        
+
         if ( ! vfUser()->canCreateSurveys() )
         {
             $wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        
+
         global $wgRequest;
         if($wgRequest->getVal('vpAction') == 'editcontinue' )
         {
@@ -653,7 +654,7 @@ class CreateSurvey
     }
     /**
      * Before drawing form
-     * 
+     *
      * @param String $errors
      */
     function preDrawForm($errors)
@@ -667,7 +668,7 @@ class CreateSurvey
             $output .=  vfErrorBox( '<ul>'.$errors.'</ul>');
         $crform = Title::newFromText($this->spPageName);
         $output .= $this->form->StartForm( $crform->escapeLocalURL(), 'mw-preferences-form' );
-        
+
         $wgOut->addHTML($output);
     }
     /**

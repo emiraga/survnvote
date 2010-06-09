@@ -44,7 +44,7 @@ class PageVO
      */
     function __construct()
     {
-        $this->endTime = $this->renewEndTime();
+        $this->endTime = $this->renewEndTime($this->duration);
         $this->setCreateTime(vfDate());
     }
     /**
@@ -76,7 +76,7 @@ class PageVO
     function setStartTime($startTime)
     {
         $this->startTime = $this->validateDate($startTime);
-        $this->endTime = $this->renewEndTime();
+        $this->endTime = $this->renewEndTime($this->duration);
     }
     /**
      * Set end time of this survey
@@ -89,11 +89,21 @@ class PageVO
     /**
      * Set duration of this survey, must be Integer
      * @param Integer $duration
+     * @param Boolean $checkEndNow check if this will cause survey to stop!
+     * @return Boolean result of the checking for now < endTime
      */
-    function setDuration($duration)
+    function setDuration($duration, $checkEndNow = false)
     {
+        $newEndTime = $this->renewEndTime($duration);
+        if($checkEndNow)
+        {
+            $now = vfDate();
+            if( $newEndTime <= $now )
+                return false;
+        }
         $this->duration = $duration;
-        $this->endTime = $this->renewEndTime();
+        $this->endTime = $newEndTime;
+        return true;
     }
     /**
      * get created time of this survey
@@ -458,15 +468,16 @@ class PageVO
      * If current unix time cannot fit into an integer,
      * end time will be equal to start time.
      *
+     * @param Integer $duration in minutes duration of survey
      * @return String new value of end time
      */
-    private function renewEndTime()
+    private function renewEndTime($duration)
     {
         $start=strtotime($this->startTime);
         if($start == false || $start == -1)
             return $this->startTime;
         else
-            return vfDate($start + $this->duration*60);
+            return vfDate($start + $duration*60);
     }
     /**
      * Set multiple presentations of this page
