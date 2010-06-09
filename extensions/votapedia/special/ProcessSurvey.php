@@ -60,22 +60,22 @@ class ProcessSurvey extends SpecialPage
                 {
                     throw new SurveyException('Survey is either running or finished and cannot be started');
                 }
-                if($page->getPhoneVoting() != 'no')
+                $tel = new Telephone();
+                try
                 {
-                    $tel = new Telephone();
-                    try
+                    if($page->getPhoneVoting() != 'no')
                     {
                         //Setup receivers
                         $tel->setupReceivers($page);
                         $pagedao->updateReceiversSMS($page);
-                        $pagedao->startPageSurvey($page);
                     }
-                    catch(Exception $e)
-                    {
-                        // in case of an error
-                        $tel->deleteReceivers($page);
-                        throw $e; //continue throwing
-                    }
+                    $pagedao->startPageSurvey($page);
+                }
+                catch(Exception $e)
+                {
+                    // in case of an error
+                    $tel->deleteReceivers($page);
+                    throw $e; //continue throwing
                 }
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));

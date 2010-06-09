@@ -58,36 +58,23 @@ class VoteDAO
     function vote(VoteVO &$vote)
     {
         global $vgDB, $vgDBPrefix;
-        $vgDB->StartTrans();
-
-        // Check whether voted before
-        $sql ="select ID, choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
+        // Check if user has voted before
+        $sql ="select ID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
         $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
         {
             //user has more votes than allowed, remove previous vote
             $IDbyOldVote = $rs->fields['ID'];
-            $choiceIDbyOldVote = $rs->fields['choiceID'];
             $vgDB->Execute("update {$vgDBPrefix}surveyrecord set choiceID = ? , voteDate = ? where ID = ?",
                     array($vote->getChoiceID(), $vote->getVoteDate(), $IDbyOldVote));
-            $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote+1 where surveyID = ? and choiceID = ?",
-                    array($vote->getSurveyID(), $vote->getChoiceID()));
-            $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote-1 where surveyID = ? and choiceID = ?",
-                    array($vote->getSurveyID(), $choiceIDbyOldVote));
         }
         else
         {
-            $vgDB->Execute("insert into {$vgDBPrefix}surveyRecord (voterID, pageID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?,?)",
+            //add new vote
+            $vgDB->Execute("insert into {$vgDBPrefix}surveyrecord (voterID, pageID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?,?)",
                     array($vote->getVoterID(), $vote->getPageID(), $vote->getSurveyID(), $vote->getChoiceID(),
                     $vote->getPresentationID(), $vote->getVoteDate(), $vote->getVoteType()));
-            $vgDB->Execute("update {$vgDBPrefix}surveychoice set vote=vote+1 where surveyID = ? and choiceID = ?",
-                    array($vote->getSurveyID(),  $vote->getChoiceID()));
-        }
-        $vgDB->CompleteTrans();
-        if ($vgDB->HasFailedTrans())
-        {
-            throw new Exception("Process Vote database error: ".$vgDB->ErrorMsg(), 400);
         }
         return true;
     }

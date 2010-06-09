@@ -140,7 +140,6 @@ class SurveyDAO {
             $choice->setChoice(trim($rsChoice->fields['choice']));
             $choice->setReceiver(trim($rsChoice->fields['receiver']));
             $choice->setSMS(trim($rsChoice->fields['SMS']));
-            $choice->setVote($rsChoice->fields['vote']);
             $choice->setPoints($rsChoice->fields['points']);
 
             $choices[] = $choice;

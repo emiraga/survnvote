@@ -19,7 +19,6 @@ class ChoiceVO
     private $choice;
     private $receiver;
     private $SMS;
-    private $vote;
     private $points;
     
     /**
@@ -72,15 +71,6 @@ class ChoiceVO
     public function getReceiver()
     {
         return $this->receiver;
-    }
-    /**
-     * Get how many votes this choice got
-     *
-     * @return Integer $vote the number of votes
-     */
-    public function getVote()
-    {
-        return $this->vote;
     }
     /**
      * Get how many points this choice has
@@ -142,15 +132,6 @@ class ChoiceVO
         $this->SMS = $SMS;
     }
     /**
-     * Set number of votes for this choice
-     *
-     * @param Integer $vote
-     */
-    public function setVote($vote)
-    {
-        $this->vote = $vote;
-    }
-    /**
      * Set points for this choice
      *
      * @param Integer $points
@@ -158,17 +139,6 @@ class ChoiceVO
     public function setPoints($points)
     {
         $this->points = $points;
-    }
-    /**
-     * Function for comparison of two choices based on number of votes.
-     *
-     * @param ChoiceVO $a
-     * @param ChoiceVO $b
-     * @return Integer result of comparison
-     */
-    static public function cmp_votes(ChoiceVO $a, ChoiceVO $b)
-    {
-        return $a->getVote() - $b->getVote();
     }
 }
 

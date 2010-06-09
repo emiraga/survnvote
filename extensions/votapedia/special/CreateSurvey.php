@@ -117,8 +117,8 @@ class CreateSurvey
                         },
                         'options' => array(
                                 "Low - Public survey (anyone can vote) "=>"low",
-                                "Medium - No information (Information about voting is not publicly available)"=>"medium",
-                                "High - Restricted survey (Voting is restricted to the group of people) "=>"high",
+                                //"Medium - No information (Information about voting is not publicly available)"=>"medium",
+                                "High - Restricted survey (voting is restricted to the group of people) "=>"high",
                         ),
                         'explanation' => 'This option determines who will be able to participate in your survey.',
                         'learn_more' => 'Details of Survey Privacy',
@@ -129,7 +129,7 @@ class CreateSurvey
                         'name' => 'Duration',
                         'default' => '60',
                         'width' => '10',
-                        'textafter' => ' minutes. <script>document.write("&nbsp;&nbsp; <a href=\'\' onClick=\'d = document.getElementById(\"duration\");d.value = parseInt(d.value) + 5;return false;\'>Add five more minutes.</a>")</script>',
+                        'textafter' => ' minutes. <script>document.write("&nbsp;&nbsp; <a href=\'\' onClick=\'d = document.getElementById(\"duration\");d.value = parseInt(d.value) + 5;d.focus();return false;\'>Add five more minutes.</a>")</script>',
                         'valid' => function($v,$i,$js)
                         {
                             if($js) return "";

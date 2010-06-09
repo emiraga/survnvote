@@ -104,14 +104,12 @@ if(true) /* Test choiceVO */
     assert(! $choice->getReceiver() );
     assert(! $choice->getSMS() );
     assert(! $choice->getSurveyID() );
-    assert(! $choice->getVote() );
 
     $choice->setChoice("Yes");
     $choice->setChoiceID(5);
     $choice->setSurveyID(6);
     $choice->setReceiver("+060102999325");
     $choice->setSMS("25");
-    $choice->setVote(3);
     $choice->setPoints(4);
 
     assert( $choice->getChoice() == 'Yes' );
@@ -119,7 +117,6 @@ if(true) /* Test choiceVO */
     assert( $choice->getSurveyID() == 6 );
     assert( $choice->getReceiver() == '+060102999325'  );
     assert( $choice->getSMS() == '25' );
-    assert( $choice->getVote() == 3  );
     assert( $choice->getPoints() == 4  );
 }
 

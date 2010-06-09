@@ -142,7 +142,6 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   receiver varchar(20) DEFAULT NULL,
   points tinyint(8) NOT NULL DEFAULT '0',
   SMS varchar(20) DEFAULT NULL,
-  vote int NOT NULL DEFAULT '0',
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
 );
