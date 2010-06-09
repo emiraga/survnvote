@@ -40,7 +40,7 @@ class SurveyBody
     }
     /**
      * Should show voting options
-     * 
+     *
      * @param Boolean $show
      */
     function setShowVoting($show)
@@ -49,8 +49,8 @@ class SurveyBody
     }
     /**
      * Should show phone numbers
-     * 
-     * @param Boolean $show 
+     *
+     * @param Boolean $show
      */
     function setShowNumbers($show)
     {
@@ -58,7 +58,7 @@ class SurveyBody
     }
     /**
      * Does this user have control.
-     * 
+     *
      * @param Boolean $control
      */
     function setHasControl($control)
@@ -67,7 +67,7 @@ class SurveyBody
     }
     /**
      * Should show the graph on the survey.
-     * 
+     *
      * @param Boolean $show
      */
     function setShowGraph($show)
@@ -76,7 +76,7 @@ class SurveyBody
     }
     /**
      * Get HTML code for one choice
-     * 
+     *
      * @param String $choice value of choice
      * @param String $image path to image used as bullet
      * @param String $addtext Put Extra HTML after this choice
@@ -97,7 +97,7 @@ class SurveyBody
     }
     /**
      * Get Body HTML
-     * 
+     *
      * @return String html code
      */
     function getHTML()
@@ -108,7 +108,9 @@ class SurveyBody
         $surveys =& $this->page->getSurveys();
         $pagestatus = $this->page->getStatus();
         $colorindex = 1;
-        
+
+        $votescount = VoteDAO::getNumVotes($this->page->getPageID(), 0);
+
         foreach ($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
@@ -178,7 +180,7 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $numvotes += $choice->getVote();
+                    $numvotes += $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                 }
                 if($numvotes == 0)
                     $numvotes = 1;
@@ -189,11 +191,12 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor($colorindex);
-                    $percent = substr(100.0 * $choice->getVote() / $numvotes, 0, 5);
-                    $width = 290.0 * $choice->getVote() / $numvotes;
+                    $votes = $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                    $percent = substr(100.0 * $votes / $numvotes, 0, 5);
+                    $width = 290.0 * $votes / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
-                        $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$choice->getVote()})";
+                        $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
                     else
                         $extra = '';
                     if($survey->getAnswer() == $choice->getChoiceID())
@@ -203,7 +206,7 @@ class SurveyBody
                     }else
                         $style = '';
                     $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra, '', '', $style);
-                    $votesout[] = $choice->getVote();
+                    $votesout[] = $votes;
                 }
                 array_multisort($votesout, SORT_DESC, SORT_NUMERIC, $choicesout);
                 $output .= join('',$choicesout);
@@ -246,7 +249,7 @@ class SurveyBody
                 $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
             $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
             $script=
-            "<script>
+                    "<script>
             var vTimeleft=$timeleft;
             function updateTimeLeft(){
                 if(vTimeleft<=0)
@@ -283,7 +286,7 @@ class SurveyBody
             //Prepend this image!
             $tmpvar = 1;
             $output = '<div style="float:right">'
-                    .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $imgid)
+                    .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $this->page->getPageID(), 0, $imgid)
                     .'</div>' . $output;
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
@@ -337,7 +340,7 @@ class SurveyBody
     }
     /**
      * Get more details about Survey.
-     * 
+     *
      * @return String
      */
     public function getDetailsHTML()
@@ -350,15 +353,19 @@ class SurveyBody
      *
      * @param Integer $colorindex
      * @param Array $surveys
+     * @param Integer $pageID
+     * @param Integer $presentationID
      * @param String $imgid
      * @return String
      */
-    public function getGraphHTML(&$colorindex, $surveys, $imgid = '')
+    public function getGraphHTML(&$colorindex, $surveys, $pageID, $presentationID, $imgid = '')
     {
         if(count($surveys) > 1)
             $graph = new GraphStackPercent();
         else
             $graph = new GraphPie();
+
+        $votescount = VoteDAO::getNumVotes($pageID, $presentationID);
 
         foreach($surveys as &$survey)
         {
@@ -369,7 +376,8 @@ class SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $graphseries->addItem(vfWikiToText($choice->getChoice()), $choice->getVote(), $color);
+                $votes = $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $graphseries->addItem(vfWikiToText($choice->getChoice()), $votes, $color);
             }
             if($this->page->getDisplayTop())
             {
@@ -407,11 +415,13 @@ class SurveyBody
 
         if($survey_id)
         {
-            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)))."@".$now;
+            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),
+                    $page_id, 0)."@".$now;
         }
         else
         {
-            return $surveybody->getGraphHTML($colorindex, $page->getSurveys())."@".$now;
+            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),
+                    $page_id, 0)."@".$now;
         }
     }
     /**
@@ -465,7 +475,7 @@ class QuestionnaireBody extends SurveyBody
     }
     /**
      * Get more details about Questionnaire.
-     * 
+     *
      * @return String
      */
     public function getDetailsHTML()
@@ -485,7 +495,7 @@ class QuestionnaireBody extends SurveyBody
                 //insert graph image at the beginning
                 $imgid = 'gr'.$this->page->getPageID().'_'.$survey->getSurveyID().'_'.rand();
                 //Prepend this image!
-                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $imgid).'</div>';
+                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), 0, $imgid).'</div>';
                 global $vgImageRefresh;
                 if($pagestatus == 'active' && $vgImageRefresh)
                 {
@@ -505,7 +515,7 @@ class QuizBody extends QuestionnaireBody
 {
     /**
      * Construct QuizBody
-     * 
+     *
      * @param PageVO $page
      * @param MwParser $parser
      */

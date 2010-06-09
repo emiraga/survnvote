@@ -10,14 +10,14 @@ require_once("$vgPath/VO/VoteVO.php");
 
 /**
  * Class for managing votes in database
- * 
+ *
  * @package DataAccessObject
  */
 class VoteDAO
 {
     /** @var PageVO */ private $page;
     /** @var String */ private $name;
-    
+
     /**
      * @param PageVO $page
      */
@@ -58,9 +58,10 @@ class VoteDAO
     function vote(VoteVO &$vote)
     {
         global $vgDB, $vgDBPrefix;
+
         // Check if user has voted before
-        $sql ="select ID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
-        $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
+        $sql ="select ID from {$vgDBPrefix}surveyrecord where voterID = ? and pageID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
+        $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getPageID(),  $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
         {
@@ -80,7 +81,7 @@ class VoteDAO
     }
     /**
      * Count new votes since certain datetime.
-     * 
+     *
      * @param Integer $page_id
      * @param Integer $timestamp
      * @return Integer number of new votes
@@ -91,6 +92,29 @@ class VoteDAO
         $datetime = vfDate($timestamp);
         return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}surveyrecord WHERE pageID = ? AND voteDate >= ?",
                 array($page_id, $datetime));
+    }
+    /**
+     * Get number of votes for a specific page and presentationID
+     * Returned array $result has following structure
+     *
+     *  $result[surveyID][choiceID] = num_of_votes
+     *
+     * @param Integer $pageID
+     * @param Integer $presentationID
+     * @return VotesCount
+     */
+    static function getNumVotes($pageID, $presentationID)
+    {
+        global $vgDB, $vgDBPrefix;
+        $result = new VotesCount();
+        $records = $vgDB->GetAll("select surveyID, choiceID, count(ID) as votes from v_surveyrecord "
+                ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
+                array($pageID, $presentationID));
+        foreach($records as $record)
+        {
+            $result->set( $record['surveyID'], $record['choiceID'], $record['votes']);
+        }
+        return $result;
     }
 }
 

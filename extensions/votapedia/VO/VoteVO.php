@@ -144,3 +144,39 @@ class VoteVO
     }
 }
 
+
+/**
+ * Class which holds number of votes in a specific page
+ */
+class VotesCount
+{
+    private $record = array();
+    /**
+     * Set value of votes
+     *
+     * @param Integer $surveyID
+     * @param Integer $choiceID
+     * @param Integer $votes
+     */
+    public function set($surveyID, $choiceID, $votes)
+    {
+        if(!isset( $this->record[$surveyID]))
+            $this->record[$surveyID] = array();
+        $this->record[$surveyID][$choiceID] = $votes;
+    }
+    /**
+     * Get number of votes for a choice in given survey.
+     *
+     * @param Integer $surveyID
+     * @param Integer $choiceID
+     * @return Integer
+     */
+    public function get($surveyID, $choiceID)
+    {
+        if(isset($this->record[$surveyID][$choiceID]))
+            return $this->record[$surveyID][$choiceID];
+        else
+            return 0;
+    }
+}
+

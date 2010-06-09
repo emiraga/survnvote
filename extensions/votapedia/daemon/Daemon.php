@@ -136,6 +136,7 @@ function vfDaemonSmsAction()
  */
 function vfVoteFromDaemon($choice, $username)
 {
+    echo "$choice\n";
     global $vgDBPrefix, $vgDB, $pagedao;
     //load PageVO
     $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",

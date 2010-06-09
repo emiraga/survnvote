@@ -131,7 +131,6 @@ class SurveyVO
             $choice->setSurveyID( $this->getSurveyID() );
             $choice->setPageID($this->getPageID());
             $choice->setChoice($value);
-            $choice->setVote(0);
             $choice->setPoints(0);
             $choices[] = $choice;
         }
