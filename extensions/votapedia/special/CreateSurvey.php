@@ -129,7 +129,7 @@ class CreateSurvey
                         'name' => 'Duration',
                         'default' => '60',
                         'width' => '10',
-                        'textafter' => ' minutes.',
+                        'textafter' => ' minutes. <script>document.write("&nbsp;&nbsp; <a href=\'\' onClick=\'d = document.getElementById(\"duration\");d.value = parseInt(d.value) + 5;return false;\'>Add five more minutes.</a>")</script>',
                         'valid' => function($v,$i,$js)
                         {
                             if($js) return "";
@@ -298,19 +298,22 @@ class CreateSurvey
      * @param PageVO $page
      * @param Array $values
      * @param Boolean $surveyended did this survey end?
+     * @return String if any errors
      */
     protected function setPageVOvaluesSmall(PageVO &$page, &$values, $surveyended = true)
     {
+        $errors = '';
         if(! $surveyended)
         {
             if($page->setDuration( $values['duration'], true ) == false)
-                throw new SurveyException('Value of set in the "Duration" field will cause this survey to stop.');
+                $errors .= '<li>Value of set in the "Duration" field will cause this survey to stop.</li>';
         }
         $page->setDisplayTop($values['showtop']);
         if(isset($values['showresultsend']) && $values['showresultsend'])
             $page->setShowGraphEnd(true);
         else
             $page->setShowGraphEnd(false);
+        return $errors;
     }
     /**
      *
@@ -561,8 +564,11 @@ class CreateSurvey
                 if($smallupdate)
                 {
                     $page =& $this->page;
-                    $this->setPageVOvaluesSmall($page, $this->form->getValuesArray(), $surveyended);
-                    $pagedao->updatePage($page, false, false);
+                    $error .= $this->setPageVOvaluesSmall($page, $this->form->getValuesArray(), $surveyended);
+                    if(! $error)
+                    {
+                        $pagedao->updatePage($page, false, false);
+                    }
                 }
                 else
                 {
@@ -576,12 +582,15 @@ class CreateSurvey
                 $wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
                 return;
             }
-            //Purge all pages that have this survey included.
-            vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+            if(! $error)
+            {
+                //Purge all pages that have this survey included.
+                vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
 
-            $title = Title::newFromText($this->returnTo);
-            $wgOut->redirect($title->escapeLocalURL(), 302);
-            return;
+                $title = Title::newFromText($this->returnTo);
+                $wgOut->redirect($title->escapeLocalURL(), 302);
+                return;
+            }
         }
         $this->preDrawForm($error);
         $this->drawFormEdit($page_id);
