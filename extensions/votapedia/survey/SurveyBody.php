@@ -194,7 +194,7 @@ class SurveyBody
                     $color = vfGetColor($colorindex);
                     $votes = $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                     $percent = substr(100.0 * $votes / $numvotes, 0, 5);
-                    $width = 290.0 * $votes / $numvotes;
+                    $width = 280.0 * $votes / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
                         $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";

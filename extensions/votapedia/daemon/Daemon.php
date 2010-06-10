@@ -1,7 +1,7 @@
 <?php
 if(isset($_SERVER['HOST'])) die('Must be run from command line.');
 /**
- * Background process which monitors the incoming SMS and CALLS.
+ * Background process which monitors the incoming SMS and phone CALLS.
  * 
  * @package Daemon
  */

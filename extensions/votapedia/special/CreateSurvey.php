@@ -490,6 +490,7 @@ class CreateSurvey
         }
         if( ! vfUser()->canControlSurvey($page) )
         {
+            global $wgTitle;
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }

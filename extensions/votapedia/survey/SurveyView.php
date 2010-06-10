@@ -111,8 +111,11 @@ class SurveyView
         $this->buttons->setPageID($this->page_id);
         $this->buttons->setType($this->page->getTypeName());
         if($pagestatus == 'ended' )
+        {
             $this->buttons->setRenewButton(true);
-        
+            $this->buttons->setHasControl(true);
+        }
+
         //Configure body and buttons for different types
         switch($this->page->getType())
         {
@@ -147,14 +150,17 @@ class SurveyView
     /**
      * Get HTML of a one page of survey
      *
+     * @param Boolean $show_details
      * @return String html code
      */
-    function getHTML()
+    function getHTML($show_details = false)
     {
         $runs = $this->page->getCurrentPresentationID();
         if($runs == 1)
         {
             $output = $this->getHTMLOnePage(1);
+            if($show_details)
+                $output .= $this->getDetailsHTML(1);
         }
         else
         {
@@ -169,7 +175,7 @@ class SurveyView
             {
                 $output .= $form->pageContents( 
                         $presentations[$i-1]->getName(),
-                        $this->getHTMLOnePage($i)
+                        $this->getHTMLOnePage($i) . $this->getDetailsHTML($i)
                     );
             }
             $output .= $form->EndFormLite();
@@ -223,11 +229,12 @@ class SurveyView
     /**
      * Get more details about Survey.
      *
+     * @param Boolean $presID
      * @return String
      */
-    function getDetailsHTML()
+    private function getDetailsHTML($presID)
     {
-        return $this->body->getDetailsHTML();
+        return $this->body->getDetailsHTML($presID);
     }
     /**
      * AJAX call for choices preview
