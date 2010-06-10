@@ -80,7 +80,7 @@ class PreferencesForm {
 				$this->mToggles[$tname] = $request->getCheck( "wpOp$tname" ) ? 1 : 0;
 			}
 		}
-		
+
 		$this->mUsedToggles = array();
 
 		# Search namespace options
@@ -599,6 +599,7 @@ class PreferencesForm {
 
 		if ( !$this->mEmailFlag ) { $emfc = 'checked="checked"'; }
 		else { $emfc = ''; }
+
 
 		if ($wgEmailAuthentication && ($this->mUserEmail != '') ) {
 			if( $wgUser->getEmailAuthenticationTimestamp() ) {

@@ -318,7 +318,7 @@ class SurveyBody
         $script = "<script>
         function refresh$imgid()
         {
-            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, $page_id, $presID],function(o) {
+            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, $presID, $page_id],function(o) {
                 graph=document.getElementById('$imgid');
                 if(o.responseText.length)
                 {
@@ -406,7 +406,7 @@ class SurveyBody
      * @param Integer $survey_id
      * @return String
      */
-    static function ajaxgraph($last_refresh, $colorindex, $page_id, $presID, $survey_id = null)
+    static function ajaxgraph($last_refresh, $colorindex, $presID, $page_id, $survey_id = null)
     {
         if(VoteDAO::countNewVotes($page_id, $presID, intval($last_refresh)) == 0)
             return ''; // there are no new votes
@@ -484,7 +484,7 @@ class QuestionnaireBody extends SurveyBody
      */
     public function getDetailsHTML($presID)
     {
-        $output = parent::getDetailsHTML();
+        $output = parent::getDetailsHTML($presID);
         $pagestatus = $this->page->getStatus($presID);
         $colorindex = 1; /* for showing items */
         $surveys =& $this->page->getSurveys();
@@ -497,7 +497,7 @@ class QuestionnaireBody extends SurveyBody
                 $question = wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ));
                 $output .= "<h2>$question</h2>";
                 //insert graph image at the beginning
-                $imgid = 'gr'.$this->page->getPageID().'_'.$survey->getSurveyID().'_'.rand();
+                $imgid = 'gr'.$this->page->getPageID().'_'.$presID.'_'.$survey->getSurveyID().'_'.rand();
                 //Prepend this image!
                 $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $presID, $imgid).'</div>';
                 global $vgImageRefresh;

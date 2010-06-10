@@ -1671,6 +1671,7 @@ class OutputPage {
 			if( $link )
 				$links[] = $link;
 		}
+
 		return implode( "\n\t\t", $links );
 	}
 

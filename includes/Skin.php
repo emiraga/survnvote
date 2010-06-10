@@ -280,9 +280,9 @@ class Skin extends Linker {
 
 		// See self::afterContentHook() for documentation
 		$afterContent = $this->afterContentHook();
-		
+
 		$out->out( $out->headElement( $this ) );
-		
+
 		$out->out( "\n<body" );
 		$ops = $this->getBodyOptions();
 		foreach ( $ops as $name => $val ) {
@@ -604,8 +604,7 @@ END;
 		if( ( $us = $wgRequest->getVal( 'useskin', '' ) ) !== '' ) {
 			$siteargs['useskin'] = $us;
 		}
-		//modified by Emir Habul (emiraga) config for extra css, not needed
-		//$out->addStyle( self::makeUrl( '-', wfArrayToCGI( $siteargs ) ) );
+		$out->addStyle( self::makeUrl( '-', wfArrayToCGI( $siteargs ) ) );
 
 		// Per-user custom style pages
 		if( $wgAllowUserCss && $wgUser->isLoggedIn() ) {

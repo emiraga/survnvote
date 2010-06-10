@@ -168,15 +168,19 @@ class SurveyView
             $form = new FormControl($items);
             $output = $form->getScriptsIncluded(false);
             $output .= $form->StartFormLite();
-            $output .= $form->pageContents('Current', $this->getHTMLOnePage($runs));
+
+            $contents = $this->getHTMLOnePage($runs);
+            if($show_details)
+                $contents .= $this->getDetailsHTML($runs);
+            $output .= $form->pageContents('Current', $contents);
 
             $presentations =& $this->page->getPresentations();
             for($i=count($presentations);$i;$i--)
             {
-                $output .= $form->pageContents( 
-                        $presentations[$i-1]->getName(),
-                        $this->getHTMLOnePage($i) . $this->getDetailsHTML($i)
-                    );
+                $contents = $this->getHTMLOnePage($i);
+                if($show_details)
+                    $contents .= $this->getDetailsHTML($i);
+                $output .= $form->pageContents( $presentations[$i-1]->getName(), $contents );
             }
             $output .= $form->EndFormLite();
         }
@@ -218,7 +222,10 @@ class SurveyView
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
         $output .= $this->body->getHTML($presID);
         $output .= '<br />';
-        $output .= $this->buttons->getHTML($presID);
+        if($this->page->getCurrentPresentationID() == $presID)
+        {
+            $output .= $this->buttons->getHTML($presID);
+        }
         $output .= '</form>';
         if($pagestatus == 'ended')
         {

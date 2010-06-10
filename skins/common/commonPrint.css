@@ -108,8 +108,7 @@ div#f-copyrightico,
 li#viewcount,
 li#about,
 li#disclaimer,
-li#privacy,
-#f-list {
+li#privacy {
     /* Hides all the elements irrelevant for printing */
     display: none;
 }
@@ -144,11 +143,11 @@ p, .documentDescription {
 }
 
 pre {
-    border: 1px dashed gray;
+    border: 1pt dashed black;
     white-space: pre;
-    font-size: 10pt;
+    font-size: 8pt;
     overflow: auto;
-    padding: 0.5em 0;
+    padding: 1em 0;
 	background : white;
 	color : black;
 }
