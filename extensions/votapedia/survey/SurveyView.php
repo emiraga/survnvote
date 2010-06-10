@@ -42,7 +42,6 @@ class SurveyView
         $page_id = intval(trim($input));
         try
         {
-            #var_dump($parser);
             $mwparser = new MwParser($parser);
             $mwparser->setTag();
             $buttons = new SurveyButtons();
@@ -100,15 +99,19 @@ class SurveyView
         if($this->wikititle->isSpecial('ViewSurvey'))
             $this->wikititle = Title::newMainPage();
 
-        if($this->page->getStatus() != 'ended' )
+        $pagestatus = $this->page->getStatus( $this->page->getCurrentPresentationID() );
+        if($pagestatus != 'ended' )
+        {
             $this->parser->disableCache(); // for active and ready type of surveys
+        }
 
         //configure buttons
         $this->buttons->setPageAuthor($this->page->getAuthor());
         $this->buttons->setWikiTitle($this->wikititle->getFullText());
         $this->buttons->setPageID($this->page_id);
-        $this->buttons->setPageStatus($this->page->getStatus());
         $this->buttons->setType($this->page->getTypeName());
+        if($pagestatus == 'ended' )
+            $this->buttons->setRenewButton(true);
         
         //Configure body and buttons for different types
         switch($this->page->getType())
@@ -124,19 +127,6 @@ class SurveyView
                 break;
             default:
                 throw new Exception('Unknown survey type');
-        }
-
-        //Should we enable web voting?
-        if($this->page->getStatus() == 'active'
-                && $this->page->getWebVoting() != 'no'
-                && ! vfUser()->isAuthor( $this->page ))
-        {
-            //either user is not anonymous or it is allowed to vote anonymously
-            if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
-            {
-                $this->body->setShowVoting(true);
-                $this->buttons->setVoteButton(true);
-            }
         }
         
         $this->body->setShowGraph(true);
@@ -161,17 +151,29 @@ class SurveyView
      */
     function getHTML()
     {
-        $items = array();
-        $form = new FormControl($items);
-        
-        global $vgScript;
-        $output = $form->getScriptsIncluded(false);
+        $runs = $this->page->getCurrentPresentationID();
+        if($runs == 1)
+        {
+            $output = $this->getHTMLOnePage(1);
+        }
+        else
+        {
+            $items = array();
+            $form = new FormControl($items);
+            $output = $form->getScriptsIncluded(false);
+            $output .= $form->StartFormLite();
+            $output .= $form->pageContents('Current', $this->getHTMLOnePage($runs));
 
-        $output .= $form->StartFormLite();
-        $output .= $form->pageContents('Run # 3', $this->getHTMLOnePage());
-        $output .= $form->pageContents('Run # 2', '<h1>HAMO</h1>');
-        $output .= $form->pageContents('Run # 1', '<h1>HAMO</h1>');
-        $output .= $form->EndFormLite();
+            $presentations =& $this->page->getPresentations();
+            for($i=count($presentations);$i;$i--)
+            {
+                $output .= $form->pageContents( 
+                        $presentations[$i-1]->getName(),
+                        $this->getHTMLOnePage($i)
+                    );
+            }
+            $output .= $form->EndFormLite();
+        }
         return $output;
     }
     /**
@@ -179,10 +181,25 @@ class SurveyView
      *
      * @return String html code
      */
-    function getHTMLOnePage()
+    function getHTMLOnePage($presID)
     {
         global $vgScript;
         $output = '';
+        $pagestatus = $this->page->getStatus($presID);
+
+        //Should we enable web voting?
+        $this->buttons->setPageStatus($pagestatus);
+        if($pagestatus == 'active'
+                && $this->page->getWebVoting() != 'no'
+                && ! vfUser()->isAuthor( $this->page ))
+        {
+            //either user is not anonymous or it is allowed to vote anonymously
+            if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
+            {
+                $this->body->setShowVoting(true);
+                $this->buttons->setVoteButton(true);
+            }
+        }
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
         $output.= '<h3>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</h3>';
@@ -191,13 +208,13 @@ class SurveyView
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
-        if($this->page->getStatus() != 'ended')
+        if($pagestatus != 'ended')
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
-        $output .= $this->body->getHTML();
+        $output .= $this->body->getHTML($presID);
         $output .= '<br />';
-        $output .= $this->buttons->getHTML();
+        $output .= $this->buttons->getHTML($presID);
         $output .= '</form>';
-        if($this->page->getStatus() == 'ended')
+        if($pagestatus == 'ended')
         {
             $output .= "This survey has ended.";
         }
@@ -256,4 +273,4 @@ class SurveyView
         return $this->page;
     }
 }
-?>
+

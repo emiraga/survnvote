@@ -445,10 +445,14 @@ class PageVO
     /**
      * Get the status of the survey/page
      *
+     * @param Integer $presID for which presentation are you asking for status?
      * @return String values of 'ready', 'active' or 'ended'
      */
-    function getStatus()
+    function getStatus($presID)
     {
+        if( $this->getCurrentPresentationID() != $presID )
+            return 'ended';
+        
         $starttime = strtotime ($this->getStartTime());
         $endtime = strtotime ($this->getEndTime());
         $now = time();
@@ -489,11 +493,20 @@ class PageVO
         $this->presentations =& $presentations;
     }
     /**
+     * Add new presentation to this page.
+     *
+     * @param PresentationVO $presentation
+     */
+    function addPresentation(PresentationVO $presentation)
+    {
+        $this->presentations[] = $presentation;
+    }
+    /**
      * Get multi presentations in this survey.
      *
      * @return Array of presentations in this survey
      */
-    function getPresentations()
+    function &getPresentations()
     {
         return $this->presentations;
     }
@@ -514,8 +527,8 @@ class PageVO
      */
     function getPresentationByNum($i)
     {
-        if(isset($this->presentations[$i]))
-            return $this->presentations[$i];
+        if(isset($this->presentations[$i-1]))
+            return $this->presentations[$i-1];
         else
             return false;
     }
@@ -524,7 +537,7 @@ class PageVO
      *
      * @return PresentationVO presentation
      */
-    function getActivePresentationID()
+    /*function getActivePresentationID()
     {
         foreach($this->presentations as $presentation)
         {
@@ -532,6 +545,32 @@ class PageVO
                 return  $presentation->getPresentationID();
         }
         return 0;
+    }*/
+    /**
+     * Should this page be allowed to be edited.
+     *
+     * @param Integer $presID
+     * @return Boolean
+     */
+    function isEditable($presID)
+    {
+        return ($this->getStatus($presID) == 'ready') && ($this->getNumOfPresentations() == 0);
+    }
+    /**
+     * Get current presentationID.
+     * Used only for surveys, questionnaires and quizes.
+     *
+     * @return Integer
+     */
+    function getCurrentPresentationID()
+    {
+        if($this->getType() != vSIMPLE_SURVEY
+                && $this->getType() != vQUESTIONNAIRE
+                && $this->getType() != vQUIZ)
+        {
+            throw new SurveyESurveyException('Survey type must be survey or questionnaire or quiz');
+        }
+        return $this->getNumOfPresentations() + 1;
     }
 }
 

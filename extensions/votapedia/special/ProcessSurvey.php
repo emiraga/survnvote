@@ -56,7 +56,7 @@ class ProcessSurvey extends SpecialPage
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
                 }
-                if($page->getStatus() != 'ready')
+                if($page->getStatus( $page->getCurrentPresentationID() ) != 'ready')
                 {
                     throw new SurveyException('Survey is either running or finished and cannot be started');
                 }
@@ -80,6 +80,44 @@ class ProcessSurvey extends SpecialPage
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);
+                return;
+            }
+            if(    $action == wfMsg('renew-survey')
+                || $action == wfMsg('renew-questionnaire')
+                || $action == wfMsg('renew-quiz')
+              )
+            {
+                if( ! vfUser()->canControlSurvey($page) )
+                {
+                    $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+                    return;
+                }
+                if($page->getStatus( $page->getCurrentPresentationID() ) != 'ended')
+                {
+                    throw new SurveyException('Survey is not finished and cannot be renewed.');
+                }
+                if ( ! vfUser()->checkEditToken() )
+                {
+                    //repeat same request with Edit Token included.
+                    $wgOut->redirect( Skin::makeSpecialUrl('ProcessSurvey',
+                            'wpSubmit='.urlencode($action)
+                            .'&id='.$page_id
+                            .'&returnto='.urlencode($wgRequest->getVal('returnto'))
+                            .'&wpEditToken='.urlencode(vfUser()->editToken())
+                    ) );
+                }
+                else
+                {
+                    $tel = new Telephone();
+                    $tel->releaseReceivers(); //in case this survey has unreleased receivers
+                    
+                    $pagedao->renewPageSurvey($page);
+                    //Purge all pages that have this survey included.
+                    vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+                    //Redirect to the previous page
+                    $title = Title::newFromText($wgRequest->getVal('returnto'));
+                    $wgOut->redirect($title->escapeLocalURL(), 302);
+                }
                 return;
             }
             elseif (   $action == wfMsg('edit-survey')
@@ -124,7 +162,8 @@ class ProcessSurvey extends SpecialPage
                     $choiceid = intval($wgRequest->getVal('survey'.$surveyid));
                     if( $choiceid )
                     {
-                        $votevo = $votedao->newFromPage('WEB', $page_id, $surveyid, $choiceid );
+                        $votevo = $votedao->newFromPage('WEB', $page_id, $surveyid,
+                                $choiceid, $page->getCurrentPresentationID() );
                         $votedao->vote($votevo);
                     }
                 }
@@ -139,7 +178,16 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
+                if( ! vfUser()->canControlSurvey($page) )
+                {
+                    $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+                    return;
+                }
                 $pagedao->stopPageSurvey($page);
+                
+                # $tel = new Telephone();
+                # $tel->releaseReceivers();
+                
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
                 $wgOut->redirect($title->escapeLocalURL(), 302);

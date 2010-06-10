@@ -57,7 +57,7 @@ class ViewSurvey extends SpecialPage
             $text .= "== More information ==\n";
             $text .= "* Author: [[User:$author|$author]]\n";
             $text .= "* Creation date: {$tag->getPage()->getCreateTime()}\n";
-            $text .= "* Status: {$tag->getPage()->getStatus()}\n";
+            $text .= "* Status: {$tag->getPage()->getStatus( $tag->getPage()->getCurrentPresentationID() )}\n";
             $text .= "* Type: {$tag->getPage()->getTypeName()}\n";
             $text .= "* Privacy: {$tag->getPage()->getPrivacyByName()}\n";
             $text .= "* Phone voting: {$tag->getPage()->getPhoneVoting()}\n";

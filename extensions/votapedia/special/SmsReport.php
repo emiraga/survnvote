@@ -130,8 +130,6 @@ class SmsReport extends SpecialPage
                 $balance = preg_replace("/RM/", '', $sms['balance']);
                 $values->addPoint($sms['date'], $balance);
             }
-            # echo $gs->getXMax().','.$gs->getXMin().'<br>';
-            # echo $gs->getYMax().','.$gs->getYMin().'<br>';
             $gr = new GraphLineXY('linexy');
             $gr->setWidth(750);
             $gr->addValues($values);

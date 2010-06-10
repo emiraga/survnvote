@@ -24,7 +24,7 @@ require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 
-$page_cache = array();
+$page_cache = array();//@todo
 $pagedao = new PageDAO();
 
 /**
@@ -142,14 +142,14 @@ function vfVoteFromDaemon($choice, $username)
     $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
         array($choice));
     if($result == false)
-        throw new SurveyException("SurveyID not found.");
+        throw new SurveyException("Survey not found.");
     $surveyid = $result->fields['surveyID'];
     $choiceid = $result->fields['choiceID'];
     $pageid = $result->fields['pageID'];
     $page =& $pagedao->findByPageID($pageid, false);
     //Save vote
     $votedao = new VoteDAO($page, $username);
-    $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid );
+    $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid, $page->getCurrentPresentationID() );
     $votedao->vote($votevo);
 }
 

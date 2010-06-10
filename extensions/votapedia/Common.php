@@ -186,4 +186,4 @@ function vfConnectDatabase()
  */
 global $vgDB;
 $vgDB = vfConnectDatabase();
-?>
+

@@ -246,7 +246,7 @@ class PageDAO
                 PresentationDAO::insert($presentation);
             }
         }
-
+        
         $vgDB->CompleteTrans();
         if ($vgDB->HasFailedTrans())
         {
@@ -265,7 +265,7 @@ class PageDAO
         $startDate = vfDate();
         $pageVO->setStartTime($startDate);
 
-        $sql = "update {$vgDBPrefix}page set starttime = ?, endtime = ? where pageID = ?";
+        $sql = "update {$vgDBPrefix}page set starttime = ?, endtime = ?, receivers_released = 0 where pageID = ?";
         $vgDB->Execute($sql, array($pageVO->getStartTime(), $pageVO->getEndTime(), $pageVO->getPageID()));
 
         return true;
@@ -284,7 +284,38 @@ class PageDAO
         return true;
     }
     /**
-     * Update database and set new receivers and SMS from the PageVO object
+     * Prepare page for restart survey and save a history of survey runs.
+     * Survey type must be survey or questionnaire or quiz.
+     *
+     * @param PageVO $page
+     */
+    function renewPageSurvey(PageVO $page)
+    {
+        if($page->getType() != vSIMPLE_SURVEY
+                && $page->getType() != vQUESTIONNAIRE
+                && $page->getType() != vQUIZ)
+        {
+            throw new SurveyESurveyException('Survey type must be survey or questionnaire or quiz');
+        }
+        $presid = $page->getCurrentPresentationID();
+
+        //Save history of survey runs
+        $pres = new PresentationVO();
+        $pres->setActive(false);
+        $pres->setStartTime($page->getStartTime());
+        $pres->setEndTime($page->getEndTime());
+        $pres->setPageID($page->getPageID());
+        $pres->setName('Run # ' . $presid);
+        $pres->setPresentationID($presid);
+
+        $page->addPresentation($pres);
+        $page->setStartTime("2999-01-01 00:00:00");
+        $page->setEndTime('2999-01-01 00:00:00');
+        //update page information
+        $this->updatePage($page, false, true);
+    }
+    /**
+     * Update database and set new receivers and SMS from the PageVO object.
      *
      * @param PageVO $page
      */

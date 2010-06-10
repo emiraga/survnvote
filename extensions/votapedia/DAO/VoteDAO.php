@@ -34,7 +34,7 @@ class VoteDAO
      * @param Integer $presentationID of a survey, could be NULL
      * @return SurveyVO object
      */
-    function newFromPage($type, $pageID, $surveyID, $choiceID, $presentationID = 0)
+    function newFromPage($type, $pageID, $surveyID, $choiceID, $presentationID)
     {
         //$survey =& $this->page->getSurveyBySurveyID($surveyID);
 
@@ -83,15 +83,17 @@ class VoteDAO
      * Count new votes since certain datetime.
      *
      * @param Integer $page_id
+     * @param Integer $presentation_id
      * @param Integer $timestamp
      * @return Integer number of new votes
      */
-    static function countNewVotes($page_id, $timestamp)
+    static function countNewVotes($page_id, $presentation_id, $timestamp)
     {
         global $vgDB, $vgDBPrefix;
         $datetime = vfDate($timestamp);
-        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}surveyrecord WHERE pageID = ? AND voteDate >= ?",
-                array($page_id, $datetime));
+        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}surveyrecord WHERE pageID = ? "
+        ."AND presentationID = ? AND voteDate >= ?",
+                array($page_id, $presentation_id , $datetime));
     }
     /**
      * Get number of votes for a specific page and presentationID
@@ -110,9 +112,11 @@ class VoteDAO
         $records = $vgDB->GetAll("select surveyID, choiceID, count(ID) as votes from v_surveyrecord "
                 ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
                 array($pageID, $presentationID));
+        $votes = 0;
         foreach($records as $record)
         {
             $result->set( $record['surveyID'], $record['choiceID'], $record['votes']);
+            $votes += $record['votes'];
         }
         return $result;
     }

@@ -37,17 +37,20 @@ class spCreateSurvey extends SpecialPage
 }
 
 /**
- * Special page Create Survey
+ * Special page Create Survey.
+ * This class is used for creating surveys.
+ * Also it is used for editing surveys.
  *
  * @author Emir Habul
  * @package ControlSurvey
  */
 class CreateSurvey
 {
-    protected $formitems;
-    protected $formpages;
-    protected $spPageName;
-    protected $form;
+    /** @var Array */protected $formitems;
+    /** @var Array */protected $formpages;
+    /** @var String */protected $spPageName;
+    /** @var FormControl */protected $form;
+    /** @var PageVO */ protected $page;
 
     /**
      * Constructor for CreateSurvey
@@ -490,9 +493,9 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        if($page->getStatus() != 'ready')
+        if(! $page->isEditable( $page->getCurrentPresentationID() ))
         {
-            $surveyended = $page->getStatus() == 'ended';
+            $surveyended = $page->getStatus( $page->getCurrentPresentationID() ) == 'ended';
             $this->setLimitedFormPages( $surveyended );
         }
         $this->fillFormValuesFromPage($page);
@@ -546,9 +549,9 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        if($this->page->getStatus() != 'ready')
+        if(! $this->page->isEditable())
         {
-            $surveyended = $this->page->getStatus() == 'ended';
+            $surveyended = $this->page->getStatus( $this->page->getCurrentPresentationID() ) == 'ended';
             $this->setLimitedFormPages( $surveyended );
             $smallupdate = true;
         }

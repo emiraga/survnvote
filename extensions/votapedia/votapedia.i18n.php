@@ -40,6 +40,10 @@ $messages['en'] = array(
     'start-questionnaire' => 'Start Questionnaire',
     'start-quiz' => 'Start Quiz',
 
+    'renew-survey' => 'Renew Survey',
+    'renew-questionnaire' => 'Renew Questionnaire',
+    'renew-quiz' => 'Renew Quiz',
+
     'stop-survey' => 'Stop Survey',
     'stop-questionnaire' => 'Stop Questionnaire',
     'stop-quiz' => 'Stop Quiz',

@@ -160,8 +160,6 @@ class VotesCount
      */
     public function set($surveyID, $choiceID, $votes)
     {
-        if(!isset( $this->record[$surveyID]))
-            $this->record[$surveyID] = array();
         $this->record[$surveyID][$choiceID] = $votes;
     }
     /**

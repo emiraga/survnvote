@@ -130,7 +130,7 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $wgEnableWriteAPI=true; # required for votapedia
 require_once("$IP/extensions/votapedia/votapedia.php");
 require_once("$IP/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php"); 
-# require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
+require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
 
 $wgUseAjax = true;
 $wgAjaxWatch = false;

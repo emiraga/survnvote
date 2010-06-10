@@ -48,7 +48,7 @@ $vgAllowedTags = '<math><code><b><u><i>';
 $vgAnonSurveyCreation = true;
 
 // Interval after which images will be refreshed, set 0 to disable
-$vgImageRefresh = 3; //@todo increase this value
+$vgImageRefresh = 10; //@todo increase this value
 
 /**
  * @return Array containing all phone numbers that can be dialed for voting

@@ -22,6 +22,7 @@ class SurveyButtons
     /** @var Boolean */protected $show_details = true;
     /** @var Boolean */protected $show_vote = false;
     /** @var Boolean */protected $has_control = false;
+    /** @var Boolean */protected $show_renew = false;
     /**
      * Construct class
      */
@@ -86,6 +87,14 @@ class SurveyButtons
         $this->show_vote = $show;
     }
     /**
+     * Should it show button "renew"
+     * @param Boolean $show
+     */
+    function setRenewButton($show)
+    {
+        $this->show_renew = $show;
+    }
+    /**
      * Does this user has control over survey.
      * 
      * @param Boolean $control
@@ -95,9 +104,12 @@ class SurveyButtons
         $this->has_control = $control;
     }
     /**
+     * 
+     * @param Integer $presID presentation ID
+     * @param Boolean $show_details
      * @return String HTML code of buttons
      */
-    function getHTML($show_details = false)
+    function getHTML($presID, $show_details = false)
     {
         $divname = "btnsSurvey{$this->page_id}-".rand();
         $output = "<div id='$divname'>";
@@ -125,6 +137,11 @@ class SurveyButtons
                   .'" onClick="return confirm(\'Are you sure you want to stop this '.$this->type
                         .'? This operation cannot be undone.\')" />';
             }
+            else // page is 'ended'
+            {
+                if($this->show_renew)
+                    $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('renew-'.$this->type).'" />';
+            }
         }
         //$output.= '<div style="float: right;">';
         if($this->show_details)
@@ -137,3 +154,4 @@ class SurveyButtons
         return $output;
     }
 }
+

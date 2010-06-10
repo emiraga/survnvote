@@ -218,7 +218,6 @@ class SurveyVO
      */
     /*function getChoiceIDByReceiver($receiver)
     {
-        var_dump($this->choices);
         foreach($this->choices as $choice )
         {
             if ($choice->getReceiver() == $receiver)

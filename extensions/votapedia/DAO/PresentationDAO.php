@@ -3,6 +3,7 @@ if (!defined('MEDIAWIKI')) die();
 /**
  * @package DataAccessObject
  */
+require_once("$vgPath/VO/PresentationVO.php");
 
 /**
  * Description of PresentationDAO
@@ -32,7 +33,7 @@ class PresentationDAO
         ));
     }
     /**
-     * Get presentations of a survey
+     * Get presentations of a survey.
      *
      * @param Integer $pageID
      * @return Array $presentations
@@ -63,7 +64,7 @@ class PresentationDAO
         return $presentations;
     }
     /**
-     * Activate a presentation in a survey
+     * Activate a presentation in a survey.
      *
      * @param Integer $surveyID
      * @param Integer $presentationID
@@ -83,7 +84,7 @@ class PresentationDAO
         $vgDB->CompleteTrans();
     }
     /**
-     * Delete presentation in a page which includes it
+     * Delete presentation in a page which includes it.
      *
      * @param Integer $pageID id of a page
      */
