@@ -39,10 +39,10 @@ class VoteDAO
         //$survey =& $this->page->getSurveyBySurveyID($surveyID);
 
         $vote = new VoteVO();
-        $vote->setPageID($pageID);
-        $vote->setSurveyID($surveyID);
-        $vote->setChoiceID($choiceID);
-        $vote->setPresentationID($presentationID);
+        $vote->setPageID(intval($pageID));
+        $vote->setSurveyID(intval($surveyID));
+        $vote->setChoiceID(intval($choiceID));
+        $vote->setPresentationID(intval($presentationID));
         $vote->setVoterID($this->userID);
         $vote->setVoteDate(vfDate());
         $vote->setVoteType( $type );
@@ -76,7 +76,7 @@ class VoteDAO
             $vgDB->Execute("insert into {$vgDBPrefix}vote (userID, pageID, surveyID, choiceID, presentationID) values(?,?,?,?,?)",
                     array($vote->getVoterID(), $vote->getPageID(), $vote->getSurveyID(), $vote->getChoiceID(),
                     $vote->getPresentationID()));
-            $voteid = $vgDB->Insert_ID();
+            $voteid = intval($vgDB->Insert_ID());
             $vgDB->Execute("insert into {$vgDBPrefix}vote_details (voteID, voteDate, voteType, comments) values(?,?,?,?)",
                     array($voteid, $vote->getVoteDate(), $vote->getVoteType(), 'no comment'));
         }
@@ -87,16 +87,17 @@ class VoteDAO
      *
      * @param Integer $page_id
      * @param Integer $presentation_id
-     * @param Integer $timestamp
+     * @param Integer $last_voteID
      * @return Integer number of new votes
      */
-    static function countNewVotes($page_id, $presentation_id, $timestamp)
+    static function countNewVotes($page_id, $presentation_id, $last_voteID)
     {
         global $vgDB, $vgDBPrefix;
-        $datetime = vfDate($timestamp);
-        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}vote WHERE pageID = ? "
-        ."AND presentationID = ? AND voteDate >= ?",
-                array($page_id, $presentation_id , $datetime));
+        $r = $vgDB->GetAll("SELECT count(voteID) as count, max(voteID) as maxch FROM {$vgDBPrefix}vote WHERE pageID = ? "
+                ."AND presentationID = ? AND voteID > ?",
+                array($page_id, $presentation_id , $last_voteID));
+        $r = $r[0];
+        return array($r['count'], $r['maxch']);
     }
     /**
      * Get number of votes for a specific page and presentationID
@@ -114,7 +115,7 @@ class VoteDAO
         $result = new VotesCount();
         $records = $vgDB->GetAll("select surveyID, choiceID, count(voteID) as votes from {$vgDBPrefix}vote "
                 ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
-                array($pageID, $presentationID));
+                array(intval($pageID), $presentationID));
         $votes = 0;
         foreach($records as $record)
         {

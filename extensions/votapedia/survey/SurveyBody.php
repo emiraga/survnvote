@@ -145,7 +145,7 @@ class SurveyBody
             {
                 global $vgDB, $vgDBPrefix;
                 $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
-                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->userID(), $survey->getSurveyID(), $this->presID ));
+                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->userID(), intval($survey->getSurveyID()), $this->presID ));
                 if($prev_vote)
                     $userhasvoted=true;
                 foreach ($choices as &$choice)
@@ -322,7 +322,9 @@ class SurveyBody
             $page_id .= ", $survey_id";
         }
         global $vgImageRefresh;
-        $now = time();
+
+        $lastchoiceid = 0; //@todo get proper value here
+
         $script = "<script>
         function refresh$imgid()
         {
@@ -340,7 +342,7 @@ class SurveyBody
                 setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
             });
         }
-        var time$imgid = \"$now\";
+        var time$imgid = \"$lastchoiceid\";
         setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
         /*alert(document.getElementById('$imgid').src);*/
         </script>";
@@ -406,30 +408,32 @@ class SurveyBody
     /**
      * Get link to graph from ajax
      *
-     * @param Integer $last_refresh
+     * @param Integer $last_choiceID
      * @param Integer $colorindex
      * @param Integer $page_id
      * @param Integer $presID
      * @param Integer $survey_id
      * @return String
      */
-    static function ajaxgraph($last_refresh, $colorindex, $presID, $page_id, $survey_id = null)
+    static function ajaxgraph($last_choiceID, $colorindex, $presID, $page_id, $survey_id = null)
     {
-        if(VoteDAO::countNewVotes($page_id, $presID, intval($last_refresh)) == 0)
+        list($newcount, $newchoiceid) = VoteDAO::countNewVotes($page_id, $presID, intval($last_choiceID));
+
+        if($newcount == 0)
             return ''; // there are no new votes
+
         //@todo check permisions
-        $now = time();
         $pagedao = new PageDAO();
         $page = $pagedao->findByPageID($page_id);
         $surveybody = new SurveyBody($page, new MwParser(new Parser()), $presID);
 
         if($survey_id)
         {
-            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),$page_id)."@".$now;
+            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),$page_id)."@".$newchoiceid;
         }
         else
         {
-            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),$page_id)."@".$now;
+            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),$page_id)."@".$newchoiceid;
         }
     }
     /**

@@ -182,7 +182,7 @@ class UserphonesDAO
      * @param String $phone telephone number
      * @return String userID, or Boolean false if it does not exist.
      */
-    static function getNameFromPhone($phone)
+    static function getUserIDFromPhone($phone)
     {
         global $vgDB, $vgDBPrefix;
         return $vgDB->GetOne("SELECT userID FROM {$vgDBPrefix}phone WHERE phonenumber = ? AND status >= ?",

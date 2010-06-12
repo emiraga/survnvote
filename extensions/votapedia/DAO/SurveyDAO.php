@@ -95,8 +95,8 @@ class SurveyDAO {
         {
             $survey = new SurveyVO();
 
-            $survey->setPageID($rsSurveys->fields["pageID"]);
-            $survey->setSurveyID($rsSurveys->fields["surveyID"]);
+            $survey->setPageID(intval($rsSurveys->fields["pageID"]));
+            $survey->setSurveyID(intval($rsSurveys->fields["surveyID"]));
             $survey->setQuestion(trim($rsSurveys->fields["question"]));
             $survey->setAnswer(trim($rsSurveys->fields["answer"]));
             $survey->setPoints($rsSurveys->fields["points"]);
@@ -134,9 +134,9 @@ class SurveyDAO {
             //Access by name, some database may not support this
             //small case
             $choice = new ChoiceVO();
-            $choice->setSurveyID($rsChoice->fields['surveyID']);
-            $choice->setPageID($rsChoice->fields['pageID']);
-            $choice->setChoiceID($rsChoice->fields['choiceID']);
+            $choice->setSurveyID(intval($rsChoice->fields['surveyID']));
+            $choice->setPageID(intval($rsChoice->fields['pageID']));
+            $choice->setChoiceID(intval($rsChoice->fields['choiceID']));
             $choice->setChoice(trim($rsChoice->fields['choice']));
             $choice->setReceiver(trim($rsChoice->fields['receiver']));
             $choice->setSMS(trim($rsChoice->fields['SMS']));

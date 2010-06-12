@@ -312,7 +312,7 @@ class MwUser
             return $this->userID;
 
         $user = $this->getUserVO();
-        return $this->userID = $user->userID;
+        return $this->userID = intval($user->userID);
     }
     /**
      * @return UserVO

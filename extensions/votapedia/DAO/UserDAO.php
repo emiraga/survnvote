@@ -25,7 +25,7 @@ class UserDAO
     function insert(UserVO &$user)
     {
         global $vgDB, $vgDBPrefix;
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (isAnon, username, password) VALUES (?,?)",
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (isAnon, username, password) VALUES (?,?,?)",
                 array($user->isAnon, $user->username, $user->password));
         $user->userID = $vgDB->Insert_ID();
         return $user->userID;
@@ -115,19 +115,19 @@ class UserDAO
                 //wiki names start with capital letter
                 $name[0] = strtoupper($name[0]);
             }
+
             if($this->requestNew($name, $password, $phonenumber))
             {
                 if($send_sms)
                 {
                     Sms::sendSMS($phonenumber, sprintf(Sms::$msgCreateUser, $name, $password));
                 }
-
                 $user = new UserVO();
                 $user->username = $name;
                 $user->password = $password;
                 $user->isAnon = false;
                 $this->insert($user);
-
+echo "inserted {$user->userID}   $phonenumber\n";
                 $phonedao = new UserphonesDAO($user);
                 $phonedao->addVerifiedPhone($user->userID, $phonenumber);
                 return $user;

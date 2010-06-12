@@ -42,7 +42,7 @@ class PageDAO
         while(!$rs->EOF)
         {
             $page = new PageVO();
-            $page->setPageID($rs->fields["pageID"]);
+            $page->setPageID(intval($rs->fields["pageID"]));
             $page->setTitle($rs->fields["title"]);
             $page->setStartTime($rs->fields["startTime"]);
             $page->setDuration($rs->fields["duration"]);
@@ -112,7 +112,7 @@ class PageDAO
      */
     function findByPageID($id, $loadsurveys = true, $loadPresentations = true)
     {
-        $page = $this->getOnePage("where pageID = ?", array($id), $loadsurveys, $loadPresentations);
+        $page = $this->getOnePage("where pageID = ?", array(intval($id)), $loadsurveys, $loadPresentations);
         if(!$page)
             throw new SurveyException("Cannot find this survey.", 201);
         return $page;

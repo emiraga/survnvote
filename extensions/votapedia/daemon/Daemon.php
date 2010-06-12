@@ -20,19 +20,20 @@ $vgDBUserPassword = $wgDBadminpassword;
 
 /** Include dependencies */
 require_once("$vgPath/Common.php");
-$vgDB->debug = false;
+$vgDB->debug = true;
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
+$vgDaemonDebug = false;
 
 /**
  * Do whatever is needed to process new incoming SMS.
  */
 function vfDaemonSmsAction()
 {
-    global $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS;
+    global $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS, $vgDaemonDebug;
 
     if(! $vgEnableSMS)
         return;
@@ -40,17 +41,22 @@ function vfDaemonSmsAction()
     $new = Sms::getNewSms();
     foreach($new as $sms)
     {
-        //load user
-        $username = UserphonesDAO::getNameFromPhone($sms['from']);
-        $userdao = new UserDAO();
+        if($vgDaemonDebug)
+            echo "New sms: $sms[from] $sms[text]\n";
         
-        if($username == false)
+        //load user
+        $userID = UserphonesDAO::getUserIDFromPhone($sms['from']);
+        
+        if($userID == false)
         {
+            $userdao = new UserDAO();
             $user = $userdao->newFromPhone($sms['from'], true);
-            $username = $user->username;
-            echo "New from phone $username\n";
+            $userID = $user->userID;
+            if($vgDaemonDebug)
+                echo "New userID=$userID from phone $sms[from]\n";
         }
-        echo "$username\n";
+        if($vgDaemonDebug)
+            echo "Found $userID\n";
         $numbers = preg_split("/[^0-9]+/", $sms['text']);
 
         foreach($numbers as $choice)
@@ -62,12 +68,14 @@ function vfDaemonSmsAction()
                 $choice = '0' . $choice;
             try
             {
-                vfVoteFromDaemon($choice, $username);
+                vfVoteFromDaemon($choice, $userID);
             }
             catch(Exception $e)
             {
                 //We do not care about these Exceptions.
                 //Since this is error of a voter.
+                if($vgDaemonDebug)
+                    echo "Exception: ".$e->getMessage()."\n";
             }
         }
         Sms::processed($sms['id']);
@@ -77,14 +85,14 @@ function vfDaemonSmsAction()
  * Find if such choice exists and vote for it.
  *
  * @param String $choice choice that user has coosen
- * @param String $username name of user
+ * @param String $userID ID of user
  */
-function vfVoteFromDaemon($choice, $username)
+function vfVoteFromDaemon($choice, $userID)
 {
     global $vgDBPrefix, $vgDB;
     //load PageVO
     $pagedao = new PageDAO();
-    $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
+    $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}choice WHERE SMS = ? AND finished = 0",
         array($choice));
     if($result == false)
         throw new SurveyException("Survey not found.");
@@ -93,36 +101,26 @@ function vfVoteFromDaemon($choice, $username)
     $pageid = $result->fields['pageID'];
     $page =& $pagedao->findByPageID($pageid, false);
     //Save vote
-    $votedao = new VoteDAO($page, $username);
+    $votedao = new VoteDAO($page, $userID);
     $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid, $page->getCurrentPresentationID() );
     $votedao->vote($votevo);
-}
-
-/**
- * Generate a random character string
- * 
- * @param Integer $length length of output string
- * @param String $chars used characters, default: all alpha-numeric characters
- * @return String random string
- */
-function vfRandStr($length = 32, $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890')
-{
-    $chars_length = strlen($chars) - 1;
-    $string = '';
-    for ($i = 1; $i < $length; $i++)
-        $string .= $chars[rand(0, $chars_length)];
-    return $string;
 }
 
 /* get command line parameters */
 $args = $_SERVER['argv'];
 if(!isset($args[1]))
 {
-    die("\nUsage: php $args[0] daemon | fakevote [votes]+ | checkbalance | reportbalance\n");
+    die("\nUsage: php $args[0] daemon [debug] | fakevote [votes]+ | checkbalance | reportbalance\n");
 }
 
 if($args[1] == 'daemon')
 {
+    if(isset($args[2]) && $args[2] == 'debug')
+    {
+        $vgDaemonDebug = true;
+        echo "Debug enabled\n";
+    }
+    
     /* Run as a daemon */
     while(1)
     {
@@ -141,7 +139,7 @@ if($args[1] == 'daemon')
 else if($args[1] == 'fakevote') /*used for testing*/
 {
     global $vgSmsChoiceLen;
-    $name = 'fake:'.vfRandStr(8);
+    $userID = 1000 * 1000 + rand();
     for($i=2;$i<count($args);$i++)
     {
         $choice = $args[$i];
@@ -149,7 +147,7 @@ else if($args[1] == 'fakevote') /*used for testing*/
             $choice = '0' . $choice;
         try
         {
-            vfVoteFromDaemon($choice, $name);
+            vfVoteFromDaemon($choice, $userID);
             echo "Fake vote: $choice\n";
         }
         catch(Exception $e)
@@ -181,3 +179,4 @@ elseif($args[1] == 'masstest')
             VALUES('FAKE',4,5,2,'FAKE',$choice,'$now')");
     }
 }
+
