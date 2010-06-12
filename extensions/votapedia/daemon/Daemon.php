@@ -14,11 +14,13 @@ define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
 @require_once("$IP/LocalSettings.php");
 @include_once("$IP/AdminSettings.php");
+
 $vgDBUserName = $wgDBadminuser; //Set this to database user that has priviledges to access votapedia
 $vgDBUserPassword = $wgDBadminpassword;
 
 /** Include dependencies */
 require_once("$vgPath/Common.php");
+$vgDB->debug = false;
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
@@ -40,12 +42,15 @@ function vfDaemonSmsAction()
     {
         //load user
         $username = UserphonesDAO::getNameFromPhone($sms['from']);
+        $userdao = new UserDAO();
         
         if($username == false)
         {
-            $username = vfDaemonNewUser($sms['from']);
+            $user = $userdao->newFromPhone($sms['from'], true);
+            $username = $user->username;
+            echo "New from phone $username\n";
         }
-
+        echo "$username\n";
         $numbers = preg_split("/[^0-9]+/", $sms['text']);
 
         foreach($numbers as $choice)
@@ -55,7 +60,6 @@ function vfDaemonSmsAction()
             //process SMS
             while(strlen($choice) < $vgSmsChoiceLen)
                 $choice = '0' . $choice;
-
             try
             {
                 vfVoteFromDaemon($choice, $username);
@@ -77,7 +81,6 @@ function vfDaemonSmsAction()
  */
 function vfVoteFromDaemon($choice, $username)
 {
-    echo "$choice\n";
     global $vgDBPrefix, $vgDB;
     //load PageVO
     $pagedao = new PageDAO();

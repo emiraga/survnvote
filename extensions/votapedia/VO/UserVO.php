@@ -14,5 +14,6 @@ class UserVO
     /** @var Integer */ public $userID;
     /** @var String  */ public $username;
     /** @var String  */ public $password;
+    /** @var Boolean */ public $isAnon;
 }
 

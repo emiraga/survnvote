@@ -63,6 +63,10 @@ function vfParserFirstCallInit( &$parser )
     return true;
 }
 
+//API
+$wgAPIModules['vpAutoUser'] = 'vpAutocreateUsers';
+$wgAutoloadClasses['vpAutocreateUsers'] = "$vgPath/API/AutocreateUsers.php";
+
 //Magic words (tags)
 define('vtagSIMPLE_SURVEY',    'Survey');
 define('vtagQUIZ',             'Quiz');

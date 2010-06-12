@@ -24,8 +24,8 @@ class PresentationDAO
         $sql = "insert into {$vgDBPrefix}presentation(pageID, presentationID, ";
         $sql .= "name, active, startTime, endTime ) values (?,?,?,?,?,?)";
         $vgDB->Execute($sql,array(
-            $presentation->getPageID(),
-            $presentation->getPresentationID(),
+            intval($presentation->getPageID()),
+            intval($presentation->getPresentationID()),
             $presentation->getName(),
             $presentation->getActive(),
             $presentation->getStartTime(),
@@ -42,7 +42,7 @@ class PresentationDAO
     {
         global $vgDB, $vgDBPrefix;
         $sql = "select * from {$vgDBPrefix}presentation where pageID = ? order by presentationID";
-        $rsPresentation = &$vgDB->Execute($sql, array($pageID));
+        $rsPresentation = &$vgDB->Execute($sql, array(intval($pageID)));
 
         $presentations = array();
 
@@ -93,7 +93,7 @@ class PresentationDAO
         global $vgDB, $vgDBPrefix;
 
         $sql = "delete from {$vgDBPrefix}presentation where pageID = ?";
-        $vgDB->Execute($sql, array($pageID));
+        $vgDB->Execute($sql, array(intval($pageID)));
     }
 }
 

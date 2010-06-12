@@ -309,9 +309,16 @@ class MwUser
     function userID()
     {
         if(isset($this->userID))
-        {
             return $this->userID;
-        }
+
+        $user = $this->getUserVO();
+        return $this->userID = $user->userID;
+    }
+    /**
+     * @return UserVO
+     */
+    function getUserVO()
+    {
         $dao = new UserDAO();
         $user = $dao->findByName( $this->getName() );
         if($user == false)
@@ -319,8 +326,10 @@ class MwUser
             $user = new UserVO();
             $user->username = $this->getName();
             $user->password = '';
+            $user->isAnon = $this->isAnon();
             $dao->insert($user);
         }
-        return $this->userID = $user->userID;
+        return $user;
     }
 }
+

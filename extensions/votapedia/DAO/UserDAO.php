@@ -25,8 +25,8 @@ class UserDAO
     function insert(UserVO &$user)
     {
         global $vgDB, $vgDBPrefix;
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (username, password) VALUES (?,?)",
-                array($user->username, $user->password));
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (isAnon, username, password) VALUES (?,?)",
+                array($user->isAnon, $user->username, $user->password));
         $user->userID = $vgDB->Insert_ID();
         return $user->userID;
     }
@@ -38,55 +38,73 @@ class UserDAO
     function findByName($username)
     {
         global $vgDB, $vgDBPrefix;
-        $r = $vgDB->Execute( "SELECT userID, password FROM {$vgDBPrefix}user WHERE username = ?", array($username) );
+        $r = $vgDB->Execute( "SELECT isAnon, userID, password FROM {$vgDBPrefix}user WHERE username = ?", array($username) );
         if($r->RecordCount() == 0)
             return false;
         $user = new UserVO();
+        $user->isAnon = $r->fields['isAnon'];
         $user->userID = $r->fields['userID'];
         $user->username = $username;
         $user->password = $r->fields['password'];
-
         return $user;
     }
     /**
-     * Create a new user by performing a POST request to the MediaWiki.
-     * This is a very ugly hack. Needs to be improved. @todo Fix this.
+     * Find a user by userID.
+     *
+     * @return UserVO or Boolean false if it cannot be found.
+     */
+    function findByID($userID)
+    {
+        global $vgDB, $vgDBPrefix;
+        $r = $vgDB->Execute( "SELECT isAnon, username, password FROM {$vgDBPrefix}user WHERE userID = ?", array($userID) );
+        if($r->RecordCount() == 0)
+            return false;
+        $user = new UserVO();
+        $user->userID = $userID;
+        $user->isAnon = $r->fields['isAnon'];
+        $user->username = $r->fields['username'];
+        $user->password = $r->fields['password'];
+        return $user;
+    }
+    /**
+     * Create a new user by performing a GET request to the MediaWiki API.
      *
      * @return Boolean success true of false
      */
     function requestNew($username, $password, $realname)
     {
-        //@todo *BUG* this part is very fragile, captcha extension can prevent this from working
-        global $wgServer, $wgScriptPath, $wgScriptExtension;
-        $url = "{$wgServer}{$wgScriptPath}/index$wgScriptExtension?title=Special:UserLogin&action=submitlogin&type=signup";
+        global $wgServer, $wgScriptPath, $wgScriptExtension, $wgSecretKey;
 
-        $post = "wpName=".urlencode($username);
-        $post .= "&wpPassword=".urlencode($password);
-        $post .= "&wpRetype=".urlencode($password);
-        $post .= "&wpRealName=".urlencode($realname);
-        $post .= "&wpCreateaccount=Create+account";
+        $secretkey = sha1($wgSecretKey);
+        
+        $url = "{$wgServer}{$wgScriptPath}/api$wgScriptExtension?action=vpAutoUser";
+        $url .= "&secretkey=".$secretkey;
+        $url .= "&format=php";
+        $url .= "&name=".urlencode($username);
+        $url .= "&password=".urlencode($password);
+        $url .= "&realname=".urlencode($realname);
 
         $ch = curl_init();
         curl_setopt ($ch, CURLOPT_URL, $url );
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec ($ch);
         curl_close ($ch);
-        return !strstr($data, 'errorbox');
+
+        $data = unserialize( $data );
+        return isset($data['success']);
     }
     /**
      * Pick a new username, create that account and send an SMS.
-     *
+     * 
      * @param String $phonenumber
      * @return UserVO
      */
     function newFromPhone($phonenumber, $send_sms = false)
     {
         global $vgDB, $vgDBPrefix;
-        $password = rand(1000,9999);
+        $password = rand(100000,999999);
 
-        for($i=0;$i<50;$i++)
+        for($i=0;$i<500;$i++)
         {
             $name = $vgDB->GetOne("SELECT name FROM {$vgDBPrefix}names WHERE taken = 0");
             if($name == false)
@@ -97,7 +115,7 @@ class UserDAO
                 //wiki names start with capital letter
                 $name[0] = strtoupper($name[0]);
             }
-            if($this->requestNewUser($name, $password, $phonenumber))
+            if($this->requestNew($name, $password, $phonenumber))
             {
                 if($send_sms)
                 {
@@ -107,10 +125,11 @@ class UserDAO
                 $user = new UserVO();
                 $user->username = $name;
                 $user->password = $password;
+                $user->isAnon = false;
                 $this->insert($user);
 
                 $phonedao = new UserphonesDAO($user);
-                $phonedao->addVerifiedPhone($name, $phonenumber);
+                $phonedao->addVerifiedPhone($user->userID, $phonenumber);
                 return $user;
             }
         }

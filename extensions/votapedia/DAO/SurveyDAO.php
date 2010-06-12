@@ -88,7 +88,7 @@ class SurveyDAO {
         global $vgDB, $vgDBPrefix;
         $sql = "select * from {$vgDBPrefix}survey where pageID = ? order by surveyID";
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
-        $rsSurveys = &$vgDB->Execute($sql, array($pageID));
+        $rsSurveys = &$vgDB->Execute($sql, array(intval($pageID)));
 
         $surveys = array();
         while(!$rsSurveys->EOF)
@@ -126,7 +126,7 @@ class SurveyDAO {
         global $vgDB, $vgDBPrefix;
         $sql = "select * from {$vgDBPrefix}choice where surveyID=? order by choiceID";
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
-        $rsChoice = &$vgDB->Execute($sql, array($surveyID));
+        $rsChoice = &$vgDB->Execute($sql, array(intval($surveyID)));
 
         $choices = array();
         while(!$rsChoice->EOF)

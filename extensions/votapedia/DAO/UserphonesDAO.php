@@ -30,6 +30,8 @@ class UserphonesDAO
     public function __construct(UserVO &$user)
     {
         $this->user =& $user;
+        if($this->user->isAnon)
+            throw new Exception('Must be logged in to manage phones.');
     }
     /**
      * Add new phone number for this user

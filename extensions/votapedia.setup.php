@@ -8,6 +8,12 @@ define('VOTAPEDIA_SETUP',true);
 $vgDBUserName = $wgDBadminuser;
 $vgDBUserPassword = $wgDBadminpassword;
 
+if(! isset($wgSecretKey) || strlen($wgSecretKey) < 20 )
+{
+    die('$wgSecretKey is not specified or it is too short, votapedia requires this value to be '
+            .'set at least 20 characters. http://www.mediawiki.org/wiki/Manual:$wgSecretKey');
+}
+
 if(!defined('VOTAPEDIA_TEST'))
     echo '<html><head><title>votapedia installation</title></head><body>';
 global $vgScript, $wgScriptPath;
@@ -96,6 +102,7 @@ DROP TABLE IF EXISTS {$vgDBPrefix}choice;
 DROP TABLE IF EXISTS {$vgDBPrefix}used_receivers;
 DROP TABLE IF EXISTS {$vgDBPrefix}phone;
 DROP TABLE IF EXISTS {$vgDBPrefix}names;
+DROP TABLE IF EXISTS {$vgDBPrefix}user;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote_details;
 
@@ -172,6 +179,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
   userID       $tUserID     NOT NULL AUTO_INCREMENT,
   username     varchar(255) NOT NULL,
   password     varchar(20)  NOT NULL DEFAULT '',
+  isAnon       $tBoolean    NOT NULL,
   PRIMARY KEY  (userID),
   KEY          (username),
   UNIQUE       (username)

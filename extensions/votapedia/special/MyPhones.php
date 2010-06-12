@@ -30,7 +30,10 @@ class MyPhones extends SpecialPage
         $this->includable( false );
         $this->setGroup('MyPhones', 'votapedia');
         global $vgScript;
-        
+
+        if(vfUser()->isAnon())
+                die('Must be logged in.');
+
         $this->target = Skin::makeSpecialUrl('MyPhones');
         $this->items = array(
                 'empty' => array(
@@ -102,7 +105,9 @@ class MyPhones extends SpecialPage
         global $wgOut;
         try
         {
-            $this->dao = new UserphonesDAO(vfUser());
+            $user = vfUser()->getUserVO();
+
+            $this->dao = new UserphonesDAO($user);
             global $wgOut, $wgRequest;
             if($wgRequest->getVal('wpSubmit') == wfMsg('add-number'))
             {
