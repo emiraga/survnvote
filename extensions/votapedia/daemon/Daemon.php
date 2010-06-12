@@ -223,5 +223,15 @@ elseif($args[1] == 'reportbalance')
     Sms::getReport();
     echo (Sms::getLatestBalance())."\n";
     echo "Reporting done.\n";
+}elseif($args[1] == 'masstest')
+{
+    for($i=0;$i<100000;$i++)
+    {
+        if($i%1000 == 0)echo "$i\n";
+        $now = vfDate();
+        $choice = rand(1,7);
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}surveyrecord
+        (voterID,pageID,surveyID,presentationID,voteType,choiceID,voteDate)
+            VALUES('FAKE',4,5,2,'FAKE',$choice,'$now')");
+    }
 }
-

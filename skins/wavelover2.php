@@ -78,7 +78,7 @@ class WaveLover2Template extends QuickTemplate {
 	<head>
 		<meta http-equiv="Content-Type" content="<?php $this->text('mimetype') ?>; charset=<?php $this->text('charset') ?>" />
 		<?php $this->html('headlinks') ?>
-		<title><?php $this->text('pagetitle') ?></title>
+		<title><?php $this->text('pagetitle') ?> - New and Improved Audience Response System</title>
 		<?php $this->html('csslinks') ?>
 
 		<!--[if lt IE 7]><script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath') ?>/common/IEFixes.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"></script>
@@ -274,7 +274,7 @@ class WaveLover2Template extends QuickTemplate {
 		</div>
 </div>
 <?php $this->html('bottomscripts'); /* JS call to runBodyOnloadHook */ ?>
-<?php $this->html('reporttime') ?>
+<?php $this->html('reporttime'); ?>
 <?php if ( $this->data['debug'] ): ?>
 <!-- Debug output:
 <?php $this->text( 'debug' ); ?>

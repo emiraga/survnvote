@@ -109,7 +109,7 @@ class VoteDAO
     {
         global $vgDB, $vgDBPrefix;
         $result = new VotesCount();
-        $records = $vgDB->GetAll("select surveyID, choiceID, count(ID) as votes from v_surveyrecord "
+        $records = $vgDB->GetAll("select surveyID, choiceID, count(ID) as votes from {$vgDBPrefix}surveyrecord "
                 ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
                 array($pageID, $presentationID));
         $votes = 0;

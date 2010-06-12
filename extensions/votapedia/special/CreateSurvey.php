@@ -550,7 +550,7 @@ class CreateSurvey
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-        if(! $this->page->isEditable())
+        if(! $this->page->isEditable( $this->page->getCurrentPresentationID() ))
         {
             $surveyended = $this->page->getStatus( $this->page->getCurrentPresentationID() ) == 'ended';
             $this->setLimitedFormPages( $surveyended );

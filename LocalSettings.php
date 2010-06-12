@@ -121,8 +121,6 @@ $wgDefaultSkin = 'wavelover2';
 #$wgRightsIcon = "${wgScriptPath}/skins/common/images/gnu-fdl.png";
 #$wgRightsCode = "gfdl1_2"; # Not yet used
 
-$wgDiff3 = "";
-
 # When you make changes to this configuration file, this will make
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
@@ -153,4 +151,16 @@ $wgUseSiteCss = false;
 $wgUseSiteJs = false;
 
 $wgLocaltimezone = "Asia/Kuala_Lumpur";
+
+#$wgReadOnly = 'Testing the locking mode';
+
+$wgMainCacheType = CACHE_ACCEL;
+$wgUseDatabaseMessage = false;
+
+###$wgUseFileCache = true; /* default: false */
+###$wgFileCacheDirectory = "$IP/cache";
+$wgShowIPinHeader = false;
+
+$wgDiff = 'c:/bin/diff/bin/diff.exe';
+$wgDiff3 = 'c:/bin/diff/bin/diff3.exe';
 

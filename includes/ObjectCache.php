@@ -66,6 +66,7 @@ function &wfGetCache( $inputType ) {
 		}
 		$cache =& $wgCaches[CACHE_MEMCACHED];
 	} elseif ( $type == CACHE_ACCEL ) {
+		//echo $type;var_dump($wgCaches);
 		if ( !array_key_exists( CACHE_ACCEL, $wgCaches ) ) {
 			if ( function_exists( 'eaccelerator_get' ) ) {
 				$wgCaches[CACHE_ACCEL] = new eAccelBagOStuff;

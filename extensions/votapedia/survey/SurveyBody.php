@@ -135,7 +135,7 @@ class SurveyBody
             elseif($pagestatus == 'active')
             {
                 global $vgDB, $vgDBPrefix;
-                $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ? order by voteDate desc";
+                $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ?";
                 $prev_vote = $vgDB->GetOne($sql, array(vfUser()->getName(), $survey->getSurveyID(), $presID ));
                 if($prev_vote)
                     $userhasvoted=true;

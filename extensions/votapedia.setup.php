@@ -73,7 +73,7 @@ if(!defined('VOTAPEDIA_TEST'))
  */
 function vfDoSetup($justprint = false)
 {
-    global $vgPath, $vgDB, $vgDBPrefix;
+    global $vgPath, $vgDB, $vgDBPrefix, $wgDBTableOptions;
     require_once("$vgPath/Common.php");
 
     $sql = <<<END_SQL
@@ -110,14 +110,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   receivers_released tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (pageID),
   KEY pageID (pageID)
-);
-
--- --------------------------------------------------------
+) $wgDBTableOptions;
 
 --
 -- Table structure for table survey
 --
-
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
   pageID int NOT NULL,
   surveyID int NOT NULL AUTO_INCREMENT,
@@ -126,14 +123,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
   points tinyint(8) NOT NULL DEFAULT '0',
   PRIMARY KEY (surveyID),
   KEY pageID (pageID)
-);
-
--- --------------------------------------------------------
+) $wgDBTableOptions;
 
 --
 -- Table structure for table surveychoice
 --
-
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   pageID int NOT NULL,
   surveyID int NOT NULL,
@@ -144,14 +138,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
   SMS varchar(20) DEFAULT NULL,
   finished tinyint(1) NOT NULL DEFAULT '0',
   KEY surveyID (surveyID)
-);
-
--- --------------------------------------------------------
+) $wgDBTableOptions;
 
 --
 -- Table structure for table presentation
 --
-
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   pageID int NOT NULL,
   presentationID int NOT NULL,
@@ -159,61 +150,73 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   startTime datetime NOT NULL,
   endTime datetime NOT NULL,
   active tinyint(1) NOT NULL DEFAULT '0'
-);
-
--- --------------------------------------------------------
+) $wgDBTableOptions;
 
 --
--- Table structure for table surveyrecord
+-- Table structure for table user
 --
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
+  userID       int          NOT NULL AUTO_INCREMENT,
+  username     varchar(255) NOT NULL,
+  PRIMARY KEY    (userID)
+) $wgDBTableOptions;
 
-CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveyrecord (
-  ID int NOT NULL AUTO_INCREMENT,
-  voterID varchar(255) NOT NULL DEFAULT 'unknown',
-  pageID int NOT NULL,
-  surveyID int NOT NULL,
-  presentationID int NOT NULL DEFAULT '0',
-  choiceID int NOT NULL,
-  voteDate datetime NOT NULL,
-  voteType varchar(6) NOT NULL,
-  PRIMARY KEY (ID),
-  KEY i_surveyrecord (surveyID)
-);
+--
+-- Table structure for table vote
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote (
+  voteID         int     NOT NULL AUTO_INCREMENT,
+  userID         int     NOT NULL,
+  surveyID       int     NOT NULL,
+  presentationID TINYINT NOT NULL,
+  choiceID       TINYINT NOT NULL,
+  PRIMARY KEY    (voteID),
+  INDEX          (voterID)
+) $wgDBTableOptions;
+
+--
+-- Table structure for table vote_details
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote_details (
+  voteID         int         NOT NULL,
+  voteDate       datetime    NOT NULL,
+  voteType       varchar(6)  NOT NULL,
+  comments       varchar(50) NOT NULL,
+  PRIMARY KEY    (voteID),
+) $wgDBTableOptions;
 
 --
 -- Table structure for table usedreceivers
 --
-
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
-  receiver varchar(20) NOT NULL,
+  receiver  varchar(20)  NOT NULL,
   UNIQUE(receiver)
-);
+) $wgDBTableOptions;
 
 --
 -- Table structure for table userphones
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}userphones
 (
-  id int NOT NULL AUTO_INCREMENT,
-  username varchar(255) NOT NULL,
-  phonenumber varchar(20) NOT NULL,
-  dateadded datetime NOT NULL,
-  status tinyint(4) NOT NULL default 0,
-  confirmcode varchar(20),
-  confirmsent datetime,
-  PRIMARY KEY (id)
-);
+  ID           int           NOT NULL AUTO_INCREMENT,
+  userID       int           NOT NULL,
+  phonenumber  varchar(20)   NOT NULL,
+  dateadded    datetime      NOT NULL,
+  status       tinyint(4)    NOT NULL default 0,
+  confirmcode  varchar(20),
+  confirmsent  datetime,
+  PRIMARY KEY  (ID)
+) $wgDBTableOptions;
 
 --
 -- Table structure for table userphones
 --
-
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}names
 (
-  name varchar(20) NOT NULL,
-  taken tinyint(1) NOT NULL default 0,
+  name   varchar(20)  NOT NULL,
+  taken  tinyint(1)   NOT NULL default 0,
   UNIQUE(name)
-);
+) $wgDBTableOptions;
 
 END_SQL;
 
