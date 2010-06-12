@@ -33,7 +33,7 @@ class SurveyDAO {
         if ($survey->getNumOfChoices() > 0)
         {
             //Insert Choices begin
-            $sql = "insert into {$vgDBPrefix}surveychoice (pageID, surveyID, choiceID, choice, points) values (?,?,?,?,?)";
+            $sql = "insert into {$vgDBPrefix}choice (pageID, surveyID, choiceID, choice, points) values (?,?,?,?,?)";
             $resChoice = $vgDB->Prepare($sql);
             $choiceID = 0;
             $choices =& $survey->getChoices();
@@ -64,7 +64,7 @@ class SurveyDAO {
         global $vgDB, $vgDBPrefix;
         $vgDB->StartTrans();
 
-        $sql = "delete from {$vgDBPrefix}surveychoice where pageID = ?";
+        $sql = "delete from {$vgDBPrefix}choice where pageID = ?";
         $vgDB->Execute($sql, array($pageID));
 
         $sql = "delete from {$vgDBPrefix}survey where pageID = ?";
@@ -124,7 +124,7 @@ class SurveyDAO {
     static function &getChoices($surveyID, $pageID)
     {
         global $vgDB, $vgDBPrefix;
-        $sql = "select * from {$vgDBPrefix}surveyChoice where surveyID=? and pageID=? order by choiceID";
+        $sql = "select * from {$vgDBPrefix}choice where surveyID=? and pageID=? order by choiceID";
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
         $rsChoice = &$vgDB->Execute($sql, array($surveyID, $pageID));
 

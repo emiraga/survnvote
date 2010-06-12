@@ -21,8 +21,7 @@ class PageVO
 {
     private $pageID;
     private $title;
-    private $phone='000';
-    private $author = "UnknownUser";
+    private $author = 0;
     private $startTime = "2999-01-01 00:00:00";
     private $endTime;
     private $duration = 60;
@@ -115,19 +114,11 @@ class PageVO
     }
     /**
      * Set author of this survey
-     * @param String $author
+     * @param Integer $author
      */
     function setAuthor($author)
     {
         $this->author = trim($author);
-    }
-    /**
-     * Set phone of this survey , which is used to activate/deactivate survey
-     * @param String $phone
-     */
-    function setPhone($phone)
-    {
-        $this->phone = trim($phone);
     }
     /**
      * set whether the suvey needs to sms back to the voters
@@ -272,19 +263,11 @@ class PageVO
     }
     /**
      * get author of this survey
-     * @return String author of this survey
+     * @return Integer author of this survey
      */
     function getAuthor()
     {
         return $this->author;
-    }
-    /**
-     * get phone of this survey
-     * @return String phone of this survey
-     */
-    function getPhone()
-    {
-        return $this->phone;
     }
     /**
      * get created time of this survey

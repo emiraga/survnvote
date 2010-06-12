@@ -187,5 +187,6 @@ function vfConnectDatabase()
 global $vgDB;
 $vgDB = vfConnectDatabase();
 
-#$vgDB->debug = true;
-#$vgDB->LogSQL(true);
+$vgDB->debug = true;
+$vgDB->LogSQL(true);
+

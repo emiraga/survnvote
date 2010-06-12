@@ -15,7 +15,7 @@ if (!defined('MEDIAWIKI')) die();
  */
 class UserphonesDAO
 {
-    /** @var MwUser */ private $user;
+    /** @var UserVO */ private $user;
     private $statusdesc = array(
             vPHONE_NEW => 'New phone number',
             vPHONE_SENT_CODE => 'Confirmation code send by SMS',
@@ -27,11 +27,9 @@ class UserphonesDAO
      *
      * @param MwUser $user
      */
-    public function __construct(MwUser &$user)
+    public function __construct(UserVO &$user)
     {
         $this->user =& $user;
-        if($this->user->isAnon())
-            throw new Exception("Cannot add phone numbers to anonymous user.");
     }
     /**
      * Add new phone number for this user
@@ -43,8 +41,8 @@ class UserphonesDAO
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
-                array($this->user->getName(), $number, vPHONE_NEW, $now));
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}phone (userID, phonenumber, status, dateadded) VALUES (?,?,?,?)",
+                array($this->user->userID, $number, vPHONE_NEW, $now));
         return $vgDB->Insert_ID();
     }
     /**
@@ -57,11 +55,11 @@ class UserphonesDAO
     {
         $result = array();
         global $vgDB, $vgDBPrefix;
-        $p = $vgDB->GetALL("SELECT id, phonenumber, status, dateadded FROM {$vgDBPrefix}userphones WHERE username = ?", array($this->user->getName()));
+        $p = $vgDB->GetALL("SELECT phoneID, phonenumber, status, dateadded FROM {$vgDBPrefix}phone WHERE userID = ?", array($this->user->userID));
         foreach($p as $phone)
         {
             $result[] = array(
-                    'id' => $phone['id'],
+                    'id' => $phone['phoneID'],
                     'dateadded' => $phone['dateadded'],
                     'number' => $phone['phonenumber'],
                     'status' => $phone['status'],
@@ -79,8 +77,8 @@ class UserphonesDAO
     {
         global $vgDB, $vgDBPrefix;
         $yesterday = vfDate( time() - 24*60*60 );
-        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE username = ? AND confirmsent > ?",
-                array($this->user->getName(), $yesterday));
+        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE userID = ? AND confirmsent > ?",
+                array($this->user->userID, $yesterday));
         return $c == 0;
     }
     /**
@@ -88,36 +86,36 @@ class UserphonesDAO
      * You should call checkConfirmAllowed() to see if it is allowed to request
      * another code.
      *
-     * @param Integer $id id of record
+     * @param Integer $phoneid id of record
      * @return String conformation code
      */
-    public function getConfirmCode($id)
+    public function getConfirmCode($phoneid)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
-        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE id = ? and username = ? AND status != ?",
-                array($id, $this->user->getName(), vPHONE_VERIFIED));
+        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE phoneID = ? and userID = ? AND status != ?",
+                array($phoneid, $this->user->userID, vPHONE_VERIFIED));
         if($c == 0)
-            throw new Exception("No such record in userphones.");
+            throw new Exception("No such record in phone.");
 
         $confirm = $this->getNewCode();
-        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET confirmsent = ?, confirmcode = ?, status = ?  WHERE id = ?",
-                array($now, $confirm, vPHONE_SENT_CODE, $id));
+        $vgDB->Execute("UPDATE {$vgDBPrefix}phone SET confirmsent = ?, confirmcode = ?, status = ?  WHERE phoneID = ?",
+                array($now, $confirm, vPHONE_SENT_CODE, $phoneid));
         return $confirm;
     }
     /**
-     * Get phone number
+     * Get phone number.
      *
-     * @param Integer $id record ID
+     * @param Integer $phoneid record ID
      * @return String phone number
      */
-    public function getPhoneNumber($id)
+    public function getPhoneNumber($phoneid)
     {
         global $vgDB, $vgDBPrefix;
-        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}userphones WHERE id = ? and username = ?",
-                array($id, $this->user->getName(), vPHONE_VERIFIED));
+        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}phone WHERE phoneID = ? and userID = ?",
+                array($phoneid, $this->user->userID, vPHONE_VERIFIED));
         if($number == false)
-            throw new Exception("No such record in userphones.");
+            throw new Exception("No such record in phone.");
         return $number;
     }
     /**
@@ -136,71 +134,71 @@ class UserphonesDAO
     /**
      * Verify if suplied code is valid
      *
-     * @param Integer $id id of a record
+     * @param Integer $phoneid id of a record
      * @param String $code supplied code
      * @return Boolean true
      */
-    public function verifyCode($id, $code)
+    public function verifyCode($phoneid, $code)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
         $yesterday = vfDate( time() - 24*60*60 );
-        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}userphones WHERE id = ? AND username = ? AND confirmcode = ? AND confirmsent > ? AND status = ?",
-                array($id, $this->user->getName(), $code, $yesterday, vPHONE_SENT_CODE));
+        $number = $vgDB->GetOne("SELECT phonenumber FROM {$vgDBPrefix}phone WHERE phoneID = ? AND userID = ? AND confirmcode = ? AND confirmsent > ? AND status = ?",
+                array($phoneid, $this->user->userID, $code, $yesterday, vPHONE_SENT_CODE));
         if(! $number)
             throw new Exception("Invalid confirmation code.");
-        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE status=? AND phonenumber = ?",
+        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE status=? AND phonenumber = ?",
                 array(vPHONE_VERIFIED, $number));
         if($c)
         {
             throw new Exception("That phone has already been verified by other user.");
         }
-        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
-                array(vPHONE_VERIFIED, $id));
+        $vgDB->Execute("UPDATE {$vgDBPrefix}phone SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE phoneID = ?",
+                array(vPHONE_VERIFIED, $phoneid));
         return true;
     }
     /**
      * Mark phone as deleted.
      *
-     * @param Integer $id record id
+     * @param Integer $phoneid record id
      * @return Boolean true
      */
-    public function deletePhone($id)
+    public function deletePhone($phoneid)
     {
         global $vgDB, $vgDBPrefix;
-        $c = $vgDB->GetOne("SELECT count(id) FROM {$vgDBPrefix}userphones WHERE username = ? AND id = ?",
-                array($this->user->getName(), $id));
+        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE userID = ? AND phoneID = ?",
+                array($this->user->userID, $phoneid));
         if(! $c)
             throw new Exception("Invalid code or it has expired.");
-        $vgDB->Execute("UPDATE {$vgDBPrefix}userphones SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE id = ?",
-                array(vPHONE_DELETED, $id));
+        $vgDB->Execute("UPDATE {$vgDBPrefix}phone SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE phoneID = ?",
+                array(vPHONE_DELETED, $phoneid));
         return true;
     }
     /**
-     * Resolve a username from given phone number.
+     * Resolve a userID from given phone number.
      *
      * @param String $phone telephone number
-     * @return String username, or Boolean false if it does not exist.
+     * @return String userID, or Boolean false if it does not exist.
      */
     static function getNameFromPhone($phone)
     {
         global $vgDB, $vgDBPrefix;
-        return $vgDB->GetOne("SELECT username FROM {$vgDBPrefix}userphones WHERE phonenumber = ? AND status >= ?",
+        return $vgDB->GetOne("SELECT userID FROM {$vgDBPrefix}phone WHERE phonenumber = ? AND status >= ?",
                 array($phone, vPHONE_VERIFIED));
     }
     /**
      * Add a phone number to the user and
      * automatically mark this phone number as verified.
      *
-     * @param String $username
+     * @param Integer $userID
      * @param String $phone
      */
-    static function addVerifiedPhone($username, $phone)
+    static function addVerifiedPhone($userID, $phone)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}userphones (username, phonenumber, status, dateadded) VALUES (?,?,?,?)",
-                array($username, $phone, vPHONE_VERIFIED, $now));
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}phone (userID, phonenumber, status, dateadded) VALUES (?,?,?,?)",
+                array($userID, $phone, vPHONE_VERIFIED, $now));
     }
 }
 

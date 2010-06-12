@@ -300,6 +300,8 @@ class MwUser
         return $name;
     }
 }
+
+
 /*
 class CustomUser extends MwUser
 {
@@ -318,3 +320,4 @@ class CustomUser extends MwUser
     }
 }
 */
+

@@ -23,67 +23,8 @@ require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
+require_once("$vgPath/DAO/UserDAO.php");
 
-$page_cache = array();//@todo
-$pagedao = new PageDAO();
-
-/**
- * Create a new user by performing a POST request to the MediaWiki.
- * This is a very ugly hack. Needs to be improved.
- *
- * @return Boolean success true of false
- */
-function vfRequestNewUser($username, $password, $realname)
-{
-    //@todo *BUG* this part is very fragile, captcha extension can prevent this from working
-    global $wgServer, $wgScriptPath, $wgScriptExtension;
-    $url = "{$wgServer}{$wgScriptPath}/index$wgScriptExtension?title=Special:UserLogin&action=submitlogin&type=signup";
-
-    $post = "wpName=".urlencode($username);
-    $post .= "&wpPassword=".urlencode($password);
-    $post .= "&wpRetype=".urlencode($password);
-    $post .= "&wpRealName=".urlencode($realname);
-    $post .= "&wpCreateaccount=Create+account";
-
-    $ch = curl_init();
-    curl_setopt ($ch, CURLOPT_URL, $url );
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $data = curl_exec ($ch);
-    curl_close ($ch);
-    return !strstr($data, 'errorbox');
-}
-/**
- * Pick a new username, create that account and send an SMS.
- *
- * @param String $phonenumber
- */
-function vfDaemonNewUser($phonenumber)
-{
-    global $vgDB, $vgDBPrefix;
-    $password = rand(1000,9999);
-    
-    for($i=0;$i<50;$i++)
-    {
-        $name = $vgDB->GetOne("SELECT name FROM {$vgDBPrefix}names WHERE taken = 0");
-        if($name == false)
-            $name = rand(100000, 999999);
-        else
-        {
-            $vgDB->Execute("UPDATE {$vgDBPrefix}names SET taken = 1 WHERE name = ?", array($name));
-            //wiki names start with capital letter
-            $name[0] = strtoupper($name[0]);
-        }
-        if(vfRequestNewUser($name, $password, $phonenumber))
-        {
-            Sms::sendSMS($phonenumber, sprintf(Sms::$msgCreateUser, $name, $password));
-            UserphonesDAO::addVerifiedPhone($name, $phonenumber);
-            return $name;
-        }
-    }
-    throw new Exception('Could not create a new user');
-}
 /**
  * Do whatever is needed to process new incoming SMS.
  */
@@ -137,8 +78,9 @@ function vfDaemonSmsAction()
 function vfVoteFromDaemon($choice, $username)
 {
     echo "$choice\n";
-    global $vgDBPrefix, $vgDB, $pagedao;
+    global $vgDBPrefix, $vgDB;
     //load PageVO
+    $pagedao = new PageDAO();
     $result = $vgDB->Execute("SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}surveychoice WHERE SMS = ? AND finished = 0",
         array($choice));
     if($result == false)

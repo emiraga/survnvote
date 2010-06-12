@@ -14,6 +14,7 @@ $vgDBPrefix = '';
 
 echo "Starting unit testing.\n";
 require_once("$vgPath/Common.php");
+$vgDB->debug = false;
 require_once("$vgPath/../votapedia.setup.php");
 
 $a = microtime(true);
@@ -248,7 +249,6 @@ if( true ) /* test PageVO */
     $page = new PageVO();
     assert( ! $page->getPageID() );
     assert( ! $page->getTitle() );
-    assert( $page->getPhone() == '000' );
     assert( $page->getAuthor() == 'UnknownUser' );
     assert( $page->getStartTime() == '2999-01-01 00:00:00' );
     assert( $page->getDuration() == 60 );
@@ -272,7 +272,6 @@ if( true ) /* test PageVO */
     $page->setTitle('page1');
     $page->setPageID(45);
     $page->setAuthor('Admin');
-    $page->setPhone('+060197654321');//for activation
     $page->setDisplayTop(14);
     $page->setVotesAllowed(7);
     $page->setSMSRequired(true);
@@ -300,7 +299,6 @@ if( true ) /* test PageVO */
     assert($page->getPageID() == 45);
     $page->setEndTime('2001-01-01 03:00:00');
     assert( $page->getAuthor() == 'Admin' );
-    assert( $page->getPhone() == '+060197654321' );
     assert( $page->getPrivacy() == 3);
     assert($page->getDisplayTop() == 14);
     assert($page->getVotesAllowed() == 7);
@@ -324,7 +322,7 @@ if( true ) /* test PageVO */
     {
         assert(false);
     }
-    assert( 0 == $page->getActivePresentationID() );
+    //assert( 0 == $page->getActivePresentationID() );
     assert( 0 == $page->getNumOfPresentations() );
     assert(!  $page->getPresentationByNum(0) );
     assert( array() ==  $page->getPresentations() );
@@ -431,14 +429,14 @@ if( true ) /* testing Telephone */
     $phoneprefix = vfGetAllNumbers();
     $phoneprefix = substr($phoneprefix[0], 0, strlen($phoneprefix[0]) - 2);
 
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999910')");
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999919')");
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}used_receivers VALUES ('+60109999910')");
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}used_receivers VALUES ('+60109999919')");
     assert( count($t->getAvailablePhones()) == count($t->getAllPhones())-2 );
     $g = $t->makeGroups($t->getAvailablePhones());
 
     assert(count($g) == 3 && count($g[0]) == 10 && count($g[1]) == 8);
     assert(count($g[2]) == count($t->getAllPhones()) - 2 - 10 - 8);
-    $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers VALUES ('+60109999905')");
+    $vgDB->Execute("INSERT INTO {$vgDBPrefix}used_receivers VALUES ('+60109999905')");
 
     $g = $t->makeGroups($t->getAvailablePhones());
     assert(count($g) == 4);
@@ -455,19 +453,12 @@ if( true ) /* testing DAO/UserphonesDAO */
 {
     echo '.';
     require_once("$vgPath/DAO/UserphonesDAO.php");
-    require_once("$vgPath/MwAdapter.php");
+    require_once("$vgPath/VO/UserVO.php");
 
-    /* Mocking object*/
-    class MwUserMock extends MwUser
-    {
-        public function __construct()
-        {
-            //parent::__construct(); don't call parent
-        }
-        function isAnon() { return false; }
-        function getName() { return 'TestUser'; }
-    };
-    $user = new MwUserMock();
+    $user = new UserVO();
+    $user->userID = 1;
+    $user->username = 'test';
+
     $p = new UserphonesDAO( $user );
     $p->addNewPhone('123456');
     $l = $p->getList();

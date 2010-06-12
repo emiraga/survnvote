@@ -76,67 +76,79 @@ function vfDoSetup($justprint = false)
     global $vgPath, $vgDB, $vgDBPrefix, $wgDBTableOptions;
     require_once("$vgPath/Common.php");
 
+    //which data type to use for specific fields
+    $tPageID = "INT unsigned";
+    $tSurveyID = "INT unsigned";
+    $tPresID = "TINYINT unsigned";
+    $tChoiceID = "TINYINT unsigned";
+    $tUserID = "INT unsigned";
+    $tVoteID = "INT unsigned";
+    $tPhoneID = "INT unsigned";
+    
+    //new data types
+    $tBoolean = "tinyint(1) unsigned";
+    
     $sql = <<<END_SQL
 DROP TABLE IF EXISTS {$vgDBPrefix}page;
 DROP TABLE IF EXISTS {$vgDBPrefix}presentation;
 DROP TABLE IF EXISTS {$vgDBPrefix}survey;
-DROP TABLE IF EXISTS {$vgDBPrefix}surveychoice;
-DROP TABLE IF EXISTS {$vgDBPrefix}surveyrecord;
-DROP TABLE IF EXISTS {$vgDBPrefix}usedreceivers;
-DROP TABLE IF EXISTS {$vgDBPrefix}userphones;
+DROP TABLE IF EXISTS {$vgDBPrefix}choice;
+DROP TABLE IF EXISTS {$vgDBPrefix}used_receivers;
+DROP TABLE IF EXISTS {$vgDBPrefix}phone;
 DROP TABLE IF EXISTS {$vgDBPrefix}names;
+DROP TABLE IF EXISTS {$vgDBPrefix}vote;
+DROP TABLE IF EXISTS {$vgDBPrefix}vote_details;
 
 --
 -- Table structure for table page
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
-  pageID int NOT NULL AUTO_INCREMENT,
-  title text NOT NULL,
-  startTime datetime NOT NULL,
-  endTime datetime NOT NULL,
-  duration int NOT NULL,
-  author varchar(255) NOT NULL,
-  phone varchar(20) DEFAULT NULL,
-  createTime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  smsRequired tinyint(1) NOT NULL DEFAULT '0', 
-  showGraphEnd tinyint(1) NOT NULL DEFAULT '0',
-  displayTop tinyint(4) NOT NULL DEFAULT '0',
-  surveyType tinyint(4) NOT NULL DEFAULT '1',
-  votesAllowed tinyint(8) NOT NULL DEFAULT '1',
-  subtractWrong tinyint(1) NOT NULL DEFAULT '0',
-  privacy tinyint(4) NOT NULL DEFAULT '1',
-  phonevoting varchar(5) DEFAULT 'anon',
-  webvoting varchar(5) DEFAULT 'anon',
-  receivers_released tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (pageID),
-  KEY pageID (pageID)
+  pageID                $tPageID     NOT NULL AUTO_INCREMENT,
+  title                 text         NOT NULL,
+  startTime             datetime     NOT NULL,
+  endTime               datetime     NOT NULL,
+  duration              int          NOT NULL,
+  author                $tUserID     NOT NULL,
+  createTime            timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  smsRequired           $tBoolean    NOT NULL DEFAULT '0',
+  showGraphEnd          $tBoolean    NOT NULL DEFAULT '0',
+  displayTop            tinyint(4)   NOT NULL DEFAULT '0',
+  surveyType            tinyint(4)   NOT NULL DEFAULT '1',
+  votesAllowed          tinyint(8)   NOT NULL DEFAULT '1',
+  subtractWrong         $tBoolean    NOT NULL DEFAULT '0',
+  privacy               tinyint(4)   NOT NULL DEFAULT '1',
+  phonevoting           varchar(5)   NOT NULL DEFAULT 'anon',
+  webvoting             varchar(5)   NOT NULL DEFAULT 'anon',
+  receivers_released    $tBoolean    NOT NULL DEFAULT '0',
+  PRIMARY KEY (pageID)
 ) $wgDBTableOptions;
 
 --
 -- Table structure for table survey
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}survey (
-  pageID int NOT NULL,
-  surveyID int NOT NULL AUTO_INCREMENT,
-  question text NOT NULL,
-  answer tinyint(8) NOT NULL DEFAULT '0',
-  points tinyint(8) NOT NULL DEFAULT '0',
+  pageID        $tPageID    NOT NULL,
+  surveyID      $tSurveyID  NOT NULL AUTO_INCREMENT,
+  question      text        NOT NULL,
+  answer        tinyint(8)  NOT NULL DEFAULT '0',
+  points        tinyint(8)  NOT NULL DEFAULT '0',
   PRIMARY KEY (surveyID),
   KEY pageID (pageID)
 ) $wgDBTableOptions;
 
 --
--- Table structure for table surveychoice
+-- Table structure for table choice
 --
-CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
-  pageID int NOT NULL,
-  surveyID int NOT NULL,
-  choiceID int NOT NULL DEFAULT '1',
-  choice text NOT NULL,
-  receiver varchar(20) DEFAULT NULL,
-  points tinyint(8) NOT NULL DEFAULT '0',
-  SMS varchar(20) DEFAULT NULL,
-  finished tinyint(1) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}choice (
+  pageID      $tPageID      NOT NULL,
+  surveyID    $tSurveyID    NOT NULL,
+  choiceID    $tChoiceID    NOT NULL DEFAULT '1',
+  choice      text          NOT NULL,
+  points      tinyint(8)    NOT NULL DEFAULT '0',
+  receiver    varchar(20)   DEFAULT NULL,
+  SMS         varchar(20)   DEFAULT NULL,
+  finished    $tBoolean     NOT NULL DEFAULT '0',
+  KEY pageID (pageID),
   KEY surveyID (surveyID)
 ) $wgDBTableOptions;
 
@@ -144,77 +156,79 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}surveychoice (
 -- Table structure for table presentation
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
-  pageID int NOT NULL,
-  presentationID int NOT NULL,
-  name varchar(50) NOT NULL,
-  startTime datetime NOT NULL,
-  endTime datetime NOT NULL,
-  active tinyint(1) NOT NULL DEFAULT '0'
+  pageID             $tPageID     NOT NULL,
+  presentationID     $tPresID     NOT NULL,
+  name               varchar(50)  NOT NULL,
+  startTime          datetime     NOT NULL,
+  endTime            datetime     NOT NULL,
+  active             $tBoolean    NOT NULL DEFAULT '0',
+  KEY(pageID)
 ) $wgDBTableOptions;
 
 --
 -- Table structure for table user
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
-  userID       int          NOT NULL AUTO_INCREMENT,
+  userID       $tUserID     NOT NULL AUTO_INCREMENT,
   username     varchar(255) NOT NULL,
-  PRIMARY KEY    (userID)
+  password     varchar(20)  NOT NULL DEFAULT '',
+  PRIMARY KEY  (userID),
+  UNIQUE       (username)
 ) $wgDBTableOptions;
 
 --
 -- Table structure for table vote
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote (
-  voteID         int     NOT NULL AUTO_INCREMENT,
-  userID         int     NOT NULL,
-  surveyID       int     NOT NULL,
-  presentationID TINYINT NOT NULL,
-  choiceID       TINYINT NOT NULL,
-  PRIMARY KEY    (voteID),
-  INDEX          (voterID)
+  voteID         $tVoteID       NOT NULL AUTO_INCREMENT,
+  userID         $tUserID       NOT NULL,
+  surveyID       $tSurveyID     NOT NULL,
+  presentationID $tPresID       NOT NULL,
+  choiceID       $tChoiceID     NOT NULL,
+  PRIMARY KEY    (voteID)
 ) $wgDBTableOptions;
 
 --
 -- Table structure for table vote_details
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote_details (
-  voteID         int         NOT NULL,
+  voteID         $tVoteID    NOT NULL,
   voteDate       datetime    NOT NULL,
   voteType       varchar(6)  NOT NULL,
   comments       varchar(50) NOT NULL,
-  PRIMARY KEY    (voteID),
+  PRIMARY KEY    (voteID)
 ) $wgDBTableOptions;
 
 --
--- Table structure for table usedreceivers
+-- Table structure for table used_receivers
 --
-CREATE TABLE IF NOT EXISTS {$vgDBPrefix}usedreceivers (
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}used_receivers (
   receiver  varchar(20)  NOT NULL,
   UNIQUE(receiver)
 ) $wgDBTableOptions;
 
 --
--- Table structure for table userphones
+-- Table structure for table phone
 --
-CREATE TABLE IF NOT EXISTS {$vgDBPrefix}userphones
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}phone
 (
-  ID           int           NOT NULL AUTO_INCREMENT,
-  userID       int           NOT NULL,
+  phoneID      $tPhoneID     NOT NULL AUTO_INCREMENT,
+  userID       $tUserID      NOT NULL,
   phonenumber  varchar(20)   NOT NULL,
   dateadded    datetime      NOT NULL,
   status       tinyint(4)    NOT NULL default 0,
   confirmcode  varchar(20),
   confirmsent  datetime,
-  PRIMARY KEY  (ID)
+  PRIMARY KEY  (phoneID)
 ) $wgDBTableOptions;
 
 --
--- Table structure for table userphones
+-- Table structure for table names
 --
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}names
 (
-  name   varchar(20)  NOT NULL,
-  taken  tinyint(1)   NOT NULL default 0,
+  name    varchar(20)  NOT NULL,
+  taken   $tBoolean    NOT NULL default 0,
   UNIQUE(name)
 ) $wgDBTableOptions;
 
@@ -292,14 +306,19 @@ END_SQL;
  'sapote', 'sapoten', 'seeded', 'seedless', 'serviceberry', 'shell', 'shrub', 'snakework', 'soursop', 'spinach', 'spoon', 'strawberry', 'sunflower',
  'susu', 'sweet', 'tamarind', 'taro', 'thorn', 'tomato', 'tree', 'treegrape', 'turnip', 'utan', 'verde', 'vine', 'walker', 'walknot', 'walnull',
  'walnut', 'wampi', 'white', 'wild', 'wildgap', 'wildgrape', 'wine', 'winepalm', 'zealand' );
+    $vnames = array();
     foreach($names as $name)
     {
-        $sql = "INSERT INTO {$vgDBPrefix}names (name) VALUES('$name')";
-
-        if(! $justprint)
-            $vgDB->Execute($sql);
-        else
-            echo htmlspecialchars($sql) . ";\n";
+        $vnames[] = "('$name')";
+        if(count($vnames) > 50 || $name == 'zealand')
+        {
+            $sql = "INSERT INTO {$vgDBPrefix}names (name) VALUES".join(',',$vnames);
+            if(! $justprint)
+                $vgDB->Execute($sql);
+            else
+                echo htmlspecialchars($sql) . ";\n";
+            $vnames = array();
+        }
     }
     /* END OF function vfDoSetup */
 }

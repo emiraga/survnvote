@@ -47,7 +47,7 @@ class PageDAO
             $page->setStartTime($rs->fields["startTime"]);
             $page->setDuration($rs->fields["duration"]);
             $page->setEndTime($rs->fields["endTime"]);
-            $page->setAuthor(trim($rs->fields["author"]));
+            $page->setAuthor($rs->fields["author"]);
             $page->setCreateTime($rs->fields['createTime']);
             $page->setShowGraphEnd($rs->fields['showGraphEnd']);
             $page->setDisplayTop($rs->fields['displayTop']);
@@ -130,15 +130,14 @@ class PageDAO
         global $vgDB, $vgDBPrefix;
         $vgDB->StartTrans();
 
-        $sql = "insert into {$vgDBPrefix}page (title,author,phone,startTime,duration,endTime,"
+        $sql = "insert into {$vgDBPrefix}page (title,author,startTime,duration,endTime,"
                 ."smsRequired,showGraphEnd,surveyType,"
                 ."displayTop,subtractWrong,privacy,phonevoting,webvoting)values"
-                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                ."(?,?,?,?,?,?,?,?,?,?,?,?,?)";
         //@todo some fields from page are missing
         $resPage = $vgDB->Prepare($sql);
         $param = array( $pageVO->getTitle(),
                 $pageVO->getAuthor(),
-                $pageVO->getPhone(),
                 $pageVO->getStartTime(),
                 $pageVO->getDuration(),
                 $pageVO->getEndTime(),
@@ -322,7 +321,7 @@ class PageDAO
     public function updateReceiversSMS(PageVO &$page)
     {
         global $vgDB, $vgDBPrefix;
-        $sqlChoice = "update {$vgDBPrefix}surveychoice set receiver = ?, sms = ?, finished = 0 where surveyID = ? and choiceID = ?";
+        $sqlChoice = "update {$vgDBPrefix}choice set receiver = ?, sms = ?, finished = 0 where surveyID = ? and choiceID = ?";
         $resChoice = $vgDB->Prepare($sqlChoice);
         $surveys = &$page->getSurveys();
         foreach($surveys as &$survey)

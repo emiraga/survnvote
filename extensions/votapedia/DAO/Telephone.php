@@ -51,7 +51,7 @@ class Telephone
     function getAvailablePhones()
     {
         global $vgDB,$vgDBPrefix;
-        $sql = "select receiver from {$vgDBPrefix}usedreceivers";
+        $sql = "select receiver from {$vgDBPrefix}used_receivers";
         $rs= &$vgDB->GetAll($sql);
         $telephones = array();
         foreach($rs as $r)
@@ -230,7 +230,7 @@ class Telephone
         //insert into database
         try
         {
-            $success = $vgDB->Execute("INSERT INTO {$vgDBPrefix}usedreceivers (receiver) VALUES(?)", $receivers);
+            $success = $vgDB->Execute("INSERT INTO {$vgDBPrefix}used_receivers (receiver) VALUES(?)", $receivers);
         }
         catch(Exception $e)
         {
@@ -259,7 +259,7 @@ class Telephone
             {
                 if($surveyChoice->getReceiver())
                 {
-                    $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}usedreceivers WHERE receiver = ?", array($surveyChoice->getReceiver()));
+                    $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}used_receivers WHERE receiver = ?", array($surveyChoice->getReceiver()));
                     if(! $success)
                         throw new SurveyException("Failed to delete used receivers");
                 }
@@ -268,9 +268,9 @@ class Telephone
             }
             $surveysid[] = array($survey->getSurveyID());
         }
-        $success = $vgDB->Execute("UPDATE {$vgDBPrefix}surveychoice SET finished = 1 WHERE surveyID = ?", $surveysid );
+        $success = $vgDB->Execute("UPDATE {$vgDBPrefix}choice SET finished = 1 WHERE surveyID = ?", $surveysid );
         if(! $success)
-            throw new SurveyException("Could not mark surveychoice as finished");
+            throw new SurveyException("Could not mark choice as finished");
         return true;
     }
 
