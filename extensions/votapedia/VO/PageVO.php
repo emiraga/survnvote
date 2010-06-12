@@ -118,7 +118,7 @@ class PageVO
      */
     function setAuthor($author)
     {
-        $this->author = trim($author);
+        $this->author = $author;
     }
     /**
      * set whether the suvey needs to sms back to the voters

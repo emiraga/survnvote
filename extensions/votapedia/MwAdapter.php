@@ -6,6 +6,10 @@
  * @package MediaWikiInterface
  */
 
+/** Include dependencies */
+global $vgPath;
+require_once("$vgPath/DAO/UserDAO.php");
+
 /**
  * MediaWiki Adapter desing pattern.
  * Idea is to have all functions related to MediaWiki in one place
@@ -261,7 +265,7 @@ class MwUser
      */
     public function isAuthor(&$page)
     {
-        return $page->getAuthor() == $this->getName();
+        return $page->getAuthor() == $this->userID();
     }
     /**
      * Can current user create surveys?
@@ -299,25 +303,24 @@ class MwUser
             return $ip;
         return $name;
     }
+    /**
+     * Get user ID
+     */
+    function userID()
+    {
+        if(isset($this->userID))
+        {
+            return $this->userID;
+        }
+        $dao = new UserDAO();
+        $user = $dao->findByName( $this->getName() );
+        if($user == false)
+        {
+            $user = new UserVO();
+            $user->username = $this->getName();
+            $user->password = '';
+            $dao->insert($user);
+        }
+        return $this->userID = $user->userID;
+    }
 }
-
-
-/*
-class CustomUser extends MwUser
-{
-    public function __construct($name)
-    {
-        $this->name = $name;
-        //don't call parent
-    }
-    public function getDisplayName()
-    {
-        return $this->name;
-    }
-    public function isAnon()
-    {
-        throw new Exception("I don't know.");
-    }
-}
-*/
-

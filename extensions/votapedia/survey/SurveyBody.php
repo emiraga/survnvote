@@ -26,17 +26,29 @@ class SurveyBody
     /** @var Boolean */  protected $show_phones = false;
     /** @var Boolean */  protected $show_graph = false;
     /** @var Boolean */  protected $has_control = false;
+    /** @var Integer */  protected $presID;
 
     /**
      *
      * @param PageVO $page
      * @param MwParser $parser
+     * @param Integer $presID which presentation to show
      */
-    function  __construct(PageVO &$page, MwParser &$parser)
+    function  __construct(PageVO &$page, MwParser &$parser, $presentationID)
     {
         $this->page =& $page;
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
+        $this->presID = $presentationID;
+        $this->votescount = VoteDAO::getNumVotes($this->page->getPageID(), $this->presID);
+    }
+    function setPresentationID($presID)
+    {
+        if($presID != $this->presID)
+        {
+            $this->presID = $presID;
+            $this->votescount = VoteDAO::getNumVotes($this->page->getPageID(), $this->presID);
+        }
     }
     /**
      * Should show voting options
@@ -98,19 +110,16 @@ class SurveyBody
     /**
      * Get Body HTML
      *
-     * @param Integer $presID which presentation to show
      * @return String html code
      */
-    function getHTML($presID)
+    function getHTML()
     {
         global $wgOut, $vgColors;
         $output = '';
         $userhasvoted = false;
         $surveys =& $this->page->getSurveys();
-        $pagestatus = $this->page->getStatus($presID);
+        $pagestatus = $this->page->getStatus($this->presID);
         $colorindex = 1;
-        
-        $votescount = VoteDAO::getNumVotes($this->page->getPageID(), $presID);
 
         foreach ($surveys as &$survey)
         {
@@ -135,8 +144,8 @@ class SurveyBody
             elseif($pagestatus == 'active')
             {
                 global $vgDB, $vgDBPrefix;
-                $sql ="select choiceID from {$vgDBPrefix}surveyrecord where voterID = ? and surveyID = ? and presentationID = ?";
-                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->getName(), $survey->getSurveyID(), $presID ));
+                $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
+                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->userID(), $survey->getSurveyID(), $this->presID ));
                 if($prev_vote)
                     $userhasvoted=true;
                 foreach ($choices as &$choice)
@@ -181,7 +190,7 @@ class SurveyBody
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
-                    $numvotes += $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                    $numvotes += $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                 }
                 if($numvotes == 0)
                     $numvotes = 1;
@@ -192,7 +201,7 @@ class SurveyBody
                 {
                     /* @var $choice ChoiceVO */
                     $color = vfGetColor($colorindex);
-                    $votes = $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                    $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                     $percent = substr(100.0 * $votes / $numvotes, 0, 5);
                     $width = 280.0 * $votes / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
@@ -283,16 +292,16 @@ class SurveyBody
         if($this->show_graph)
         {
             //insert graph image at the beginning
-            $imgid = 'gr'.$this->page->getPageID().'_'.$presID.'_'.rand();
+            $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.rand();
             //Prepend this image!
             $tmpvar = 1;
             $output = '<div style="float:right">'
-                    .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $this->page->getPageID(), $presID, $imgid)
+                    .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $this->page->getPageID(), $imgid)
                     .'</div>' . $output;
             global $vgImageRefresh;
             if($pagestatus == 'active' && $vgImageRefresh)
             {
-                $output .= $this->refreshImage($imgid, 1, $this->page->getPageID(), $presID);
+                $output .= $this->refreshImage($imgid, 1, $this->page->getPageID());
             }
         }
         return $output;
@@ -303,11 +312,10 @@ class SurveyBody
      * @param String $imgid
      * @param Integer $colorindex
      * @param Integer $page_id
-     * @param Integer $presID
      * @param Integer $survey_id
      * @return String
      */
-    function refreshImage($imgid, $colorindex, $page_id, $presID, $survey_id = null)
+    function refreshImage($imgid, $colorindex, $page_id, $survey_id = null)
     {
         if($survey_id)
         {
@@ -318,7 +326,7 @@ class SurveyBody
         $script = "<script>
         function refresh$imgid()
         {
-            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, $presID, $page_id],function(o) {
+            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, {$this->presID}, $page_id],function(o) {
                 graph=document.getElementById('$imgid');
                 if(o.responseText.length)
                 {
@@ -346,7 +354,7 @@ class SurveyBody
      * @param Integer $presentationID
      * @return String
      */
-    public function getDetailsHTML($presID)
+    public function getDetailsHTML()
     {
         $output = '';
         return $output;
@@ -361,14 +369,13 @@ class SurveyBody
      * @param String $imgid
      * @return String
      */
-    public function getGraphHTML(&$colorindex, $surveys, $pageID, $presentationID, $imgid = '')
+    public function getGraphHTML(&$colorindex, $surveys, $pageID, $imgid = '')
     {
         if(count($surveys) > 1)
             $graph = new GraphStackPercent();
         else
             $graph = new GraphPie();
 
-        $votescount = VoteDAO::getNumVotes($pageID, $presentationID);
         foreach($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
@@ -378,14 +385,14 @@ class SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $votes = $votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                 $graphseries->addItem(vfWikiToText($choice->getChoice()), $votes, $color);
             }
             if($this->page->getDisplayTop())
             {
                 $graphseries->sortOnlyTop($this->page->getDisplayTop());
             }
-            elseif($this->page->getStatus($presentationID) == 'ended')
+            elseif($this->page->getStatus($this->presID) == 'ended')
             {
                 $graphseries->sort();
             }
@@ -414,17 +421,15 @@ class SurveyBody
         $now = time();
         $pagedao = new PageDAO();
         $page = $pagedao->findByPageID($page_id);
-        $surveybody = new SurveyBody($page, new MwParser(new Parser()));
+        $surveybody = new SurveyBody($page, new MwParser(new Parser()), $presID);
 
         if($survey_id)
         {
-            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),
-                    $page_id, $presID)."@".$now;
+            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),$page_id)."@".$now;
         }
         else
         {
-            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),
-                    $page_id, $presID)."@".$now;
+            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),$page_id)."@".$now;
         }
     }
     /**
@@ -479,13 +484,12 @@ class QuestionnaireBody extends SurveyBody
     /**
      * Get more details about Questionnaire.
      *
-     * @param Integer $presID
      * @return String
      */
-    public function getDetailsHTML($presID)
+    public function getDetailsHTML()
     {
-        $output = parent::getDetailsHTML($presID);
-        $pagestatus = $this->page->getStatus($presID);
+        $output = parent::getDetailsHTML();
+        $pagestatus = $this->page->getStatus($this->presID);
         $colorindex = 1; /* for showing items */
         $surveys =& $this->page->getSurveys();
         if($this->show_graph && count($surveys) > 1)
@@ -497,13 +501,13 @@ class QuestionnaireBody extends SurveyBody
                 $question = wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ));
                 $output .= "<h2>$question</h2>";
                 //insert graph image at the beginning
-                $imgid = 'gr'.$this->page->getPageID().'_'.$presID.'_'.$survey->getSurveyID().'_'.rand();
+                $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.$survey->getSurveyID().'_'.rand();
                 //Prepend this image!
-                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $presID, $imgid).'</div>';
+                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
                 global $vgImageRefresh;
                 if($pagestatus == 'active' && $vgImageRefresh)
                 {
-                    $output .= $this->refreshImage($imgid, $tmpcolor, $this->page->getPageID(), $presID, $survey->getSurveyID());
+                    $output .= $this->refreshImage($imgid, $tmpcolor, $this->page->getPageID(), $survey->getSurveyID());
                 }
             }
         }

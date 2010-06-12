@@ -124,9 +124,9 @@ class SurveyDAO {
     static function &getChoices($surveyID, $pageID)
     {
         global $vgDB, $vgDBPrefix;
-        $sql = "select * from {$vgDBPrefix}choice where surveyID=? and pageID=? order by choiceID";
+        $sql = "select * from {$vgDBPrefix}choice where surveyID=? order by choiceID";
         $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
-        $rsChoice = &$vgDB->Execute($sql, array($surveyID, $pageID));
+        $rsChoice = &$vgDB->Execute($sql, array($surveyID));
 
         $choices = array();
         while(!$rsChoice->EOF)

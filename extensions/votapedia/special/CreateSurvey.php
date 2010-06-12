@@ -281,7 +281,7 @@ class CreateSurvey
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
-        $author = vfUser()->getName();
+        $author = vfUser()->userID();
 
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);

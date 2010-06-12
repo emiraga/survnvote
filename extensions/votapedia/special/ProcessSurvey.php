@@ -149,7 +149,7 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
-                $votedao = new VoteDAO($page, vfUser()->getName());
+                $votedao = new VoteDAO($page, vfUser()->userID());
 
                 if($page->getWebVoting() == 'no')
                         throw new Exception("Web voting is not allowed");

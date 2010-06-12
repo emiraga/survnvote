@@ -23,7 +23,6 @@ class SurveyView
 {
     /** @var MwParser */      protected $parser;
     /** @var PageVO */        protected $page;
-    /** @var String */        protected $username;
     /** @var Integer */       protected $page_id;
     /** @var Title */         protected $wikititle;
     /** @var SurveyButtons */ protected $buttons;
@@ -80,7 +79,6 @@ class SurveyView
         $this->parser =& $parser;
         $this->page_id=$page_id;
         $this->buttons =& $surveybuttons;
-        $this->username = vfUser()->getName();
 
         if(! $this->page_id)
             throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
@@ -120,13 +118,13 @@ class SurveyView
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody($this->page, $this->parser);
+                $this->body = new SurveyBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody($this->page, $this->parser);
+                $this->body = new QuestionnaireBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUIZ:
-                $this->body = new QuizBody($this->page, $this->parser);
+                $this->body = new QuizBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             default:
                 throw new Exception('Unknown survey type');
@@ -168,7 +166,7 @@ class SurveyView
             $form = new FormControl($items);
             $output = $form->getScriptsIncluded(false);
             $output .= $form->StartFormLite();
-
+            
             $contents = $this->getHTMLOnePage($runs);
             if($show_details)
                 $contents .= $this->getDetailsHTML($runs);
@@ -196,6 +194,7 @@ class SurveyView
         global $vgScript;
         $output = '';
         $pagestatus = $this->page->getStatus($presID);
+        $this->body->setPresentationID($presID);
 
         //Should we enable web voting?
         $this->buttons->setPageStatus($pagestatus);
@@ -220,7 +219,7 @@ class SurveyView
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
         if($pagestatus != 'ended')
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
-        $output .= $this->body->getHTML($presID);
+        $output .= $this->body->getHTML();
         $output .= '<br />';
         if($this->page->getCurrentPresentationID() == $presID)
         {

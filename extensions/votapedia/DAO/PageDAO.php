@@ -54,7 +54,6 @@ class PageDAO
             $page->setVotesAllowed($rs->fields['votesAllowed']);
             $page->setType($rs->fields['surveyType']);
             $page->setSubtractWrong($rs->fields['subtractWrong']);
-            $page->setPhone( $rs->fields['phone'] );
             $page->setSMSRequired( $rs->fields['smsRequired'] );
             $page->setPrivacy($rs->fields['privacy']);
             $page->setPhoneVoting($rs->fields['phonevoting']);

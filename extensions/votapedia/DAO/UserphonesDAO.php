@@ -190,15 +190,14 @@ class UserphonesDAO
      * Add a phone number to the user and
      * automatically mark this phone number as verified.
      *
-     * @param Integer $userID
      * @param String $phone
      */
-    static function addVerifiedPhone($userID, $phone)
+    function addVerifiedPhone($userID, $phone)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}phone (userID, phonenumber, status, dateadded) VALUES (?,?,?,?)",
-                array($userID, $phone, vPHONE_VERIFIED, $now));
+                array($this->user->userID, $phone, vPHONE_VERIFIED, $now));
     }
 }
 

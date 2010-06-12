@@ -33,14 +33,14 @@ class UserDAO
     /**
      * Find a user by name.
      *
-     * @return UserVO
+     * @return UserVO or Boolean false if it cannot be found.
      */
     function findByName($username)
     {
         global $vgDB, $vgDBPrefix;
-        $r = $vgDB->Execute( "SELECT userID, password FROM {$vgDBPrefix}user WHERE username = ?", array($name) );
-        if($r == false)
-            throw new SurveyException("Cannot find user");
+        $r = $vgDB->Execute( "SELECT userID, password FROM {$vgDBPrefix}user WHERE username = ?", array($username) );
+        if($r->RecordCount() == 0)
+            return false;
         $user = new UserVO();
         $user->userID = $r->fields['userID'];
         $user->username = $username;
@@ -54,7 +54,7 @@ class UserDAO
      *
      * @return Boolean success true of false
      */
-    function requestNewUser($username, $password, $realname)
+    function requestNew($username, $password, $realname)
     {
         //@todo *BUG* this part is very fragile, captcha extension can prevent this from working
         global $wgServer, $wgScriptPath, $wgScriptExtension;
@@ -81,7 +81,7 @@ class UserDAO
      * @param String $phonenumber
      * @return UserVO
      */
-    function newUserFromPhone($phonenumber, $send_sms = false)
+    function newFromPhone($phonenumber, $send_sms = false)
     {
         global $vgDB, $vgDBPrefix;
         $password = rand(1000,9999);
@@ -103,12 +103,14 @@ class UserDAO
                 {
                     Sms::sendSMS($phonenumber, sprintf(Sms::$msgCreateUser, $name, $password));
                 }
+
                 $user = new UserVO();
                 $user->username = $name;
                 $user->password = $password;
                 $this->insert($user);
-                
-                UserphonesDAO::addVerifiedPhone($name, $phonenumber);
+
+                $phonedao = new UserphonesDAO($user);
+                $phonedao->addVerifiedPhone($name, $phonenumber);
                 return $user;
             }
         }

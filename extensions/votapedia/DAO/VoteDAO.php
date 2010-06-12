@@ -16,15 +16,15 @@ require_once("$vgPath/VO/VoteVO.php");
 class VoteDAO
 {
     /** @var PageVO */ private $page;
-    /** @var String */ private $name;
+    /** @var String */ private $userID;
 
     /**
      * @param PageVO $page
      */
-    public function __construct(PageVO &$page, $username)
+    public function __construct(PageVO &$page, $userID)
     {
         $this->page =& $page;
-        $this->name = $username;
+        $this->userID = $userID;
     }
     /**
      * @param PageVO $page
@@ -43,7 +43,7 @@ class VoteDAO
         $vote->setSurveyID($surveyID);
         $vote->setChoiceID($choiceID);
         $vote->setPresentationID($presentationID);
-        $vote->setVoterID($this->name);
+        $vote->setVoterID($this->userID);
         $vote->setVoteDate(vfDate());
         $vote->setVoteType( $type );
         $vote->setVotesAllowed( $this->page->getVotesAllowed() );
@@ -60,22 +60,25 @@ class VoteDAO
         global $vgDB, $vgDBPrefix;
 
         // Check if user has voted before
-        $sql ="select ID from {$vgDBPrefix}surveyrecord where voterID = ? and pageID = ? and surveyID = ? and presentationID = ? order by voteDate asc";
-        $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getPageID(),  $vote->getSurveyID(), $vote->getPresentationID() ));
+        $sql ="select voteID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
+        $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
         {
             //user has more votes than allowed, remove previous vote
             $IDbyOldVote = $rs->fields['ID'];
-            $vgDB->Execute("update {$vgDBPrefix}surveyrecord set choiceID = ? , voteDate = ? where ID = ?",
+            $vgDB->Execute("update {$vgDBPrefix}vote set choiceID = ? , voteDate = ? where voteID = ?",
                     array($vote->getChoiceID(), $vote->getVoteDate(), $IDbyOldVote));
         }
         else
         {
             //add new vote
-            $vgDB->Execute("insert into {$vgDBPrefix}surveyrecord (voterID, pageID, surveyID, choiceID, presentationID, voteDate, voteType) values(?,?,?,?,?,?,?)",
+            $vgDB->Execute("insert into {$vgDBPrefix}vote (userID, pageID, surveyID, choiceID, presentationID) values(?,?,?,?,?)",
                     array($vote->getVoterID(), $vote->getPageID(), $vote->getSurveyID(), $vote->getChoiceID(),
-                    $vote->getPresentationID(), $vote->getVoteDate(), $vote->getVoteType()));
+                    $vote->getPresentationID()));
+            $voteid = $vgDB->Insert_ID();
+            $vgDB->Execute("insert into {$vgDBPrefix}vote_details (voteID, voteDate, voteType, comments) values(?,?,?,?)",
+                    array($voteid, $vote->getVoteDate(), $vote->getVoteType(), 'no comment'));
         }
         return true;
     }
@@ -91,7 +94,7 @@ class VoteDAO
     {
         global $vgDB, $vgDBPrefix;
         $datetime = vfDate($timestamp);
-        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}surveyrecord WHERE pageID = ? "
+        return $vgDB->GetOne("SELECT count(ID) FROM {$vgDBPrefix}vote WHERE pageID = ? "
         ."AND presentationID = ? AND voteDate >= ?",
                 array($page_id, $presentation_id , $datetime));
     }
@@ -109,7 +112,7 @@ class VoteDAO
     {
         global $vgDB, $vgDBPrefix;
         $result = new VotesCount();
-        $records = $vgDB->GetAll("select surveyID, choiceID, count(ID) as votes from {$vgDBPrefix}surveyrecord "
+        $records = $vgDB->GetAll("select surveyID, choiceID, count(voteID) as votes from {$vgDBPrefix}vote "
                 ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
                 array($pageID, $presentationID));
         $votes = 0;

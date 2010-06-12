@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
   username     varchar(255) NOT NULL,
   password     varchar(20)  NOT NULL DEFAULT '',
   PRIMARY KEY  (userID),
+  KEY          (username),
   UNIQUE       (username)
 ) $wgDBTableOptions;
 
@@ -182,6 +183,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote (
   voteID         $tVoteID       NOT NULL AUTO_INCREMENT,
   userID         $tUserID       NOT NULL,
+  pageID         $tPageID       NOT NULL,
   surveyID       $tSurveyID     NOT NULL,
   presentationID $tPresID       NOT NULL,
   choiceID       $tChoiceID     NOT NULL,
