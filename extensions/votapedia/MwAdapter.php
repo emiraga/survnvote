@@ -180,7 +180,7 @@ class MwUser
             $this->name = $wgUser->getName()."-".$randnum;
             // Need to set a cookie?
             if($needcookie)
-                setcookie('vcName', $this->name, time() + 60*60*24*365); // A year of validity
+                setcookie('vcName', $this->name, time() + 60*60*24*365, '/'); // A year of validity
         }
         else
         {
@@ -320,6 +320,7 @@ class MwUser
     function getUserVO()
     {
         $dao = new UserDAO();
+
         $user = $dao->findByName( $this->getName() );
         if($user == false)
         {

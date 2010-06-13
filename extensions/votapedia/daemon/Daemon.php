@@ -124,8 +124,10 @@ if($args[1] == 'daemon')
     /* Run as a daemon */
     while(1)
     {
+        $tel = new Telephone();
         try
         {
+            $tel->releaseReceivers();
             vfDaemonSmsAction();
         }
         catch(Exception $e)
@@ -138,6 +140,9 @@ if($args[1] == 'daemon')
 }
 else if($args[1] == 'fakevote') /*used for testing*/
 {
+    $tel = new Telephone();
+    $tel->releaseReceivers();
+
     global $vgSmsChoiceLen;
     $userID = 1000 * 1000 + rand();
     for($i=2;$i<count($args);$i++)

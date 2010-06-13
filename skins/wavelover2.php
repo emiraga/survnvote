@@ -230,8 +230,8 @@ class WaveLover2Template extends QuickTemplate {
 				$this->html('poweredbyico');  
 				
 				global $wgScriptPath;
-				echo '&nbsp;&nbsp;<a title="International Islamic University Malaysia" href="http://www.iiu.edu.my/"><img src="'.$wgScriptPath.'/skins/wavelover2/iium_mini.jpg" /></a>';
-				echo '&nbsp;&nbsp;<a title="Intelligent Environment Group" href="http://kict.iiu.edu.my/integ/index.html"><img src="'.$wgScriptPath.'/skins/wavelover2/integ_mini.jpg" /></a>';
+				echo '&nbsp;&nbsp;<a title="International Islamic University Malaysia" alt="International Islamic University Malaysia" href="http://www.iiu.edu.my/"><img src="'.$wgScriptPath.'/skins/wavelover2/iium_mini.jpg" /></a>';
+				echo '&nbsp;&nbsp;<a title="Intelligent Environment Group" alt="Intelligent Environment Group" href="http://kict.iiu.edu.my/integ/index.html"><img src="'.$wgScriptPath.'/skins/wavelover2/integ_mini.jpg" /></a>';
 				
 				?></div>
 <?php 	} 
@@ -261,6 +261,10 @@ class WaveLover2Template extends QuickTemplate {
 		//&& ! $wgRequest->getBool( 'printable' )
 		if ( count( $validFooterLinks ) > 0 ) {
 ?>			<ul id="f-list">
+			<li>
+				<a href="http://twitter.com/votapedia" alt="Follow us on twitter" title="Follow us on twitter"><img src="<?php echo $wgScriptPath?>/skins/wavelover2/twitter.png" width=32 height=32/></a>
+				<a href="http://www.youtube.com/user/votapedia" alt="Our Youtube videos" title="Our Youtube videos"><img src="<?php echo $wgScriptPath?>/skins/wavelover2/youtube.png" width=32 height=32/></a>
+			</li>
 <?php
 			foreach( $validFooterLinks as $aLink ) {
 				if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {

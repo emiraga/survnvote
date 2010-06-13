@@ -43,7 +43,7 @@ class UserDAO
             return false;
         $user = new UserVO();
         $user->isAnon = $r->fields['isAnon'];
-        $user->userID = $r->fields['userID'];
+        $user->userID = intval( $r->fields['userID'] );
         $user->username = $username;
         $user->password = $r->fields['password'];
         return $user;
@@ -127,7 +127,6 @@ class UserDAO
                 $user->password = $password;
                 $user->isAnon = false;
                 $this->insert($user);
-echo "inserted {$user->userID}   $phonenumber\n";
                 $phonedao = new UserphonesDAO($user);
                 $phonedao->addVerifiedPhone($user->userID, $phonenumber);
                 return $user;

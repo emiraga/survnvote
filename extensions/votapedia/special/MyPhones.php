@@ -29,12 +29,12 @@ class MyPhones extends SpecialPage
         wfLoadExtensionMessages('Votapedia');
         $this->includable( false );
         $this->setGroup('MyPhones', 'votapedia');
-        global $vgScript;
-
-        if(vfUser()->isAnon())
-                die('Must be logged in.');
-
         $this->target = Skin::makeSpecialUrl('MyPhones');
+        $this->display = array();
+    }
+    function initItems()
+    {
+        global $vgScript;
         $this->items = array(
                 'empty' => array(
                         'type' => 'null',
@@ -93,7 +93,6 @@ class MyPhones extends SpecialPage
                         'icon' => $vgScript.'/icons/mobile.png',
                 ),
         );
-        $this->display = array();
     }
     /**
      * Mandatory execute function for a Special Page
@@ -102,7 +101,14 @@ class MyPhones extends SpecialPage
      */
     function execute( $par = null )
     {
-        global $wgOut;
+        global $wgOut, $wgTitle;
+        if(vfUser()->isAnon())
+        {
+            $wgOut->showErrorPage( 'phonesnologin', 'phonesnologin-desc', array($wgTitle->getPrefixedDBkey()) );
+            return;
+        }
+
+        $this->initItems();
         try
         {
             $user = vfUser()->getUserVO();
@@ -181,7 +187,7 @@ class MyPhones extends SpecialPage
         }
     }
     /**
-     * 
+     *
      */
     function listPhones()
     {

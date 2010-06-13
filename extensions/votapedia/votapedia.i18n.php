@@ -21,6 +21,8 @@ $messages['en'] = array(
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
     'notauthorized' => 'Not authorized',
     'notauthorized-desc' => 'You are not authorized to perform this action.',
+    'phonesnologin' => 'Not logged in',
+    'phonesnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to manage your phones.',
 
     'id-not-found' => 'Survey identifier "$1" was not found.',
     'id-not-present' => 'Survey identifier is not specified.',
