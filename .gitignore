@@ -53,3 +53,14 @@ thumb.php5
 trackback.php
 trackback.php5
 wiki.phtml
+extensions/FBConnect/
+extensions/Gnuplot/
+extensions/OLD_votapedia/
+extensions/ParserFunctions/
+extensions/SyntaxHighlight_GeSHi/
+extensions/UsageStatistics/
+extensions/checkdocumentation.py
+extensions/phpinfo.php
+extensions/test.bat
+extensions/test.php
+extensions/testdb.php
