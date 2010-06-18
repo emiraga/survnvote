@@ -33,9 +33,21 @@ class vpAutocreateUsers extends ApiBase
     public function execute()
     {
         global $wgSecretKey;
-        if( $this->getParameter('secretkey') != sha1($wgSecretKey))
-            die('Invalid secretkey');
-        
+        for($i=0; $i<=5; $i++)
+        {
+            $time = time() - $i;
+            if( $this->getParameter('secretkey') == sha1($wgSecretKey.'-'.$time) )
+            {
+                $this->addUser();
+                return;
+            }
+        }
+        $apiResult = $this->getResult();
+        $apiResult->addValue( array(), 'error', array('title' => 'Invalid secretkey') );
+    }
+
+    private function adduser()
+    {
         $name     = $this->getParameter('name');
         $password = $this->getParameter('password');
         $realname = $this->getParameter('realname');

@@ -75,7 +75,7 @@ class UserDAO
     {
         global $wgServer, $wgScriptPath, $wgScriptExtension, $wgSecretKey;
 
-        $secretkey = sha1($wgSecretKey);
+        $secretkey = sha1($wgSecretKey.'-'.time());
         
         $url = "{$wgServer}{$wgScriptPath}/api$wgScriptExtension?action=vpAutoUser";
         $url .= "&secretkey=".$secretkey;
