@@ -27,7 +27,9 @@ $messages['en'] = array(
     'phonesnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to manage your phones.',
     'crowdnologin' => 'Not logged in',
     'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access Crowd.',
+
     'create-crowd' => 'Create new crowd',
+    'add-to-crowd' => 'Add to crowd',
     
     'id-not-found' => 'Survey identifier "$1" was not found.',
     'id-not-present' => 'Survey identifier is not specified.',

@@ -88,6 +88,16 @@ class MwAdapter
         $row = $res->current();
         return $row === false ? false : $row->user_name;
     }
+    function filePath( $name )
+    {
+        /* @var $file File */
+        $file = wfFindFile($name);
+        if($file && $file->exists())
+        {
+            return $file->getFullUrl();
+        }
+        return false;
+    }
 }
 
 /**

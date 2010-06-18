@@ -37,6 +37,7 @@ class PageVO
     private $webvoting = 'anon';
     private $surveys = array();
     private $presentations = array();
+    public  $bgimage = 'Defaultbg.jpg';
 
     /**
      * Construct PageVO

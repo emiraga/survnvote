@@ -19,3 +19,12 @@ class CrowdVO
 
 }
 
+class CrowdMemberVO
+{
+    /** @var Integer  */ public $crowdID;
+    /** @var Integer  */ public $userID;
+    /** @var Boolean  */ public $is_manager;
+    /** @var Datetime */ public $date_added;
+    /** @var Boolean*/   public $show_password;
+}
+

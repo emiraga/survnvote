@@ -58,6 +58,7 @@ class PageDAO
             $page->setPrivacy($rs->fields['privacy']);
             $page->setPhoneVoting($rs->fields['phonevoting']);
             $page->setWebVoting($rs->fields['webvoting']);
+            $page->bgimage = $rs->fields['bgimage'];
             if($loadSurveys)
             {
                 $page->setSurveys( SurveyDAO::getFromPage($page->getPageID()));
@@ -131,8 +132,8 @@ class PageDAO
 
         $sql = "insert into {$vgDBPrefix}page (title,author,startTime,duration,endTime,"
                 ."smsRequired,showGraphEnd,surveyType,"
-                ."displayTop,subtractWrong,privacy,phonevoting,webvoting)values"
-                ."(?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                ."displayTop,subtractWrong,privacy,phonevoting,webvoting,bgimage)values"
+                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         //@todo some fields from page are missing
         $resPage = $vgDB->Prepare($sql);
         $param = array( $pageVO->getTitle(),
@@ -148,6 +149,7 @@ class PageDAO
                 $pageVO->getPrivacy(),
                 $pageVO->getPhoneVoting(),
                 $pageVO->getWebVoting(),
+                $pageVO->bgimage
         );
         $vgDB->Execute($resPage,$param);
         $pageVO->setPageID($vgDB->Insert_ID());
@@ -198,7 +200,7 @@ class PageDAO
         $sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
                 . "smsRequired=?,"
                 . " showGraphEnd=?,surveyType=?,displayTop=?,votesallowed=?,"
-                . "subtractWrong=?,privacy=?, phonevoting=?, webvoting=?"
+                . "subtractWrong=?,privacy=?, phonevoting=?, webvoting=?, bgimage=?"
                 . "where pageID = ?";
         $resPage = $vgDB->Prepare($sql);
         $param = array(
@@ -215,6 +217,7 @@ class PageDAO
                 $pageVO->getPrivacy(),
                 $pageVO->getPhoneVoting(),
                 $pageVO->getWebVoting(),
+                $pageVO->bgimage,
                 $pageID
         );
         //@todo some fields here are missing

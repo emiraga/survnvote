@@ -145,9 +145,12 @@ function vfWikiToText($wiki)
  * @param String $phone phone number
  * @return String HTML code with modified phone
  */
-function vfColorizePhone($phone, $colorsms=false)
+function vfColorizePhone($phone, $colorsms=false, $obscure = false)
 {
     global $vgSmsChoiceLen, $vgEnableSMS, $vgCountryCode;
+
+    if($obscure)
+        $phone = substr($phone, 0, -3) . "<font color=gray>XXX</font>";
 
     $prefix = '+'.$vgCountryCode;
     if(substr($phone,0,strlen($prefix)) == $prefix)

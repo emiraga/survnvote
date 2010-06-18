@@ -76,9 +76,7 @@ class SmsReport extends SpecialPage
         foreach($pending as $sms)
         {
             $number = $sms['number'];
-            if(!$admin)
-                $number = substr($number, 0, strlen($number) - 3) . "<font color=gray>XXX</font>";
-            $number = vfColorizePhone($number);
+            $number = vfColorizePhone($number, false, !$admin);
             $out .= "|-\n";
             $out .= "| Pending || $number || $sms[date]";
             if($admin)

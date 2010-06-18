@@ -41,14 +41,14 @@ class CrowdDAO
         $r = $vgDB->Execute( "SELECT description, ownerID, crowdID, no_members FROM {$vgDBPrefix}crowd WHERE name = ?", array($name) );
         if($r->RecordCount() == 0)
             return false;
-        $user = new CrowdVO();
-        $user->crowdID = intval( $r->fields['crowdID'] );
-        $user->ownerID = intval( $r->fields['ownerID'] );
-        $user->name = $name;
-        $user->description = $r->fields['description'];
-        $user->no_members = $r->fields['no_members'];
+        $crowd = new CrowdVO();
+        $crowd->crowdID = intval( $r->fields['crowdID'] );
+        $crowd->ownerID = intval( $r->fields['ownerID'] );
+        $crowd->name = $name;
+        $crowd->description = $r->fields['description'];
+        $crowd->no_members = $r->fields['no_members'];
 
-        return $user;
+        return $crowd;
     }
     /**
      * Find a crowd by crowdID.
@@ -74,14 +74,40 @@ class CrowdDAO
     {
         global $vgDB, $vgDBPrefix;
         $pr = $vgDBPrefix;
-        $r = $vgDB->GetALL( "SELECT crowdID, isManager, date_added FROM {$vgDBPrefix}crowd_member WHERE userID = ?", array(intval($userID)));
+        $r = $vgDB->GetALL( "SELECT * FROM {$vgDBPrefix}crowd_member LEFT JOIN {$vgDBPrefix}crowd "
+        ."USING (crowdID) WHERE {$vgDBPrefix}crowd_member.userID = ?", array(intval($userID)));
         $result = array();
         foreach($r as $member)
         {
-            $crowd = $this->findByID( $member['crowdID'] );
+            $crowd = new CrowdVO();
+            $crowd->crowdID = $member['crowdID'];
+            $crowd->name = $member['name'];
+            $crowd->description = $member['description'];
+            $crowd->ownerID = $member['ownerID'];
+            $crowd->no_members = $member['no_members'];
             $crowd->date_added = $member['date_added'];
             $crowd->isManager = $member['isManager'];
             $result[] = $crowd;
+        }
+        return $result;
+    }
+
+    function getCrowdMembers(CrowdVO &$crowd)
+    {
+        $result = array();
+        global $vgDB, $vgDBPrefix;
+        $r = $vgDB->GetALL( "SELECT * FROM {$vgDBPrefix}crowd_member WHERE crowdID = ?", 
+                array(intval($crowd->crowdID)));
+        foreach($r as $member)
+        {
+            $mvo = new CrowdMemberVO();
+            $mvo->crowdID = $member['crowdID'];
+            $mvo->date_added = $member['date_added'];
+            $mvo->is_manager = $member['isManager'];
+            $mvo->show_password = $member['show_password'];
+            $mvo->userID = $member['userID'];
+
+            $result[] = $mvo;
         }
         return $result;
     }
@@ -93,3 +119,4 @@ class CrowdDAO
                 array( $crowdID, $userID, $isManager, $showpassword, $now));
     }
 }
+

@@ -195,7 +195,9 @@ class FormControl
             $value = str_replace("\r", "\n", $value);
             $value = str_replace("\n\n", "\r", $value);
             //$value = htmlspecialchars_decode($value);
-            $form_element = Xml::textarea( $id, $value, 5, 5, array( 'id' => $id ) );
+            $cols = isset($item['cols'])?$item['cols']:5;
+            $rows = isset($item['rows'])?$item['rows']:5;
+            $form_element = Xml::textarea( $id, $value, $cols, $rows, array( 'id' => $id ) );
         }
         elseif($item['type'] == 'null')
         {
@@ -256,7 +258,7 @@ class FormControl
                 $this->TableRow(
                 $label,
                 $form_element,
-                Xml::tags('div', array( 'class' => 'prefsectiontip' ), $explanation ),
+                Xml::tags('div', array( 'class' => 'prefsectiontip', 'style' => 'width: 100%' ), $explanation ),
                 isset($item['afterall'])?$item['afterall']:null
         );
         if(isset($item['html']))

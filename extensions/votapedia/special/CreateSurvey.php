@@ -69,7 +69,7 @@ class CreateSurvey
      */
     function setFormItems()
     {
-        global $vgCountry, $vgScript, $vgAllowedTags;
+        global $vgCountry, $vgScript, $vgAllowedTags,$wgScriptPath;
         $this->formitems = array (
                 'titleorquestion' => array(
                         'type' => 'input',
@@ -216,6 +216,19 @@ class CreateSurvey
                         },
                         'icon' => $vgScript.'/icons/star.png',
                 ),
+                'bgimage' => array(
+                        'type' => 'input',
+                        'name' => 'Backgroung image',
+                        'default' => '',
+                        'valid' => function ($v,$i,$js)
+                        {
+                            if($js) return "";
+                            return strlen($v) > 1;
+                        },
+                        'explanation' => 'Leave this value blank for no image. Otherwise, <a href="'.Skin::makeSpecialUrl('Upload').'" target=_blank>upload an image</a> and write it\'s file name in the box above, for example: <code>Defaultbg.jpg</code>',
+                        #'learn_more' => 'Details of Title or Survey Question',
+                        'icon' => $vgScript.'/icons/image.png',
+                ),
                 'titlewarning' => array(
                         'type' => 'infobox',
                         'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
@@ -230,7 +243,7 @@ class CreateSurvey
         $this->formpages = array(
                 0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
                 1=>array('title'=>'Voting options','items'=>array('privacy', 'duration', 'phonevoting','webvoting' )),
-                2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop')),
+                2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop', 'bgimage')),
         );
     }
     /**
@@ -316,6 +329,7 @@ class CreateSurvey
             $page->setShowGraphEnd(true);
         else
             $page->setShowGraphEnd(false);
+        $page->bgimage = $values['bgimage'];
         return $errors;
     }
     /**
@@ -431,6 +445,7 @@ class CreateSurvey
         $this->form->setValue('privacy', $page->getPrivacyByName());
         $this->form->setValue('phonevoting', $page->getPhoneVoting());
         $this->form->setValue('webvoting', $page->getWebVoting());
+        $this->form->setValue('bgimage', $page->bgimage);
         $this->fillValuesFromSurveys($page->getSurveys());
     }
     /**

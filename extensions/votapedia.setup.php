@@ -147,6 +147,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   phonevoting           varchar(5)   NOT NULL DEFAULT 'anon',
   webvoting             varchar(5)   NOT NULL DEFAULT 'anon',
   receivers_released    $tBoolean    NOT NULL DEFAULT '0',
+  bgimage               varchar(255) NOT NULL DEFAULT 'Defaultbg.jpg',
   PRIMARY KEY (pageID)
 ) $wgDBTableOptions;
 

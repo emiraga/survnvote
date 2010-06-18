@@ -373,15 +373,29 @@ class SurveyBody
      */
     public function getGraphHTML(&$colorindex, $surveys, $pageID, $imgid = '')
     {
+        /* @var $graph Graph */
         if(count($surveys) > 1)
             $graph = new GraphStackPercent();
         else
             $graph = new GraphPie();
-
+        $usetransp = false;
+        if($this->page->bgimage)
+        {
+            $img = vfAdapter()->filePath($this->page->bgimage);
+            if($img)
+            {
+                $graph->setBackgroungImage($img);
+                $usetransp = true;
+            }
+        }
         foreach($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
-            $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) ); //@todo remove extra things
+            $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) );
+            if($usetransp)
+            {
+                $graphseries->setTransparent('AA');
+            }
             $choices = &$survey->getChoices();
             foreach($choices as &$choice)
             {

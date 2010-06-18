@@ -35,6 +35,7 @@ abstract class Graph
     protected $width = 400;
     protected $height = 200;
     protected $graphvalues = array();
+    protected $bgimage = '';
     /**
      * Add values object GraphValues to the graph.
      *
@@ -44,6 +45,10 @@ abstract class Graph
     {
         $this->graphvalues[] = $val;
     }
+    function setBackgroungImage($img)
+    {
+        $this->bgimage = $img;
+    }
     /**
      * Get link to image;
      *
@@ -51,7 +56,12 @@ abstract class Graph
      */
     public function getImageLink()
     {
-        return "http://chart.apis.google.com/chart?".$this->getImageParams();
+        $link = "http://chart.apis.google.com/chart?";
+        if($this->bgimage)
+        {
+            $link .= "chf=bg,s,FFFFFF44&";
+        }
+        return $link.$this->getImageParams();
     }
     /**
      * Get image parameters
@@ -65,8 +75,14 @@ abstract class Graph
      */
     public function getHTMLImage($imgid)
     {
-        return "<img id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
+        $out = '';
+        $out = "<img id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
                 ."src=\"{$this->getImageLink()}\">";
+        if($this->bgimage)
+        {
+            $out = "<div style='z-index: -10; position: absolute'><img src='".$this->bgimage."' width=$this->width height=$this->height></div>".$out;
+        }
+        return $out;
     }
     /**
      * Get width of an image
@@ -308,7 +324,7 @@ class GraphStackPercent extends Graph
 }
 /**
  * class GraphValues
- * 
+ *
  * @package Graphing
  * @abstract
  */
@@ -316,7 +332,7 @@ abstract class GraphValues
 {
     protected $title;
     protected $count = 0;
-
+    protected $trans = '';
     /**
      *
      * @param String $title
@@ -326,7 +342,7 @@ abstract class GraphValues
         $this->title = vfCutEncode($title, 50);
     }
     /**
-     * 
+     *
      * @return String
      */
     function getTitle()
@@ -340,6 +356,10 @@ abstract class GraphValues
     function getCount()
     {
         return $this->count;
+    }
+    function setTransparent($trans)
+    {
+        $this->trans = $trans;
     }
 }
 /**
@@ -401,7 +421,7 @@ class GraphSeries extends GraphValues
 
         $this->names[] = $name;
         $this->values[] = $value;
-        $this->colors[] = $color;
+        $this->colors[] = $color.$this->trans;
         $this->count++;
     }
     /**
@@ -639,7 +659,7 @@ class GraphXY extends GraphValues
         return "|$y2|{$this->getYMax()}";
     }
     /**
-     * 
+     *
      * @return String
      */
     public function getXlabel()

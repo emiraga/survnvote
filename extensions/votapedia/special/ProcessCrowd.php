@@ -63,10 +63,13 @@ class ProcessCrowd extends SpecialPage
                     $name = $wgRequest->getVal('name');
                     $name = preg_replace("/\W/", '_', $name);
                     $name = preg_replace('/_+/', '_', $name);
+                    $name = preg_replace('/_$/', '', $name);
+                    $name = preg_replace('/^_/', '', $name);
 
                     $cr->name = $name;
                     $cr->description = $wgRequest->getVal( 'description' );
                     $cr->ownerID = vfUser()->userID();
+                    $cr->no_members = 1;
                     $dao->insert($cr);
                     var_dump($cr->crowdID);
                     $dao->addUserToCrowd($cr->crowdID, vfUser()->userID(), true, false);

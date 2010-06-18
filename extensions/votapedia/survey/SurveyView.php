@@ -211,14 +211,17 @@ class SurveyView
         }
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
-        $output.= '<h3>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</h3>';
-        //$output.= '<tr><td valign="top" colspan="2"><img src="'.$vgScript.'/images/spacer.gif" />';
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
+        $output.= '<font size=4>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
+        
         if($pagestatus != 'ended')
+        {
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
+        }
+
         $output .= $this->body->getHTML();
         $output .= '<br />';
         if($this->page->getCurrentPresentationID() == $presID)
