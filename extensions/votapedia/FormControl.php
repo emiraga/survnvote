@@ -299,7 +299,7 @@ class FormControl
      * @param Integer $id id inside HTML of form
      * @return String HTML code
      */
-    public function StartForm($action='', $id='')
+    public function StartForm($action='', $id='', $makediv = true)
     {
         $output = '';
         if($action)
@@ -310,7 +310,8 @@ class FormControl
             'id'     => $id,
             ) );
         }
-        $output .= Xml::openElement( 'div', array( 'id' => 'preferences' ) );
+        if($makediv)
+            $output .= Xml::openElement( 'div', array( 'id' => 'preferences' ) );
         return $output;
     }
     /**
@@ -331,7 +332,7 @@ class FormControl
      * @param String $submit value of submit button in the form
      * @return String HTML code
      */
-    public function EndForm($submit = '')
+    public function EndForm($submit = '', $makediv = true)
     {
         $output = '';
         if($submit)
@@ -347,7 +348,9 @@ class FormControl
             </tr></table>
             <input type='hidden' name='wpEditToken' value=\"{$token}\" />";
         }
-        $output .= '</div></form>';
+        if($makediv)
+            $output .= '</div>';
+        $output .= '</form>';
         return $output;
     }
     /**

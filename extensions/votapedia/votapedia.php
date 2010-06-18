@@ -47,6 +47,14 @@ $wgSpecialPages['MyPhones'] = 'MyPhones';
 $wgAutoloadClasses['SmsReport'] = "$vgPath/special/SmsReport.php";
 $wgSpecialPages['SmsReport'] = 'SmsReport';
 
+//Special page Crowd
+$wgAutoloadClasses['Crowd'] = "$vgPath/special/Crowd.php";
+$wgSpecialPages['Crowd'] = 'Crowd';
+
+//Special page Crowd
+$wgAutoloadClasses['ProcessCrowd'] = "$vgPath/special/ProcessCrowd.php";
+$wgSpecialPages['ProcessCrowd'] = 'ProcessCrowd';
+
 //Tag <Survey />
 //Survey view options
 $wgAutoloadClasses['SurveyView'] = "$vgPath/survey/SurveyView.php";

@@ -13,21 +13,25 @@ if(! isset($wgSecretKey) || strlen($wgSecretKey) < 20 )
     die('$wgSecretKey is not specified or it is too short, votapedia requires this value to be '
             .'set at least 20 characters. http://www.mediawiki.org/wiki/Manual:$wgSecretKey');
 }
-
 if(! isset($wgScriptPath) || strlen($wgSecretKey) < 1 )
 {
     die('$wgScriptPath is not specified or it is too short, votapedia requires this value to be '
             .'set. http://www.mediawiki.org/wiki/Manual:$wgScriptPath');
 }
-
 if(! isset($IP) || strlen($IP) < 1 )
 {
     die('$IP is not specified or it is too short, votapedia requires this value to be '
             .'set. http://www.mediawiki.org/wiki/Manual:$IP');
 }
+if(! isset($wgDBTableOptions) )
+{
+    die('$wgDBTableOptions is not specified, votapedia requires this value to be '
+            .'set. http://www.mediawiki.org/wiki/Manual:$wgDBTableOptions');
+}
 
 if(!defined('VOTAPEDIA_TEST'))
     echo '<html><head><title>votapedia installation</title></head><body>';
+
 global $vgScript, $wgScriptPath;
 if(defined('VOTAPEDIA_TEST') || isset($_POST['do_install']))
 {
@@ -95,6 +99,7 @@ function vfDoSetup($justprint = false)
     require_once("$vgPath/Common.php");
 
     //which data type to use for specific fields
+    //@todo optimize these values
     $tPageID = "INT unsigned";
     $tSurveyID = "INT unsigned";
     $tPresID = "TINYINT unsigned";
@@ -102,6 +107,7 @@ function vfDoSetup($justprint = false)
     $tUserID = "INT unsigned";
     $tVoteID = "INT unsigned";
     $tPhoneID = "INT unsigned";
+    $tCrowdID = "INT unsigned";
     
     //new data types
     $tBoolean = "tinyint(1) unsigned";
@@ -115,6 +121,8 @@ DROP TABLE IF EXISTS {$vgDBPrefix}used_receivers;
 DROP TABLE IF EXISTS {$vgDBPrefix}phone;
 DROP TABLE IF EXISTS {$vgDBPrefix}names;
 DROP TABLE IF EXISTS {$vgDBPrefix}user;
+DROP TABLE IF EXISTS {$vgDBPrefix}crowd;
+DROP TABLE IF EXISTS {$vgDBPrefix}crowd_member;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote_details;
 
@@ -195,6 +203,34 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
   PRIMARY KEY  (userID),
   KEY          (username),
   UNIQUE       (username)
+) $wgDBTableOptions;
+
+--
+-- Table structure for table crowd
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd (
+    crowdID       $tCrowdID    NOT NULL AUTO_INCREMENT,
+    name          varchar(50)  NOT NULL,
+    description   TEXT         NOT NULL DEFAULT '',
+    ownerID       $tUserID     NOT NULL,
+    no_members    $tUserID   NOT NULL,
+    PRIMARY KEY   (crowdID),
+    KEY           (name),
+    UNIQUE        (name),
+    KEY           (ownerID)
+) $wgDBTableOptions;
+
+--
+-- Table structure for table crowd_member
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd_member (
+    crowdID        $tCrowdID    NOT NULL,
+    userID         $tUserID     NOT NULL,
+    isManager      $tBoolean    NOT NULL,
+    show_password  $tBoolean    NOT NULL,
+    date_added     datetime     NOT NULL,
+    KEY            (crowdID),
+    KEY            (userID)
 ) $wgDBTableOptions;
 
 --

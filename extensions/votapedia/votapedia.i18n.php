@@ -16,6 +16,8 @@ $messages['en'] = array(
     'viewsurvey' => 'View Survey',
     'myphones' => 'My Phones',
     'smsreport' => 'Sms Report',
+    'crowd' => 'Crowd',
+    'crowdprocess' => 'Process Crowd',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
@@ -23,7 +25,10 @@ $messages['en'] = array(
     'notauthorized-desc' => 'You are not authorized to perform this action.',
     'phonesnologin' => 'Not logged in',
     'phonesnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to manage your phones.',
-
+    'crowdnologin' => 'Not logged in',
+    'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access Crowd.',
+    'create-crowd' => 'Create new crowd',
+    
     'id-not-found' => 'Survey identifier "$1" was not found.',
     'id-not-present' => 'Survey identifier is not specified.',
 

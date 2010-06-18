@@ -12,5 +12,7 @@ $aliases['en'] = array(
         'ProcessSurvey' => array( 'ProcessSurvey' ),
         'MyPhones' => array( 'MyPhones' ),
         'SmsReport' => array( 'SmsReport' ),
+        'Crowd' => array( 'Crowd' ),
+        'ProcessCrowd' => array( 'ProcessCrowd' ),
 );
 

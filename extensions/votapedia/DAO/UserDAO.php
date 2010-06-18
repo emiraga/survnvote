@@ -6,6 +6,7 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
+require_once("$vgPath/Common.php");
 require_once("$vgPath/VO/UserVO.php");
 require_once("$vgPath/SMS.php");
 
@@ -115,8 +116,9 @@ class UserDAO
                 //wiki names start with capital letter
                 $name[0] = strtoupper($name[0]);
             }
-
-            if($this->requestNew($name, $password, $phonenumber))
+            
+            $realname = substr($phonenumber, 0, -3) . "XXX";
+            if($this->requestNew($name, $password, $realname))
             {
                 if($send_sms)
                 {
@@ -136,6 +138,7 @@ class UserDAO
     }
     /**
      * Invalidate password in votapedia database.
+     * 
      * @param String $username
      */
     static function invalidatePassword($username)

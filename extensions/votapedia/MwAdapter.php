@@ -13,7 +13,7 @@ require_once("$vgPath/DAO/UserDAO.php");
 /**
  * MediaWiki Adapter desing pattern.
  * Idea is to have all functions related to MediaWiki in one place
- * 
+ *
  * @package MediaWikiInterface
  */
 class MwAdapter
@@ -37,7 +37,7 @@ class MwAdapter
     }
     /**
      * Get a list of subcategories of a category
-     * 
+     *
      * @param String $category Name of a category
      * @return Array with a list of categories
      */
@@ -75,6 +75,19 @@ class MwAdapter
             $this->purgePage(Title::newFromText( $m )->getFullText());
         }
     }
+    /**
+     * Find user by email
+     *
+     * @param String $email
+     * @return String username
+     */
+    function findByEmail($email)
+    {
+        $dbr = wfGetDB( DB_SLAVE );
+        $res = $dbr->select( 'user', 'user_name', array( 'user_email' => $email ), __METHOD__ );
+        $row = $res->current();
+        return $row === false ? false : $row->user_name;
+    }
 }
 
 /**
@@ -93,7 +106,7 @@ class MwParser
 
     /**
      * Construct MwParser
-     * 
+     *
      * @param Parser $parser
      * @param ParserOptions $options
      * @param Title $title
@@ -238,7 +251,7 @@ class MwUser
     }
     /**
      * Is this user admin?
-     * 
+     *
      * @return Boolean
      */
     public function isAdmin()
