@@ -6,7 +6,7 @@ if (!defined('MEDIAWIKI')) die('Cannot access this file.');
  */
 
 /** Configure votapedia */
-require_once("config.php");
+require_once("./config.php");
 
 //International Texts and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$vgPath/votapedia.i18n.php";
@@ -82,6 +82,10 @@ function vfLanguageGetMagic(&$magicWords, $langCode)
             vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
     return true;
 }
+
+//change password hook
+$wgAutoloadClasses['UserDAO'] = "$vgPath/DAO/UserDAO.php";
+$wgHooks['PrefsPasswordAudit'][] = 'UserDAO::PrefsPasswordAudit';
 
 //add personal URL for "my phones"
 $wgHooks['PersonalUrls'][] = 'vfPersonalUrlsHook';

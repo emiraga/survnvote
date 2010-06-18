@@ -134,5 +134,29 @@ class UserDAO
         }
         throw new SurveyException('Could not create a new user');
     }
+    /**
+     * Invalidate password in votapedia database.
+     * @param String $username
+     */
+    static function invalidatePassword($username)
+    {
+        global $vgDB, $vgDBPrefix;
+        $vgDB->Execute( "UPDATE {$vgDBPrefix}user SET password = '' WHERE username = ?", array($username) );
+    }
+    /**
+     * Hook function for MediaWiki PrefsPasswordAudit
+     * http://www.mediawiki.org/wiki/Manual:Hooks/PrefsPasswordAudit
+     * 
+     * @param User $user
+     * @param String $newPass
+     * @param String $error
+     * @return Boolean
+     */
+    static function PrefsPasswordAudit(User $user, $newPass, $error)
+    {
+        if($error == 'success')
+            UserDAO::invalidatePassword( $user->getName() );
+        return true;
+    }
 }
 

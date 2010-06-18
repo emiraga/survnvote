@@ -10,7 +10,8 @@ if (!defined('MEDIAWIKI')) die();
 $vgPath = "$IP/extensions/votapedia";
 $vgScript = "$wgScriptPath/extensions/votapedia";
 
-// Votapedia database connection
+// Votapedia database connection, change this to different values //
+// if you don't want to use same database/user as Mediawiki
 $vgDBserver         = $wgDBserver;
 $vgDBName           = $wgDBname;
 $vgDBUserName       = $wgDBuser;

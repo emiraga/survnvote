@@ -14,6 +14,18 @@ if(! isset($wgSecretKey) || strlen($wgSecretKey) < 20 )
             .'set at least 20 characters. http://www.mediawiki.org/wiki/Manual:$wgSecretKey');
 }
 
+if(! isset($wgScriptPath) || strlen($wgSecretKey) < 1 )
+{
+    die('$wgScriptPath is not specified or it is too short, votapedia requires this value to be '
+            .'set. http://www.mediawiki.org/wiki/Manual:$wgScriptPath');
+}
+
+if(! isset($IP) || strlen($IP) < 1 )
+{
+    die('$IP is not specified or it is too short, votapedia requires this value to be '
+            .'set. http://www.mediawiki.org/wiki/Manual:$IP');
+}
+
 if(!defined('VOTAPEDIA_TEST'))
     echo '<html><head><title>votapedia installation</title></head><body>';
 global $vgScript, $wgScriptPath;
