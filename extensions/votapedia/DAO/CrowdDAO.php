@@ -121,6 +121,13 @@ class CrowdDAO
         $now = vfDate();
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}crowd_member (crowdID,userID,isManager,show_password,date_added) VALUES (?,?,?,?,?)",
                 array( $crowdID, $userID, $isManager, $showpassword, $now));
+        $vgDB->Execute("UPDATE {$vgDBPrefix}crowd SET no_members = no_members + 1 WHERE crowdID = ?",array($crowdID));
+    }
+    function isManager($crowdID, $userID)
+    {
+        global $vgDB, $vgDBPrefix;
+        return (bool) $vgDB->GetOne("SELECT isManager FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
+                array(intval($crowdID), intval($userID)));
     }
     function addLog($crowdID, $text, $printable = false)
     {

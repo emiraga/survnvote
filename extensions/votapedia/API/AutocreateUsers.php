@@ -65,7 +65,7 @@ class vpAutocreateUsers extends ApiBase
         global $wgAuth;
         if(class_exists('User') && isset($wgAuth))
         {
-            return $this->addToDatabase($name, $password, $realname, $email);
+            return vpAutocreateUsers::addToDatabase($name, $password, $realname, $email);
         }
         else
         {

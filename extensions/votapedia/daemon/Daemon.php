@@ -26,6 +26,7 @@ require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
+require_once("$vgPath/API/AutocreateUsers.php");
 $vgDaemonDebug = false;
 
 /**
@@ -49,8 +50,12 @@ function vfDaemonSmsAction()
         
         if($userID == false)
         {
+            //create user
             $userdao = new UserDAO();
-            $user = $userdao->newFromPhone($sms['from'], true);
+            $user = $userdao->newFromPhone($sms['from']);
+
+            Sms::sendSMS($sms['from'], sprintf(Sms::$msgCreateUser, $user->username, $user->password));
+
             $userID = $user->userID;
             if($vgDaemonDebug)
                 echo "New userID=$userID from phone $sms[from]\n";

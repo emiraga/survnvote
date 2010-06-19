@@ -8,7 +8,6 @@ if (!defined('MEDIAWIKI')) die();
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/VO/UserVO.php");
-require_once("$vgPath/SMS.php");
 
 /**
  * Class for managing users in database
@@ -68,21 +67,12 @@ class UserDAO
         return $user;
     }
     /**
-     * Create a new user by performing a GET request to the MediaWiki API.
-     *
-     * @return Boolean success true of false
-     */
-    function requestNew($username, $password, $realname)
-    {
-        ///////////////////
-    }
-    /**
      * Pick a new username, create that account and send an SMS.
      * 
      * @param String $phonenumber
      * @return UserVO
      */
-    function newFromPhone($phonenumber, $send_sms = false)
+    function newFromPhone($phonenumber)
     {
         global $vgDB, $vgDBPrefix;
         $password = rand(100000,999999);
@@ -99,13 +89,9 @@ class UserDAO
                 $name[0] = strtoupper($name[0]);
             }
             
-            $realname = substr($phonenumber, 0, -3) . "XXX";
-            if($this->requestNew($name, $password, $realname))
+            # $realname = substr($phonenumber, 0, -3) . "XXX";
+            if( vpAutocreateUsers::create($name, $password, '', '') )
             {
-                if($send_sms)
-                {
-                    Sms::sendSMS($phonenumber, sprintf(Sms::$msgCreateUser, $name, $password));
-                }
                 $user = new UserVO();
                 $user->username = $name;
                 $user->password = $password;

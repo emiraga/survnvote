@@ -41,7 +41,7 @@ class Crowd extends SpecialPage
      */
     function execute( $par = null )
     {
-        global $wgOut;
+        global $wgOut, $wgRequest;
         # $wgOut->addWikiText( vfAdapter()->findByEmail('emiraga@gmail.com'));
 
         if(vfUser()->isAnon())
@@ -58,12 +58,25 @@ class Crowd extends SpecialPage
                 {
                     throw new Exception("No such Crowd");
                 }
-                $this->iamamanager = false;
-                $this->showMembersList();
-                if($this->iamamanager)
+                $wgOut->setPageTitle("Crowd ".str_replace('_', ' ', $this->crowd->name));
+
+                if($wgRequest->getVal('showlog') == 'true')
                 {
-                    $this->addUsersForm();
-                    $this->showLog();
+                    if(! $this->crowddao->isManager($this->crowd->crowdID, vfUser()->userID()))
+                    {
+                        throw new Exception('Not authorized');
+                    }
+                    $this->showPrintLog();
+                }
+                else
+                {
+                    $this->iamamanager = false;
+                    $this->showMembersList();
+                    if($this->iamamanager)
+                    {
+                        $this->addUsersForm();
+                        $this->showLog();
+                    }
                 }
             }
             else
@@ -111,7 +124,6 @@ class Crowd extends SpecialPage
     function showMembersList()
     {
         global $wgOut;
-        $wgOut->setPageTitle("Crowd ".str_replace('_', ' ', $this->crowd->name));
 
         $userdao = new UserDAO();
         $user = vfUser()->getUserVO();
@@ -151,6 +163,13 @@ class Crowd extends SpecialPage
         }
         $out .= '|}';
         $wgOut->addWikiText($out);
+        if($this->iamamanager)
+        {
+            global $vgScript;
+            $wgOut->addHTML('<h4><img src="'.$vgScript.'/icons/print.png" /> '
+                    .'<a href="'.Skin::makeSpecialUrlSubpage('Crowd', $this->crowd->name, 'showlog=true&printable=true')
+                    .'" target=_blank>Print handouts</a></h4> (only newly created usernames for this crowd will be shown)');
+        }
     }
     function newCrowdForm()
     {
@@ -240,6 +259,23 @@ class Crowd extends SpecialPage
             /* @var $log CrowdLogVO */
             $out .= "|-\n";
             $out .= "| {$log->log} || {$log->date_added}\n";
+        }
+        $out .= '|}';
+        $wgOut->addWikiText($out);
+    }
+    function showPrintLog()
+    {
+        global $wgOut;
+        $out = "{| class=\"wikitable\" style=\"width: 100%\"\n";
+
+        $logs =& $this->crowddao->getLogs($this->crowd->crowdID, true);
+        foreach ($logs as &$log)
+        {
+            /* @var $log CrowdLogVO */
+            $out .= "|-\n";
+            $out .= "| {$log->log}\n";
+            $out .= "|-\n";
+            $out .= "| <hr>\n";
         }
         $out .= '|}';
         $wgOut->addWikiText($out);

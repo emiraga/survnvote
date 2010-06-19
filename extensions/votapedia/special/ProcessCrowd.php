@@ -9,6 +9,7 @@ global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
 require_once("$vgPath/FormControl.php");
+require_once("$vgPath/DAO/UserphonesDAO.php");
 
 /**
  * Special page Crowd
@@ -55,7 +56,8 @@ class ProcessCrowd extends SpecialPage
                 {
                     $this->addByUsername($par);
                     $this->addByEmail($par);
-                    //$this->addByUsername($par);
+                    $this->addByPhone($par);
+
                     $title = Skin::makeSpecialUrlSubpage('Crowd', $par);
                     $wgOut->redirect($title, 302);
                     return;
@@ -98,6 +100,8 @@ class ProcessCrowd extends SpecialPage
     }
     function addByUsername($par)
     {
+        global $wgRequest;
+        
         $userdao = new UserDAO();
         $crdao = new CrowdDAO();
         $crowd = $crdao->findByName($par);
@@ -126,6 +130,36 @@ class ProcessCrowd extends SpecialPage
                 $userdao->insert($user);
             }
             $crdao->addUserToCrowd($crowd->crowdID, $user->userID);
+        }
+    }
+    function addByEmail($par)
+    {
+        ;
+    }
+    
+    function addByPhone($par)
+    {
+        global $wgRequest;
+        $userdao = new UserDAO();
+        $crdao = new CrowdDAO();
+        $crowd = $crdao->findByName($par);
+        $phones = preg_split("/\n/", $wgRequest->getVal('bynumber'));
+        foreach($phones as $phone)
+        {
+            $phone = trim($phone);
+            if(strlen($phone) <  5)
+                continue;
+            $phone = vfProcessNumber($phone);
+
+            $userID = UserphonesDAO::getUserIDFromPhone($phone);
+            if($userID == false)
+            {
+                $user = $userdao->newFromPhone($phone);
+                $crdao->addLog($crowd->crowdID, "Phone number: $phone<br>"
+                        ."Username: {$user->username}<br>Password: {$user->password}", true);
+                $userID = $user->userID;
+            }
+            $crdao->addUserToCrowd($crowd->crowdID, $userID, false, true);
         }
     }
 }
