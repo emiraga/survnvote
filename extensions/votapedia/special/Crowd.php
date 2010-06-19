@@ -42,8 +42,6 @@ class Crowd extends SpecialPage
     function execute( $par = null )
     {
         global $wgOut, $wgRequest;
-        # $wgOut->addWikiText( vfAdapter()->findByEmail('emiraga@gmail.com'));
-
         if(vfUser()->isAnon())
         {
             $wgOut->showErrorPage( 'crowdnologin', 'crowdnologin-desc', array($wgTitle->getPrefixedDBkey()) );
@@ -168,7 +166,7 @@ class Crowd extends SpecialPage
             global $vgScript;
             $wgOut->addHTML('<h4><img src="'.$vgScript.'/icons/print.png" /> '
                     .'<a href="'.Skin::makeSpecialUrlSubpage('Crowd', $this->crowd->name, 'showlog=true&printable=true')
-                    .'" target=_blank>Print handouts</a></h4> (only newly created usernames for this crowd will be shown)');
+                    .'" target=_blank>Print handouts</a></h4>');
         }
     }
     function newCrowdForm()
@@ -209,7 +207,7 @@ class Crowd extends SpecialPage
                         'name' => 'Emails',
                         'cols' => '70',
                         'rows' => '10',
-                        'explanation' => 'Enter a list of users\' e-mails, one per line. These users will receive an e-mail containing the login information.',
+                        'explanation' => 'Enter a list of users\' e-mails, one per line. These users will receive an e-mail containing the login information. For example: <code>example@mail.com</code>.',
                         'icon' => $vgScript.'/icons/mail.png',
                 ),
                 'sendemails' => array(
@@ -277,7 +275,10 @@ class Crowd extends SpecialPage
             $out .= "|-\n";
             $out .= "| <hr>\n";
         }
-        $out .= '|}';
+        $out .= "|}\n";
+        $out .= "* This list shows only new users which have been added for the first time.\n";
+        $out .= "* Information shown here might be outdated.\n";
+        $out .= "** Users can change their passwords, emails and phone numbers. However, this will not be updated in this list.\n";
         $wgOut->addWikiText($out);
     }
 }

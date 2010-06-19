@@ -66,13 +66,7 @@ class UserDAO
         $user->password = $r->fields['password'];
         return $user;
     }
-    /**
-     * Pick a new username, create that account and send an SMS.
-     * 
-     * @param String $phonenumber
-     * @return UserVO
-     */
-    function newFromPhone($phonenumber)
+    function generateNewUser($realname='', $email='')
     {
         global $vgDB, $vgDBPrefix;
         $password = rand(100000,999999);
@@ -88,21 +82,40 @@ class UserDAO
                 //wiki names start with capital letter
                 $name[0] = strtoupper($name[0]);
             }
-            
-            # $realname = substr($phonenumber, 0, -3) . "XXX";
-            if( vpAutocreateUsers::create($name, $password, '', '') )
+            if( vpAutocreateUsers::create($name, $password, $realname, $email) )
             {
                 $user = new UserVO();
                 $user->username = $name;
                 $user->password = $password;
                 $user->isAnon = false;
                 $this->insert($user);
-                $phonedao = new UserphonesDAO($user);
-                $phonedao->addVerifiedPhone($user->userID, $phonenumber);
                 return $user;
             }
         }
         throw new SurveyException('Could not create a new user');
+    }
+    /**
+     * Pick a new username, create that account and add verified phone.
+     * 
+     * @param String $phonenumber
+     * @return UserVO
+     */
+    function newFromPhone($phonenumber)
+    {
+        $user =& $this->generateNewUser();
+        $phonedao = new UserphonesDAO($user);
+        $phonedao->addVerifiedPhone($phonenumber);
+        return $user;
+    }
+    /**
+     * Pick a new username, create that account and add email.
+     *
+     * @param String $email
+     * @return UserVO
+     */
+    function newFromEmail($email)
+    {
+        return $this->generateNewUser('', $email);
     }
     /**
      * Invalidate password in votapedia database.

@@ -194,7 +194,7 @@ class UserphonesDAO
      *
      * @param String $phone
      */
-    function addVerifiedPhone($userID, $phone)
+    function addVerifiedPhone($phone)
     {
         global $vgDB, $vgDBPrefix;
         $now = vfDate();

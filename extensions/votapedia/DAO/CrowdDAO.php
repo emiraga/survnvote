@@ -134,7 +134,7 @@ class CrowdDAO
         $log = new CrowdLogVO();
         $log->crowdID = $crowdID;
         $log->date_added = vfDate();
-        $log->log = $text;
+        $log->log = htmlspecialchars( $text );
         $log->printable = $printable;
 
         global $vgDB, $vgDBPrefix;

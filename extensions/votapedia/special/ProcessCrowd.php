@@ -134,7 +134,64 @@ class ProcessCrowd extends SpecialPage
     }
     function addByEmail($par)
     {
-        ;
+        global $wgRequest;
+        $userdao = new UserDAO();
+        $crdao = new CrowdDAO();
+        $crowd = $crdao->findByName($par);
+        $emails = preg_split("/\n/", $wgRequest->getVal('byemail'));
+        $sendemails = (bool) $wgRequest->getVal('sendemails');
+        foreach ($emails as $email)
+        {
+            $email = trim($email);
+            if(!User::isValidEmailAddr($email))
+            {
+                $crdao->addLog($crowd->crowdID, 'Email "'.$email.'" is not valid.');
+                continue;
+            }
+            $name = vfAdapter()->findByEmail($email);
+            if($name)
+            {
+                $user = $userdao->findByName($name);
+                if($user == false)
+                {
+                    $user = new UserVO();
+                    $user->username = $name;
+                    $user->password = '';
+                    $user->isAnon = false;
+                    $userdao->insert($user);
+                }
+            }
+            else
+            {
+                $user = $userdao->newFromEmail($email);
+                if($sendemails)
+                {
+                    global $wgEmergencyContact, $wgSitename, $wgServer;
+                    $a = '';
+                    UserMailer::send(new MailAddress($email), new MailAddress($wgEmergencyContact),
+                            'New account has been created for you at '.$wgSitename,
+<<<END_MAIL
+You are invited to join $wgSitename.
+
+Username: {$user->username}
+Password: {$user->password}
+
+Reason you are receving this email is because manager of crowd $par has invited you.
+
+Visit us at: $wgServer
+
+END_MAIL
+.'Login page: '.$wgServer.Skin::makeSpecialUrl('UserLogin')."\n".'Crowd page: '.$wgServer.Skin::makeSpecialUrlSubpage('Crowd', $par));
+                }
+                else
+                {
+                    //don't send email, store it to log.
+                    $crdao->addLog($crowd->crowdID, "Email: $email<br>"
+                            ."Username: {$user->username}<br>Password: {$user->password}", true);
+                }
+            }
+            $crdao->addUserToCrowd($crowd->crowdID, $user->userID, false, false);
+        }
     }
     
     function addByPhone($par)
