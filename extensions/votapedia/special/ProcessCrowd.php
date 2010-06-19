@@ -50,7 +50,16 @@ class ProcessCrowd extends SpecialPage
         {
             if($par)
             {
-                $wgOut->addWikiText($par);
+                $action = $wgRequest->getVal( 'wpSubmit' );
+                if($action == wfMsg('add-to-crowd'))
+                {
+                    $this->addByUsername($par);
+                    $this->addByEmail($par);
+                    //$this->addByUsername($par);
+                    $title = Skin::makeSpecialUrlSubpage('Crowd', $par);
+                    $wgOut->redirect($title, 302);
+                    return;
+                }
             }
             else
             {
@@ -85,6 +94,38 @@ class ProcessCrowd extends SpecialPage
             $wgOut->addHTML(vfErrorBox($e->getMessage()));
             $wgOut->addWikiText("[[Special:Crowd|Return to crowd management]]");
             return;
+        }
+    }
+    function addByUsername($par)
+    {
+        $userdao = new UserDAO();
+        $crdao = new CrowdDAO();
+        $crowd = $crdao->findByName($par);
+
+        $usernames = preg_split("/\n/", $wgRequest->getVal('byusername'));
+        foreach($usernames as $name)
+        {
+            if(strlen($name) < 2)
+                continue;
+            $name = trim($name);
+            $user = $userdao->findByName($name);
+            if($user == false)
+            {
+                $mwuser = User::newFromName($name);
+                var_dump($mwuser);
+                $mwid = $mwuser->idForName();
+                if($mwid == 0)
+                {
+                    $crdao->addLog( $crowd->crowdID, 'Error, username "'.htmlspecialchars($name).'" not found' );
+                    continue;
+                }
+                $user = new UserVO();
+                $user->username = $mwuser->getName();
+                $user->password = '';
+                $user->isAnon = $mwuser->isAnon();
+                $userdao->insert($user);
+            }
+            $crdao->addUserToCrowd($crowd->crowdID, $user->userID);
         }
     }
 }

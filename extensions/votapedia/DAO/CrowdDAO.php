@@ -114,9 +114,49 @@ class CrowdDAO
     function addUserToCrowd($crowdID, $userID, $isManager = false, $showpassword = false)
     {
         global $vgDB, $vgDBPrefix;
+        $prev = $vgDB->GetOne("SELECT userID FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
+                array(intval($crowdID), intval($userID)));
+        if($prev == $userID)
+            return;
         $now = vfDate();
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}crowd_member (crowdID,userID,isManager,show_password,date_added) VALUES (?,?,?,?,?)",
                 array( $crowdID, $userID, $isManager, $showpassword, $now));
+    }
+    function addLog($crowdID, $text, $printable = false)
+    {
+        $log = new CrowdLogVO();
+        $log->crowdID = $crowdID;
+        $log->date_added = vfDate();
+        $log->log = $text;
+        $log->printable = $printable;
+
+        global $vgDB, $vgDBPrefix;
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}crowd_log (crowdID,date_added,log,printable) VALUES (?,?,?,?)",
+                array( $log->crowdID, $log->date_added, $log->log, $log->printable));
+    }
+    function getLogs($crowdID, $only_printable = false)
+    {
+        global $vgDB, $vgDBPrefix;
+        if($only_printable)
+        {
+            $r = $vgDB->GetAll("SELECT * FROM {$vgDBPrefix}crowd_log WHERE crowdID = ? AND printable = 1",
+                    array(intval($crowdID)));
+        }
+        else
+        {
+            $r = $vgDB->GetAll("SELECT * FROM {$vgDBPrefix}crowd_log WHERE crowdID = ?", array(intval($crowdID)));
+        }
+        $result = array();
+        foreach($r as $log)
+        {
+            $logvo = new CrowdLogVO();
+            $logvo->crowdID = $crowdID;
+            $logvo->date_added = $log['date_added'];
+            $logvo->printable = $log['printable'];
+            $logvo->log = $log['log'];
+            $result[] = $logvo;
+        }
+        return $result;
     }
 }
 

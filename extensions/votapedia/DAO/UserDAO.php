@@ -74,25 +74,7 @@ class UserDAO
      */
     function requestNew($username, $password, $realname)
     {
-        global $wgServer, $wgScriptPath, $wgScriptExtension, $wgSecretKey;
-
-        $secretkey = sha1($wgSecretKey.'-'.time());
-        
-        $url = "{$wgServer}{$wgScriptPath}/api$wgScriptExtension?action=vpAutoUser";
-        $url .= "&secretkey=".$secretkey;
-        $url .= "&format=php";
-        $url .= "&name=".urlencode($username);
-        $url .= "&password=".urlencode($password);
-        $url .= "&realname=".urlencode($realname);
-
-        $ch = curl_init();
-        curl_setopt ($ch, CURLOPT_URL, $url );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $data = curl_exec ($ch);
-        curl_close ($ch);
-
-        $data = unserialize( $data );
-        return isset($data['success']);
+        ///////////////////
     }
     /**
      * Pick a new username, create that account and send an SMS.

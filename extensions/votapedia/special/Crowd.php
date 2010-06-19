@@ -20,6 +20,8 @@ require_once("$vgPath/FormControl.php");
  */
 class Crowd extends SpecialPage
 {
+    /** @var CrowdVO */  protected $crowd;
+    /** @var CrowdDAO */ protected $crowddao;
     /**
      * Constructor for ProcessSurvey
      */
@@ -30,6 +32,7 @@ class Crowd extends SpecialPage
         $this->includable( false );
         $this->setGroup('Crowd', 'votapedia');
         $this->target = Skin::makeSpecialUrl('Crowd');
+        $this->crowddao = new CrowdDAO();
     }
     /**
      * Mandatory execute function for a Special Page
@@ -46,49 +49,43 @@ class Crowd extends SpecialPage
             $wgOut->showErrorPage( 'crowdnologin', 'crowdnologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
-
-        if($par)
-        {
-            $this->iamamanager = false;
-            $this->showMembersList($par);
-            if($this->iamamanager)
-            {
-                $this->addUsersForm();
-            }
-        }
-        else
-        {
-            $this->showCrowdList();
-            $this->newCrowdForm();
-        }
-        /*$this->initItems();
         try
         {
-            $user = vfUser()->getUserVO();
-
-            $this->dao = new UserphonesDAO($user);
-            global $wgOut, $wgRequest;
-            if($wgRequest->getVal('wpSubmit') == wfMsg('add-number'))
+            if($par)
             {
-                if(! vfUser()->checkEditToken())
-                    die('Wrong edit token');
-                $phone = vfProcessNumber( $wgRequest->getVal('newnumber') );
+                $this->crowd = $this->crowddao->findByName($par);
+                if($this->crowd == false)
+                {
+                    throw new Exception("No such Crowd");
+                }
+                $this->iamamanager = false;
+                $this->showMembersList();
+                if($this->iamamanager)
+                {
+                    $this->addUsersForm();
+                    $this->showLog();
+                }
             }
-        }*/
-        /*catch(Exception $e)
+            else
+            {
+                $this->showCrowdList();
+                $this->newCrowdForm();
+            }
+        }
+        catch(Exception $e)
         {
-            $wgOut->setPageTitle("My Phones Error");
+            $wgOut->setPageTitle("Crowd Error");
             $wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
-            $wgOut->addReturnTo( Title::newFromText('Special:MyPhones') );
+            $wgOut->addReturnTo( Title::newFromText('Special:Crowd') );
             return;
-        }*/
+        }
     }
     function showCrowdList()
     {
         global $wgOut;
-        $dao = new CrowdDAO();
+
         $user = vfUser()->getUserVO();
-        $crowds = $dao->getCrowdsOfUser($user->userID);
+        $crowds = $this->crowddao->getCrowdsOfUser($user->userID);
         $wgOut->setPageTitle("Crowd management");
         $out = '';
 
@@ -111,23 +108,18 @@ class Crowd extends SpecialPage
         }
         $wgOut->addWikiText($out);
     }
-    function showMembersList($name)
+    function showMembersList()
     {
         global $wgOut;
-        $wgOut->setPageTitle("Crowd ".str_replace('_', ' ', $name));
+        $wgOut->setPageTitle("Crowd ".str_replace('_', ' ', $this->crowd->name));
 
-        $crowddao = new CrowdDAO();
         $userdao = new UserDAO();
         $user = vfUser()->getUserVO();
-        $crowd = $crowddao->findByName($name);
-        if($crowd == false)
-        {
-            throw new Exception("No such Crowd");
-        }
+
         $out = '';
         $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! User name !! Real name || E-mail || Phone !! Join Date || class=\"unsortable\" | \n";
 
-        $members = $crowddao->getCrowdMembers($crowd);
+        $members = $this->crowddao->getCrowdMembers($this->crowd);
         $this->iamamanager = false;
         foreach($members as $member)
         {
@@ -185,11 +177,6 @@ class Crowd extends SpecialPage
     {
         global $wgOut, $vgScript;
         $items = array(
-                'name' => array(
-                        'type' => 'input',
-                        'name' => 'Name',
-                        'explanation' => 'In name of crowd any characters other than alpha-numberic will be converted to underscore _.'
-                ),
                 'byusername' => array(
                         'type' => 'textarea',
                         'name' => 'Usernames',
@@ -235,11 +222,27 @@ class Crowd extends SpecialPage
         $wgOut->addWikiText("== Add members ==");
         $form = new FormControl($items);
         $wgOut->addHTML($form->getScriptsIncluded());
-        $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrl('ProcessCrowd')));
+        $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrlSubpage('ProcessCrowd',$this->crowd->name)));
         $wgOut->addHTML($form->AddPage('by user name', array('byusername')));
         $wgOut->addHTML($form->AddPage('by e-mail', array('byemail','sendemails')));
         $wgOut->addHTML($form->AddPage('by phone number', array('bynumber')));
         $wgOut->addHTML($form->EndForm(wfMsg('add-to-crowd')));
+    }
+    function showLog()
+    {
+        global $wgOut;
+        $out = "\n\n== Crowd logs (errors, notices, etc.) ==\n";
+        $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! Log text !! Date\n";
+
+        $logs =& $this->crowddao->getLogs($this->crowd->crowdID);
+        foreach ($logs as &$log)
+        {
+            /* @var $log CrowdLogVO */
+            $out .= "|-\n";
+            $out .= "| {$log->log} || {$log->date_added}\n";
+        }
+        $out .= '|}';
+        $wgOut->addWikiText($out);
     }
 }
 

@@ -240,9 +240,9 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd_member (
 CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd_log (
     crowdID        $tCrowdID     NOT NULL,
     date_added     datetime      NOT NULL,
+    printable      $tBoolean     NOT NULL,
     log            varchar(255)  NOT NULL,
-    KEY            (crowdID),
-    KEY            (userID)
+    KEY            (crowdID)
 ) $wgDBTableOptions;
 
 --

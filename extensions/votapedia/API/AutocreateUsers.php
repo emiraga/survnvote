@@ -17,7 +17,7 @@ class vpAutocreateUsers extends ApiBase
      */
     protected function getAllowedParams()
     {
-        return array( 'secretkey' => '','name' => '','password' => '','realname' => '' );
+        return array( 'secretkey' => '','name' => '','password' => '','realname' => '','email' => '' );
     }
     /**
      * Version.
@@ -45,30 +45,63 @@ class vpAutocreateUsers extends ApiBase
         $apiResult = $this->getResult();
         $apiResult->addValue( array(), 'error', array('title' => 'Invalid secretkey') );
     }
-
     private function adduser()
     {
         $name     = $this->getParameter('name');
         $password = $this->getParameter('password');
         $realname = $this->getParameter('realname');
+        $email    = $this->getParameter('email');
+
+        $success = vpAutocreateUsers::addToDatabase($name, $password, $realname, $email);
 
         $apiResult = $this->getResult();
+        if( $success )
+            $apiResult->addValue( array(), 'success', array() );
+        else
+            $apiResult->addValue( array(), 'error', array('title' => 'username null or user already exists') );
+    }
+    static public function create($name, $password, $realname, $email)
+    {
+        global $wgAuth;
+        if(class_exists('User') && isset($wgAuth))
+        {
+            return $this->addToDatabase($name, $password, $realname, $email);
+        }
+        else
+        {
+            global $wgServer, $wgScriptPath, $wgScriptExtension, $wgSecretKey;
+
+            $secretkey = sha1($wgSecretKey.'-'.time());
+
+            $url = "{$wgServer}{$wgScriptPath}/api$wgScriptExtension?action=vpAutoUser";
+            $url .= "&secretkey=".$secretkey;
+            $url .= "&format=php";
+            $url .= "&name=".urlencode($name);
+            $url .= "&password=".urlencode($password);
+            $url .= "&realname=".urlencode($realname);
+            $url .= "&email=".urlencode($email);
+
+            $ch = curl_init();
+            curl_setopt ($ch, CURLOPT_URL, $url );
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $data = curl_exec ($ch);
+            curl_close ($ch);
+
+            $data = unserialize( $data );
+            return isset($data['success']);
+        }
+    }
+    static private function addToDatabase($name, $password, $realname, $email)
+    {
         $u = User::newFromName( $name, 'creatable' );
-        if ( is_null( $u ) )
-        {
-            $apiResult->addValue( array(), 'error', array('title' => 'username null') );
-            return;
-        }
-        if ( 0 != $u->idForName() )
-        {
-            $apiResult->addValue( array(), 'error', array('title' => 'username exists') );
-            return;
-        }
+        if ( is_null( $u ) || 0 != $u->idForName() )
+            return false;
+
         $u->setName($name);
 
         $u->addToDatabase();
         $u->setPassword( $password );
-        $u->setEmail( '' );
+        $u->setEmail( $email );
         $u->setRealName( $realname );
         $u->setToken();
 
@@ -82,7 +115,7 @@ class vpAutocreateUsers extends ApiBase
         $ssUpdate = new SiteStatsUpdate( 0, 0, 0, 0, 1 );
         $ssUpdate->doUpdate();
 
-        $apiResult->addValue( array(), 'success', array() );
+        return true;
     }
 }
 
