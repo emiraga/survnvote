@@ -7,6 +7,7 @@ if (!defined('MEDIAWIKI')) die();
 /** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php" );
+require_once("$vgPath/DAO/UserDAO.php" );
 
 /**
  * Special page View Survey
@@ -49,7 +50,10 @@ class ViewSurvey extends SpecialPage
             
             $wgOut->addHTML($tag->getHTML(true));
 
-            $author = MwUser::displayName($tag->getPage()->getAuthor());
+            $userdao = new UserDAO();
+            $user = $userdao->findByID($tag->getPage()->getAuthor());
+            $author = $user->username;
+            $author = MwUser::convertDisplayName($author);
 
             $text = '';
             $text .= "== More information ==\n";

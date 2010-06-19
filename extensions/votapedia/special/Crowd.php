@@ -86,26 +86,29 @@ class Crowd extends SpecialPage
     function showCrowdList()
     {
         global $wgOut;
+        $dao = new CrowdDAO();
+        $user = vfUser()->getUserVO();
+        $crowds = $dao->getCrowdsOfUser($user->userID);
         $wgOut->setPageTitle("Crowd management");
         $out = '';
-        $out .= "== My Crowds ==\nYou are member of:\n";
-        $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! Crowd Name !! Members !! Join Date || class=\"unsortable\" | \n";
 
-        $user = vfUser()->getUserVO();
-
-        $dao = new CrowdDAO();
-        $crowds = $dao->getCrowdsOfUser($user->userID);
-
-        foreach($crowds as $crowd)
+        if(count($crowds))
         {
-            /* @var $crowd CrowdVO */
-            $out .= "|-\n";
-            $out .= "| [[Special:Crowd/{$crowd->name}|{$crowd->name}]] <br />{$crowd->description} || {$crowd->no_members} || {$crowd->date_added} ||";
-            if($crowd->isManager)
-                $out .= "Manager";
-            $out .= "\n";
+            $out .= "== My Crowd ==\nYou are member of:\n";
+            $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! Crowd Name !! Members !! Join Date || class=\"unsortable\" | \n";
+
+
+            foreach($crowds as $crowd)
+            {
+                /* @var $crowd CrowdVO */
+                $out .= "|-\n";
+                $out .= "| [[Special:Crowd/{$crowd->name}|{$crowd->name}]] <br />{$crowd->description} || {$crowd->no_members} || {$crowd->date_added} ||";
+                if($crowd->isManager)
+                    $out .= "Manager";
+                $out .= "\n";
+            }
+            $out .= '|}';
         }
-        $out .= '|}';
         $wgOut->addWikiText($out);
     }
     function showMembersList($name)
@@ -122,7 +125,7 @@ class Crowd extends SpecialPage
             throw new Exception("No such Crowd");
         }
         $out = '';
-        $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! User name !! Real name !! Join Date || class=\"unsortable\" | Phone || class=\"unsortable\" | \n";
+        $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! User name !! Real name || E-mail || Phone !! Join Date || class=\"unsortable\" | \n";
 
         $members = $crowddao->getCrowdMembers($crowd);
         $this->iamamanager = false;
@@ -133,7 +136,8 @@ class Crowd extends SpecialPage
             $user = $userdao->findByID($member->userID);
             $mwuser = User::newFromName($user->username);
 
-            $out .= "| [[User:{$user->username}|{$user->username}]] || {$mwuser->getRealName()} || $member->date_added || ";
+            $out .= "| [[User:{$user->username}|{$user->username}]] || {$mwuser->getRealName()} || ";
+            $out .= vfColorizeEmail($mwuser->getEmail(), true) . " || ";
             $phdao = new UserphonesDAO($user);
             $phonelist = $phdao->getList();
             foreach($phonelist as $phone)
@@ -141,6 +145,8 @@ class Crowd extends SpecialPage
                 $out .= vfColorizePhone($phone['number'],false, true ) . "<br>";
             }
             $out .= " || ";
+            $out .= " $member->date_added || ";
+            
             if($member->is_manager)
             {
                 $out .= "Manager";
@@ -177,9 +183,9 @@ class Crowd extends SpecialPage
     }
     function addUsersForm()
     {
-        global $wgOut;
+        global $wgOut, $vgScript;
         $items = array(
-               'name' => array(
+                'name' => array(
                         'type' => 'input',
                         'name' => 'Name',
                         'explanation' => 'In name of crowd any characters other than alpha-numberic will be converted to underscore _.'
@@ -189,25 +195,41 @@ class Crowd extends SpecialPage
                         'name' => 'Usernames',
                         'cols' => '70',
                         'rows' => '10',
-                        'explanation' => 'Enter a list of users, one per line. These have to be a list of registered users <b>with</b> this web site.'
+                        'explanation' => 'Enter a list of users, one per line. These have to be a list of registered users <b>with</b> this web site.',
+                        'icon' => $vgScript.'/icons/user_add.png',
                 ),
                 'byemail' => array(
                         'type' => 'textarea',
                         'name' => 'Emails',
                         'cols' => '70',
                         'rows' => '10',
-                        'explanation' => 'Enter a list of users\' e-mails, one per line. These users will receive an e-mail containing the login information.'
+                        'explanation' => 'Enter a list of users\' e-mails, one per line. These users will receive an e-mail containing the login information.',
+                        'icon' => $vgScript.'/icons/mail.png',
+                ),
+                'sendemails' => array(
+                        'type' => 'checkbox',
+                        'name' => 'Send emails',
+                        'default' => true,
+                        'checklabel' => ' Send emails to users containing username and password for login on this web site.',
+                        'valid' => function($v,$i,$js)
+                        {
+                            if($js) return "";
+                            return true;
+                        },
+                        'explanation' => 'If checked, the survey result will only be shown after the survey finishes. Otherwise, voters will see the partial result after they vote.',
+                        //'learn_more' => 'Details_of_Anonymous_Voting',
                 ),
                 'bynumber' => array(
                         'type' => 'textarea',
                         'name' => 'Numbers',
                         'cols' => '70',
                         'rows' => '10',
-                        'explanation' => 'Enter a list of users\' phone numbers one per line. SMS messages will <b>NOT</b> be send to these users but they can call @todo number to obtain a user/password combination.'
+                        'explanation' => 'Enter a list of users\' phone numbers one per line. SMS messages will <b>NOT</b> be send to these users but they can call @todo number to obtain a user/password combination.',
+                        'icon' => $vgScript.'/icons/phone.png',
                 ),
                 'place' => array(
-                    'type' => 'null',
-                    'html' => ''
+                        'type' => 'null',
+                        'html' => ''
                 )
         );
         $wgOut->addWikiText("== Add members ==");
@@ -215,7 +237,7 @@ class Crowd extends SpecialPage
         $wgOut->addHTML($form->getScriptsIncluded());
         $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrl('ProcessCrowd')));
         $wgOut->addHTML($form->AddPage('by user name', array('byusername')));
-        $wgOut->addHTML($form->AddPage('by e-mail', array('byemail')));
+        $wgOut->addHTML($form->AddPage('by e-mail', array('byemail','sendemails')));
         $wgOut->addHTML($form->AddPage('by phone number', array('bynumber')));
         $wgOut->addHTML($form->EndForm(wfMsg('add-to-crowd')));
     }

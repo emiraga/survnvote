@@ -123,6 +123,7 @@ DROP TABLE IF EXISTS {$vgDBPrefix}names;
 DROP TABLE IF EXISTS {$vgDBPrefix}user;
 DROP TABLE IF EXISTS {$vgDBPrefix}crowd;
 DROP TABLE IF EXISTS {$vgDBPrefix}crowd_member;
+DROP TABLE IF EXISTS {$vgDBPrefix}crowd_log;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote_details;
 
@@ -230,6 +231,16 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd_member (
     isManager      $tBoolean    NOT NULL,
     show_password  $tBoolean    NOT NULL,
     date_added     datetime     NOT NULL,
+    KEY            (crowdID),
+    KEY            (userID)
+) $wgDBTableOptions;
+--
+-- Table structure for table crowd_log
+--
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}crowd_log (
+    crowdID        $tCrowdID     NOT NULL,
+    date_added     datetime      NOT NULL,
+    log            varchar(255)  NOT NULL,
     KEY            (crowdID),
     KEY            (userID)
 ) $wgDBTableOptions;

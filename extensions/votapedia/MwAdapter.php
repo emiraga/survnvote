@@ -315,7 +315,7 @@ class MwUser
      * @param String $name name of user
      * @return String prepare name of user to be displayed
      */
-    static function displayName($name)
+    static function convertDisplayName($name)
     {
         $val = preg_split('/-/', $name);
         if(count($val) == 1)

@@ -167,6 +167,24 @@ function vfColorizePhone($phone, $colorsms=false, $obscure = false)
             . '<font color=#E00000>'.substr($phone,-$vgSmsChoiceLen,$vgSmsChoiceLen).'</font>';
 }
 /**
+ *
+ * @param String $email
+ * @param Boolean $obscure
+ * @return String
+ */
+function vfColorizeEmail($email, $obscure = false)
+{
+    $part = preg_split('/@/', $email);
+    if(count($part) < 2)
+        return $email;
+    if($obscure)
+    {
+        $one = substr($part[0], 0, 3).'<font color=gray>...</font>';
+        $two = substr($part[1], 0, 3).'<font color=gray>...</font>';
+    }
+    return $one.'@'.$two;
+}
+/**
  * This is used to connect database.
  */
 include_once("adodb/adodb.inc.php");

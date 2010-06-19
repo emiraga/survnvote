@@ -103,18 +103,25 @@ function vfPersonalUrlsHook( &$personal_urls, &$title )
     if($wgUser->isLoggedIn())
     {
         $keys = array_keys($personal_urls);
-        assert($keys[0] == 'userpage');
-
         $pageurl = $title->getLocalURL();
-        $href = Skin::makeSpecialUrl( 'MyPhones' );
+
+        $hrefphones = Skin::makeSpecialUrl( 'MyPhones' );
+        $hrefcrowd = Skin::makeSpecialUrl( 'Crowd' );
         $add_urls = array(
-                'userpage' => $personal_urls['userpage'],
+                $keys[0] => $personal_urls[$keys[0]],
+                $keys[1] => $personal_urls[$keys[1]],
                 'phones' => array(
                         'text' => 'My phones',
-                        'href' => $href,
-                        'active' => ( $href == $pageurl )
-                )
+                        'href' => $hrefphones,
+                        'active' => ( $hrefphones == $pageurl )
+                ),
+                'crowd' => array(
+                        'text' => 'My crowd',
+                        'href' => $hrefcrowd,
+                        'active' => ( $hrefcrowd == $pageurl )
+                ),
         );
+        array_shift($personal_urls);
         array_shift($personal_urls);
         $personal_urls = $add_urls + $personal_urls;
     }
@@ -128,6 +135,6 @@ $wgExtensionCredits['other'][] = array(
         'url' => 'http://www.votapedia.net/',
         'description' => 'Votapedia - Audience Response System',
         'descriptionmsg' => 'votapedia-desc',
-        'version' => '0.2.1',
+        'version' => '0.2.2',
 );
 
