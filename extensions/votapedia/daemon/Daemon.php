@@ -8,7 +8,7 @@ if(isset($_SERVER['HOST'])) die('Must be run from command line.');
 
 /** Configuration */
 //Set this path to MediaWiki installation
-$IP = '../../..';
+$IP = dirname(__FILE__).'/../../..';
 
 define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
@@ -212,6 +212,7 @@ if($args[1] == 'daemon')
 }
 else if($args[1] == 'fakevote') /*used for testing*/
 {
+    $vgDaemonDebug = true;
     $tel = new Telephone();
     $tel->releaseReceivers();
 

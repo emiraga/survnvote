@@ -9,6 +9,7 @@ global $vgPath;
 require_once("$vgPath/Common.php" );
 require_once("$vgPath/FormControl.php");
 require_once("$vgPath/DAO/PageDAO.php");
+require_once("$vgPath/DAO/CrowdDAO.php");
 
 /**
  * @package MediaWikiInterface
@@ -58,8 +59,6 @@ class CreateSurvey
     function __construct()
     {
         wfLoadExtensionMessages('Votapedia');
-        $this->setFormItems();
-        $this->form = new FormControl($this->formitems);
 
         $this->spPageName = 'Special:CreateSurvey';
         $this->tagname = vtagSIMPLE_SURVEY;
@@ -119,13 +118,25 @@ class CreateSurvey
                             return true;
                         },
                         'options' => array(
-                                "Low - Public survey (anyone can vote) "=>"low",
+                                "Low - Public survey (everyone can vote) "=>"low",
                                 //"Medium - No information (Information about voting is not publicly available)"=>"medium",
-                                "High - Restricted survey (voting is restricted to the group of people) "=>"high",
+                                "High - Restricted survey to particular crowd"=>"high",
                         ),
                         'explanation' => 'This option determines who will be able to participate in your survey.',
                         'learn_more' => 'Details of Survey Privacy',
                         'icon' => $vgScript.'/icons/lock.png',
+                        'html' => '<script>plow=document.getElementById("privacy-low"); plow.onchange = '
+                           .'function(){cid=document.getElementById("crowdID");cid.value=\'0\';cid.disabled=true};'
+                           .'phigh=document.getElementById("privacy-high");phigh.onchange = '
+                           .'function() { cid=document.getElementById("crowdID");cid.disabled=false; }</script>',
+                ),
+                'crowdID' => array(
+                        'type' => 'select',
+                        'name' => 'Crowd',
+                        'default' => 'Everyone',
+                        'options' => array('Everyone'=>'0'),
+                        'explanation' => 'This option is effective only when Survey Privacy is set to "High"',
+                        'html' => '<script>if(plow.checked)plow.onchange();</script>',
                 ),
                 'duration' => array(
                         'type' => 'input',
@@ -223,7 +234,7 @@ class CreateSurvey
                         'valid' => function ($v,$i,$js)
                         {
                             if($js) return "";
-                            return strlen($v) > 1;
+                            return true;
                         },
                         'explanation' => 'Leave this value blank for no image. Otherwise, <a href="'.Skin::makeSpecialUrl('Upload').'" target=_blank>upload an image</a> and write it\'s file name in the box above, for example: <code>Defaultbg.jpg</code>',
                         #'learn_more' => 'Details of Title or Survey Question',
@@ -239,10 +250,20 @@ class CreateSurvey
         $subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
         $subcat = $this->removePrefSufCategories($subcat);
         $this->formitems['category']['options'] = $subcat;
+
+        //Fill in crowd options
+        $crowddao = new CrowdDAO();
+        $crowds = $crowddao->getCrowdsOfUser(vfUser()->userID());
+        foreach($crowds as $crowd)
+        {
+            /* @var $crowd CrowdVO */
+            $this->formitems['crowdID']['options'][$crowd->name] = $crowd->crowdID;
+        }
+
         //List of pages
         $this->formpages = array(
                 0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
-                1=>array('title'=>'Voting options','items'=>array('privacy', 'duration', 'phonevoting','webvoting' )),
+                1=>array('title'=>'Voting options','items'=>array('privacy', 'crowdID', 'duration', 'phonevoting','webvoting' )),
                 2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop', 'bgimage')),
         );
     }
@@ -305,6 +326,10 @@ class CreateSurvey
         $page->setPhoneVoting($values['phonevoting']);
         $page->setWebVoting($values['webvoting']);
         $page->setDuration( $values['duration'] );
+        if(isset($values['crowdID']))
+            $page->crowdID = $values['crowdID' ];
+        else
+            $page->crowdID = 0;
 
         $this->setPageVOvaluesSmall($page, $values);
     }
@@ -446,6 +471,7 @@ class CreateSurvey
         $this->form->setValue('phonevoting', $page->getPhoneVoting());
         $this->form->setValue('webvoting', $page->getWebVoting());
         $this->form->setValue('bgimage', $page->bgimage);
+        $this->form->setValue('crowdID', $page->crowdID);
         $this->fillValuesFromSurveys($page->getSurveys());
     }
     /**
@@ -630,6 +656,11 @@ class CreateSurvey
         $this->drawFormNew();
         $this->postDrawForm();
     }
+    function initialize()
+    {
+        $this->setFormItems();
+        $this->form = new FormControl($this->formitems);
+    }
     /**
      * Mandatory execute function for a Special Page
      *
@@ -637,6 +668,8 @@ class CreateSurvey
      */
     function execute( $par = null )
     {
+        $this->initialize();
+
         global $wgTitle, $wgOut, $vgAnonSurveyCreation;
         $wgOut->setArticleBodyOnly(false);
 
@@ -677,6 +710,17 @@ class CreateSurvey
         {
             if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
                 $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
+        }
+        if($wgRequest->getCheck('privacy'))
+        {
+            if($this->form->getValue('privacy') != 'low' && ! $this->form->getValue('crowdID'))
+            {
+                $error .= '<li>Must specify a crowd in voting options.</li>';
+            }
+            if($this->form->getValue('privacy') == 'low' && $this->form->getValue('crowdID'))
+            {
+                $error .= '<li>You cannot specify a crowd for low privacy surveys, they are for Everyone.</li>';
+            }
         }
         return $error;
     }

@@ -38,7 +38,7 @@ class PageVO
     private $surveys = array();
     private $presentations = array();
     public  $bgimage = 'Defaultbg.jpg';
-
+    public  $crowdID = 0;
     /**
      * Construct PageVO
      */

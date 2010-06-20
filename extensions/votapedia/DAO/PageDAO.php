@@ -59,6 +59,7 @@ class PageDAO
             $page->setPhoneVoting($rs->fields['phonevoting']);
             $page->setWebVoting($rs->fields['webvoting']);
             $page->bgimage = $rs->fields['bgimage'];
+            $page->crowdID = $rs->fields['crowdID'];
             if($loadSurveys)
             {
                 $page->setSurveys( SurveyDAO::getFromPage($page->getPageID()));
@@ -132,8 +133,8 @@ class PageDAO
 
         $sql = "insert into {$vgDBPrefix}page (title,author,startTime,duration,endTime,"
                 ."smsRequired,showGraphEnd,surveyType,"
-                ."displayTop,subtractWrong,privacy,phonevoting,webvoting,bgimage)values"
-                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                ."displayTop,subtractWrong,privacy,phonevoting,webvoting,bgimage,crowdID)values"
+                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         //@todo some fields from page are missing
         $resPage = $vgDB->Prepare($sql);
         $param = array( $pageVO->getTitle(),
@@ -149,7 +150,8 @@ class PageDAO
                 $pageVO->getPrivacy(),
                 $pageVO->getPhoneVoting(),
                 $pageVO->getWebVoting(),
-                $pageVO->bgimage
+                $pageVO->bgimage,
+                intval($pageVO->crowdID),
         );
         $vgDB->Execute($resPage,$param);
         $pageVO->setPageID($vgDB->Insert_ID());
@@ -176,7 +178,7 @@ class PageDAO
         $vgDB->CompleteTrans();
         if ($vgDB->HasFailedTrans())
         {
-            throw new SurveyException("Erro while inserting a page: ".$vgDB->ErrorMsg(), 400);
+            throw new SurveyException("Error while inserting a page: ".$vgDB->ErrorMsg(), 400);
         }
     }
     /**
@@ -198,10 +200,10 @@ class PageDAO
 
         $vgDB->StartTrans();
         $sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
-                . "smsRequired=?,"
+                . " smsRequired=?,"
                 . " showGraphEnd=?,surveyType=?,displayTop=?,votesallowed=?,"
-                . "subtractWrong=?,privacy=?, phonevoting=?, webvoting=?, bgimage=?"
-                . "where pageID = ?";
+                . " subtractWrong=?,privacy=?, phonevoting=?, webvoting=?, bgimage=?, crowdID=?"
+                . " where pageID = ?";
         $resPage = $vgDB->Prepare($sql);
         $param = array(
                 $pageVO->getTitle(),
@@ -218,6 +220,7 @@ class PageDAO
                 $pageVO->getPhoneVoting(),
                 $pageVO->getWebVoting(),
                 $pageVO->bgimage,
+                $pageVO->crowdID,
                 $pageID
         );
         //@todo some fields here are missing
