@@ -10,6 +10,7 @@ require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
 require_once("$vgPath/FormControl.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
+require_once("$vgPath/Sms.php");
 
 /**
  * Special page Crowd
@@ -168,8 +169,10 @@ class ProcessCrowd extends SpecialPage
                 $user = $userdao->newFromEmail($email);
                 if($sendemails)
                 {
-                    global $wgEmergencyContact, $wgSitename, $wgServer;
+                    global $wgEmergencyContact, $wgSitename, $wgServer, $vgSmsNumber;
                     $a = '';
+                    $smsmessage = Sms::$cmdConfirm.' '.$user->getConfirmCode();
+                    
                     UserMailer::send(new MailAddress($email), new MailAddress($wgEmergencyContact),
                             'New account has been created for you at '.$wgSitename,
 <<<END_MAIL
@@ -178,7 +181,11 @@ You are invited to join $wgSitename.
 Username: {$user->username}
 Password: {$user->password}
 
-Reason you are receving this email is because manager of crowd $par has invited you.
+In order to add your mobile phone to our database,
+please send a SMS message "$smsmessage" (without quotes)
+from your mobile to number $vgSmsNumber.
+
+Reason you are receving this email is because manager of crowd $par has added you.
 
 Visit us at: $wgServer
 

@@ -297,7 +297,7 @@ class Crowd extends SpecialPage
         $out .= "* Information shown here can be outdated.\n";
         $out .= "** Users can change their passwords, emails and phone numbers. However, this change will not be updated in this list.\n";
         
-        $out .= "* Users can send a SMS message '".Sms::$cmdCheck."' to number $vgSmsNumber and receive a reply with username/password combination.";
+        $out .= "* Users can send a SMS message '".Sms::$cmdCheck."' (without quotes) to number $vgSmsNumber and receive a reply with username/password combination.";
         $wgOut->addWikiText($out);
     }
 }

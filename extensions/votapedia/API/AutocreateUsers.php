@@ -62,7 +62,7 @@ if(class_exists('ApiBase'))
             else
                 $apiResult->addValue( array(), 'error', array('title' => 'username null or user already exists') );
         }
-        static private function addToDatabase($name, $password, $realname, $email)
+        static public function addToDatabase($name, $password, $realname, $email)
         {
             $u = User::newFromName( $name, 'creatable' );
             if ( is_null( $u ) || 0 != $u->idForName() )
