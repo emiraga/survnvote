@@ -244,7 +244,7 @@ class Crowd extends SpecialPage
                         'name' => 'Numbers',
                         'cols' => '70',
                         'rows' => '10',
-                        'explanation' => 'Enter a list of users\' phone numbers one per line. SMS messages will <b>NOT</b> be send to these users but they can call @todo number to obtain a user/password combination.',
+                        'explanation' => 'Enter a list of users\' phone numbers one per line. SMS messages will <b>NOT</b> be send to these users. Don\'t forget to "Print handouts" after adding users by phone.',
                         'icon' => $vgScript.'/icons/phone.png',
                 ),
                 'place' => array(

@@ -68,7 +68,14 @@ function vfParserFirstCallInit( &$parser )
 {
     $parser->setHook( 'SurveyChoice', 'SurveyView::executeTag' );
     $parser->setFunctionHook( 'Survey', 'SurveyView::executeMagic' );
+    $parser->setFunctionHook( 'vpSmsNumber', 'vfGetSmsNumber' );
     return true;
+}
+
+function vfGetSmsNumber($parser)
+{
+    global $vgSmsNumber;
+    return $vgSmsNumber;
 }
 
 //API
@@ -88,6 +95,7 @@ function vfLanguageGetMagic(&$magicWords, $langCode)
     $magicWords['Survey'] = array(0,
             vtagSIMPLE_SURVEY, vtagQUIZ, vtagRANK_EXPOSITIONS,
             vtagQUESTIONNAIRE, vtagTEXT_RESPONSE);
+    $magicWords['vpSmsNumber'] = array(0, 'vpSmsNumber');
     return true;
 }
 
