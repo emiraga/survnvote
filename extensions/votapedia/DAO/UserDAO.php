@@ -26,8 +26,8 @@ class UserDAO
     function insert(UserVO &$user)
     {
         global $vgDB, $vgDBPrefix;
-        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (isAnon, username, password) VALUES (?,?,?)",
-                array($user->isAnon, $user->username, $user->password));
+        $vgDB->Execute("INSERT INTO {$vgDBPrefix}user (isAnon, username, password, smsConfirm) VALUES (?,?,?,?)",
+                array($user->isAnon, $user->username, $user->password, $user->smsConfirm));
         $user->userID = $vgDB->Insert_ID();
         return $user->userID;
     }
@@ -39,7 +39,7 @@ class UserDAO
     function findByName($username)
     {
         global $vgDB, $vgDBPrefix;
-        $r = $vgDB->Execute( "SELECT isAnon, userID, password FROM {$vgDBPrefix}user WHERE username = ?", array($username) );
+        $r = $vgDB->Execute( "SELECT * FROM {$vgDBPrefix}user WHERE username = ?", array($username) );
         if($r->RecordCount() == 0)
             return false;
         $user = new UserVO();
@@ -47,6 +47,7 @@ class UserDAO
         $user->userID = intval( $r->fields['userID'] );
         $user->username = $username;
         $user->password = $r->fields['password'];
+        $user->smsConfirm = $r->fields['smsConfirm'];
         return $user;
     }
     /**
@@ -57,7 +58,7 @@ class UserDAO
     function findByID($userID)
     {
         global $vgDB, $vgDBPrefix;
-        $r = $vgDB->Execute( "SELECT isAnon, username, password FROM {$vgDBPrefix}user WHERE userID = ?", array($userID) );
+        $r = $vgDB->Execute( "SELECT * FROM {$vgDBPrefix}user WHERE userID = ?", array($userID) );
         if($r->RecordCount() == 0)
             return false;
         $user = new UserVO();
@@ -65,6 +66,7 @@ class UserDAO
         $user->isAnon = $r->fields['isAnon'];
         $user->username = $r->fields['username'];
         $user->password = $r->fields['password'];
+        $user->smsConfirm = $r->fields['smsConfirm'];
         return $user;
     }
     function generateNewUser($realname='', $email='')
@@ -97,7 +99,7 @@ class UserDAO
     }
     /**
      * Pick a new username, create that account and add verified phone.
-     * 
+     *
      * @param String $phonenumber
      * @return UserVO
      */
@@ -120,7 +122,7 @@ class UserDAO
     }
     /**
      * Invalidate password in votapedia database.
-     * 
+     *
      * @param String $username
      */
     static function invalidatePassword($username)
@@ -132,7 +134,7 @@ class UserDAO
      * Hook function for MediaWiki PrefsPasswordAudit
      * When password is changed by user, this will be called
      * http://www.mediawiki.org/wiki/Manual:Hooks/PrefsPasswordAudit
-     * 
+     *
      * @param User $user
      * @param String $newPass
      * @param String $error
@@ -143,6 +145,18 @@ class UserDAO
         if($error == 'success')
             UserDAO::invalidatePassword( $user->getName() );
         return true;
+    }
+    public function checkValidConfirmCode($code)
+    {
+        global $vgConfirmCodeLen;
+        $confirm = substr($code, 0, $vgConfirmCodeLen);
+        $userID = intval(trim(substr($code, $vgConfirmCodeLen)));
+
+        $user = $this->findByID($userID);
+        if($user && $user->smsConfirm == $confirm)
+            return $user;
+        else
+            return false;
     }
 }
 

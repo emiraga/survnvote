@@ -31,6 +31,8 @@ class Sms
 
     /* Command to send by SMS to check validity of account. */
     static public $cmdCheck = 'CHECK';
+    /* Command to send by SMS to check validity of account. */
+    static public $cmdConfirm = 'CONFIRM';
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */

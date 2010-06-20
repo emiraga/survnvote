@@ -191,12 +191,16 @@ class UserphonesDAO
     /**
      * Add a phone number to the user and
      * automatically mark this phone number as verified.
+     * Delete if this number was added previously.
      *
      * @param String $phone
      */
     function addVerifiedPhone($phone)
     {
         global $vgDB, $vgDBPrefix;
+        $vgDB->Execute("DELETE FROM {$vgDBPrefix}phone WHERE phonenumber = ?",
+                array( $phone ));
+        
         $now = vfDate();
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}phone (userID, phonenumber, status, dateadded) VALUES (?,?,?,?)",
                 array($this->user->userID, $phone, vPHONE_VERIFIED, $now));

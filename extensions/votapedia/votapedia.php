@@ -72,7 +72,7 @@ function vfParserFirstCallInit( &$parser )
     return true;
 }
 
-function vfGetSmsNumber($parser)
+function vfGetSmsNumber($parser = null)
 {
     global $vgSmsNumber;
     return $vgSmsNumber;
@@ -118,15 +118,15 @@ function vfPersonalUrlsHook( &$personal_urls, &$title )
         $add_urls = array(
                 $keys[0] => $personal_urls[$keys[0]],
                 $keys[1] => $personal_urls[$keys[1]],
-                'phones' => array(
-                        'text' => 'My phones',
-                        'href' => $hrefphones,
-                        'active' => ( $hrefphones == $pageurl )
-                ),
                 'crowd' => array(
                         'text' => 'My crowd',
                         'href' => $hrefcrowd,
                         'active' => ( $hrefcrowd == $pageurl )
+                ),
+                'phones' => array(
+                        'text' => 'My phones',
+                        'href' => $hrefphones,
+                        'active' => ( $hrefphones == $pageurl )
                 ),
         );
         array_shift($personal_urls);

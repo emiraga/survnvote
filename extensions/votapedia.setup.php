@@ -202,6 +202,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}user (
   username     varchar(255) NOT NULL,
   password     varchar(20)  NOT NULL DEFAULT '',
   isAnon       $tBoolean    NOT NULL,
+  smsConfirm   varchar(20)  NOT NULL,
   PRIMARY KEY  (userID),
   KEY          (username),
   UNIQUE       (username)

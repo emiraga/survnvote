@@ -7,8 +7,8 @@ if(isset($_SERVER['HOST'])) die('Must be run from command line.');
  */
 
 /** Configuration */
-//Set this path to MediaWiki
-$IP = '/xampp/htdocs/new';
+//Set this path to MediaWiki installation
+$IP = '../../..';
 
 define('VOTAPEDIA_DAEMON',true);
 define('MEDIAWIKI',true);
@@ -84,13 +84,32 @@ function vfDaemonSmsAction()
         
         $sms['text'] = trim($sms['text']);
 
-        //is it check command?
+        //is it a check command?
         if( strncasecmp($sms['text'], Sms::$cmdCheck, strlen(Sms::$cmdCheck) ) == 0 )
         {
             //this user wants to check account status
             $userID = vfDaemonGetUserSendSMS($sms['from'], true);
             if($vgDaemonDebug)
                 echo "Check account $userID\n";
+        }
+        //is it a confirm command?
+        elseif( strncasecmp($sms['text'], Sms::$cmdConfirm, strlen(Sms::$cmdConfirm) ) == 0 )
+        {
+            $confirmcode = trim(substr($sms['text'], strlen(Sms::$cmdConfirm)));
+            $userdao = new UserDAO();
+            $user = $userdao->checkValidConfirmCode($confirmcode);
+            if($user)
+            {
+                $phonedao = new UserphonesDAO($user);
+                $phonedao->addVerifiedPhone($sms['from']);
+                if($vgDaemonDebug)
+                    echo "Confirmed phone $sms[from] account {$user->userID}\n";
+            }
+            else
+            {
+                if($vgDaemonDebug)
+                    echo "Confirm INVALID\n";
+            }
         }
         else
         {
@@ -178,7 +197,10 @@ if($args[1] == 'daemon')
         try
         {
             $tel->releaseReceivers();
-            vfDaemonSmsAction();
+            if($vgEnableSMS)
+            {
+                vfDaemonSmsAction();
+            }
         }
         catch(Exception $e)
         {

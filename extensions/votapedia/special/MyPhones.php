@@ -9,6 +9,7 @@ global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/FormControl.php");
+require_once("$vgPath/Sms.php");
 
 /**
  * Special page Create Survey
@@ -81,7 +82,7 @@ class MyPhones extends SpecialPage
                         'name' => 'NUMBER GOES HERE',
                         //'explanation' => 'Confirm your phone number by entering confirmation code.',
                         //'learn_more' => 'Details of Phone confirmation',
-                        'code' => vfSuccessBox('Number {NUMBER} has been verified.'),
+                        'code' => vfSuccessBox('<img src="'.$vgScript.'/icons/correct.png" /> Number {NUMBER} has been verified.'),
                         'icon' => $vgScript.'/icons/mobile.png',
                 ),
                 'deleted' => array(
@@ -173,9 +174,21 @@ class MyPhones extends SpecialPage
             //View the list
             $wgOut->setPageTitle(wfMsg('myphones'));
             $this->listPhones();
+
             $form = new FormControl($this->items);
-            $this->display[] = 'newnumber';
-            $wgOut->addHTML( $form->AddPage('', $this->display) );
+
+            if(count($this->display))
+            {
+                $wgOut->addHTML( $form->AddPage('', $this->display) );
+            }
+
+            $wgOut->addWikiText("\n\n== Add new phone number via SMS ==\n");
+            $wgOut->addWikiText("Send a SMS message from ''your'' mobile phone like shown below:");
+            $wgOut->addWikiText('{{SMS Example|'.Sms::$cmdConfirm.' '.$user->getConfirmCode().'}}');
+            $wgOut->addWikiText("Refresh this page after some time to confirm that phone has been added.");
+
+            $wgOut->addWikiText("\n\n== Alternative: Add new phone number manually ==\n");
+            $wgOut->addHTML( $form->AddPage('', array('newnumber')) );
         }
         catch(Exception $e)
         {
@@ -186,9 +199,6 @@ class MyPhones extends SpecialPage
             return;
         }
     }
-    /**
-     *
-     */
     function listPhones()
     {
         $list = $this->dao->getList();
@@ -197,7 +207,6 @@ class MyPhones extends SpecialPage
         global $wgOut, $vgScript;
         $wgOut->addHTML("<p><i>You have added a total of $num phone number(s).</i></p>");
 
-        $this->display[] = 'empty';
         foreach($list as $phone)
         {
             $id = $phone['id'];
@@ -217,7 +226,7 @@ class MyPhones extends SpecialPage
             elseif($phone['status'] == vPHONE_VERIFIED)
             {
                 $this->items[ $id ] = $this->items[ 'verified' ];
-                $this->items[ $id ]['code'] = str_replace('{NUMBER}',$phone['number'],$this->items[ $id ]['code']);
+                $this->items[ $id ]['code'] = str_replace('{NUMBER}', vfColorizePhone( $phone['number'] ), $this->items[ $id ]['code']);
             }
             elseif($phone['status'] == vPHONE_DELETED)
             {
@@ -225,8 +234,8 @@ class MyPhones extends SpecialPage
 
             }
             $this->items[ $id ]['name'] = $phone['number'];
-            $this->display[] = $id;
             $this->display[] = 'empty';
+            $this->display[] = $id;
 
             if($phone['status'] != vPHONE_DELETED)
             {
