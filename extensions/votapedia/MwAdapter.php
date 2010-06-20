@@ -97,7 +97,6 @@ class MwAdapter
             }
         }
         return false;
-        #return $row === false ? false : $row->user_name;
     }
     function filePath( $name )
     {

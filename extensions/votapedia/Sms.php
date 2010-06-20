@@ -26,6 +26,11 @@ class Sms
     static public $msgConfim = 'Confirmation code is %s. Thank you for using www.votapedia.net.';
     /* Message used when user is using votapedia for the first time */
     static public $msgCreateUser = 'Thank for participating in Votapedia surveys. You can login to www.votapedia.net, Username:%s Password:%s';
+    /* Message used when user is using votapedia for the first time */
+    static public $msgCreateUserNoPass = 'Thank for participating in Votapedia surveys. You can login to www.votapedia.net, Username:%s';
+
+    /* Command to send by SMS to check validity of account. */
+    static public $cmdCheck = 'CHECK';
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */

@@ -8,6 +8,7 @@ if (!defined('MEDIAWIKI')) die();
 global $vgPath;
 require_once("$vgPath/Common.php");
 require_once("$vgPath/VO/UserVO.php");
+require_once("$vgPath/API/AutocreateUsers.php");
 
 /**
  * Class for managing users in database
@@ -82,7 +83,7 @@ class UserDAO
                 //wiki names start with capital letter
                 $name[0] = strtoupper($name[0]);
             }
-            if( vpAutocreateUsers::create($name, $password, $realname, $email) )
+            if( AutocreateUsers::create($name, $password, $realname, $email) )
             {
                 $user = new UserVO();
                 $user->username = $name;
@@ -129,6 +130,7 @@ class UserDAO
     }
     /**
      * Hook function for MediaWiki PrefsPasswordAudit
+     * When password is changed by user, this will be called
      * http://www.mediawiki.org/wiki/Manual:Hooks/PrefsPasswordAudit
      * 
      * @param User $user

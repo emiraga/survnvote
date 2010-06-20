@@ -11,6 +11,7 @@ require_once("$vgPath/DAO/CrowdDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/FormControl.php");
+require_once("$vgPath/Sms.php");
 
 /**
  * Special page Crowd
@@ -278,7 +279,7 @@ class Crowd extends SpecialPage
     }
     function showPrintLog()
     {
-        global $wgOut;
+        global $wgOut, $vgSmsNumber;
         $out = "{| class=\"wikitable\" style=\"width: 100%\"\n";
 
         $logs =& $this->crowddao->getLogs($this->crowd->crowdID, true);
@@ -291,9 +292,12 @@ class Crowd extends SpecialPage
             $out .= "| <hr>\n";
         }
         $out .= "|}\n";
-        $out .= "* This list shows only new users which have been added for the first time.\n";
-        $out .= "* Information shown here might be outdated.\n";
-        $out .= "** Users can change their passwords, emails and phone numbers. However, this will not be updated in this list.\n";
+        $out .= "* This list shows only new users, added for the first time.\n";
+        $out .= "* Only managers of crowds are allowed to see this.\n";
+        $out .= "* Information shown here can be outdated.\n";
+        $out .= "** Users can change their passwords, emails and phone numbers. However, this change will not be updated in this list.\n";
+        
+        $out .= "* Users can send a SMS message '".Sms::$cmdCheck."' to number $vgSmsNumber and receive a reply with username/password combination.";
         $wgOut->addWikiText($out);
     }
 }

@@ -20,7 +20,7 @@ $vgDBUserPassword = $wgDBadminpassword;
 
 /** Include dependencies */
 require_once("$vgPath/Common.php");
-$vgDB->debug = true;
+$vgDB->debug = false;
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
@@ -28,6 +28,43 @@ require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
 require_once("$vgPath/API/AutocreateUsers.php");
 $vgDaemonDebug = false;
+
+/**
+ * Get an userId and send SMS if necessary.
+ *
+ * @param String $phone
+ * @param Boolean $check_status is user check his/hers status
+ */
+function vfDaemonGetUserSendSMS($phone, $check_status = false)
+{
+    global $vgDaemonDebug;
+    $userID = UserphonesDAO::getUserIDFromPhone($phone);
+    $userdao = new UserDAO();
+
+    if($userID == false)
+    {
+        //create user
+        $user = $userdao->newFromPhone($phone);
+
+        Sms::sendSMS($phone, sprintf(Sms::$msgCreateUser, $user->username, $user->password));
+
+        $userID = $user->userID;
+        if($vgDaemonDebug)
+            echo "New userID=$userID from phone $phone\n";
+    }
+    else
+    {
+        if($check_status)
+        {
+            $user = $userdao->findByID($userID);
+            if(strlen($user->password) > 1)
+                Sms::sendSMS($phone, sprintf(Sms::$msgCreateUser, $user->username, $user->password));
+            else
+                Sms::sendSMS($phone, sprintf(Sms::$msgCreateUserNoPass, $user->username));
+        }
+    }
+    return $userID;
+}
 
 /**
  * Do whatever is needed to process new incoming SMS.
@@ -45,47 +82,53 @@ function vfDaemonSmsAction()
         if($vgDaemonDebug)
             echo "New sms: $sms[from] $sms[text]\n";
         
-        //load user
-        $userID = UserphonesDAO::getUserIDFromPhone($sms['from']);
-        
-        if($userID == false)
+        $sms['text'] = trim($sms['text']);
+
+        //is it check command?
+        if( strncasecmp($sms['text'], Sms::$cmdCheck, strlen(Sms::$cmdCheck) ) == 0 )
         {
-            //create user
-            $userdao = new UserDAO();
-            $user = $userdao->newFromPhone($sms['from']);
-
-            Sms::sendSMS($sms['from'], sprintf(Sms::$msgCreateUser, $user->username, $user->password));
-
-            $userID = $user->userID;
+            //this user wants to check account status
+            $userID = vfDaemonGetUserSendSMS($sms['from'], true);
             if($vgDaemonDebug)
-                echo "New userID=$userID from phone $sms[from]\n";
+                echo "Check account $userID\n";
+        }
+        else
+        {
+            //this user is voting
+            $userID = vfDaemonGetUserSendSMS( $sms['from'] );
+
+            if($vgDaemonDebug)
+                echo "Found $userID\n";
+
+            $numbers = preg_split("/[^0-9]+/", $sms['text']);
+
+            foreach($numbers as $choice)
+            {
+                if(strlen($choice) == 0 || strlen($choice) > $vgSmsChoiceLen)
+                    continue;
+
+                //process SMS
+                while(strlen($choice) < $vgSmsChoiceLen)
+                    $choice = '0' . $choice;
+                try
+                {
+                    vfVoteFromDaemon($choice, $userID);
+                }
+                catch(Exception $e)
+                {
+                    //We do not care about these Exceptions.
+                    //Since this is error of a voter.
+                    if($vgDaemonDebug)
+                        echo "Exception: ".$e->getMessage()."\n";
+                }
+            }
         }
         if($vgDaemonDebug)
-            echo "Found $userID\n";
-        $numbers = preg_split("/[^0-9]+/", $sms['text']);
-
-        foreach($numbers as $choice)
-        {
-            if(strlen($choice) == 0 || strlen($choice) > $vgSmsChoiceLen)continue;
-
-            //process SMS
-            while(strlen($choice) < $vgSmsChoiceLen)
-                $choice = '0' . $choice;
-            try
-            {
-                vfVoteFromDaemon($choice, $userID);
-            }
-            catch(Exception $e)
-            {
-                //We do not care about these Exceptions.
-                //Since this is error of a voter.
-                if($vgDaemonDebug)
-                    echo "Exception: ".$e->getMessage()."\n";
-            }
-        }
+            echo "Sms is processed\n";
         Sms::processed($sms['id']);
     }
 }
+
 /**
  * Find if such choice exists and vote for it.
  *
@@ -129,6 +172,8 @@ if($args[1] == 'daemon')
     /* Run as a daemon */
     while(1)
     {
+        if($vgDaemonDebug)
+            echo ".";
         $tel = new Telephone();
         try
         {
