@@ -44,6 +44,7 @@ class Crowd extends SpecialPage
         global $wgOut, $wgRequest;
         if(vfUser()->isAnon())
         {
+            global $wgTitle;
             $wgOut->showErrorPage( 'crowdnologin', 'crowdnologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
@@ -138,8 +139,22 @@ class Crowd extends SpecialPage
             $user = $userdao->findByID($member->userID);
             $mwuser = User::newFromName($user->username);
 
-            $out .= "| [[User:{$user->username}|{$user->username}]] || {$mwuser->getRealName()} || ";
-            $out .= vfColorizeEmail($mwuser->getEmail(), true) . " || ";
+            if($mwuser->getId() != 0)
+            {
+                $realname = $mwuser->getRealName();
+                $email = $mwuser->getEmail();
+            }
+            else
+            {
+                $realname = '';
+                $email = '';
+            }
+            $out .= "| [[User:{$user->username}|{$user->username}]] || {$realname} || ";
+            if( User::isValidEmailAddr($email) && $mwuser->getEmailAuthenticationTimestamp() )
+            {
+                $out .= vfColorizeEmail($email, true);
+            }
+            $out .= " || ";
             $phdao = new UserphonesDAO($user);
             $phonelist = $phdao->getList();
             foreach($phonelist as $phone)
@@ -254,9 +269,9 @@ class Crowd extends SpecialPage
         $logs =& $this->crowddao->getLogs($this->crowd->crowdID);
         foreach ($logs as &$log)
         {
-            /* @var $log CrowdLogVO */
+            $text = str_replace('!!', ' ', $log->log);
             $out .= "|-\n";
-            $out .= "| {$log->log} || {$log->date_added}\n";
+            $out .= "| {$text} || {$log->date_added}\n";
         }
         $out .= '|}';
         $wgOut->addWikiText($out);
@@ -269,9 +284,9 @@ class Crowd extends SpecialPage
         $logs =& $this->crowddao->getLogs($this->crowd->crowdID, true);
         foreach ($logs as &$log)
         {
-            /* @var $log CrowdLogVO */
+            $text = str_replace('!!', '<br>', $log->log);
             $out .= "|-\n";
-            $out .= "| {$log->log}\n";
+            $out .= "| {$text}\n";
             $out .= "|-\n";
             $out .= "| <hr>\n";
         }

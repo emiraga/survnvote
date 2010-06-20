@@ -26,7 +26,7 @@ $messages['en'] = array(
     'phonesnologin' => 'Not logged in',
     'phonesnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to manage your phones.',
     'crowdnologin' => 'Not logged in',
-    'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access Crowd.',
+    'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access crowd.',
 
     'create-crowd' => 'Create new crowd',
     'add-to-crowd' => 'Add to crowd',

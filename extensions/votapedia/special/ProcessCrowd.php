@@ -82,7 +82,7 @@ class ProcessCrowd extends SpecialPage
                     $cr->ownerID = vfUser()->userID();
                     $cr->no_members = 1;
                     $dao->insert($cr);
-                    var_dump($cr->crowdID);
+                    
                     $dao->addUserToCrowd($cr->crowdID, vfUser()->userID(), true, false);
 
                     $title = Skin::makeSpecialUrlSubpage('Crowd', $name);
@@ -116,7 +116,7 @@ class ProcessCrowd extends SpecialPage
             if($user == false)
             {
                 $mwuser = User::newFromName($name);
-                var_dump($mwuser);
+                
                 $mwid = $mwuser->idForName();
                 if($mwid == 0)
                 {
@@ -143,6 +143,8 @@ class ProcessCrowd extends SpecialPage
         foreach ($emails as $email)
         {
             $email = trim($email);
+            if(strlen($email) < 5)
+                continue;
             if(!User::isValidEmailAddr($email))
             {
                 $crdao->addLog($crowd->crowdID, 'Email "'.$email.'" is not valid.');
@@ -186,8 +188,8 @@ END_MAIL
                 else
                 {
                     //don't send email, store it to log.
-                    $crdao->addLog($crowd->crowdID, "Email: $email<br>"
-                            ."Username: {$user->username}<br>Password: {$user->password}", true);
+                    $crdao->addLog($crowd->crowdID, "Email: $email!!"
+                            ."Username: {$user->username}!!Password: {$user->password}", true);
                 }
             }
             $crdao->addUserToCrowd($crowd->crowdID, $user->userID, false, false);
@@ -212,8 +214,8 @@ END_MAIL
             if($userID == false)
             {
                 $user = $userdao->newFromPhone($phone);
-                $crdao->addLog($crowd->crowdID, "Phone number: $phone<br>"
-                        ."Username: {$user->username}<br>Password: {$user->password}", true);
+                $crdao->addLog($crowd->crowdID, "Phone number: $phone!!"
+                        ."Username: {$user->username}!!Password: {$user->password}", true);
                 $userID = $user->userID;
             }
             $crdao->addUserToCrowd($crowd->crowdID, $userID, false, true);

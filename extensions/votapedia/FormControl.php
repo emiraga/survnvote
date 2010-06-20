@@ -118,8 +118,6 @@ class FormControl
             {
                 if($this->items[$id]['type'] == 'checkbox')
                 {
-                    #var_dump($this->items[$id]);
-                    #die('');
                     $this->setValue( $id , false );
                 }
             }

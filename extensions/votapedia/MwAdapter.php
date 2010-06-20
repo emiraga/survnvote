@@ -84,9 +84,20 @@ class MwAdapter
     function findByEmail($email)
     {
         $dbr = wfGetDB( DB_SLAVE );
-        $res = $dbr->select( 'user', 'user_name', array( 'user_email' => $email ), __METHOD__ );
-        $row = $res->current();
-        return $row === false ? false : $row->user_name;
+        $res = $dbr->select( 'user', '*', array( 'user_email' => $email ), __METHOD__ );
+        if($res == false)
+            return false;
+        $userArray = new UserArrayFromResult( $res );
+        foreach ($userArray as $user)
+        {
+            /* @var $user User */
+            if($user->getEmailAuthenticationTimestamp())
+            {
+                return $user->getName();
+            }
+        }
+        return false;
+        #return $row === false ? false : $row->user_name;
     }
     function filePath( $name )
     {

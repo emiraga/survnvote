@@ -21,7 +21,7 @@ define('vPHONE_NEW', 0);
 define('vPHONE_SENT_CODE', 1);
 define('vPHONE_DELETED', 2);
 define('vPHONE_VERIFIED', 10);
-define('vPHONE_UNKNOWN', 11); //phone owner did not confirm (verify) his phone
+define('vPHONE_UNKNOWN', 11);
 
 /**
  * Return a current datetime formated in particular way.

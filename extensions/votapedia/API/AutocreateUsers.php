@@ -109,6 +109,11 @@ class vpAutocreateUsers extends ApiBase
         $wgAuth->initUser( $u, false );
 
         $u->setOption('rememberpassword', 0);
+
+        if( User::isValidEmailAddr($email) )
+        {
+            $u->setEmailAuthenticationTimestamp(time());
+        }
         $u->saveSettings();
 
         # Update user count
