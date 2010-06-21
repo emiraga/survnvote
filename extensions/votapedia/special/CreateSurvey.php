@@ -670,9 +670,14 @@ class CreateSurvey
      */
     function execute( $par = null )
     {
+        global $wgTitle, $wgOut, $vgAnonSurveyCreation;
         $this->initialize();
 
-        global $wgTitle, $wgOut, $vgAnonSurveyCreation;
+        if ( wfReadOnly() ) {
+            $wgOut->readOnlyPage();
+            return;
+        }
+
         $wgOut->setArticleBodyOnly(false);
 
         if ( ! vfUser()->canCreateSurveys() )

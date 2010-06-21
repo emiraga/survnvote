@@ -37,6 +37,12 @@ class ProcessSurvey extends SpecialPage
     {
         /* @var $wgRequest WebRequest */
         global $wgTitle, $wgOut, $wgRequest;
+        
+        if ( wfReadOnly() ) {
+            $wgOut->readOnlyPage();
+            return;
+        }
+
         $wgOut->setArticleFlag(false);
         $page_id = intval(trim($wgRequest->getVal('id')));
         $action = $wgRequest->getVal( 'wpSubmit' );

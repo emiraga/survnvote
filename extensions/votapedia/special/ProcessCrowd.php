@@ -44,6 +44,11 @@ class ProcessCrowd extends SpecialPage
             $wgOut->showErrorPage( 'crowdnologin', 'crowdnologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
+        
+        if ( wfReadOnly() ) {
+            $wgOut->readOnlyPage();
+            return;
+        }
 
         if ( ! vfUser()->checkEditToken() )
             die('Edit token is wrong, please try again.');
