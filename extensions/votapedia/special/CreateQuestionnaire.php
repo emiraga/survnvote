@@ -54,6 +54,20 @@ class CreateQuestionnaire extends CreateSurvey
     {
         parent::__construct();
         global $vgScript;
+        $this->spPageName = 'Special:CreateQuestionnaire';
+        $this->tagname = vtagQUESTIONNAIRE;
+
+        $this->isQuiz = false;
+        $this->prev_questions = '';
+        $this->prev_num_q = 0;
+        $this->prev_num_ch = '';
+    }
+    /**
+     * Set default values for $this->formitems
+     */
+    public function setFormItems()
+    {
+        parent::setFormItems();
         $this->formitems['titleorquestion']['name'] = 'Title';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire.';
         $this->formitems['choices']['type'] = 'html';
@@ -67,13 +81,6 @@ class CreateQuestionnaire extends CreateSurvey
                 };
         $this->formitems['choices']['textafter'] = '';
         $this->formitems['choices']['textbefore'] = '';
-        $this->spPageName = 'Special:CreateQuestionnaire';
-        $this->tagname = vtagQUESTIONNAIRE;
-
-        $this->isQuiz = false;
-        $this->prev_questions = '';
-        $this->prev_num_q = 0;
-        $this->prev_num_ch = '';
     }
     /**
      * Generate templates which will be used by PHP and Javascript

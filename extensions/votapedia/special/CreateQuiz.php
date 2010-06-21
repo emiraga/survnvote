@@ -46,6 +46,15 @@ class CreateQuiz extends CreateQuestionnaire
     {
         parent::__construct();
         $this->spPageName = 'Special:CreateQuiz';
+        $this->isQuiz = true;
+        $this->tagname = vtagQUIZ;
+    }
+    /**
+     * Set default values for $this->formitems
+     */
+    public function setFormItems()
+    {
+        parent::setFormItems();
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Quiz.';
         $this->formitems['showresultsend']['default'] = true;
 
@@ -63,8 +72,6 @@ class CreateQuiz extends CreateQuestionnaire
                         'learn_more' => 'Details of Quiz Marking',
                 );
         $this->formpages[0]['items'][] = 'subtractwrong';
-        $this->isQuiz = true;
-        $this->tagname = vtagQUIZ;
     }
     /**
      * Generate array of SurveyVO based on the values provided.
