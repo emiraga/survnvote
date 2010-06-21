@@ -6,7 +6,7 @@ if (!defined('MEDIAWIKI')) die('Cannot access this file.');
  */
 
 /** Configure votapedia */
-require_once("config.php");
+require_once(dirname(__FILE__).'/config.php');
 
 //International Texts and Aliases
 $wgExtensionMessagesFiles['Votapedia'] = "$vgPath/votapedia.i18n.php";

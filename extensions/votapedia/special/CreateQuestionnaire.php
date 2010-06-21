@@ -382,6 +382,8 @@ END_SCRIPT;
      */
     function execute($par = null)
     {
+        $this->initialize();
+        
         global $wgOut;
         $this->form->setOnFormSubmit('$(".btnAddChoice").click(); return true;');
         $this->generateTemplates();

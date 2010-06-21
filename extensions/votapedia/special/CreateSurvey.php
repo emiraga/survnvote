@@ -126,9 +126,9 @@ class CreateSurvey
                         'learn_more' => 'Details of Survey Privacy',
                         'icon' => $vgScript.'/icons/lock.png',
                         'html' => '<script>plow=document.getElementById("privacy-low"); plow.onchange = '
-                           .'function(){cid=document.getElementById("crowdID");cid.value=\'0\';cid.disabled=true};'
-                           .'phigh=document.getElementById("privacy-high");phigh.onchange = '
-                           .'function() { cid=document.getElementById("crowdID");cid.disabled=false; }</script>',
+                                .'function(){cid=document.getElementById("crowdID");cid.value=\'0\';cid.disabled=true};'
+                                .'phigh=document.getElementById("privacy-high");phigh.onchange = '
+                                .'function() { cid=document.getElementById("crowdID");cid.disabled=false; }</script>',
                 ),
                 'crowdID' => array(
                         'type' => 'select',
@@ -658,6 +658,8 @@ class CreateSurvey
     }
     function initialize()
     {
+        if(isset($this->form))
+            return;
         $this->setFormItems();
         $this->form = new FormControl($this->formitems);
     }

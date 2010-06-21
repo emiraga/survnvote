@@ -199,6 +199,8 @@ class CreateQuiz extends CreateQuestionnaire
      */
     function execute($par = null)
     {
+        $this->initialize();
+        
         parent::execute($par);
     }
     /**
