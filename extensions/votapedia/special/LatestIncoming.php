@@ -35,27 +35,50 @@ class LatestIncoming extends SpecialPage
      */
     function execute( $par = null )
     {
-        global $wgUser, $vgEnableSMS, $wgOut, $wgRequest;
-        #$admin = vfUser()->isAdmin();
-        
+        global $wgOut, $wgRequest;
         $wgOut->setPageTitle( wfMsg('latestincoming') );
-        $wgOut->addHTML('<table style="width: 100%;" class="wikitable">');
-        $wgOut->addHTML('<caption>'.wfMsg('latestincoming').'</caption>');
-        $wgOut->addHTML('<tr><th>Type<th>From<th></tr>');
-        
+        if($par == 'long')
+        {
+            $wgOut->addHTML($this->getContents(1));
+        }
+        else
+        {
+            $cache =& wfGetMainCache();
+            $contents =& $cache->get('vp:latestincoming');
+            if(! $contents) $cache->set('vp:latestincoming', $contents =& $this->getContents(0), 1);
+            $wgOut->addHTML($contents);
+        }
+    }
+    private function &getContents($long)
+    {
+        global $vgEnableSMS;
+        if($long)
+        {
+            $isadmin = vfUser()->isAdmin();
+        }
+        $out = '';
+        $out .= '<table style="width: 100%; margin: 0;" class="wikitable">';
+        # $wgOut->addHTML('<caption>'.wfMsg('latestincoming').'</caption>');
+        $out .= '<tr><th>Type<th>From<th></tr>';
+
         if($vgEnableSMS)
         {
-            $in = Sms::getIncoming(5);
+            $in = Sms::getIncoming($long?30:5);
             foreach($in as $sms)
             {
-                $wgOut->addHTML('<tr><td>SMS<td>'.
+                $out .= '<tr><td>SMS<td>'.
                         vfColorizePhone($sms['number'],false,true)
                         .'<td>'
-                        .vfPrettyDate($sms['date'])
-                        .'</tr>');
+                        .vfPrettyDate($sms['date']);
+                if($long && $isadmin)
+                {
+                    $out .= '<td>'.htmlspecialchars( $sms['text'] );
+                }
+                $out .= '</tr>';
             }
         }
-        $wgOut->addHTML('</table>');
+        $out .= '</table>';
+        return $out;
     }
 }
 

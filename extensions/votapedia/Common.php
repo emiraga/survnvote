@@ -151,7 +151,7 @@ function vfColorizePhone($phone, $colorsms=false, $obscure = false)
 {
     global $vgSmsChoiceLen, $vgEnableSMS, $vgCountryCode;
 
-    if($obscure)
+    if($obscure && strlen($phone) > 5)
         $phone = substr($phone, 0, -3) . "<font color=gray>XXX</font>";
 
     $prefix = '+'.$vgCountryCode;

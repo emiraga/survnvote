@@ -204,8 +204,8 @@ class Sms
         $result = array();
         foreach($rec as $message)
         {
-            if(in_array($message['SenderNumber'], Sms::$blackList) )
-                continue;
+            #if(in_array($message['SenderNumber'], Sms::$blackList) )
+            #    continue;
 
             $result[] = array(
                     'number' => $message['SenderNumber'],

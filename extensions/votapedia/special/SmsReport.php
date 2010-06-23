@@ -104,7 +104,9 @@ class SmsReport extends SpecialPage
             $out .= "|-\n";
             $out .= "| $statcolor $status || $number || ".vfPrettyDate( $sms['date'] );
             if($admin)
-                $out.="|| " . substr( $sms['text'], 0, 60 );
+            {
+                $out.="|| " . htmlspecialchars( substr( $sms['text'], 0, 60 ) );
+            }
             $out.="\n";
         }
         $out .= '|}';
@@ -125,6 +127,7 @@ class SmsReport extends SpecialPage
         if($admin && count($bal)>1)
         {
             $values = new GraphXYdate('');
+            //@todo reduce size of output
             foreach($bal as $sms)
             {
                 $balance = preg_replace("/RM/", '', $sms['balance']);
