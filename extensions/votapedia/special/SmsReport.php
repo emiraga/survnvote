@@ -88,10 +88,7 @@ class SmsReport extends SpecialPage
         $report = Sms::getReport(10);
         foreach($report as $sms)
         {
-            $number = $sms['number'];
-            if(!$admin)
-                $number = substr($number, 0, strlen($number) - 3) . "<font color=gray>XXX</font>";
-            $number = vfColorizePhone($number);
+            $number = vfColorizePhone($sms['number'], false, !$admin);
             if( strstr($sms['status'], 'Error') )
                 $statcolor = "style=\"background: #FFA0A0\" | ";
             elseif( strstr($sms['status'], 'OK') )

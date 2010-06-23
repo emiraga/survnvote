@@ -45,7 +45,7 @@ class LatestIncoming extends SpecialPage
         {
             $cache =& wfGetMainCache();
             $contents =& $cache->get('vp:latestincoming');
-            if(! $contents) $cache->set('vp:latestincoming', $contents =& $this->getContents(0), 1);
+            if(! $contents) $cache->set('vp:latestincoming', $contents =& $this->getContents(0), 10);
             $wgOut->addHTML($contents);
         }
     }
@@ -67,7 +67,7 @@ class LatestIncoming extends SpecialPage
             foreach($in as $sms)
             {
                 $out .= '<tr><td>SMS<td>'.
-                        vfColorizePhone($sms['number'],false,true)
+                        vfColorizePhone($sms['number'], false, !$long || !$isadmin)
                         .'<td>'
                         .vfPrettyDate($sms['date']);
                 if($long && $isadmin)
