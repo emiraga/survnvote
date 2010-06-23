@@ -14,5 +14,6 @@ $aliases['en'] = array(
         'SmsReport' => array( 'SmsReport' ),
         'Crowd' => array( 'Crowd' ),
         'ProcessCrowd' => array( 'ProcessCrowd' ),
+        'LatestIncoming' => array( 'LatestIncoming' ),
 );
 

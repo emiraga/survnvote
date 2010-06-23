@@ -13,8 +13,6 @@ if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
  * If you have another source of SMS, please modify this script accordingly
  * to adjust votapedia to your system.
  *
- * This class is being called by the Daemon.php.
- *
  * @package SmsIntegration
  */
 class Sms
@@ -36,7 +34,13 @@ class Sms
 
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */
-    static public $blackList = array('2888', '28882', 'CELCOM', '22990', '23131','29292','ChannelC', '63008');
+    static private $blackList = array('2888', '28882', 'CELCOM', '22990',
+        '23131', '29292', 'ChannelC', '63008', 'Channel X'); //In Malaysia I receive a lot of spam.
+
+    /* Number to send a message when requesting a balance report */
+    static private $balanceNumber = '2888';
+    /* Text message to send when requesting a balance report */
+    static private $balanceMessage = 'BAL';
 
     /**
      * function getNewSms()
@@ -64,7 +68,7 @@ class Sms
         {
             if(in_array($sms['SenderNumber'], Sms::$blackList))
             {
-                Sms::processed($sms['ID']);
+                Sms::delete($sms['ID']);
                 continue;
             }
             
@@ -92,6 +96,19 @@ class Sms
         $smsdDBname = Sms::$smsdDBname;
         
         $vgDB->Execute("UPDATE $smsdDBname.inbox SET Processed = 'true' WHERE ID = ?", array($id));
+    }
+    /**
+     * Delete a record from sms incoming database.
+     * Private called by a getNewSms() to remove items from Sms::$blackList
+     * 
+     * @param Integer $id
+     */
+    private static function delete($id)
+    {
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+
+        $vgDB->Execute("DELETE FROM $smsdDBname.inbox WHERE ID = ?", array($id));
     }
     /**
      * function sendSMS($destination, $message)
@@ -141,26 +158,59 @@ class Sms
         return $result;
     }
     /**
-     *
+     * Report about latest outgoing SMS messages.
+     * 
+     * @param $limit how many results
      * @return Array a list of previous messages and their status
      */
-    static function getReport()
+    static function getReport($limit = 0)
     {
         global $vgDB;
         $smsdDBname = Sms::$smsdDBname;
-        
-        $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded "
-                ."FROM $smsdDBname.sentitems ORDER BY InsertIntoDB");
+        $sql = "SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded "
+                ."FROM $smsdDBname.sentitems ORDER BY InsertIntoDB DESC";
+        if($limit)
+            $sql .= " LIMIT ".intval($limit);
+
+        $rec = $vgDB->GetAll($sql);
         $result = array();
         foreach($rec as $message)
         {
-            if(in_array($message['DestinationNumber'], Sms::$blackList))
-                continue;
-            
             $result[] = array(
                     'number' => $message['DestinationNumber'],
                     'date' => $message['InsertIntoDB'],
                     'status' => $message['Status'],
+                    'text' => $message['TextDecoded'],
+            );
+        }
+        return $result;
+    }
+    /**
+     * Get latest incoming SMS messages.
+     * 
+     * @param $limit how many results
+     * @return Array a list of incoming messages
+     */
+    static function getIncoming($limit = 0)
+    {
+        global $vgDB;
+        $smsdDBname = Sms::$smsdDBname;
+        $sql = "SELECT SenderNumber, ReceivingDateTime, TextDecoded "
+                ."FROM $smsdDBname.inbox ORDER BY ReceivingDateTime DESC";
+        if($limit)
+            $sql .= " LIMIT ".intval($limit);
+
+        $rec = $vgDB->GetAll($sql);
+        $result = array();
+        foreach($rec as $message)
+        {
+            if(in_array($message['SenderNumber'], Sms::$blackList) )
+                continue;
+
+            $result[] = array(
+                    'number' => $message['SenderNumber'],
+                    'date' => $message['ReceivingDateTime'],
+                    'status' => 'Received',
                     'text' => $message['TextDecoded'],
             );
         }
@@ -175,7 +225,7 @@ class Sms
      */
     static function requestCheckBalance()
     {
-        Sms::sendSMS('2888', 'BAL');
+        Sms::sendSMS(Sms::$balanceNumber, Sms::$balanceMessage);
     }
     /**
      * function getLatestBalance()
@@ -189,8 +239,10 @@ class Sms
         
         $text = $vgDB->GetOne("SELECT TextDecoded FROM $smsdDBname.inbox "
                 ."WHERE SenderNumber = ? ORDER BY ID DESC",
-                array('2888'));
-        preg_match('@RM([^,]+)@i', $text, $matches);
+                array(Sms::$balanceNumber));
+
+        //Change this to match format of your balance reports
+        preg_match('@RM([^,]+)@i', $text, $matches); //Malaysian ringgits
         return $matches[0];
     }
     /**
@@ -198,19 +250,24 @@ class Sms
      *
      * @return Array
      */
-    static function getBalanceReports()
+    static function getBalanceReports($limit = 0)
     {
         global $vgDB;
         $smsdDBname = Sms::$smsdDBname;
+        $sql = "SELECT TextDecoded, ReceivingDateTime FROM $smsdDBname.inbox "
+                ."WHERE SenderNumber = ? ORDER BY ID DESC";
+        if($limit)
+            $sql .= " LIMIT ".intval($limit);
         
-        $bal = $vgDB->GetAll("SELECT TextDecoded, ReceivingDateTime FROM $smsdDBname.inbox "
-                ."WHERE SenderNumber = ? ORDER BY ID DESC",
-                array('2888'));
+        $bal = $vgDB->GetAll($sql, array(Sms::$balanceNumber));
         $result = array();
         foreach($bal as $sms)
         {
             $text = $sms['TextDecoded'];
-            preg_match('@RM([^,]+)@i', $text, $matches);
+
+            //Change this to match format of your balance reports
+            preg_match('@RM([^,]+)@i', $text, $matches);//Malaysian ringgits
+            
             $result[] = array(
                 'text' => $text,
                 'date' => $sms['ReceivingDateTime'],
@@ -220,3 +277,4 @@ class Sms
         return $result;
     }
 }
+

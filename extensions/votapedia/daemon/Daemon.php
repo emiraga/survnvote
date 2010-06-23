@@ -186,7 +186,7 @@ function vfVoteFromDaemon($choice, UserVO &$user)
 $args = $_SERVER['argv'];
 if(!isset($args[1]))
 {
-    die("\nUsage: php $args[0] daemon [debug] | fakevote [votes]+ | checkbalance | reportbalance\n");
+    die("\nUsage: php $args[0] daemon [debug] | fakevote [votes]+ | checkbalance | reportbalance | masstest | incoming\n");
 }
 
 if($args[1] == 'daemon')
@@ -255,7 +255,6 @@ elseif($args[1] == 'checkbalance')
 }
 elseif($args[1] == 'reportbalance')
 {
-    Sms::getReport();
     echo (Sms::getLatestBalance())."\n";
     echo "Reporting done.\n";
 }
@@ -270,5 +269,9 @@ elseif($args[1] == 'masstest')
         (userID,pageID,surveyID,presentationID,voteType,choiceID,voteDate)
             VALUES('FAKE',4,5,2,'FAKE',$choice,'$now')");
     }
+}
+elseif($args[1] == 'incoming')
+{
+    var_dump(Sms::getIncoming(5));
 }
 

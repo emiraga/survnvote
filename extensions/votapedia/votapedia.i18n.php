@@ -17,7 +17,8 @@ $messages['en'] = array(
     'myphones' => 'My Phones',
     'smsreport' => 'Sms Report',
     'crowd' => 'Crowd',
-    'crowdprocess' => 'Process Crowd',
+    'processcrowd' => 'Process Crowd',
+    'latestincoming' => 'Latest Incoming SMS and calls',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',

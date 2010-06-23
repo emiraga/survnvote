@@ -47,6 +47,10 @@ $wgSpecialPages['MyPhones'] = 'MyPhones';
 $wgAutoloadClasses['SmsReport'] = "$vgPath/special/SmsReport.php";
 $wgSpecialPages['SmsReport'] = 'SmsReport';
 
+//Special page SmsReport
+$wgAutoloadClasses['LatestIncoming'] = "$vgPath/special/LatestIncoming.php";
+$wgSpecialPages['LatestIncoming'] = 'LatestIncoming';
+
 //Special page Crowd
 $wgAutoloadClasses['Crowd'] = "$vgPath/special/Crowd.php";
 $wgSpecialPages['Crowd'] = 'Crowd';

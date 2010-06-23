@@ -44,7 +44,7 @@ class SmsReport extends SpecialPage
             $wgOut->showErrorPage('smsnot', 'smsnot-desc');
             return;
         }
-        $wgOut->setPageTitle("SMS Report");
+        $wgOut->setPageTitle("SMS Delivery Report");
         $out = '';
         if($admin)
         {
@@ -78,12 +78,14 @@ class SmsReport extends SpecialPage
             $number = $sms['number'];
             $number = vfColorizePhone($number, false, !$admin);
             $out .= "|-\n";
-            $out .= "| Pending || $number || $sms[date]";
+            $out .= "| Pending || $number || ". vfPrettyDate( $sms['date'] );
             if($admin)
-                $out.="|| $sms[text]";
+            {
+                $out.="|| ". substr( $sms['text'], 0, 60 );
+            }
             $out.="\n";
         }
-        $report = Sms::getReport();
+        $report = Sms::getReport(10);
         foreach($report as $sms)
         {
             $number = $sms['number'];
@@ -100,9 +102,9 @@ class SmsReport extends SpecialPage
             $status = preg_replace("/OK/", 'OK, ', $status);
 
             $out .= "|-\n";
-            $out .= "| $statcolor $status || $number || $sms[date]";
+            $out .= "| $statcolor $status || $number || ".vfPrettyDate( $sms['date'] );
             if($admin)
-                $out.="|| $sms[text]";
+                $out.="|| " . substr( $sms['text'], 0, 60 );
             $out.="\n";
         }
         $out .= '|}';

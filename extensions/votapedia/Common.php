@@ -25,7 +25,7 @@ define('vPHONE_UNKNOWN', 11);
 
 /**
  * Return a current datetime formated in particular way.
- * 
+ *
  * @return String
  */
 function vfDate($date = NULL)
@@ -58,7 +58,8 @@ function vfGetPageTitle($mytitle)
  */
 function vfErrorBox($message)
 {
-    return '<div class="errorbox" style="margin-bottom: 0.5em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
+    return '<div class="errorbox" style="margin-bottom: 0.5em;"><strong>'
+    .$message.'</strong></div><div class="visualClear"></div>';
 }
 /**
  * Return a message in error box, will show as red in HTML
@@ -68,7 +69,8 @@ function vfErrorBox($message)
  */
 function vfSuccessBox($message)
 {
-    return '<div class="successbox" style="margin-bottom: 0em;"><strong>'.$message.'</strong></div><div class="visualClear"></div>';
+    return '<div class="successbox" style="margin-bottom: 0em;"><strong>'
+    .$message.'</strong></div><div class="visualClear"></div>';
 }
 /**
  * Custom Exception class for surveys
@@ -83,12 +85,12 @@ class SurveyException extends Exception
  */
 global $vgColors;
 $vgColors = array('808080', 'FF6766', '669934', '669ACC', 'FFCC66', '986699', '008001',
-    'FF6833', '882295', '006599', 'CD9933', '006766', '99CCCD', 'CC00CC', 'BBBB9B',
-    'CD3301', '676767', '807FFE', '804000', 'FE80FE', '00FF41', 'FFFF00', 'FE0000',
-    '808042', '247D9F', 'FE8081', '807FFE', 'FF8041', '427F80', 'C0C0C0', '7F00FF',
-    'FF00FE', '800000', '7FFFFE', 'E3A39A', '804000', 'FFFF00', '800000', '007FFF',
-    '7F00FF', 'FE0000', '81FF81', '47064A', 'B8D2D3', 'DBC1B0', '008001', 'FE8DA1',
-    '47064A', '804000', 'FF0080');
+        'FF6833', '882295', '006599', 'CD9933', '006766', '99CCCD', 'CC00CC', 'BBBB9B',
+        'CD3301', '676767', '807FFE', '804000', 'FE80FE', '00FF41', 'FFFF00', 'FE0000',
+        '808042', '247D9F', 'FE8081', '807FFE', 'FF8041', '427F80', 'C0C0C0', '7F00FF',
+        'FF00FE', '800000', '7FFFFE', 'E3A39A', '804000', 'FFFF00', '800000', '007FFF',
+        '7F00FF', 'FE0000', '81FF81', '47064A', 'B8D2D3', 'DBC1B0', '008001', 'FE8DA1',
+        '47064A', '804000', 'FF0080');
 /**
  * Rotates color images for a choice.
  *
@@ -122,12 +124,12 @@ function &vfUser()
 }
 /**
  * Convert wiki text to regular text.
- * 
+ *
  *  1. Strip tags
  *  2. Replace '''bold text''' -> bold text
  *  3. Replace ''italic'' -> Italic
  *  4. Remove duplicate whitespace
- * 
+ *
  * @param String $wiki wiki text
  * @return String regular text
  */
@@ -201,6 +203,60 @@ function vfConnectDatabase()
     if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
         throw new SurveyException("Could not connect to database", 400);
     return $cn;
+}
+/**
+ * Compare date with current datetime and give description.
+ * 
+ * @param String $date
+ * @return String
+ */
+function vfPrettyDate($date)
+{
+    $diff = time() - strtotime($date);
+    $dayDiff = floor($diff / 86400);
+
+    if(is_nan($dayDiff) || $dayDiff < 0)
+        return '';
+    
+    if($dayDiff == 0)
+    {
+        if($diff < 60)
+        {
+            return 'Just now';
+        } elseif($diff < 120)
+        {
+            return '1 minute ago';
+        } elseif($diff < 3600)
+        {
+            return floor($diff/60) . ' minutes ago';
+        } elseif($diff < 7200)
+        {
+            return '1 hour ago';
+        } elseif($diff < 86400)
+        {
+            return floor($diff/3600) . ' hours ago';
+        }
+    } elseif($dayDiff == 1)
+    {
+        return 'Yesterday';
+    } elseif($dayDiff < 7)
+    {
+        return $dayDiff . ' days ago';
+    } elseif($dayDiff == 7)
+    {
+        return '1 week ago';
+    } elseif($dayDiff < (7*6))
+    { // Modifications Start Here
+        // 6 weeks at most
+        return ceil($dayDiff/7) . ' weeks ago';
+    } elseif($dayDiff < 365)
+    {
+        return ceil($dayDiff/(365/12)) . ' months ago';
+    } else
+    {
+        $years = round($dayDiff/365);
+        return $years . ' year' . ($years != 1 ? 's' : '') . ' ago';
+    }
 }
 /**
  * @var $vgDB global variable ADOdb connection
