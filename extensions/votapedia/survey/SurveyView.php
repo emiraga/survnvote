@@ -12,6 +12,7 @@ require_once("$vgPath/survey/SurveyBody.php");
 require_once("$vgPath/Graph/Graph.php");
 require_once("$vgPath/FormControl.php");
 require_once("$vgPath/DAO/PageDAO.php");
+require_once("$vgPath/UserPermissions.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey.
@@ -29,7 +30,7 @@ class SurveyView
     /** @var SurveyBody */    protected $body;
 
     /**
-     * Function called for the &lt;SurveyChoice&gt; tag
+     * Function called for the SurveyChoice tag
      *
      * @param String $input text between tags
      * @param Array $args tag arguments
@@ -108,10 +109,12 @@ class SurveyView
         $this->buttons->setWikiTitle($this->wikititle->getFullText());
         $this->buttons->setPageID($this->page_id);
         $this->buttons->setType($this->page->getTypeName());
+        
         if($pagestatus == 'ended' )
         {
             $this->buttons->setRenewButton(true);
             $this->buttons->setHasControl(true);
+            //since this page is cached, we have no choice but to include control buttons
         }
 
         //Configure body and buttons for different types
@@ -132,8 +135,9 @@ class SurveyView
         
         $this->body->setShowGraph(true);
         
-        //control?.
-        if( vfUser()->canControlSurvey($this->page) )
+        //has control?.
+        $this->userperm = new UserPermissions( vfUser()->getUserVO() );
+        if( $this->userperm->canControlSurvey($this->page) )
         {
             $this->buttons->setHasControl(true);
             $this->body->setHasControl(true);
@@ -198,16 +202,15 @@ class SurveyView
 
         //Should we enable web voting?
         $this->buttons->setPageStatus($pagestatus);
-        if($pagestatus == 'active'
-                && $this->page->getWebVoting() != 'no'
-                && ! vfUser()->isAuthor( $this->page ))
+        if($pagestatus == 'active' && $this->userperm->canVote($this->page, 'web'))
         {
-            //either user is not anonymous or it is allowed to vote anonymously
-            if( !vfUser()->isAnon() || $this->page->getWebVoting() == 'anon' )
-            {
-                $this->body->setShowVoting(true);
-                $this->buttons->setVoteButton(true);
-            }
+            $this->body->setShowVoting(true);
+            $this->buttons->setVoteButton(true);
+        }
+        else
+        {
+            $this->body->setShowVoting(false);
+            $this->buttons->setVoteButton(false);
         }
 
         $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
@@ -221,7 +224,7 @@ class SurveyView
         {
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
         }
-
+        
         $output .= $this->body->getHTML();
         $output .= '<br />';
         if($this->page->getCurrentPresentationID() == $presID)

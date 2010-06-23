@@ -10,6 +10,7 @@ require_once("$vgPath/Common.php" );
 require_once("$vgPath/FormControl.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
+require_once("$vgPath/UserPermissions.php");
 
 /**
  * @package MediaWikiInterface
@@ -487,12 +488,6 @@ class CreateSurvey
         $this->form->loadValuesFromRequest();
         $error = $this->Validate();
 
-        if( ! vfUser()->canCreateSurveys() )
-        {
-            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
-            return;
-        }
-
         if(! $error)
         {
             $error = $this->insertPage($this->form->getValuesArray());
@@ -529,12 +524,15 @@ class CreateSurvey
             $wgOut->returnToMain();
             return;
         }
-        if( ! vfUser()->canControlSurvey($page) )
+        $userperm = new UserPermissions( vfUser()->getUserVO() );
+
+        if( ! $userperm->canControlSurvey($page) )
         {
             global $wgTitle;
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
+        
         if(! $page->isEditable( $page->getCurrentPresentationID() ))
         {
             $surveyended = $page->getStatus( $page->getCurrentPresentationID() ) == 'ended';
@@ -586,11 +584,14 @@ class CreateSurvey
             $wgOut->returnToMain();
             return;
         }
-        if( ! vfUser()->canControlSurvey($this->page) )
+        $userperm = new UserPermissions( vfUser()->getUserVO() );
+        
+        if( ! $userperm->canControlSurvey($this->page) )
         {
             $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
             return;
         }
+        
         if(! $this->page->isEditable( $this->page->getCurrentPresentationID() ))
         {
             $surveyended = $this->page->getStatus( $this->page->getCurrentPresentationID() ) == 'ended';
@@ -646,11 +647,6 @@ class CreateSurvey
      */
     function processNewSurvey()
     {
-        if( ! vfUser()->canCreateSurveys() )
-        {
-            $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
-            return;
-        }
         //fresh new form
         $this->preDrawForm('');
         $this->drawFormNew();
@@ -680,7 +676,8 @@ class CreateSurvey
 
         $wgOut->setArticleBodyOnly(false);
 
-        if ( ! vfUser()->canCreateSurveys() )
+        $userperm = new UserPermissions( vfUser()->getUserVO() );
+        if ( ! $userperm->canCreateSurveys() )
         {
             $wgOut->showErrorPage( 'surveynologin', 'surveynologin-desc', array($wgTitle->getPrefixedDBkey()) );
             return;

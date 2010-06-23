@@ -27,6 +27,8 @@ require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
 require_once("$vgPath/API/AutocreateUsers.php");
+require_once("$vgPath/UserPermissions.php");
+
 $vgDaemonDebug = false;
 
 /**
@@ -34,6 +36,7 @@ $vgDaemonDebug = false;
  *
  * @param String $phone
  * @param Boolean $check_status is user check his/hers status
+ * @return UserVO
  */
 function vfDaemonGetUserSendSMS($phone, $check_status = false)
 {
@@ -45,25 +48,24 @@ function vfDaemonGetUserSendSMS($phone, $check_status = false)
     {
         //create user
         $user = $userdao->newFromPhone($phone);
-
+        
         Sms::sendSMS($phone, sprintf(Sms::$msgCreateUser, $user->username, $user->password));
 
-        $userID = $user->userID;
         if($vgDaemonDebug)
             echo "New userID=$userID from phone $phone\n";
     }
     else
     {
+        $user = $userdao->findByID($userID);
         if($check_status)
         {
-            $user = $userdao->findByID($userID);
-            if(strlen($user->password) > 1)
+            if(strlen($user->password) > 2)
                 Sms::sendSMS($phone, sprintf(Sms::$msgCreateUser, $user->username, $user->password));
             else
                 Sms::sendSMS($phone, sprintf(Sms::$msgCreateUserNoPass, $user->username));
         }
     }
-    return $userID;
+    return $user;
 }
 
 /**
@@ -88,9 +90,9 @@ function vfDaemonSmsAction()
         if( strncasecmp($sms['text'], Sms::$cmdCheck, strlen(Sms::$cmdCheck) ) == 0 )
         {
             //this user wants to check account status
-            $userID = vfDaemonGetUserSendSMS($sms['from'], true);
+            $user = vfDaemonGetUserSendSMS($sms['from'], true);
             if($vgDaemonDebug)
-                echo "Check account $userID\n";
+                echo "Check account {$user->userID}\n";
         }
         //is it a confirm command?
         elseif( strncasecmp($sms['text'], Sms::$cmdConfirm, strlen(Sms::$cmdConfirm) ) == 0 )
@@ -114,11 +116,11 @@ function vfDaemonSmsAction()
         else
         {
             //this user is voting
-            $userID = vfDaemonGetUserSendSMS( $sms['from'] );
-
+            $user = vfDaemonGetUserSendSMS( $sms['from'] );
+            
             if($vgDaemonDebug)
-                echo "Found $userID\n";
-
+                echo "Found {$user->userID}\n";
+            
             $numbers = preg_split("/[^0-9]+/", $sms['text']);
 
             foreach($numbers as $choice)
@@ -131,7 +133,7 @@ function vfDaemonSmsAction()
                     $choice = '0' . $choice;
                 try
                 {
-                    vfVoteFromDaemon($choice, $userID);
+                    vfVoteFromDaemon($choice, $user);
                 }
                 catch(Exception $e)
                 {
@@ -152,9 +154,9 @@ function vfDaemonSmsAction()
  * Find if such choice exists and vote for it.
  *
  * @param String $choice choice that user has coosen
- * @param String $userID ID of user
+ * @param UserVO $user
  */
-function vfVoteFromDaemon($choice, $userID)
+function vfVoteFromDaemon($choice, UserVO &$user)
 {
     global $vgDBPrefix, $vgDB;
     //load PageVO
@@ -167,10 +169,17 @@ function vfVoteFromDaemon($choice, $userID)
     $choiceid = $result->fields['choiceID'];
     $pageid = $result->fields['pageID'];
     $page =& $pagedao->findByPageID($pageid, false);
-    //Save vote
-    $votedao = new VoteDAO($page, $userID);
-    $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid, $page->getCurrentPresentationID() );
-    $votedao->vote($votevo);
+
+    $status = $page->getStatus($page->getCurrentPresentationID());
+
+    $userperm = new UserPermissions($user);
+    if($status == 'active' && $userperm->canVote($page, 'phone'))
+    {
+        //Save vote
+        $votedao = new VoteDAO($page, $user->userID);
+        $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid, $page->getCurrentPresentationID() );
+        $votedao->vote($votevo);
+    }
 }
 
 /* get command line parameters */
@@ -225,7 +234,12 @@ else if($args[1] == 'fakevote') /*used for testing*/
             $choice = '0' . $choice;
         try
         {
-            vfVoteFromDaemon($choice, $userID);
+            $user = new UserVO();
+            $user->userID = $userID;
+            $user->isAnon = false;
+            $user->username = $userID;
+            
+            vfVoteFromDaemon($choice, $user);
             echo "Fake vote: $choice\n";
         }
         catch(Exception $e)

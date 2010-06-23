@@ -199,10 +199,12 @@ class MwUser
             // Track anonymous users with cookies
             $randnum = rand(10, 2000000000);
             $needcookie = true;
+            $cookiename = 'vp_UserName';
+
             // Is there a previous cookie?
-            if(isset($_COOKIE['vcName']))
+            if(isset($_COOKIE[$cookiename]))
             {
-                $name = $_COOKIE['vcName'];
+                $name = $_COOKIE[$cookiename];
                 list($ip, $num)  = preg_split('/-/', $name);
                 if(intval($num) > 0 && $wgUser->getName() == $ip)
                 {
@@ -213,7 +215,7 @@ class MwUser
             $this->name = $wgUser->getName()."-".$randnum;
             // Need to set a cookie?
             if($needcookie)
-                setcookie('vcName', $this->name, time() + 60*60*24*365, '/'); // A year of validity
+                setcookie($cookiename, $this->name, time() + 60*60*24*3*30, '/'); // three month of validity
         }
         else
         {
@@ -308,23 +310,22 @@ class MwUser
         return $name;
     }
     /**
-     * Get user ID
+     * Get user ID from the votapedia database.
+     * @return Integer
      */
     function userID()
     {
-        if(isset($this->userID))
-            return $this->userID;
-
-        $user = $this->getUserVO();
-        return $this->userID = intval($user->userID);
+        return $this->getUserVO()->userID;
     }
     /**
      * @return UserVO
      */
     function getUserVO()
     {
-        $dao = new UserDAO();
+        if(isset($this->userVO))
+            return $this->userVO;
 
+        $dao = new UserDAO();
         $user = $dao->findByName( $this->getName() );
         if($user == false)
         {
@@ -332,10 +333,10 @@ class MwUser
             $user->username = $this->getName();
             $user->password = '';
             $user->isAnon = $this->isAnon();
-            $user->isAdmin = $this->isAdmin();
             $dao->insert($user);
         }
-        return $user;
+        $user->isAdmin = $this->isAdmin();
+        return $this->userVO = $user;
     }
 }
 

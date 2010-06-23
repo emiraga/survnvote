@@ -237,7 +237,7 @@ class MyPhones extends SpecialPage
             $this->display[] = 'empty';
             $this->display[] = $id;
 
-            if($phone['status'] != vPHONE_DELETED)
+            if($phone['status'] != vPHONE_DELETED && $phone['status'] != vPHONE_VERIFIED)
             {
 
                 $this->items[ $id ]['afterall'] = "<form style=\"text-align:center;\"action=\"{$this->target}\" method=\"POST\">"
@@ -245,10 +245,17 @@ class MyPhones extends SpecialPage
                         ."<input onclick=\"return confirm('Are you sure you want to delete this number?');\" title=\"Delete this number\" type=\"image\" src=\"$vgScript/icons/file_delete.png\" name=\"wpSubmit\" value=\"".wfMsg('delete-number')."\">"
                         .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
                         ." Delete</form>";
-            }else
+            }
+            
+            if($phone['status'] == vPHONE_DELETED)
             {
                 $this->items[ $id ]['name'] = '';
                 $this->items[ $id ]['aftername'] = "<strike>$phone[number]</strike>";
+            }
+            if($phone['status'] == vPHONE_VERIFIED)
+            {
+                $this->items[ $id ]['name'] = '';
+                $this->items[ $id ]['aftername'] = '&nbsp;&nbsp;&nbsp;';
             }
         }
     }

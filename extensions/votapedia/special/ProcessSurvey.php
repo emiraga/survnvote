@@ -9,6 +9,7 @@ global $vgPath;
 require_once("$vgPath/MwAdapter.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
+require_once("$vgPath/UserPermissions.php");
 
 /**
  * Special page Create Survey.
@@ -42,10 +43,12 @@ class ProcessSurvey extends SpecialPage
             $wgOut->readOnlyPage();
             return;
         }
-
+        
         $wgOut->setArticleFlag(false);
         $page_id = intval(trim($wgRequest->getVal('id')));
         $action = $wgRequest->getVal( 'wpSubmit' );
+        $userperm = new UserPermissions( vfUser()->getUserVO() );
+        
         try
         {
             $pagedao = new PageDAO();
@@ -57,7 +60,7 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
-                if( ! vfUser()->canControlSurvey($page) )
+                if( ! $userperm->canControlSurvey($page) )
                 {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
@@ -75,9 +78,7 @@ class ProcessSurvey extends SpecialPage
                         $tel->setupReceivers($page);
                         $pagedao->updateReceiversSMS($page);
                     }
-                    #echo 'starting';
                     $pagedao->startPageSurvey($page);
-                    #echo 'started';
                 }
                 catch(Exception $e)
                 {
@@ -95,15 +96,18 @@ class ProcessSurvey extends SpecialPage
                 || $action == wfMsg('renew-quiz')
               )
             {
-                if( ! vfUser()->canControlSurvey($page) )
+                //@todo edit token is auto-added, which is bad
+                if( ! $userperm->canControlSurvey($page) )
                 {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
                 }
+
                 if($page->getStatus( $page->getCurrentPresentationID() ) != 'ended')
                 {
                     throw new SurveyException('Survey is not finished and cannot be renewed.');
                 }
+                
                 if ( ! vfUser()->checkEditToken() )
                 {
                     //repeat same request with Edit Token included.
@@ -133,6 +137,8 @@ class ProcessSurvey extends SpecialPage
                     || $action == wfMsg('edit-quiz')
                 )
             {
+                //EditToken checking is not needed here, since we don't modify the datbase.
+                
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 if($page->getType() == vSIMPLE_SURVEY)
                     $title = Title::newFromText('Special:CreateSurvey');
@@ -157,13 +163,16 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
+                
                 $votedao = new VoteDAO($page, vfUser()->userID());
 
-                if($page->getWebVoting() == 'no')
-                        throw new Exception("Web voting is not allowed");
-                if($page->getWebVoting() == 'yes' && vfUser()->isAnon())
-                        throw new Exception("You must be logged in order to vote.");
-
+                if( ! $userperm->canVote($page, 'web') )
+                {
+                    global $wgTitle;
+                    $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
+                    return;
+                }
+                
                 $s = $wgRequest->getArray('surveylist', array());
                 foreach($s as $surveyid)
                 {
@@ -186,17 +195,12 @@ class ProcessSurvey extends SpecialPage
             {
                 if ( ! vfUser()->checkEditToken() )
                     die('Edit token is wrong, please try again.');
-                if( ! vfUser()->canControlSurvey($page) )
+                if( ! $userperm->canControlSurvey($page) )
                 {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
                 }
                 $pagedao->stopPageSurvey($page);
-                #$page = $pagedao->findByPageID($page->getPageID());
-                #var_dump($page);
-                
-                # $tel = new Telephone();
-                # $tel->releaseReceivers();
                 
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));
