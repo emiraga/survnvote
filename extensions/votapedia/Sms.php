@@ -17,9 +17,6 @@ if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
  */
 class Sms
 {
-    /* Configure the name of GAMMU-SMSD database followed by a dot */
-    static private $smsdPrefix = 'smsd.';
-
     /* Message used for sending confirmation code. */
     static public $msgConfim = 'Confirmation code is %s. Thank you for using www.votapedia.net.';
     /* Message used when user is using votapedia for the first time */
@@ -58,10 +55,9 @@ class Sms
      */
     static function getNewSms()
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
         
-        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM {$smsdPrefix}inbox "
+        $new = $vgDB->GetAll("SELECT ID, SenderNumber, TextDecoded FROM {$vgSmsPrefix}inbox "
                 ."WHERE Processed = 'false'");
         $list = array();
         foreach($new as $sms)
@@ -92,10 +88,9 @@ class Sms
      */
     static function processed($id)
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
         
-        $vgDB->Execute("UPDATE {$smsdPrefix}inbox SET Processed = 'true' WHERE ID = ?", array($id));
+        $vgDB->Execute("UPDATE {$vgSmsPrefix}inbox SET Processed = 'true' WHERE ID = ?", array($id));
     }
     /**
      * Delete a record from sms incoming database.
@@ -105,10 +100,9 @@ class Sms
      */
     private static function delete($id)
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
 
-        $vgDB->Execute("DELETE FROM {$smsdPrefix}inbox WHERE ID = ?", array($id));
+        $vgDB->Execute("DELETE FROM {$vgSmsPrefix}inbox WHERE ID = ?", array($id));
     }
     /**
      * function sendSMS($destination, $message)
@@ -120,6 +114,8 @@ class Sms
      */
     static function sendSMS($destination, $message)
     {
+        global $vgDB, $vgSmsPrefix;
+
         $text = '';
         for($i=0; $i<strlen($message); $i++)
             $text .= '00' . bin2hex($message[$i]);
@@ -127,10 +123,8 @@ class Sms
         $valid="255";
         $sender = 'Gammu 1.27.0';
         $phone = '';
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
         
-        $vgDB->Execute("INSERT INTO {$smsdPrefix}outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
+        $vgDB->Execute("INSERT INTO {$vgSmsPrefix}outbox(Text,DestinationNumber,TextDecoded,InsertIntoDB,"
                 ."RelativeValidity,SenderID,CreatorID) VALUES(?,?,?,NOW(),?,?,?)",
                 array($text,$destination,$message, $valid,'',$sender));
     }
@@ -141,10 +135,10 @@ class Sms
      */
     static function getPending()
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
+        
         $rec = $vgDB->GetAll("SELECT DestinationNumber, InsertIntoDB, TextDecoded "
-                ."FROM {$smsdPrefix}outbox ORDER BY InsertIntoDB");
+                ."FROM {$vgSmsPrefix}outbox ORDER BY InsertIntoDB");
         $result = array();
         foreach($rec as $message)
         {
@@ -165,10 +159,10 @@ class Sms
      */
     static function getReport($limit = 0)
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
+        
         $sql = "SELECT DestinationNumber, InsertIntoDB, Status, TextDecoded "
-                ."FROM {$smsdPrefix}sentitems ORDER BY InsertIntoDB DESC";
+                ."FROM {$vgSmsPrefix}sentitems ORDER BY InsertIntoDB DESC";
         if($limit)
             $sql .= " LIMIT ".intval($limit);
 
@@ -193,10 +187,10 @@ class Sms
      */
     static function getIncoming($limit = 0)
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
+        
         $sql = "SELECT SenderNumber, ReceivingDateTime, TextDecoded "
-                ."FROM {$smsdPrefix}inbox ORDER BY ReceivingDateTime DESC";
+                ."FROM {$vgSmsPrefix}inbox ORDER BY ReceivingDateTime DESC";
         if($limit)
             $sql .= " LIMIT ".intval($limit);
 
@@ -234,10 +228,9 @@ class Sms
      */
     static function getLatestBalance()
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
+        global $vgDB, $vgSmsPrefix;
         
-        $text = $vgDB->GetOne("SELECT TextDecoded FROM {$smsdPrefix}inbox "
+        $text = $vgDB->GetOne("SELECT TextDecoded FROM {$vgSmsPrefix}inbox "
                 ."WHERE SenderNumber = ? ORDER BY ID DESC",
                 array(Sms::$balanceNumber));
 
@@ -252,9 +245,9 @@ class Sms
      */
     static function getBalanceReports($limit = 0)
     {
-        global $vgDB;
-        $smsdPrefix = Sms::$smsdPrefix;
-        $sql = "SELECT TextDecoded, ReceivingDateTime FROM {$smsdPrefix}inbox "
+        global $vgDB, $vgSmsPrefix;
+        
+        $sql = "SELECT TextDecoded, ReceivingDateTime FROM {$vgSmsPrefix}inbox "
                 ."WHERE SenderNumber = ? ORDER BY ID DESC";
         if($limit)
             $sql .= " LIMIT ".intval($limit);

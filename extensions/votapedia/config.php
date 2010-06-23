@@ -27,13 +27,21 @@ $vgCountry = 'Malaysia';
 $vgCountryCode = '60';
 
 $vgEnableSMS = true;
+
 if($vgEnableSMS)
+{
+    /* Prefix for table names that hold sms messages.
+     * Configure the name of GAMMU-SMSD database followed by a dot
+     * or a prefix for tables that hold sms messages   */
+    $vgSmsPrefix       = 'smsd.';
+    #$vgSmsPrefix       = 'v_sms_';
 
-// How many last digits of phone number should be used for SMS choice
-$vgSmsChoiceLen = 2;  // Example:  vgSmsChoiceLen = 2  phone = +60102984598   sms = 98
+    // How many last digits of phone number should be used for SMS choice
+    $vgSmsChoiceLen = 2;  // Example:  vgSmsChoiceLen = 2  phone = +60102984598   sms = 98
 
- // This is the number that receives SMS messages from voters.
-$vgSmsNumber = '+60132156758';
+     // This is the number that receives SMS messages from voters.
+    $vgSmsNumber = '+60132156758';
+}
 
 // Length of confirm field
 $vgConfirmCodeLen = 6; 
@@ -59,7 +67,7 @@ function vfGetAllNumbers()
     $out = array();
     for($i=0;$i<=99;$i++)
     {
-        $out[] = '+601099999' . sprintf("%02d",$i);
+        $out[] = '+60361965632 enter ' . sprintf("%02d",$i);
     }
     return $out;
 }

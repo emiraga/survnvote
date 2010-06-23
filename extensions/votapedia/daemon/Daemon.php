@@ -184,14 +184,10 @@ function vfVoteFromDaemon($choice, UserVO &$user)
 
 /* get command line parameters */
 $args = $_SERVER['argv'];
-if(!isset($args[1]))
-{
-    die("\nUsage: php $args[0] daemon [debug] | fakevote [votes]+ | checkbalance | reportbalance | masstest | incoming\n");
-}
 
-if($args[1] == 'daemon')
+if(!isset($args[1]) || $args[1] == 'debug' || $args[1] == 'daemon')
 {
-    if(isset($args[2]) && $args[2] == 'debug')
+    if(isset($args[1]) && $args[1] == 'debug')
     {
         $vgDaemonDebug = true;
         echo "Debug enabled\n";
@@ -218,6 +214,10 @@ if($args[1] == 'daemon')
         }
         sleep(1);
     }
+}
+else if($args[1] == 'help')
+{
+    die("\nUsage: php $args[0] [debug] | daemon | help | fakevote [votes]+ | checkbalance | reportbalance | masstest\n");
 }
 else if($args[1] == 'fakevote') /*used for testing*/
 {
@@ -269,9 +269,5 @@ elseif($args[1] == 'masstest')
         (userID,pageID,surveyID,presentationID,voteType,choiceID,voteDate)
             VALUES('FAKE',4,5,2,'FAKE',$choice,'$now')");
     }
-}
-elseif($args[1] == 'incoming')
-{
-    var_dump(Sms::getIncoming(5));
 }
 

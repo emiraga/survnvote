@@ -72,7 +72,7 @@ class LatestIncoming extends SpecialPage
                         .vfPrettyDate($sms['date']);
                 if($long && $isadmin)
                 {
-                    $out .= '<td>'.htmlspecialchars( $sms['text'] );
+                    $out .= '<td width=500px>'.htmlspecialchars( $sms['text'] );
                 }
                 $out .= '</tr>';
             }
