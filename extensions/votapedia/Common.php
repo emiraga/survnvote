@@ -213,4 +213,5 @@ if(!isset($_GET['action']) || $_GET['action'] != 'ajax')
     # $vgDB->debug = true;
 }
 
-$vgDB->LogSQL(true);
+# $vgDB->LogSQL(true);
+

@@ -75,7 +75,9 @@ class ProcessSurvey extends SpecialPage
                         $tel->setupReceivers($page);
                         $pagedao->updateReceiversSMS($page);
                     }
+                    #echo 'starting';
                     $pagedao->startPageSurvey($page);
+                    #echo 'started';
                 }
                 catch(Exception $e)
                 {
@@ -190,6 +192,8 @@ class ProcessSurvey extends SpecialPage
                     return;
                 }
                 $pagedao->stopPageSurvey($page);
+                #$page = $pagedao->findByPageID($page->getPageID());
+                #var_dump($page);
                 
                 # $tel = new Telephone();
                 # $tel->releaseReceivers();

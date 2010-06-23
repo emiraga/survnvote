@@ -269,7 +269,7 @@ class PageDAO
         $startDate = vfDate();
         $pageVO->setStartTime($startDate);
 
-        $sql = "update {$vgDBPrefix}page set starttime = ?, endtime = ?, receivers_released = 0 where pageID = ?";
+        $sql = "UPDATE {$vgDBPrefix}page set startTime = ?, endTime = ?, receivers_released = 0 where pageID = ?";
         $vgDB->Execute($sql, array($pageVO->getStartTime(), $pageVO->getEndTime(), $pageVO->getPageID()));
 
         return true;
@@ -282,9 +282,13 @@ class PageDAO
     function stopPageSurvey(PageVO $pageVO)
     {
         global $vgDB, $vgDBPrefix;
-        $expiredDate = vfDate(time()-1);
-        $sqlChoice = "update {$vgDBPrefix}page set endtime = ? where pageID = ?";
-        $vgDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
+        $expiredDate = vfDate(time()-5);
+        $pageVO->setEndTime($expiredDate);
+
+        #$this->updatePage($pageVO);
+        $sqlChoice = "UPDATE {$vgDBPrefix}page set endTime = ? where pageID = ?";
+        $r = $vgDB->Execute($sqlChoice, array($expiredDate, $pageVO->getPageID()));
+        #echo $r->Affected_Rows();
         return true;
     }
     /**

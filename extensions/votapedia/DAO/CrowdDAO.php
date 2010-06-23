@@ -129,6 +129,12 @@ class CrowdDAO
         return (bool) $vgDB->GetOne("SELECT isManager FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
                 array(intval($crowdID), intval($userID)));
     }
+    function isMember($crowdID, $userID)
+    {
+        global $vgDB, $vgDBPrefix;
+        return (bool) $vgDB->GetOne("SELECT count(userID) FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
+                array(intval($crowdID), intval($userID)));
+    }
     function addLog($crowdID, $text, $printable = false)
     {
         $log = new CrowdLogVO();
@@ -151,7 +157,8 @@ class CrowdDAO
         }
         else
         {
-            $r = $vgDB->GetAll("SELECT * FROM {$vgDBPrefix}crowd_log WHERE crowdID = ?", array(intval($crowdID)));
+            $r = $vgDB->GetAll("SELECT * FROM {$vgDBPrefix}crowd_log WHERE crowdID = ?",
+                    array(intval($crowdID)));
         }
         $result = array();
         foreach($r as $log)

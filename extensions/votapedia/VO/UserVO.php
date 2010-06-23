@@ -16,6 +16,8 @@ class UserVO
     /** @var String  */ public $password;
     /** @var Boolean */ public $isAnon;
     /** @var String  */ public $smsConfirm;
+
+    /** @var Boolean */ public $isAdmin = false; /* not stored in database */
     public function __construct()
     {
         global $vgConfirmCodeLen;

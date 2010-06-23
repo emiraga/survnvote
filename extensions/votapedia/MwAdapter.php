@@ -277,8 +277,7 @@ class MwUser
     public function isAdmin()
     {
         global $wgUser;
-        $gr = $wgUser->getGroups();
-        return $wgUser->isLoggedIn() && in_array("bureaucrat", $gr) || in_array("sysop", $gr);
+        return $wgUser->isLoggedIn() && in_array("sysop", $wgUser->getGroups());
     }
     /**
      * Get user preferences and options
@@ -290,34 +289,6 @@ class MwUser
     {
         global $wgUser;
         return $wgUser->getOption($wgUser);
-    }
-    /**
-     * Is this user author of PageVO
-     *
-     * @return Boolean
-     */
-    public function isAuthor(&$page)
-    {
-        return $page->getAuthor() == $this->userID();
-    }
-    /**
-     * Can current user create surveys?
-     *
-     * @return Boolean
-     */
-    public function canCreateSurveys()
-    {
-        global $vgAnonSurveyCreation;
-        return $vgAnonSurveyCreation || !$this->isAnon();
-    }
-    /**
-     * Can current user control survey?
-     *
-     * @return Boolean
-     */
-    function canControlSurvey(&$page)
-    {
-        return $this->isAuthor($page) || $this->isAdmin();
     }
     /**
      * Remove unnecessary information from anonymous usernames
@@ -361,6 +332,7 @@ class MwUser
             $user->username = $this->getName();
             $user->password = '';
             $user->isAnon = $this->isAnon();
+            $user->isAdmin = $this->isAdmin();
             $dao->insert($user);
         }
         return $user;
