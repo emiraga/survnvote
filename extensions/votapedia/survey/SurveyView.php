@@ -45,7 +45,7 @@ class SurveyView
             $mwparser = new MwParser($parser);
             $mwparser->setTag();
             $buttons = new SurveyButtons();
-            $tag = new SurveyView($page_id, $mwparser, $buttons);
+            $tag = new SurveyView( vfUser()->getUserVO(), $page_id, $mwparser, $buttons);
             return $tag->getHTML();
         }
         catch(Exception $e)
@@ -68,11 +68,13 @@ class SurveyView
         return array($output, 'noparse' => false);
     }
     /**
+     *
+     * @param UserVO $user
      * @param Integer $page_id
      * @param MwParser $parser
      * @param SurveyButtons $surveybuttons
      */
-    function __construct($page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
+    function __construct(UserVO &$user, $page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
     {
         wfLoadExtensionMessages('Votapedia');
         global $wgOut, $wgTitle, $wgRequest;
@@ -116,18 +118,18 @@ class SurveyView
             $this->buttons->setHasControl(true);
             //since this page is cached, we have no choice but to include control buttons
         }
-
+        
         //Configure body and buttons for different types
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new SurveyBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new QuestionnaireBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUIZ:
-                $this->body = new QuizBody($this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new QuizBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             default:
                 throw new Exception('Unknown survey type');
@@ -136,7 +138,7 @@ class SurveyView
         $this->body->setShowGraph(true);
         
         //has control?.
-        $this->userperm = new UserPermissions( vfUser()->getUserVO() );
+        $this->userperm = new UserPermissions( $user );
         if( $this->userperm->canControlSurvey($this->page) )
         {
             $this->buttons->setHasControl(true);
@@ -218,7 +220,7 @@ class SurveyView
         $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
                 .'<input type="hidden" name="id" value="'.$this->page_id.'">'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
-        $output.= '<font size=4>'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
+        $output.= '<font size="4" class="vpTitle">'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
         
         if($pagestatus != 'ended')
         {

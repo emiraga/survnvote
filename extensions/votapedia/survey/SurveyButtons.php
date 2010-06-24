@@ -142,6 +142,13 @@ class SurveyButtons
                 if($this->show_renew)
                     $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('renew-'.$this->type).'" />';
             }
+
+            //Powerpoint button
+            if($this->page_status != 'ended')
+            {
+                $output .='&nbsp;&nbsp;<input type="submit" name="wpSubmit" value="'
+                    .wfMsg('view-liveshow').'">';
+            }
         }
         //$output.= '<div style="float: right;">';
         if($this->show_details)

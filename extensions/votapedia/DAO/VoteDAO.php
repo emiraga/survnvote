@@ -66,9 +66,11 @@ class VoteDAO
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
         {
             //user has more votes than allowed, remove previous vote
-            $IDbyOldVote = $rs->fields['ID'];
-            $vgDB->Execute("update {$vgDBPrefix}vote set choiceID = ? , voteDate = ? where voteID = ?",
-                    array($vote->getChoiceID(), $vote->getVoteDate(), $IDbyOldVote));
+            $IDbyOldVote = $rs->fields['voteID'];
+            $vgDB->Execute("update {$vgDBPrefix}vote set choiceID = ? where voteID = ?",
+                    array($vote->getChoiceID(), $IDbyOldVote));
+            $vgDB->Execute("update {$vgDBPrefix}vote_details set voteDate = ?, voteType = ? where voteID = ?",
+                    array($vote->getVoteDate(), $vote->getVoteType(), $IDbyOldVote));
         }
         else
         {

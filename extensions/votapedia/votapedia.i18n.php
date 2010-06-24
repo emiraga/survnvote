@@ -64,6 +64,7 @@ $messages['en'] = array(
     'vote-quiz' => 'Vote',
     
     'view-details' => 'View details',
+    'view-liveshow' => 'Powerpoint',
     'control-survey' => 'Control Survey',
     'cat-survey-name' => 'Category:Pages with survey id $1',
     'mobile-phone' => 'Mobile Phone:',

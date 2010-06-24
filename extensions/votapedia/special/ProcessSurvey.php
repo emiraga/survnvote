@@ -79,6 +79,7 @@ class ProcessSurvey extends SpecialPage
                         $pagedao->updateReceiversSMS($page);
                     }
                     $pagedao->startPageSurvey($page);
+                    SurveysList::purgeCache();
                 }
                 catch(Exception $e)
                 {
@@ -124,6 +125,8 @@ class ProcessSurvey extends SpecialPage
                     $tel->releaseReceivers(); //in case this survey has unreleased receivers
                     
                     $pagedao->renewPageSurvey($page);
+                    SurveysList::purgeCache();
+                    
                     //Purge all pages that have this survey included.
                     vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
                     //Redirect to the previous page
@@ -155,6 +158,12 @@ class ProcessSurvey extends SpecialPage
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 $title = Title::newFromText('Special:ViewSurvey');
                 $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}", 302);
+            }
+            elseif ($action == wfMsg('view-liveshow'))
+            {
+                $returnto = Title::newFromText($wgRequest->getVal('returnto'));
+                $title = Title::newFromText('Special:ViewSurvey');
+                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&getliveshow=1&returnto={$returnto->getFullText()}", 302);
             }
             elseif (   $action == wfMsg('vote-survey')
                     || $action == wfMsg('vote-questionnaire')
@@ -201,6 +210,7 @@ class ProcessSurvey extends SpecialPage
                     return;
                 }
                 $pagedao->stopPageSurvey($page);
+                SurveysList::purgeCache();
                 
                 //Redirect to the previous page
                 $title = Title::newFromText($wgRequest->getVal('returnto'));

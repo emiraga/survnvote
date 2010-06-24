@@ -52,7 +52,9 @@ function tabbedprefs() {
 		toc.appendChild(li);
 	}
 	prefform.parentNode.insertBefore(toc, prefform.parentNode.childNodes[0]);
-	document.getElementById('prefsubmit').id = 'prefcontrol';
+        prefsubmit = document.getElementById('prefsubmit');
+        if(prefsubmit)
+            prefsubmit.id = 'prefcontrol';
 }
 
 function uncoversection() {

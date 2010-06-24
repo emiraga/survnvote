@@ -18,6 +18,7 @@ class UserVO
     /** @var String  */ public $smsConfirm;
 
     /** @var Boolean */ public $isAdmin = false; /* not stored in database, set by MwAdapter */
+    /** @var Boolean */ public $isTemporary = false; /* not stored in database, used by liveshow */
     public function __construct()
     {
         global $vgConfirmCodeLen;
@@ -28,6 +29,11 @@ class UserVO
     public function getConfirmCode()
     {
         return $this->smsConfirm.$this->userID;
+    }
+    public function getTemporaryKey($extra)
+    {
+        global $wgSecretKey;
+        return sha1( $wgSecretKey.$this->userID.'_'.$extra );
     }
 }
 
