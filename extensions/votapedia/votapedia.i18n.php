@@ -19,6 +19,7 @@ $messages['en'] = array(
     'crowd' => 'Crowd',
     'processcrowd' => 'Process Crowd',
     'latestincoming' => 'Latest Incoming SMS and calls',
+    'surveyslist' => 'Surveys list',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
@@ -27,7 +28,7 @@ $messages['en'] = array(
     'phonesnologin' => 'Not logged in',
     'phonesnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to manage your phones.',
     'crowdnologin' => 'Not logged in',
-    'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access crowd.',
+    'crowdnologin-desc' => 'You must be [[Special:UserLogin|logged in]] to access crowd management.',
 
     'create-crowd' => 'Create new crowd',
     'add-to-crowd' => 'Add to crowd',

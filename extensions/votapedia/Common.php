@@ -139,8 +139,11 @@ function vfWikiToText($wiki)
     $text = str_replace("'''",' ',$text);
     $text = str_replace("''",' ',$text);
     $text = preg_replace('/\s+/', ' ', $text); //@todo use mb_ereg_replace
-    $invalidChars  = array('<','>','|','/',':');
+
+    //http://en.wikipedia.org/wiki/Wikipedia%3ANaming_conventions_%28technical_restrictions%29
+    $invalidChars  = array('<','>','|','/',':', '#', '[',']', '|', '{' ,'}','.');
     $text = trim(str_replace($invalidChars, " ", $text));
+    $text = str_replace("  ", " ", $text);
     return $text;
 }
 /**

@@ -15,5 +15,6 @@ $aliases['en'] = array(
         'Crowd' => array( 'Crowd' ),
         'ProcessCrowd' => array( 'ProcessCrowd' ),
         'LatestIncoming' => array( 'LatestIncoming' ),
+        'SurveysList' => array( 'SurveysList' ),
 );
 

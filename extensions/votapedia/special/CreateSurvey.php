@@ -401,6 +401,7 @@ class CreateSurvey
             $wikiText.="[[".htmlspecialchars($values['category'])."]]\n";
 
         $wikititle = vfWikiToText($wikititle);
+
         $this->insertWikiPage($wikititle, $wikiText, true);
 
         //Add an appropriate hidden category, don't show in recent changes
@@ -430,6 +431,8 @@ class CreateSurvey
             }
             return;
         }
+
+##echo $newtitle;
 
         $article = new Article( Title::newFromText( $newtitle ) );
         $status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);

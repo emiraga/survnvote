@@ -348,5 +348,14 @@ class PageDAO
             }
         }
     }
+    /**
+     * Get active presentations without surveys and presentations.
+     * @return Array of PageVO
+     */
+    public function getActiveSurveys()
+    {
+        $now = vfDate();
+        return $this->getPages("WHERE ? BETWEEN startTime and endTime ORDER BY startTime DESC", array($now), false, false);
+    }
 }
 

@@ -10,6 +10,7 @@ require_once("$vgPath/Common.php");
 require_once("$vgPath/graph/Graph.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
+require_once("$vgPath/Survey/SurveyTimer.php");
 
 /**
  * SurveyBody shows the main part of the survey.
@@ -275,29 +276,11 @@ class SurveyBody
         if($pagestatus == 'active')
         {
             $timeleft = strtotime($this->page->getEndTime()) - time();
-            $id='timeleft_'.$this->page->getPageID().'_'.rand();
+            $id='tl_'.$this->page->getPageID().'_'.rand();
             $output.= "Time Left: ";
-            $timeleftstr = ($timeleft%60) .' seconds';
-            if(intval($timeleft/60))
-                $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
-            $output.= "<span id=\"$id\">".$timeleftstr.'</span>';
-            $script=
-                    "<script>
-            var vTimeleft=$timeleft;
-            function updateTimeLeft(){
-                if(vTimeleft<=0)
-                    location.reload(true);
-                c=vTimeleft%60+' seconds';
-                if(Math.floor(vTimeleft/60))
-                    c=Math.floor(vTimeleft/60) + ' minutes ' + c;
-                document.getElementById(\"$id\").innerHTML=c;
-                setTimeout(\"updateTimeLeft()\",999);
-                vTimeleft--;
-            };
-            updateTimeLeft();
-            </script>";
-            $script = preg_replace('/^\s+/m', '', $script);
-            $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
+
+            $timer = new SurveyTimer();
+            $output .= $timer->getJavascript($timeleft, $id);
         }
 
         if($pagestatus == 'active' && $userhasvoted == false)
