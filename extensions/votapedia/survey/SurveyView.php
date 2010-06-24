@@ -99,7 +99,7 @@ class SurveyView
             $this->wikititle = Title::newMainPage();
 
         $pagestatus = $this->page->getStatus( $this->page->getCurrentPresentationID() );
-        if($pagestatus != 'ended' )
+        if($pagestatus != 'ended' /* || $this->page->getType() == vQUIZ */ )
         {
             $this->parser->disableCache(); // for active and ready type of surveys
         }

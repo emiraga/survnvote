@@ -136,11 +136,14 @@ class FormControl
      * Read the value of form with given key(name)
      *
      * @param String $name the key
-     * @return String values[$name]
+     * @return String values[$name] or Boolean false if it is not defined.
      */
     public function getValue($name)
     {
-        return $this->values[$name];
+        if(isset($this->values[$name]))
+            return $this->values[$name];
+        else
+            return false;
     }
     /**
      * Returns an entire associative array of form values

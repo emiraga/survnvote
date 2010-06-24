@@ -87,6 +87,7 @@ class SurveyVO
             }
             $choiceid++;
         }
+        
         throw new SurveyException("SurveyVO: Answer of question choice not found.");
     }
     /**

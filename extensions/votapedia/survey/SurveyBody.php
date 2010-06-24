@@ -148,6 +148,7 @@ class SurveyBody
                 $prev_vote = $vgDB->GetOne($sql, array(vfUser()->userID(), intval($survey->getSurveyID()), $this->presID ));
                 if($prev_vote)
                     $userhasvoted=true;
+
                 foreach ($choices as &$choice)
                 {
                     /* @var $choice ChoiceVO */
@@ -186,6 +187,12 @@ class SurveyBody
             }
             elseif($pagestatus == 'ended')
             {
+                global $vgDB, $vgDBPrefix;
+                $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
+                $prev_vote = $vgDB->GetOne($sql, array(vfUser()->userID(), intval($survey->getSurveyID()), $this->presID ));
+                if($prev_vote)
+                    $userhasvoted=true;
+                
                 $numvotes = 0;
                 foreach ($choices as &$choice)
                 {
@@ -203,7 +210,7 @@ class SurveyBody
                     $color = vfGetColor($colorindex);
                     $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
                     $percent = substr(100.0 * $votes / $numvotes, 0, 5);
-                    $width = 280.0 * $votes / $numvotes;
+                    $width = 270.0 * $votes / $numvotes;
                     $name = $this->parser->run($choice->getChoice());
                     if($percent)
                         $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
@@ -211,10 +218,26 @@ class SurveyBody
                         $extra = '';
                     if($survey->getAnswer() == $choice->getChoiceID())
                     {
+                        /*if(! $prev_vote || $prev_vote == $choice->getChoiceID())
+                        {
+                            $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
+                        }*/
                         $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
                         $style = "border:0px dashed gray; background-color:#CFFFCF; padding-left: 9px;";
-                    }else
+                    }
+                    else
+                    {
+                        /*if($prev_vote == $choice->getChoiceID())
+                        {
+                            $name .= " <img src='$vgScript/icons/wrong.png' />";
+                            $style = "border:0px dashed gray; background-color:#FFCFCF; padding-left: 9px;";
+                        }
+                        else
+                        {
+                            $style = '';
+                        }*/
                         $style = '';
+                    }
                     $choicesout[] = SurveyBody::getChoiceHTML($name, $color, $extra, '', '', $style);
                     $votesout[] = $votes;
                 }
@@ -493,10 +516,11 @@ class QuestionnaireBody extends SurveyBody
      *
      * @param PageVO $page
      * @param MwParser $parser
+     * @param Integer $presentationID
      */
-    function  __construct(PageVO &$page, MwParser &$parser)
+    function  __construct(PageVO &$page, MwParser &$parser, $presentationID)
     {
-        parent::__construct($page, $parser);
+        parent::__construct($page, $parser, $presentationID);
         $this->type = vQUESTIONNAIRE;
     }
     /**
@@ -544,10 +568,11 @@ class QuizBody extends QuestionnaireBody
      *
      * @param PageVO $page
      * @param MwParser $parser
+     * @param Integer $presentationID
      */
-    function  __construct(PageVO &$page, MwParser &$parser)
+    function  __construct(PageVO &$page, MwParser &$parser, $presentationID)
     {
-        parent::__construct($page, $parser);
+        parent::__construct($page, $parser, $presentationID);
         $this->type = vQUIZ;
     }
 }

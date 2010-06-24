@@ -87,7 +87,7 @@ class CreateQuiz extends CreateQuestionnaire
         foreach($wgRequest->getIntArray('orderNum', array()) as $index)
         {
             $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
-            $surveys[$i]->setAnswerByChoice( $wgRequest->getVal("q{$index}correct",'') );
+            $surveys[$i]->setAnswerByChoice( urldecode(  $wgRequest->getVal("q{$index}correct",'') ) );
             $i++;
         }
         return $surveys;
@@ -148,7 +148,7 @@ class CreateQuiz extends CreateQuestionnaire
         {
             if($wgRequest->getCheck("q{$index}correct"))
             {
-                $surveys[$i]->setAnswerByChoice($wgRequest->getVal("q{$index}correct"));
+                $surveys[$i]->setAnswerByChoice( urldecode( $wgRequest->getVal("q{$index}correct") ));
                 $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
             }
             $i++;

@@ -183,9 +183,9 @@ class MyPhones extends SpecialPage
             }
 
             $wgOut->addWikiText("\n\n== Add new phone number via SMS ==\n");
-            $wgOut->addWikiText("Send a SMS message from ''your'' mobile phone like shown below:");
-            $wgOut->addWikiText('{{SMS Example|'.Sms::$cmdConfirm.' '.$user->getConfirmCode().'}}');
+            $wgOut->addWikiText("Send a SMS message from ''your'' mobile phone like shown below.");
             $wgOut->addWikiText("Refresh this page after some time to confirm that phone has been added.");
+            $wgOut->addWikiText('{{SMS Example|'.Sms::$cmdConfirm.' '.$user->getConfirmCode().'}}');
 
             $wgOut->addWikiText("\n\n== Alternative: Add new phone number manually ==\n");
             $wgOut->addHTML( $form->AddPage('', array('newnumber')) );

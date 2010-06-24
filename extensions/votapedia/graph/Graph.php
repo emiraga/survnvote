@@ -308,11 +308,11 @@ class GraphStackPercent extends Graph
             $markers[] = "t".$values->getTitle().",000000,$pos,$s,12,,e::15";
             $s++;
         }*/
+        $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
         $data = 't:'.join('|',$data);
         if($data == 't:')
-            return '';
+            return $imglink;
         $colors = join(',', $colors);
-        $imglink = "cht=bvs&chs={$this->width}x{$this->height}&chbh=$chbh";
         $imglink .= "&chd=$data&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
 
         $imglink2 = $imglink . "&chm=".join('|', $markers);

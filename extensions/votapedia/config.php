@@ -67,7 +67,7 @@ function vfGetAllNumbers()
     $out = array();
     for($i=0;$i<=99;$i++)
     {
-        $out[] = '+60361965632 enter ' . sprintf("%02d",$i);
+        $out[] = '+603619699' . sprintf("%02d",$i);
     }
     return $out;
 }
