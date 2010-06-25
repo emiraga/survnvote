@@ -2,7 +2,18 @@ body { font-size:200%; }
 .vpTitle { font-size: 100% }
 h5 { font-size: 90% }
 .vpGraph { width: 520px; height: 260px; }
-/*#preftoc { display: none; }*/
 #btn_prev, #btn_next { text-decoration:underline; }
 fieldset { border: none; }
+legend { display: none; }
+#preftoc li { 
+    float: left;
+    list-style-image:none;
+    list-style-type:none;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+li.selected {
+    font-weight: bold;
+    color: red;
+}
 

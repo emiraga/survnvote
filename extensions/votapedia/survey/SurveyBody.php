@@ -198,7 +198,7 @@ class SurveyBody
             $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.rand();
             //Prepend this image!
             $tmpvar = 1;
-            $output = '<div style="float:right">'
+            $output = '<div style="float:right; text-align: center;">'
                     .$this->getGraphHTML($tmpvar, $this->page->getSurveys(), $this->page->getPageID(), $imgid)
                     .'</div>' . $output;
             global $vgImageRefresh;
@@ -405,6 +405,7 @@ class SurveyBody
                     resp = o.responseText.split('@');
                     if(graph.src!=resp[0])
                     {
+                        document.getElementById('totalvotes$imgid').innerHTML = resp[2];
                         time$imgid = resp[1];
                         graph.src = resp[0];
                     }
@@ -459,6 +460,7 @@ class SurveyBody
                 $usetransp = true;
             }
         }
+        $totalvotes = 0;
         foreach($surveys as &$survey)
         {
             /* @var $survey SurveyVO */
@@ -473,6 +475,7 @@ class SurveyBody
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
                 $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $totalvotes += $votes;
                 $graphseries->addItem(vfWikiToText($choice->getChoice()), $votes, $color);
             }
             if($this->page->getDisplayTop())
@@ -486,9 +489,15 @@ class SurveyBody
             $graph->addValues($graphseries);
         }
         if($imgid)
-            return $graph->getHTMLImage($imgid);
+        {
+            $out = $graph->getHTMLImage($imgid);
+            $out .= "<br>Number of votes: <span id='totalvotes$imgid'>$totalvotes</span>";
+            return $out;
+        }
         else
-            return $graph->getImageLink();
+        {
+            return array($graph->getImageLink(), $totalvotes);
+        }
     }
     /**
      * Get link to graph from ajax
@@ -514,16 +523,17 @@ class SurveyBody
         
         if($survey_id)
         {
-            return $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),$page_id)."@".$newchoiceid;
+            list($link, $totalvotes) = $surveybody->getGraphHTML($colorindex, array($page->getSurveyBySurveyID($survey_id)),$page_id);
         }
         else
         {
-            return $surveybody->getGraphHTML($colorindex, $page->getSurveys(),$page_id)."@".$newchoiceid;
+            list($link, $totalvotes) = $surveybody->getGraphHTML($colorindex, $page->getSurveys(),$page_id);
         }
+        return $link."@".$newchoiceid.'@'.$totalvotes;
     }
     /**
      * Parse multiline wiki code
-     *
+     * 
      * @param String $title title of question
      * @param String $text multiline string
      *
