@@ -38,8 +38,6 @@ class ViewSurvey extends SpecialPage
         global $wgOut, $wgParser, $wgRequest;
         $wgOut->setPageTitle( wfMsg('title-view-survey') );
         $wgOut->setArticleFlag(false);
-        
-        $wgOut->addHTML('<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>');
 
         if($wgRequest->getCheck('liveshow'))
         {
@@ -74,6 +72,7 @@ class ViewSurvey extends SpecialPage
 
                 if($liveshow != $uservo->getTemporaryKey($page_id))
                     throw new Exception('Wrong key.');
+                $uservo->isTemporary = true;
             }
             else
             {

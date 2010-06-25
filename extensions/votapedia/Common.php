@@ -163,7 +163,7 @@ function vfColorizePhone($phone, $colorsms=false, $obscure = false)
         // in Malaysia we are lucky to have a prefix '60' which ends with zero
         $prefix = preg_replace('/0$/', '', $prefix);
 
-        $phone = '<font color=gray>'.substr($phone,0,strlen($prefix)).'</font>&thinsp;'
+        $phone = '<font color=gray>'.substr($phone,0,strlen($prefix)).'</font> ;'
                 .substr($phone,strlen($prefix));
     }
     if(! $vgEnableSMS || ! $colorsms)

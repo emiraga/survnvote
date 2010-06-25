@@ -24,6 +24,7 @@ class SurveyView
 {
     /** @var MwParser */      protected $parser;
     /** @var PageVO */        protected $page;
+    /** @var UserVO */        protected $user;
     /** @var Integer */       protected $page_id;
     /** @var Title */         protected $wikititle;
     /** @var SurveyButtons */ protected $buttons;
@@ -79,6 +80,7 @@ class SurveyView
         wfLoadExtensionMessages('Votapedia');
         global $wgOut, $wgTitle, $wgRequest;
 
+        $this->user =& $user;
         $this->parser =& $parser;
         $this->page_id=$page_id;
         $this->buttons =& $surveybuttons;
@@ -123,13 +125,13 @@ class SurveyView
         switch($this->page->getType())
         {
             case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new SurveyBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new QuestionnaireBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             case vQUIZ:
-                $this->body = new QuizBody($user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                $this->body = new QuizBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
                 break;
             default:
                 throw new Exception('Unknown survey type');
@@ -138,7 +140,7 @@ class SurveyView
         $this->body->setShowGraph(true);
         
         //has control?.
-        $this->userperm = new UserPermissions( $user );
+        $this->userperm = new UserPermissions( $this->user );
         if( $this->userperm->canControlSurvey($this->page) )
         {
             $this->buttons->setHasControl(true);
@@ -225,6 +227,12 @@ class SurveyView
         if($pagestatus != 'ended')
         {
             $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
+            if($this->user->isTemporary)
+            {
+                $output .='<input type="hidden" name="userID" value="'. $this->user->userID .'">';
+                $output .='<input type="hidden" name="presID" value="'. $presID .'">';
+                $output .='<input type="hidden" name="tempKey" value="'. $this->user->getTemporaryKey($this->page->getPageID().'_'.$presID) .'">';
+            }
         }
         
         $output .= $this->body->getHTML();
@@ -238,6 +246,7 @@ class SurveyView
         {
             $output .= "This survey has ended.";
         }
+
         return $output;
     }
     /**

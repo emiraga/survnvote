@@ -274,12 +274,12 @@ class FormControl
      */
     public function AddPage($title, $add_items)
     {
-        $output = '';
+        $output = Xml::openElement( 'table' );
         foreach($add_items as $id)
         {
             $output .= $this->showItem($id);
         }
-        
+        $output .= Xml::closeElement( 'table' );
         return $this->pageContents($title, $output);
     }
     /**
@@ -290,9 +290,9 @@ class FormControl
      */
     public function pageContents($title, $contents)
     {
-        $output = Xml::fieldset( $title ) . Xml::openElement( 'table' );
+        $output = Xml::fieldset( $title );
         $output .= $contents;
-        $output .= Xml::closeElement( 'table' ).Xml::closeElement( 'fieldset' );
+        $output .= Xml::closeElement( 'fieldset' );
         return $output;
     }
     /**
