@@ -60,8 +60,7 @@ class SurveyView
      * @param Parser $parser mediawiki type
      * @param Integer $page_id page identifier
      */
-    static function executeMagic($parser, $page_id) //do not change arguments
-
+    static function executeMagic($parser, $page_id)
     {
         wfLoadExtensionMessages('Votapedia');
         $page_id = intval(trim($page_id));
@@ -135,8 +134,6 @@ class SurveyView
                 throw new Exception('Unknown survey type');
         }
         
-        $this->body->setShowGraph(true);
-        
         //has control?.
         $this->userperm = new UserPermissions( $this->user );
         if( $this->userperm->canControlSurvey($this->page) )
@@ -162,6 +159,8 @@ class SurveyView
         $runs = $this->page->getCurrentPresentationID();
         if($runs == 1)
         {
+            $this->body->setShowGraph(true);
+
             $output = $this->getHTMLOnePage(1);
             if($show_details)
                 $output .= $this->getDetailsHTML(1);
@@ -174,18 +173,28 @@ class SurveyView
             
             $output = '';
             $output .= $form->StartFormLite();
-            
+
+            $this->body->setShowGraph(true);
+
+            //Show current run of the survey
             $contents = $this->getHTMLOnePage($runs);
             if($show_details)
+            {
                 $contents .= $this->getDetailsHTML($runs);
+            }
             $output .= $form->pageContents('Current', $contents);
 
             $presentations =& $this->page->getPresentations();
             for($i=count($presentations);$i;$i--)
             {
+                //Show previous runs
+                $this->body->setShowGraph(true);
+                
                 $contents = $this->getHTMLOnePage($i);
                 if($show_details)
+                {
                     $contents .= $this->getDetailsHTML($i);
+                }
                 $output .= $form->pageContents( $presentations[$i-1]->getName(), $contents );
             }
             $output .= $form->EndFormLite();

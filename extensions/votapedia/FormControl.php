@@ -326,7 +326,7 @@ class FormControl
      */
     public function StartFormLite()
     {
-        $output = '<div class="lite"><div id="preferences" style="margin: 0; padding: 0em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
+        $output = '<div class="lite"><div id="preferences" style="margin: 0; padding: 0em; clear: both; background-color: transparent; border-style: solid none none none;">';
         return $output;
     }
     /**

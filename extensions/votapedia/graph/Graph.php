@@ -80,7 +80,9 @@ abstract class Graph
                 ."src=\"{$this->getImageLink()}\">";
         if($this->bgimage)
         {
-            $out = "<div style='z-index: -10; position: absolute'><img src='".$this->bgimage."' width=$this->width height=$this->height></div>".$out;
+            $out = "<div style='z-index: -1; position: absolute'><img src='".$this->bgimage
+                    ."' width=$this->width height=$this->height></div>"
+                    .$out;
         }
         return $out;
     }

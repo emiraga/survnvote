@@ -168,6 +168,10 @@ class SurveyBody
             }
             $output .= "</ul></div><div class=\"visualClear\"></div>";
         }
+        else
+        {
+            $output .= '<br>';
+        }
 
         //Display how much time has left
         if($this->pagestatus == 'active')
@@ -179,6 +183,8 @@ class SurveyBody
             $timer = new SurveyTimer();
             $output .= $timer->getJavascript($timeleft, $divid);
         }
+        
+        #echo $this->pagestatus.$this->userhasvoted.'<br>';
 
         if($this->pagestatus == 'active' && $this->userhasvoted == false)
             $this->show_graph = false;
@@ -254,7 +260,16 @@ class SurveyBody
 
         if($this->type != vSIMPLE_SURVEY)
         {
-            $output .= '<h5>'. wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ) ).'</h5>';
+            if($survey->getPoints())
+            {
+                $output .= '<h5>'. wfMsg('survey-question-p',
+                        $this->parser->run( $survey->getQuestion() ), $survey->getPoints() ).'</h5>';
+            }
+            else
+            {
+                $output .= '<h5>'. wfMsg('survey-question',
+                        $this->parser->run( $survey->getQuestion() ) ).'</h5>';
+            }
         }
 
         $output.='<ul>';
@@ -482,7 +497,7 @@ class SurveyBody
             {
                 $graphseries->sortOnlyTop($this->page->getDisplayTop());
             }
-            elseif($this->page->getStatus($this->presID) == 'ended')
+            else //if($this->page->getStatus($this->presID) == 'ended')
             {
                 $graphseries->sort();
             }
@@ -604,7 +619,7 @@ class QuestionnaireBody extends SurveyBody
                 //insert graph image at the beginning
                 $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.$survey->getSurveyID().'_'.rand();
                 //Prepend this image!
-                $output .= '<div>'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
+                $output .= '<div style="text-align: center; width: 400px; height: 200px;">'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
                 global $vgImageRefresh;
                 if($pagestatus == 'active' && $vgImageRefresh)
                 {
