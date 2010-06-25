@@ -21,7 +21,7 @@ class spCreateQuiz extends SpecialPage
     {
         parent::__construct('CreateQuiz');
         $this->obj = new CreateQuiz();
-        $this->includable( true ); //we can include this from other pages
+        $this->includable( false ); //we cannot include this from other pages
         $this->setGroup('CreateQuiz', 'votapedia');
     }
     /**
@@ -30,6 +30,8 @@ class spCreateQuiz extends SpecialPage
      */
     function execute( $par = null )
     {
+        global $wgOut;
+        $wgOut->addWikiText("A '''Quiz''' is a survey designed for ''student assessment''. The questions and choices have the same syntax as the [[Special:CreateQuestionnaire| Questionnaires]] which means you can have more than one questions in it. The only difference is that you can allocate certain points to each question and define a correct answer so that participants get the points if they choose the correct answer. After the quiz finishes, you can check the answer of all students, and students can check their score by visiting the quiz page.");
         $this->obj->execute($par);
     }
 }

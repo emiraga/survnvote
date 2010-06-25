@@ -88,6 +88,8 @@ class SurveyView
         if(! $this->page_id)
             throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
 
+        $this->parser->disableCache(); // disable caching of pages with surveys
+
         $pagedao = new PageDAO();
         $this->page = $pagedao->findByPageID( $page_id );
 
@@ -103,10 +105,6 @@ class SurveyView
             $this->wikititle = Title::newMainPage();
 
         $pagestatus = $this->page->getStatus( $this->page->getCurrentPresentationID() );
-        if($pagestatus != 'ended' /* || $this->page->getType() == vQUIZ */ )
-        {
-            $this->parser->disableCache(); // for active and ready type of surveys
-        }
 
         //configure buttons
         $this->buttons->setPageAuthor($this->page->getAuthor());
@@ -172,7 +170,9 @@ class SurveyView
         {
             $items = array();
             $form = new FormControl($items);
-            $output = $form->getScriptsIncluded(false);
+            $form->getScriptsIncluded(false);
+            
+            $output = '';
             $output .= $form->StartFormLite();
             
             $contents = $this->getHTMLOnePage($runs);

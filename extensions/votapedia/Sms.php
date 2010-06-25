@@ -62,6 +62,11 @@ class Sms
         $list = array();
         foreach($new as $sms)
         {
+            if($sms['SenderNumber'] == Sms::$balanceNumber)
+            {
+                Sms::processed($sms['ID']);
+                continue;
+            }
             if(in_array($sms['SenderNumber'], Sms::$blackList))
             {
                 Sms::delete($sms['ID']);

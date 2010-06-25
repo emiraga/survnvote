@@ -126,16 +126,16 @@ function sprintf() {
 				throw("Expecting number but found " + typeof(a));
 			}
 			switch (m[7]) {
-				case 'b': a = a.toString(2); break;
-				case 'c': a = String.fromCharCode(a); break;
-				case 'd': a = parseInt(a); break;
-				case 'e': a = m[6] ? a.toExponential(m[6]) : a.toExponential(); break;
-				case 'f': a = m[6] ? parseFloat(a).toFixed(m[6]) : parseFloat(a); break;
-				case 'o': a = a.toString(8); break;
-				case 's': a = ((a = String(a)) && m[6] ? a.substring(0, m[6]) : a); break;
-				case 'u': a = Math.abs(a); break;
-				case 'x': a = a.toString(16); break;
-				case 'X': a = a.toString(16).toUpperCase(); break;
+				case 'b':a = a.toString(2);break;
+				case 'c':a = String.fromCharCode(a);break;
+				case 'd':a = parseInt(a);break;
+				case 'e':a = m[6] ? a.toExponential(m[6]) : a.toExponential();break;
+				case 'f':a = m[6] ? parseFloat(a).toFixed(m[6]) : parseFloat(a);break;
+				case 'o':a = a.toString(8);break;
+				case 's':a = ((a = String(a)) && m[6] ? a.substring(0, m[6]) : a);break;
+				case 'u':a = Math.abs(a);break;
+				case 'x':a = a.toString(16);break;
+				case 'X':a = a.toString(16).toUpperCase();break;
 			}
 			if (/[def]/.test(m[7])) {
 				s = (a >= 0 ? (m[2] ? '+' : '') : '-');
@@ -152,4 +152,39 @@ function sprintf() {
 		f = f.substring(m[0].length);
 	}
 	return o.join("");
+}
+
+function sur_showhide(id,n,c,exp)
+{
+    for(i=1;i<=n;i++)
+    {
+        document.getElementById(id+''+i).style.display = (c == 0 || c == i)?'block':'none';
+    }
+    document.getElementById('btn_next').style.display = (c && c < n)?'inline':'none';
+    document.getElementById('btn_prev').style.display = (c && c > 1)?'inline':'none';
+    document.getElementById('btn_collapse').style.display = (exp)?'none':'inline';
+    document.getElementById('btn_expand').style.display = (exp)?'inline':'none';
+}
+
+function sur_collapse(id, n)
+{
+    sur_current = 1;
+    sur_showhide(id, n, 1, true);
+}
+
+function sur_expand(id,n)
+{
+    sur_showhide(id, n, 0, false);
+}
+
+function sur_next(id,n)
+{
+    sur_current++;
+    sur_showhide(id, n, sur_current, true);
+}
+
+function sur_prev(id,n)
+{
+    sur_current--;
+    sur_showhide(id, n, sur_current, true);
 }

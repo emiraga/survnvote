@@ -108,6 +108,28 @@ class MwAdapter
         }
         return false;
     }
+    /**
+     * Add javascript to your output. It will not add scripts that have
+     * been already included. Also it supports links starting with http://
+     *
+     * @param String $path
+     * @return Nothing
+     */
+    function addScript($path)
+    {
+        global $wgOut;
+        if(strstr($wgOut->getScript(),$path) !== false)
+            return;
+        if(substr( $path, 0, 7 ) == 'http://')
+        {
+            global $wgJsMimeType;
+            $wgOut->addScript( "<script type=\"{$wgJsMimeType}\" src=\"$path\"></script>\n" );
+        }
+        else
+        {
+            $wgOut->addScriptFile($path);
+        }
+    }
 }
 
 /**

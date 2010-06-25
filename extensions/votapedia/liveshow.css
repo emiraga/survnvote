@@ -1,2 +1,8 @@
 body { font-size:200%; }
 .vpTitle { font-size: 100% }
+h5 { font-size: 90% }
+.vpGraph { width: 520px; height: 260px; }
+/*#preftoc { display: none; }*/
+#btn_prev, #btn_next { text-decoration:underline; }
+fieldset { border: none; }
+

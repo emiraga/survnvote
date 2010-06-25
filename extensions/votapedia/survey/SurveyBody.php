@@ -123,11 +123,28 @@ class SurveyBody
         $this->pagestatus = $this->page->getStatus($this->presID);
 
         $colorindex = 1;
+        $numsurvey = 1;
+
+        $divid = 'div'.rand().'Q';
+        if($this->pagestatus == 'active')
+        {
+            $output .= $this->slideSurveys( $divid, count($surveys) );
+        }
+        
         foreach ($surveys as &$survey)
         {
+            $output .= '<div id="'.$divid.$numsurvey.'">';
             $output .= $this->getOneSurvey($survey, $colorindex);
+            $output .= '</div>';
+            
+            $numsurvey++;
         }
 
+        if($this->pagestatus == 'active')
+        {
+            $output .= $this->slideSurveysBottom( $divid, count($surveys) );
+        }
+        
         //Show help message
         if($this->pagestatus == 'active' && $this->has_control)
         {
@@ -156,11 +173,11 @@ class SurveyBody
         if($this->pagestatus == 'active')
         {
             $timeleft = strtotime($this->page->getEndTime()) - time();
-            $id='tl_'.$this->page->getPageID().'_'.rand();
+            $divid='tl_'.$this->page->getPageID().'_'.rand();
             $output.= "Time Left: ";
 
             $timer = new SurveyTimer();
-            $output .= $timer->getJavascript($timeleft, $id);
+            $output .= $timer->getJavascript($timeleft, $divid);
         }
 
         if($this->pagestatus == 'active' && $this->userhasvoted == false)
@@ -191,6 +208,38 @@ class SurveyBody
             }
         }
         return $output;
+    }
+    /**
+     *
+     */
+    function slideSurveys( $id, $num)
+    {
+        if($num < 2)
+            return '';
+        global $wgOut, $vgScript;
+
+        $out = '<div>';
+        $out .= "<div id=\"btn_collapse\" style=\"display:none\"><img src='$vgScript/icons/collapse.png' /> <a href=\"#\" onclick=\"sur_collapse('$id',$num);return false;\">collapse</a> </div>";
+        $out .= "<div id=\"btn_expand\" style=\"display:none\"><img src='$vgScript/icons/expand.png' /> <a href=\"#\" onclick=\"sur_expand('$id',$num);return false;\">expand</a> </div>";
+        $out .= '</div>';
+
+        vfAdapter()->addScript($vgScript. '/survey.js');
+
+        $script = "<script>document.getElementById('btn_collapse').style.display = 'inline';</script>";
+        $script = preg_replace('/^\s+/m', '', $script);
+        $out.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
+        return $out;
+    }
+    function slideSurveysBottom( $id, $num)
+    {
+        if($num < 2)
+            return '';
+        
+        global $vgScript;
+        $out = '&nbsp;';
+        $out .= "<div id=\"btn_prev\" style=\"background-color: white; display:none; left:150px; position: absolute; \"><a href=\"#\" onclick=\"sur_prev('$id',$num);return false;\"><img src='$vgScript/icons/arrow_left.png' /> prev</a> </div>";
+        $out .= "<div id=\"btn_next\" style=\"background-color: white; display:none; left:250px; position: absolute; \"><a href=\"#\" onclick=\"sur_next('$id',$num);return false;\">next <img src='$vgScript/icons/arrow_right.png' /></a> </div>";
+        return $out;
     }
     /**
      * Get HTML code for one question of survey

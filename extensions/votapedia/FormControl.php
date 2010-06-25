@@ -326,7 +326,7 @@ class FormControl
      */
     public function StartFormLite()
     {
-        $output = '<div class="lite"><div id="preferences" style="margin: 0; padding: 0.5em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
+        $output = '<div class="lite"><div id="preferences" style="margin: 0; padding: 0em; clear: both; background-color: #FFFFFF; border-style: solid none none none;">';
         return $output;
     }
     /**
@@ -366,18 +366,19 @@ class FormControl
         return '</div></div></form>';
     }
     /**
-     * Return HTML code that includes javascript codes
+     * Adds needed scripts to the OutputPage $wgOut
+     *
+     * @param Boolean $jquery
      */
     function getScriptsIncluded($jquery = false)
     {
         global $vgScript;
-        $output = '<script type="text/javascript" src="'.$vgScript.'/survey.js"></script>';
+        
+        vfAdapter()->addScript($vgScript. '/survey.js');
         if($jquery)
         {
-            $output .= '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/'
-                .'jquery/1.4.2/jquery.min.js"></script>';
+            vfAdapter()->addScript('http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
         }
-        return $output;
     }
 }
 

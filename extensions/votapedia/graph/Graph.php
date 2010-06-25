@@ -76,7 +76,7 @@ abstract class Graph
     public function getHTMLImage($imgid)
     {
         $out = '';
-        $out = "<img id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
+        $out = "<img class=\"vpGraph\" id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
                 ."src=\"{$this->getImageLink()}\">";
         if($this->bgimage)
         {
@@ -264,7 +264,7 @@ class GraphStackPercent extends Graph
         elseif($numvalues == 7) $labelLength = 7;
         elseif($numvalues == 8) $labelLength = 6;
         $xlabel = '';
-        $chbh = intval(($this->width - 60) / $numvalues);
+        $chbh = intval(($this->width - 20) / $numvalues);
         $maxv = 0;
         $markers = array();
         foreach($this->graphvalues as &$values)
@@ -313,7 +313,7 @@ class GraphStackPercent extends Graph
         if($data == 't:')
             return $imglink;
         $colors = join(',', $colors);
-        $imglink .= "&chd=$data&chco=$colors&chxt=x,y&chxl=0:$xlabel&chxs=1N**%&chds=0";
+        $imglink .= "&chd=$data&chco=$colors&chxt=x&chxl=0:$xlabel&chds=0";
 
         $imglink2 = $imglink . "&chm=".join('|', $markers);
         if(strlen($imglink2) < 1500)

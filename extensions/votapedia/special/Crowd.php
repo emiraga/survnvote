@@ -254,7 +254,7 @@ class Crowd extends SpecialPage
         );
         $wgOut->addWikiText("== Add members ==");
         $form = new FormControl($items);
-        $wgOut->addHTML($form->getScriptsIncluded());
+        $form->getScriptsIncluded();
         $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrlSubpage('ProcessCrowd',$this->crowd->name)));
         $wgOut->addHTML($form->AddPage('by user name', array('byusername')));
         $wgOut->addHTML($form->AddPage('by e-mail', array('byemail','sendemails')));

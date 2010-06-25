@@ -25,7 +25,7 @@ class spCreateSurvey extends SpecialPage
     {
         parent::__construct('CreateSurvey');
         $this->obj = new CreateSurvey();
-        $this->includable( true ); //we can include this from other pages
+        $this->includable( false ); //we cannot include this from other pages
         $this->setGroup('CreateSurvey', 'votapedia');
     }
     /**
@@ -34,6 +34,8 @@ class spCreateSurvey extends SpecialPage
      */
     function execute( $par = null )
     {
+        global $wgOut;
+        $wgOut->addWikiText("'''A simple survey''' is a survey with only ''one question'' in it, mostly used for presentations. You can also change the options by editing the survey page before the survey starts. With this service you can build your own surveys, then ask your audience to vote using mobile phone, sms message or web forms. Learn [[Create Survey Help|more]].");
         $this->obj->execute($par);
     }
 }
@@ -249,7 +251,7 @@ class CreateSurvey
         );
         //Fill the list of subcategories
         $subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
-        $subcat = $this->removePrefSufCategories($subcat);
+        $subcat = $this->removePrefixSufCategories($subcat);
         $this->formitems['category']['options'] = $subcat;
 
         //Fill in crowd options
@@ -275,7 +277,7 @@ class CreateSurvey
      * @param Array $cats of category names
      * @return Array without prefixes and suffixes
      */
-    function removePrefSufCategories($cats)
+    function removePrefixSufCategories($cats)
     {
         global $vgCatRemovePrefix, $vgCatRemoveSuffix;
 
@@ -742,7 +744,8 @@ class CreateSurvey
         $wgOut->setArticleFlag(false);
         $wgOut->returnToMain();
 
-        $output = $this->form->getScriptsIncluded(true);
+        $this->form->getScriptsIncluded(true);
+        $output = '';
         if($errors)
             $output .=  vfErrorBox( '<ul>'.$errors.'</ul>');
         $crform = Title::newFromText($this->spPageName);

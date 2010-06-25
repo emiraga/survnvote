@@ -97,8 +97,9 @@ class ViewSurvey extends SpecialPage
                     $wgOut->addHTML('Use following link to embed this survey into a Powerpoint:');
 
                     $t = Title::newFromText('Special:ViewSurvey');
-                    $url = $t->getFullURL('liveshow='.$uservo->getTemporaryKey($page_id).'&id='.$page_id.'&userID='.$uservo->userID);
-                    $wgOut->addHTML('<textarea style="font-size: x-large" onclick="javascript:this.focus();this.select();">'.$url.'</textarea>');
+                    $url = $t->getFullURL('liveshow='.$uservo->getTemporaryKey($page_id).'&id='.$page_id.'&userID='.$uservo->userID).'#survey_id_'.$page_id;
+                    $wgOut->addHTML('<textarea style="font-size: large" onclick="javascript:this.focus();this.select();">'.$url.'</textarea>');
+                    $wgOut->addHTML('Or, follow <a href="'.$url.'" target=_blank>this link</a><br>');
                     $wgOut->returnToMain();
                 }
             }

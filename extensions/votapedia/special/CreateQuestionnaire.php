@@ -24,7 +24,7 @@ class spCreateQuestionnaire extends SpecialPage
     {
         parent::__construct('CreateQuestionnaire');
         $this->obj = new CreateQuestionnaire();
-        $this->includable( true ); //we can include this from other pages
+        $this->includable( false ); //we cannot include this from other pages
         $this->setGroup('CreateQuestionnaire', 'votapedia');
     }
     /**
@@ -34,6 +34,8 @@ class spCreateQuestionnaire extends SpecialPage
      */
     function execute( $par = null )
     {
+        global $wgOut;
+        $wgOut->addWikiText("A '''Questionnaire''' is a survey with ''more than one question'' in it. If you have several questions to ask your audience, use this type of survey instead of the [[Special:CreateSurvey|simple survey]] so that you don't have to wait everyone to finish one question and then go to the next one. Like a simple survey, this type of survey also provides some options in the advanced survey creation page.");
         $this->obj->execute($par);
     }
 }
