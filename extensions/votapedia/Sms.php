@@ -32,7 +32,7 @@ class Sms
     /*Do not show messages from these numbers, these are special numbers which
      *are specific to mobile provider. */
     static private $blackList = array('2888', '28882', 'CELCOM', '22990',
-        '23131', '29292', 'ChannelC', '63008', 'Channel X'); //In Malaysia I receive a lot of spam.
+        '23131', '29292', 'ChannelC', '63008', 'Channel X', '18888'); //In Malaysia I receive a lot of spam.
 
     /* Number to send a message when requesting a balance report */
     static private $balanceNumber = '2888';

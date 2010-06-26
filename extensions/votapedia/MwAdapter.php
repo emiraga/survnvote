@@ -130,6 +130,13 @@ class MwAdapter
             $wgOut->addScriptFile($path);
         }
     }
+    function isMobile()
+    {
+        if(!class_exists('MobileSkin'))
+            return false;
+        $m = new MobileSkin;
+        return $m->isMobile();
+    }
 }
 
 /**
@@ -213,9 +220,10 @@ class MwUser
      */
     public function  __construct()
     {
-        global $wgUser;
+        global $wgUser, $wgCookiePrefix;
         if(! isset($wgUser))
             throw new Exception('MwUser::__construct global variable $wgUser not found.');
+
         if($this->isAnon())
         {
             // Track anonymous users with cookies
@@ -224,9 +232,9 @@ class MwUser
             $cookiename = 'vp_UserName';
 
             // Is there a previous cookie?
-            if(isset($_COOKIE[$cookiename]))
+            if(isset($_COOKIE[$wgCookiePrefix.$cookiename]))
             {
-                $name = $_COOKIE[$cookiename];
+                $name = $_COOKIE[$wgCookiePrefix.$cookiename];
                 list($ip, $num)  = preg_split('/-/', $name);
                 if(intval($num) > 0 && $wgUser->getName() == $ip)
                 {
@@ -237,7 +245,12 @@ class MwUser
             $this->name = $wgUser->getName()."-".$randnum;
             // Need to set a cookie?
             if($needcookie)
-                setcookie($cookiename, $this->name, time() + 60*60*24*3*30, '/'); // three month of validity
+            {
+                global $wgRequest;
+                //$wgRequest->response()->
+                setcookie( $wgCookiePrefix.$cookiename, $this->name, 0, '/');
+                echo 'setting cookie';
+            }
         }
         else
         {

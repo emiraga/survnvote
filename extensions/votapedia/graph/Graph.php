@@ -194,10 +194,11 @@ class GraphPie extends Graph
         if($values->getCount())
         {
             $imglink.="&chd=t:{$values->getValuesFormat()}";
-            if($values->getCount() <= 11)
-                $imglink.="&chdl=".$values->getNamesFormat(30, true);
-            else
+            
+            if($values->getCount() > 11)
                 $imglink.="&chl=".$values->getNamesFormat(30, true);
+            else
+                $imglink.="&chdl=".$values->getNamesFormat(30, true);
         }
         return $imglink;
     }

@@ -6,14 +6,11 @@ h5 { font-size: 90% }
 fieldset { border: none; }
 legend { display: none; }
 #preftoc li { 
-    float: left;
+    float: right;
     list-style-image:none;
     list-style-type:none;
     padding-left: 10px;
     padding-right: 10px;
 }
-li.selected {
-    font-weight: bold;
-    color: red;
-}
+li.selected { font-weight: bold; color: red; }
 
