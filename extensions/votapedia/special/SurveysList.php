@@ -78,7 +78,7 @@ class SurveysList extends SpecialPage
 
         $out .= '<table style="width: 100%; margin: 0; background-color: rgb(245, 255, 250);" class="wikitable">';
         #$out .= '<caption>'.'Active surveys'.'</caption>';
-        $out .= '<tr><th><th>Type<th>Title or question<th>Crowd<th>Started<th>Time left</tr>';
+        $out .= '<tr><th>Type<th>Title or question<th>Time left</tr>';
 
         foreach($surveys as $page)
         {
@@ -100,29 +100,30 @@ class SurveysList extends SpecialPage
             {
                 $out .= "<img src=\"$vgScript/icons/laptop.png\" title=\"Web voting enabled\"/> ";
             }
-            $out .= '<td>' . $page->getTypeName();
+            $out .= '<br>' . $page->getTypeName();
             $out .= '<td>';
 
             $out .= '<a href="'.$wikipage.'">'. $p->run($page->getTitle(), false) .'</a> ';
+            $out .= '<br>('.vfPrettyDate($page->getStartTime()).')';
 
-            $out .= '<td>';
             if($page->crowdID == 0)
             {
-                $out .= 'Everyone';
+                # $out .= 'Everyone';
             }
             else
             {
                 $crdao = new CrowdDAO();
                 $crowd = $crdao->findByID($page->crowdID);
-                
-                $showname = str_replace('_', ' ', $crowd->name);
-                $out .= '<a href="'.Skin::makeSpecialUrlSubpage('Crowd', $crowd->name).'">'.$showname.'</a>';
-            }
-            $out .= '<td>'.vfPrettyDate($page->getStartTime());
 
+                $showname = str_replace('_', ' ', $crowd->name);
+                $out .= '<br>For: <a href="'.Skin::makeSpecialUrlSubpage('Crowd', $crowd->name).'">'.$showname.'</a>';
+            }
+            # $out .= '<td>';
+
+            $out .= '<td>';
             $timeleft = strtotime($page->getEndTime()) - time();
             $id='tl_'.$page->getPageID().'_'.rand();
-            $out .= '<td>'.$timer->getJavascript($timeleft, $id);
+            $out .= ''.$timer->getJavascript($timeleft, $id);
 
             $out .= '</tr>';
         }

@@ -63,7 +63,7 @@ class LatestIncoming extends SpecialPage
 
         if($vgEnableSMS)
         {
-            $in = Sms::getIncoming($long?30:5);
+            $in = Sms::getIncoming($long?30:7);
             foreach($in as $sms)
             {
                 $out .= '<tr><td>SMS<td>'.
