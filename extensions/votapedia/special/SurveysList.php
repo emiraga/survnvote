@@ -94,13 +94,14 @@ class SurveysList extends SpecialPage
             $out .= '<td>';
             if($page->getPhoneVoting() != 'no')
             {
-                $out .= "<img src=\"$vgScript/icons/phone.png\" title=\"Phone voting enabled\"/> ";
+                $out .= "<img class='surlistIcon' heigth=16 width=16 src=\"$vgScript/icons/phone.png\" title=\"Phone voting enabled\"/> ";
             }
+            # $out .= '<br><br>';
             if($page->getWebVoting() != 'no')
             {
-                $out .= "<img src=\"$vgScript/icons/laptop.png\" title=\"Web voting enabled\"/> ";
+                $out .= "<img class='surlistIcon' heigth=16 width=16 src=\"$vgScript/icons/laptop.png\" title=\"Web voting enabled\"/>";
             }
-            $out .= '<br>' . $page->getTypeName();
+            # $out .= '<br>' . $page->getTypeName();
             $out .= '<td>';
 
             $out .= '<a href="'.$wikipage.'">'. $p->run($page->getTitle(), false) .'</a> ';

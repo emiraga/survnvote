@@ -253,7 +253,7 @@ class SurveyView
         $output .= '</form>';
         if($pagestatus == 'ended')
         {
-            $output .= "This survey has ended.";
+            $output .= "This survey run has ended.";
         }
 
         return $output;

@@ -99,7 +99,9 @@ class SurveyBody
      */
     static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
-        $output = "<div style=\"display: block; width: 340px;$style\">";
+        //width: 280px;
+        //width: 340px;
+        $output = "<div class='surChoice' style=\"display: block; $style\">";
 
         if($vote)
             $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">$vote";
@@ -465,8 +467,13 @@ class SurveyBody
         else
             $graph = new GraphPie();
 
+        if(vfAdapter()->isMobile())
+        {
+            $graph->setWidth(290);
+        }
+
         $usetransp = false;
-        if($this->page->bgimage)
+        if($this->page->bgimage && !vfAdapter()->isMobile())
         {
             $img = vfAdapter()->filePath($this->page->bgimage);
             if($img)
@@ -619,7 +626,7 @@ class QuestionnaireBody extends SurveyBody
                 //insert graph image at the beginning
                 $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.$survey->getSurveyID().'_'.rand();
                 //Prepend this image!
-                $output .= '<div style="text-align: center; width: 400px; height: 200px;">'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
+                $output .= '<div style="text-align: center; width: 400px;">'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
                 global $vgImageRefresh;
                 if($pagestatus == 'active' && $vgImageRefresh)
                 {

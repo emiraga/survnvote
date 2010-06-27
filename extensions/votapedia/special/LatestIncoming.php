@@ -66,9 +66,9 @@ class LatestIncoming extends SpecialPage
             $in = Sms::getIncoming($long?30:7);
             foreach($in as $sms)
             {
-                $out .= '<tr><td>SMS<td>'.
+                $out .= '<tr><td align=center>SMS<td>'.
                         vfColorizePhone($sms['number'], false, !$long || !$isadmin)
-                        .'<td>'
+                        .'<td align=center>'
                         .vfPrettyDate($sms['date']);
                 if($long && $isadmin)
                 {

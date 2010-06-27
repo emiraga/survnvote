@@ -3,8 +3,8 @@ body { font-size:200%; }
 h5 { font-size: 90% }
 .vpGraph { width: 520px; height: 260px; }
 #btn_prev, #btn_next { text-decoration:underline; }
-fieldset { border: none; }
-legend { display: none; }
+.lite fieldset { border: none; }
+.lite legend { display: none; }
 #preftoc li { 
     float: right;
     list-style-image:none;
