@@ -251,19 +251,23 @@ class SurveyView
         }
         
         $output .= $this->body->getHTML();
-        $output .= '<br />';
 
         if($this->page->getCurrentPresentationID() == $presID)
         {
             $output .= $this->buttons->getHTML($presID);
             $output .= '</form>';
+            if($pagestatus == 'ended')
+            {
+                $output .= '<p><b>Run started</b>: '.vfPrettyDate( $this->page->getStartTime() , 'l').'</p>';
+                $output .= '<p><b>Run ended</b>: '.vfPrettyDate( $this->page->getEndTime() , 'l').'</p>';
+            }
         }
-
-        if($pagestatus == 'ended')
+        else
         {
-            $output .= "This survey run has ended.";
+            $p =& $this->page->getPresentationByNum($presID);
+            $output .= '<p><b>Run started</b>: '. vfPrettyDate( $p->getStartTime() , 'l' ).'</p>';
+            $output .= '<p><b>Run ended</b>: '. vfPrettyDate( $p->getEndTime() , 'l').'</p>';
         }
-
         return $output;
     }
     /**

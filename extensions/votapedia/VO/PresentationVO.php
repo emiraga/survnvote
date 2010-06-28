@@ -102,7 +102,7 @@ class PresentationVO
      */
     function setEndTime($endTime)
     {
-        $this->endTime = $endTime;
+        $this->endTime = $this->validateDate($endTime);
     }
     /**
      * get starting time of this survey
