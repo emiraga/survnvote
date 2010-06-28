@@ -225,12 +225,22 @@ class SurveyView
             $this->body->setShowVoting(false);
             $this->buttons->setVoteButton(false);
         }
-
-        $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
+        
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
-        $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
-                .'<input type="hidden" name="id" value="'.$this->page_id.'">'
-                .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
+        
+        if($this->page->getCurrentPresentationID() == $presID)
+        {
+            $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
+                    .'<input type="hidden" name="id" value="'.$this->page_id.'">'
+                    .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
+            $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
+            if($this->user->isTemporary)
+            {
+                $output .= '<input type="hidden" name="liveshow" value="'.$this->user->getTemporaryKey($this->page_id).'" />';
+                $output .= '<input type="hidden" name="userID" value="'.$this->user->userID.'" />';
+            }
+        }
+        
         $output.= '<font size="4" class="vpTitle">'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
         
         if($pagestatus != 'ended')
@@ -246,11 +256,13 @@ class SurveyView
         
         $output .= $this->body->getHTML();
         $output .= '<br />';
+
         if($this->page->getCurrentPresentationID() == $presID)
         {
             $output .= $this->buttons->getHTML($presID);
+            $output .= '</form>';
         }
-        $output .= '</form>';
+
         if($pagestatus == 'ended')
         {
             $output .= "This survey run has ended.";

@@ -68,7 +68,7 @@ class SurveysList extends SpecialPage
 
         if(count($surveys)==0)
         {
-            $out .= 'There are no active surveys at the moment.';
+            //$out .= 'There are no active surveys at the moment.';
             return $out;
         }
         
@@ -129,7 +129,7 @@ class SurveysList extends SpecialPage
             $out .= '</tr>';
         }
 
-        $out .= '</table>';
+        $out .= '</table><br>';
         return $out;
     }
 }

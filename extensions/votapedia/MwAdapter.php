@@ -229,13 +229,15 @@ class MwUser
             // Track anonymous users with cookies
             $randnum = rand(10, 2000000000);
             $needcookie = true;
-            $cookiename = 'vp_UserName';
+            $cookiename = 'vp_anonUser';
+
+            if(isset($_COOKIE[$wgCookiePrefix.$cookiename]))
+                $cookieval = $_COOKIE[$wgCookiePrefix.$cookiename];
 
             // Is there a previous cookie?
-            if(isset($_COOKIE[$wgCookiePrefix.$cookiename]))
+            if(isset($cookieval))
             {
-                $name = $_COOKIE[$wgCookiePrefix.$cookiename];
-                list($ip, $num)  = preg_split('/-/', $name);
+                list($ip, $num)  = preg_split('/-/', $cookieval);
                 if(intval($num) > 0 && $wgUser->getName() == $ip)
                 {
                     $randnum = intval($num);
@@ -247,9 +249,8 @@ class MwUser
             if($needcookie)
             {
                 global $wgRequest;
-                //$wgRequest->response()->
-                setcookie( $wgCookiePrefix.$cookiename, $this->name, 0, '/');
-                echo 'setting cookie';
+                //Set for cookie three month, per Privacy policy
+                setcookie( $wgCookiePrefix.$cookiename, $this->name, time() + 60*60*24*30*3, '/');
             }
         }
         else

@@ -33,7 +33,11 @@ class UserVO
     public function getTemporaryKey($extra)
     {
         global $wgSecretKey;
-        return sha1( $wgSecretKey.$this->userID.'_'.$extra );
+        $hlen = strlen($wgSecretKey)/2;
+        $p1 = substr($wgSecretKey, 0, $hlen);
+        $p2 = substr($wgSecretKey, $hlen);
+        //HMAC
+        return sha1( $p1. sha1( $p2.$this->userID.'_'.$extra ) );
     }
 }
 

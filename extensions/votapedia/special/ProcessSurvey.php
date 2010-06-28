@@ -19,6 +19,7 @@ require_once("$vgPath/UserPermissions.php");
  */
 class ProcessSurvey extends SpecialPage
 {
+    /** @var UserVO */ protected $user;
     /**
      * Constructor for ProcessSurvey
      */
@@ -43,16 +44,41 @@ class ProcessSurvey extends SpecialPage
             $wgOut->readOnlyPage();
             return;
         }
-        
         $wgOut->setArticleFlag(false);
-        $page_id = intval(trim($wgRequest->getVal('id')));
+        $this->page_id = intval(trim($wgRequest->getVal('id')));
+        $userdao = new UserDAO();
+        
+        if($wgRequest->getCheck('liveshow'))
+        {
+            global $vgScript;
+            $liveshow = $wgRequest->getVal('liveshow');
+            $wgOut->addStyle($vgScript.'/liveshow.css');
+            $wgRequest->setVal('printable', true);
+            $wgOut->setPageTitle( '' );
+            $userID = $wgRequest->getInt('userID');
+            if($userID == 0)
+                throw new Exception('UserID not specified.');
+
+            $this->user =& $userdao->findByID($userID);
+            if(! $this->user)
+                throw new Exception('User does not exist.');
+
+            if($liveshow != $this->user->getTemporaryKey($this->page_id))
+                throw new Exception('Wrong key.');
+            $this->user->isTemporary = true;
+        }
+        else
+        {
+            $this->user = vfUser()->getUserVO();
+        }
+        
         $action = $wgRequest->getVal( 'wpSubmit' );
-        $userperm = new UserPermissions( vfUser()->getUserVO() );
+        $userperm = new UserPermissions( $this->user );
         
         try
         {
             $pagedao = new PageDAO();
-            $page = $pagedao->findByPageID($page_id);
+            $page = $pagedao->findByPageID($this->page_id);
             if(    $action == wfMsg('start-survey')
                 || $action == wfMsg('start-questionnaire')
                 || $action == wfMsg('start-quiz')
@@ -88,8 +114,7 @@ class ProcessSurvey extends SpecialPage
                     throw $e; //continue throwing
                 }
                 //Redirect to the previous page
-                $title = Title::newFromText($wgRequest->getVal('returnto'));
-                $wgOut->redirect($title->escapeLocalURL(), 302);
+                $this->redirect();
                 return;
             }
             if(    $action == wfMsg('renew-survey')
@@ -103,23 +128,25 @@ class ProcessSurvey extends SpecialPage
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
                     return;
                 }
-
+                
                 if($page->getStatus( $page->getCurrentPresentationID() ) != 'ended')
                 {
                     throw new SurveyException('Survey is not finished and cannot be renewed.');
                 }
                 
-                if ( ! vfUser()->checkEditToken() )
+                /*if ( ! vfUser()->checkEditToken() )
                 {
                     //repeat same request with Edit Token included.
                     $wgOut->redirect( Skin::makeSpecialUrl('ProcessSurvey',
                             'wpSubmit='.urlencode($action)
-                            .'&id='.$page_id
+                            .'&id='.$this->page_id
                             .'&returnto='.urlencode($wgRequest->getVal('returnto'))
                             .'&wpEditToken='.urlencode(vfUser()->editToken())
                     ) );
                 }
                 else
+                {*/
+                if(true)
                 {
                     $tel = new Telephone();
                     $tel->releaseReceivers(); //in case this survey has unreleased receivers
@@ -128,10 +155,9 @@ class ProcessSurvey extends SpecialPage
                     SurveysList::purgeCache();
                     
                     //Purge all pages that have this survey included.
-                    vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
+                    vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $this->page_id));
                     //Redirect to the previous page
-                    $title = Title::newFromText($wgRequest->getVal('returnto'));
-                    $wgOut->redirect($title->escapeLocalURL(), 302);
+                    $this->redirect();
                 }
                 return;
             }
@@ -151,19 +177,19 @@ class ProcessSurvey extends SpecialPage
                     $title = Title::newFromText('Special:CreateQuiz');
                 else
                     throw new Exception('Unknown survey type.');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}&vpAction=editstart", 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id={$this->page_id}&returnto={$returnto->getFullText()}&vpAction=editstart", 302);
             }
             elseif ($action == wfMsg('view-details'))
             {
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 $title = Title::newFromText('Special:ViewSurvey');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&returnto={$returnto->getFullText()}", 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id={$this->page_id}&returnto={$returnto->getFullText()}", 302);
             }
             elseif ($action == wfMsg('view-liveshow'))
             {
                 $returnto = Title::newFromText($wgRequest->getVal('returnto'));
                 $title = Title::newFromText('Special:ViewSurvey');
-                $wgOut->redirect($title->escapeLocalURL()."?id=$page_id&getliveshow=1&returnto={$returnto->getFullText()}", 302);
+                $wgOut->redirect($title->escapeLocalURL()."?id={$this->page_id}&getliveshow=1&returnto={$returnto->getFullText()}", 302);
             }
             elseif (   $action == wfMsg('vote-survey')
                     || $action == wfMsg('vote-questionnaire')
@@ -188,13 +214,12 @@ class ProcessSurvey extends SpecialPage
                     $choiceid = intval($wgRequest->getVal('survey'.$surveyid));
                     if( $choiceid )
                     {
-                        $votevo = $votedao->newFromPage('WEB', $page_id, $surveyid,
+                        $votevo = $votedao->newFromPage('WEB', $this->page_id, $surveyid,
                                 $choiceid, $page->getCurrentPresentationID() );
                         $votedao->vote($votevo);
                     }
                 }
-                $title = Title::newFromText($wgRequest->getVal('returnto'));
-                $wgOut->redirect($title->escapeLocalURL(), 302);
+                $this->redirect();
                 return;
             }
             elseif ($action ==  wfMsg('stop-survey')
@@ -213,17 +238,44 @@ class ProcessSurvey extends SpecialPage
                 SurveysList::purgeCache();
                 
                 //Redirect to the previous page
-                $title = Title::newFromText($wgRequest->getVal('returnto'));
-                $wgOut->redirect($title->escapeLocalURL(), 302);
+                $this->redirect();
                 return;
             }
         }
         catch(Exception $e)
         {
             $wgOut->addHTML(vfErrorBox($e->getMessage()));
-            $wgOut->addReturnTo(Title::newFromText($wgRequest->getVal('returnto')));
+            $wgOut->addHTML( '<a href="'.$this->getRedirectLink().'">Return to survey page<a>' );
             return;
         }
+    }
+    
+    function getRedirectLink()
+    {
+        global $wgRequest;
+        if($this->user->isTemporary)
+        {
+            // User is viewing this from liveshow, means we have to redirect back to ViewSurvey page,
+            // and not the wiki page.
+            // In this case 'returnto' value does not mean anything, we know where to return.
+            $t = Title::newFromText('Special:ViewSurvey');
+
+            $url = $t->getLocalURL('liveshow='.$this->user->getTemporaryKey($this->page_id)
+                    .'&id='.$this->page_id
+                    .'&userID='.$this->user->userID).'#survey_id_'.$this->page_id;
+            return $url;
+        }
+        else
+        {
+            $title = Title::newFromText($wgRequest->getVal('returnto'));
+            return $title->getLocalURL();
+        }
+    }
+    
+    function redirect()
+    {
+        global $wgOut;
+        $wgOut->redirect( $this->getRedirectLink(), 302);
     }
 }
 

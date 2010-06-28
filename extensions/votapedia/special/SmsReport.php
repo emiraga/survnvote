@@ -112,7 +112,7 @@ class SmsReport extends SpecialPage
         {
             $out .="\n\n== Balance Reports ==\n";
             $out .= "{| class=\"wikitable sortable\" style=\"width: 100%\"\n! Date !! Balance !! Text\n";
-            $bal = Sms::getBalanceReports();
+            $bal = Sms::getBalanceReports(20);
             foreach($bal as $sms)
             {
                 $out .= "|-\n";

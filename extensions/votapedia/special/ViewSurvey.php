@@ -48,7 +48,9 @@ class ViewSurvey extends SpecialPage
             $wgOut->setPageTitle( '' );
         }
         else
+        {
             $liveshow = false;
+        }
         
         $userdao = new UserDAO();
         
@@ -62,6 +64,7 @@ class ViewSurvey extends SpecialPage
 
             if($liveshow)
             {
+                //check if every value is correct
                 $userID = $wgRequest->getInt('userID');
                 if($userID == 0)
                     throw new Exception('UserID not specified.');
@@ -73,6 +76,10 @@ class ViewSurvey extends SpecialPage
                 if($liveshow != $uservo->getTemporaryKey($page_id))
                     throw new Exception('Wrong key.');
                 $uservo->isTemporary = true;
+
+                //in presentation settings 'edit' and 'powerpoint' buttons are not visible
+                $buttons->setLiveShowButton(false);
+                $buttons->setEditButton(false);
             }
             else
             {

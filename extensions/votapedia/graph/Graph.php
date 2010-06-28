@@ -701,7 +701,7 @@ class GraphXYdate extends GraphXY
             $xmin = strtotime($this->xmin);
             $xmax = strtotime($this->xmax);
             $x = strtotime($x);
-            $x = ($x - $xmin)/($xmax - $xmin) * 5;
+            $x = ($x - $xmin)/($xmax - $xmin) * 10.5;
             $result[] = sprintf("%.2f", $x);
         }
         return $result;

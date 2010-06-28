@@ -13,4 +13,6 @@ h5 { font-size: 90% }
     padding-right: 10px;
 }
 li.selected { font-weight: bold; color: red; }
+.printfooter{ display: none }
+.surChoice { width: 490px; }
 

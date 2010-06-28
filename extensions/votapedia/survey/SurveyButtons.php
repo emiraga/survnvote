@@ -23,6 +23,8 @@ class SurveyButtons
     /** @var Boolean */protected $show_vote = false;
     /** @var Boolean */protected $has_control = false;
     /** @var Boolean */protected $show_renew = false;
+    /** @var Boolean */protected $show_liveshow = true;
+    /** @var Boolean */protected $show_edit = true;
     /**
      * Construct class
      */
@@ -87,6 +89,22 @@ class SurveyButtons
         $this->show_vote = $show;
     }
     /**
+     * Should it show button "powerpoint"
+     * @param Boolean $show
+     */
+    function setLiveShowButton($show)
+    {
+        $this->show_liveshow = $show;
+    }
+    /**
+     * Should it show button "powerpoint"
+     * @param Boolean $show
+     */
+    function setEditButton($show)
+    {
+        $this->show_edit = $show;
+    }
+    /**
      * Should it show button "renew"
      * @param Boolean $show
      */
@@ -115,7 +133,7 @@ class SurveyButtons
         $output = "<div id='$divname'>";
 
         //Edit button
-        if($this->has_control)
+        if($this->has_control && $this->show_edit)
         {
             $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-'.$this->type).'">';
         }
@@ -144,7 +162,7 @@ class SurveyButtons
             }
 
             //Powerpoint button
-            if($this->page_status != 'ended')
+            if($this->show_liveshow && $this->page_status != 'ended')
             {
                 $output .='&nbsp;&nbsp;<input type="submit" name="wpSubmit" value="'
                     .wfMsg('view-liveshow').'">';
