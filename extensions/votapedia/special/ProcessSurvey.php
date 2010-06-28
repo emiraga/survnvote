@@ -122,7 +122,9 @@ class ProcessSurvey extends SpecialPage
                 || $action == wfMsg('renew-quiz')
               )
             {
-                //@todo edit token is auto-added, which is bad
+                if ( ! vfUser()->checkEditToken() )
+                    die('Edit token is wrong, please try again.');
+
                 if( ! $userperm->canControlSurvey($page) )
                 {
                     $wgOut->showErrorPage('notauthorized', 'notauthorized-desc', array($wgTitle->getPrefixedDBkey()) );
@@ -134,18 +136,6 @@ class ProcessSurvey extends SpecialPage
                     throw new SurveyException('Survey is not finished and cannot be renewed.');
                 }
                 
-                /*if ( ! vfUser()->checkEditToken() )
-                {
-                    //repeat same request with Edit Token included.
-                    $wgOut->redirect( Skin::makeSpecialUrl('ProcessSurvey',
-                            'wpSubmit='.urlencode($action)
-                            .'&id='.$this->page_id
-                            .'&returnto='.urlencode($wgRequest->getVal('returnto'))
-                            .'&wpEditToken='.urlencode(vfUser()->editToken())
-                    ) );
-                }
-                else
-                {*/
                 if(true)
                 {
                     $tel = new Telephone();

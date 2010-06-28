@@ -25,6 +25,7 @@ class SurveyButtons
     /** @var Boolean */protected $show_renew = false;
     /** @var Boolean */protected $show_liveshow = true;
     /** @var Boolean */protected $show_edit = true;
+
     /**
      * Construct class
      */

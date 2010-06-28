@@ -106,7 +106,8 @@ class ViewSurvey extends SpecialPage
                     $t = Title::newFromText('Special:ViewSurvey');
                     $url = $t->getFullURL('liveshow='.$uservo->getTemporaryKey($page_id).'&id='.$page_id.'&userID='.$uservo->userID).'#survey_id_'.$page_id;
                     $wgOut->addHTML('<textarea style="font-size: large" onclick="javascript:this.focus();this.select();">'.$url.'</textarea>');
-                    $wgOut->addHTML('Or, follow <a href="'.$url.'" target=_blank>this link</a><br>');
+                    $wgOut->addHTML('Or, simply copy <a href="'.$url.'" target=_blank>this link</a>.');
+                    $wgOut->addHTML('<p>Note: <i>Keep this link secure from others, since it can be used to control this survey.</i></p>');
                     $wgOut->returnToMain();
                 }
             }

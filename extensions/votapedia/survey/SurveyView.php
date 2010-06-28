@@ -113,9 +113,8 @@ class SurveyView
         
         if($pagestatus == 'ended' )
         {
+            //page is no longer cached, we can control the survey even when it is ended.
             $this->buttons->setRenewButton(true);
-            $this->buttons->setHasControl(true);
-            //since this page is cached, we have no choice but to include control buttons
         }
         
         //Configure body and buttons for different types
@@ -243,15 +242,12 @@ class SurveyView
         
         $output.= '<font size="4" class="vpTitle">'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
         
-        if($pagestatus != 'ended')
+        $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
+        if($this->user->isTemporary)
         {
-            $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
-            if($this->user->isTemporary)
-            {
-                $output .='<input type="hidden" name="userID" value="'. $this->user->userID .'">';
-                $output .='<input type="hidden" name="presID" value="'. $presID .'">';
-                $output .='<input type="hidden" name="tempKey" value="'. $this->user->getTemporaryKey($this->page->getPageID().'_'.$presID) .'">';
-            }
+            $output .='<input type="hidden" name="userID" value="'. $this->user->userID .'">';
+            $output .='<input type="hidden" name="presID" value="'. $presID .'">';
+            $output .='<input type="hidden" name="tempKey" value="'. $this->user->getTemporaryKey($this->page->getPageID().'_'.$presID) .'">';
         }
         
         $output .= $this->body->getHTML();
