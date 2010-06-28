@@ -13,7 +13,7 @@ if(! isset($wgSecretKey) || strlen($wgSecretKey) < 20 )
     die('$wgSecretKey is not specified or it is too short, votapedia requires this value to be '
             .'set at least 20 characters. http://www.mediawiki.org/wiki/Manual:$wgSecretKey');
 }
-if(! isset($wgScriptPath) || strlen($wgSecretKey) < 1 )
+if(! isset($wgScriptPath) || strlen($wgScriptPath) < 1 )
 {
     die('$wgScriptPath is not specified or it is too short, votapedia requires this value to be '
             .'set. http://www.mediawiki.org/wiki/Manual:$wgScriptPath');

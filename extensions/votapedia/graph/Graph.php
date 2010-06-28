@@ -277,7 +277,8 @@ class GraphStackPercent extends Graph
         $markers = array();
         foreach($this->graphvalues as &$values)
         {
-            $xlabel .= '|'. vfCutEncode($values->getTitle(),$labelLength, '...', false);
+            $xlabel .= '|'. vfCutEncode($values->getTitle(),$labelLength, '...', false)
+                    . ' ('.$values->getSum().')';
             if($values->getCount() > $maxv)
                 $maxv = $values->getCount();
         }
@@ -321,11 +322,18 @@ class GraphStackPercent extends Graph
         if($data == 't:')
             return $imglink;
         $colors = join(',', $colors);
+
+        //Join strings together to make a link
         $imglink .= "&chd=$data&chco=$colors&chxt=x&chxl=0:$xlabel&chds=0";
 
+        //Add markers in individual fields
         $imglink2 = $imglink . "&chm=".join('|', $markers);
+        
+        //if output is too large ommit some information
         if(strlen($imglink2) < 1500)
+        {
             $imglink = $imglink2;
+        }
 
         return $imglink;
     }

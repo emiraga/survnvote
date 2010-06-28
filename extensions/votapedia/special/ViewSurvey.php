@@ -62,6 +62,9 @@ class ViewSurvey extends SpecialPage
             $buttons = new SurveyButtons();
             $buttons->setDetailsButton(false);
 
+            global $vgScript;
+            $wgOut->addStyle($vgScript.'/survey.css');
+
             if($liveshow)
             {
                 //check if every value is correct

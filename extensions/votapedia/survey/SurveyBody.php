@@ -11,6 +11,7 @@ require_once("$vgPath/graph/Graph.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/Survey/SurveyTimer.php");
+require_once("$vgPath/StatsCalc.php");
 
 /**
  * SurveyBody shows the main part of the survey.
@@ -103,7 +104,7 @@ class SurveyBody
      * @param String $addtext Put Extra HTML after this choice
      * @return String HTML code
      */
-    static private function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
+    static protected function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
         //width: 280px;
         //width: 340px;
@@ -272,7 +273,7 @@ class SurveyBody
      * @param SurveyVO $survey
      * @param Integer $colorindex
      */
-    function getOneSurvey(SurveyVO $survey, &$colorindex)
+    function getOneSurvey(SurveyVO &$survey, &$colorindex)
     {
         $choices = $survey->getChoices();
         $output = '';
@@ -458,12 +459,41 @@ class SurveyBody
     /**
      * Get more details about Survey.
      *
-     * @param Integer $presentationID
      * @return String
      */
     public function getDetailsHTML()
     {
         $output = '';
+        $pagestatus = $this->page->getStatus($this->presID);
+        $colorindex = 1; /* for showing items */
+        $surveys =& $this->page->getSurveys();
+        if($this->show_graph)
+        {
+            foreach($surveys as &$survey)
+            {
+                /* @var $survey SurveyVO */
+                $tmpcolor = $tmpcolor2 = $colorindex;
+                if($this->page->getType() != vSIMPLE_SURVEY)
+                {
+                    $question = wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ));
+                    $output .= "<h2>$question</h2>";
+                }
+                //insert graph image at the beginning
+                $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.$survey->getSurveyID().'_'.rand();
+                if( count($surveys) > 1 )
+                {
+                    //Prepend this image!
+                    $output .= '<div style="text-align: center; width: 400px;">'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
+                }
+                global $vgImageRefresh;
+                if($pagestatus == 'active' && $vgImageRefresh)
+                {
+                    $output .= $this->refreshImage($imgid, $tmpcolor, $this->page->getPageID(), $survey->getSurveyID());
+                }
+                //$tmpcolor = $colorindex;
+                $output .= $this->getSurveyStats($survey, $tmpcolor2, $tmpcolor);
+            }
+        }
         return $output;
     }
     /**
@@ -506,7 +536,7 @@ class SurveyBody
             $graphseries = new GraphSeries( vfWikiToText($survey->getQuestion()) );
             if($usetransp)
             {
-                $graphseries->setTransparent('AA');
+                $graphseries->setTransparent('DD');
             }
             $choices = &$survey->getChoices();
             foreach($choices as &$choice)
@@ -601,6 +631,75 @@ class SurveyBody
         $output .= '</ul>';
         return $output;
     }
+    /**
+     *
+     * @param SurveyVO $survey
+     * @param Integer $colorindex
+     * @return <type> 
+     */
+    function getSurveyStats(SurveyVO &$survey, &$colorindex)
+    {
+        $choices = $survey->getChoices();
+        $output = '';
+
+        $statscals = new StatsCalc();
+        $numvotes = 0;
+        $highest = -1;
+        $chnum = 1;
+        foreach ($choices as &$choice)
+        {
+            /* @var $choice ChoiceVO */
+            $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+            $numvotes += $votes;
+            $highest = max($highest, $votes);
+
+            //add the choice number and number of votes to the statistics calculator
+            $statscals->add($chnum, $votes);
+            $chnum++;
+        }
+        if($numvotes == 0)
+            $numvotes = 1;
+        $output .= '<table width=100% class="sortable surtablestat" style="text-align:center; background-color: white">';
+        $output .= "<tr><th width=\"35px\">#<th class=unsortable>Choice<th>Votes<th class=unsortable>%</tr>";
+        global $vgScript;
+        $chnum = 1;
+        foreach ($choices as &$choice)
+        {
+            /* @var $choice ChoiceVO */
+            $color = vfGetColor($colorindex);
+            $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+            $percent = substr(100.0 * $votes / $numvotes, 0, 5);
+            $width = 270.0 * $votes / $numvotes;
+            $name = $this->parser->run($choice->getChoice());
+            $class = '';
+            if($highest && $votes == $highest)
+            {
+                $class .= 'votehighest';
+            }
+            $extra = '';
+            if($survey->getAnswer() == $choice->getChoiceID())
+            {
+                $extra = "<td><img src='$vgScript/icons/correct.png' />";
+            }
+            $colorpatch = "<div style=\"width: 25px; background-color: #$color\">$chnum</div>";
+            $output .= "<tr class=\"$class\"><td>$colorpatch<td align=left> &nbsp; $name<td>$votes<td>$percent%$extra</tr>";
+            $chnum++;
+        }
+        $output .= '</table>';
+        if($highest)
+        {
+            $output .= '<table class="wikitable">';
+            $output .= sprintf("<tr><td width=\"200px\">Sample size<td>%d</tr>", $statscals->getNum());
+            $output .= sprintf("<tr><td width=\"200px\">Mean<td>%.3f</tr>", $statscals->getAverage());
+            list($clow, $chigh) = $statscals->getConfidence95();
+            $output .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$statscals->getNum());
+            $output .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $statscals->getStdDev());
+            $output .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $statscals->getStdError());
+            $output .= '</table>';
+        }
+
+        return $output;
+    }
 }
 
 /**
@@ -620,38 +719,6 @@ class QuestionnaireBody extends SurveyBody
     {
         parent::__construct($user, $page, $parser, $presentationID);
         $this->type = vQUESTIONNAIRE;
-    }
-    /**
-     * Get more details about Questionnaire.
-     *
-     * @return String
-     */
-    public function getDetailsHTML()
-    {
-        $output = parent::getDetailsHTML();
-        $pagestatus = $this->page->getStatus($this->presID);
-        $colorindex = 1; /* for showing items */
-        $surveys =& $this->page->getSurveys();
-        if($this->show_graph && count($surveys) > 1)
-        {
-            foreach($surveys as &$survey)
-            {
-                /* @var $survey SurveyVO */
-                $tmpcolor = $colorindex;
-                $question = wfMsg( 'survey-question', $this->parser->run( $survey->getQuestion() ));
-                $output .= "<h2>$question</h2>";
-                //insert graph image at the beginning
-                $imgid = 'gr'.$this->page->getPageID().'_'.$this->presID.'_'.$survey->getSurveyID().'_'.rand();
-                //Prepend this image!
-                $output .= '<div style="text-align: center; width: 400px;">'.$this->getGraphHTML($colorindex, array($survey), $this->page->getPageID(), $imgid).'</div>';
-                global $vgImageRefresh;
-                if($pagestatus == 'active' && $vgImageRefresh)
-                {
-                    $output .= $this->refreshImage($imgid, $tmpcolor, $this->page->getPageID(), $survey->getSurveyID());
-                }
-            }
-        }
-        return $output;
     }
 }
 /**

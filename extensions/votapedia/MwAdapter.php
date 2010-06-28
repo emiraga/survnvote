@@ -33,7 +33,7 @@ class MwAdapter
                     throw new Exception('Page purging has failed');
         */
         $article = new Article( Title::newFromText($title) );
-        $article->doPurge(); // Directly purge
+        $article->doPurge(); // purge directly
     }
     /**
      * Get a list of subcategories of a category
