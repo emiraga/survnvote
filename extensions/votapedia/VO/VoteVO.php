@@ -147,6 +147,8 @@ class VoteVO
 
 /**
  * Class which holds number of votes in a specific page
+ * 
+ * @package ValueObject
  */
 class VotesCount
 {

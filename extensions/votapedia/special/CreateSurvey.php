@@ -657,6 +657,9 @@ class CreateSurvey
         $this->drawFormNew();
         $this->postDrawForm();
     }
+    /**
+     * Initialize the form items
+     */
     function initialize()
     {
         if(isset($this->form))

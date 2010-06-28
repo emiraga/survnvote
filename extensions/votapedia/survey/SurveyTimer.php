@@ -6,11 +6,17 @@ if (!defined('MEDIAWIKI')) die();
 
 /**
  * Display a javascript timer/countdown.
+ * @package SurveyView
  */
 class SurveyTimer
 {
     /* Boolean */ private $refresh  = true;
-    
+
+    /**
+     * Should current webpage be refreshed after timer has expired?
+     *
+     * @param Boolean $refresh
+     */
     function setRefresh($refresh)
     {
         $this->refresh = $refresh;

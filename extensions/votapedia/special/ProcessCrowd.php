@@ -104,6 +104,11 @@ class ProcessCrowd extends SpecialPage
             return;
         }
     }
+    /**
+     * Add users by username from web request.
+     *
+     * @param String $par parameter to the special page (name of crowd)
+     */
     function addByUsername($par)
     {
         global $wgRequest;
@@ -138,6 +143,12 @@ class ProcessCrowd extends SpecialPage
             $crdao->addUserToCrowd($crowd->crowdID, $user->userID);
         }
     }
+
+    /**
+     * Add users by email from web request.
+     * 
+     * @param String $par parameter to the special page (name of crowd)
+     */
     function addByEmail($par)
     {
         global $wgRequest;
@@ -207,7 +218,11 @@ END_MAIL
             $crdao->addUserToCrowd($crowd->crowdID, $user->userID, false, false);
         }
     }
-    
+    /**
+     * Add users by phone number from the web request.
+     * 
+     * @param String $par parameter to the special page (name of crowd)
+     */
     function addByPhone($par)
     {
         global $wgRequest;

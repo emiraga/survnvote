@@ -45,6 +45,11 @@ abstract class Graph
     {
         $this->graphvalues[] = $val;
     }
+    /**
+     * Set the backgroung image.
+     *
+     * @param String $img path to image
+     */
     function setBackgroungImage($img)
     {
         $this->bgimage = $img;
@@ -360,6 +365,12 @@ abstract class GraphValues
     {
         return $this->count;
     }
+    /**
+     * Set the transparency level in hexadecimal.
+     * Example: setTransparent('AA') for transparency 170/256
+     *
+     * @param String $trans
+     */
     function setTransparent($trans)
     {
         $this->trans = $trans;

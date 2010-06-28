@@ -19,6 +19,11 @@ class UserPermissions
 {
     /** @var UserVO */ protected $user;
 
+    /**
+     * Contruct UserPermissions object
+     * 
+     * @param UserVO $user
+     */
     public function __construct(UserVO &$user)
     {
         $this->user =& $user;

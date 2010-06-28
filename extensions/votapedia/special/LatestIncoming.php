@@ -49,6 +49,12 @@ class LatestIncoming extends SpecialPage
             $wgOut->addHTML($contents);
         }
     }
+    /**
+     * Get the list of incoming calls.
+     *
+     * @param Boolean $long output long or short list
+     * @return String HTML Code
+     */
     private function &getContents($long)
     {
         global $vgEnableSMS;

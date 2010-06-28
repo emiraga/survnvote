@@ -52,11 +52,19 @@ class SurveysList extends SpecialPage
             $wgOut->addHTML($par);
         }
     }
+    /**
+     * Purge cache related to this special page.
+     */
     static function purgeCache()
     {
         $cache =& wfGetMainCache();
         $cache->delete('vp:surveyslist');
     }
+    /**
+     * Get HTML code which is to be shown on the front page.
+     *
+     * @return String HTML code
+     */
     private function &getFrontpage()
     {
         global $vgScript, $vgEnableSMS;

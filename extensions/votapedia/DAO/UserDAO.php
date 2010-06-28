@@ -69,6 +69,13 @@ class UserDAO
         $user->smsConfirm = $r->fields['smsConfirm'];
         return $user;
     }
+    /**
+     * Generate new user for Mediawiki.
+     *
+     * @param String $realname optional value for real name of user
+     * @param String $email optional value for email of user
+     * @return UserVO
+     */
     function generateNewUser($realname='', $email='')
     {
         global $vgDB, $vgDBPrefix;
@@ -146,6 +153,12 @@ class UserDAO
             UserDAO::invalidatePassword( $user->getName() );
         return true;
     }
+    /**
+     * Check if code for SMS confirmation is valid.
+     *
+     * @param String $code SMS confirm code
+     * @return UserVO or Boolean if value is not valid
+     */
     public function checkValidConfirmCode($code)
     {
         global $vgConfirmCodeLen;

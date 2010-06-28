@@ -19,6 +19,10 @@ class UserVO
 
     /** @var Boolean */ public $isAdmin = false; /* not stored in database, set by MwAdapter */
     /** @var Boolean */ public $isTemporary = false; /* not stored in database, used by liveshow */
+
+    /**
+     * Construct UserVO
+     */
     public function __construct()
     {
         global $vgConfirmCodeLen;
@@ -26,10 +30,22 @@ class UserVO
         for($i = 0; $i < $vgConfirmCodeLen; $i++)
             $this->smsConfirm .= rand(0, 9);
     }
+    /**
+     * Get confirmation code for this user to be used with SMS.
+     * 
+     * @return String
+     */
     public function getConfirmCode()
     {
         return $this->smsConfirm.$this->userID;
     }
+    /**
+     * Generate a HMAC temporary key for the current user.
+     * It takes extra parameter which is going to be authenticated.
+     *
+     * @param String $extra message which needs to be authenticated.
+     * @return String
+     */
     public function getTemporaryKey($extra)
     {
         global $wgSecretKey;

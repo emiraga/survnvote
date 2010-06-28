@@ -46,6 +46,12 @@ class SurveyBody
         $this->presID = $presentationID;
         $this->votescount = VoteDAO::getNumVotes($this->page->getPageID(), $this->presID);
     }
+
+    /**
+     * Change value of current presentation ID.
+     *
+     * @param Integer $presID
+     */
     function setPresentationID($presID)
     {
         if($presID != $this->presID)
@@ -218,7 +224,11 @@ class SurveyBody
         return $output;
     }
     /**
+     * Get a code for collapsing/expanding survey questions (above questions).
      *
+     * @param Integer $id previx of html div id
+     * @param Integer $num number of questions
+     * @return String HTML code
      */
     function slideSurveys( $id, $num)
     {
@@ -238,6 +248,13 @@ class SurveyBody
         $out.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         return $out;
     }
+    /**
+     * Get a code for collapsing/expanding survey questions (bellow of questions).
+     *
+     * @param Integer $id previx of html div id
+     * @param Integer $num number of questions
+     * @return String HTML code
+     */
     function slideSurveysBottom( $id, $num)
     {
         if($num < 2)

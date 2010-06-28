@@ -93,6 +93,10 @@ class Crowd extends SpecialPage
             return;
         }
     }
+    /**
+     * Add to the output wgOut a list of crowds user is member of.
+     *
+     */
     function showCrowdList()
     {
         global $wgOut;
@@ -121,6 +125,9 @@ class Crowd extends SpecialPage
         }
         $wgOut->addWikiText($out);
     }
+    /**
+     * Add to wgOut a list of members.
+     */
     function showMembersList()
     {
         global $wgOut;
@@ -185,6 +192,9 @@ class Crowd extends SpecialPage
                     .'" target=_blank>Print handouts</a></h4>');
         }
     }
+    /**
+     * Add to wgOut a form for adding a new crowd.
+     */
     function newCrowdForm()
     {
         global $wgOut;
@@ -206,6 +216,9 @@ class Crowd extends SpecialPage
         $wgOut->addHTML($form->AddPage('Crowd information', array('name','description')));
         $wgOut->addHTML($form->EndForm(wfMsg('create-crowd'), false));
     }
+    /**
+     * Add to wgOut a form for addign new users.
+     */
     function addUsersForm()
     {
         global $wgOut, $vgScript;
@@ -261,6 +274,9 @@ class Crowd extends SpecialPage
         $wgOut->addHTML($form->AddPage('by phone number', array('bynumber')));
         $wgOut->addHTML($form->EndForm(wfMsg('add-to-crowd')));
     }
+    /**
+     * Show message log for crowd
+     */
     function showLog()
     {
         global $wgOut;
@@ -277,6 +293,9 @@ class Crowd extends SpecialPage
         $out .= '|}';
         $wgOut->addWikiText($out);
     }
+    /**
+     * Show 'print handouts' output from message log.
+     */
     function showPrintLog()
     {
         global $wgOut, $vgSmsNumber;

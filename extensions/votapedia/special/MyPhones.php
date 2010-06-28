@@ -33,6 +33,10 @@ class MyPhones extends SpecialPage
         $this->target = Skin::makeSpecialUrl('MyPhones');
         $this->display = array();
     }
+
+    /**
+     * Initialize form items
+     */
     function initItems()
     {
         global $vgScript;
@@ -199,6 +203,9 @@ class MyPhones extends SpecialPage
             return;
         }
     }
+    /**
+     * List phones added by this user.
+     */
     function listPhones()
     {
         $list = $this->dao->getList();

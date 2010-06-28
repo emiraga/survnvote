@@ -98,6 +98,12 @@ class MwAdapter
         }
         return false;
     }
+    /**
+     * Get a path of uploaded file given it's name.
+     *
+     * @param String $name
+     * @return String path
+     */
     function filePath( $name )
     {
         /* @var $file File */
@@ -130,6 +136,11 @@ class MwAdapter
             $wgOut->addScriptFile($path);
         }
     }
+    /**
+     * Detect if we are currently showing a page to the mobile client.
+     *
+     * @return Boolean
+     */
     function isMobile()
     {
         if(!class_exists('MobileSkin'))

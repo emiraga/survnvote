@@ -69,7 +69,12 @@ class CrowdDAO
         $user->no_members = $r->fields['no_members'];
         return $user;
     }
-
+    /**
+     * Get a list of crowds for a given user.
+     * 
+     * @param Integer $userID
+     * @return Array of CrowdVO
+     */
     function getCrowdsOfUser($userID)
     {
         global $vgDB, $vgDBPrefix;
@@ -91,7 +96,12 @@ class CrowdDAO
         }
         return $result;
     }
-
+    /**
+     * Get a list of members of a crowd.
+     *
+     * @param CrowdVO $crowd
+     * @return Array of CrowdMemberVO
+     */
     function getCrowdMembers(CrowdVO &$crowd)
     {
         $result = array();
@@ -111,6 +121,14 @@ class CrowdDAO
         }
         return $result;
     }
+    /**
+     * Add user to crowd.
+     * 
+     * @param Integer $crowdID
+     * @param Integer $userID
+     * @param Boolean $isManager
+     * @param Boolean $showpassword
+     */
     function addUserToCrowd($crowdID, $userID, $isManager = false, $showpassword = false)
     {
         global $vgDB, $vgDBPrefix;
@@ -123,18 +141,39 @@ class CrowdDAO
                 array( $crowdID, $userID, $isManager, $showpassword, $now));
         $vgDB->Execute("UPDATE {$vgDBPrefix}crowd SET no_members = no_members + 1 WHERE crowdID = ?",array($crowdID));
     }
+    /**
+     * Is user manager of this crowd.
+     *
+     * @param Integer $crowdID
+     * @param Integer $userID
+     * @return Boolean
+     */
     function isManager($crowdID, $userID)
     {
         global $vgDB, $vgDBPrefix;
         return (bool) $vgDB->GetOne("SELECT isManager FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
                 array(intval($crowdID), intval($userID)));
     }
+    /**
+     * Is user member of a crowd.
+     * 
+     * @param Integer $crowdID
+     * @param Integer $userID
+     * @return Boolean
+     */
     function isMember($crowdID, $userID)
     {
         global $vgDB, $vgDBPrefix;
         return (bool) $vgDB->GetOne("SELECT count(userID) FROM {$vgDBPrefix}crowd_member WHERE crowdID = ? AND userID = ? ",
                 array(intval($crowdID), intval($userID)));
     }
+    /**
+     * Add message to the crowd log.
+     * 
+     * @param Integer $crowdID
+     * @param String $text
+     * @param Boolean $printable 
+     */
     function addLog($crowdID, $text, $printable = false)
     {
         $log = new CrowdLogVO();
@@ -147,6 +186,13 @@ class CrowdDAO
         $vgDB->Execute("INSERT INTO {$vgDBPrefix}crowd_log (crowdID,date_added,log,printable) VALUES (?,?,?,?)",
                 array( $log->crowdID, $log->date_added, $log->log, $log->printable));
     }
+    /**
+     * Get a list of logs for a crowd.
+     *
+     * @param Integer $crowdID
+     * @param Boolean $only_printable
+     * @return Array of CrowdLogVO
+     */
     function getLogs($crowdID, $only_printable = false)
     {
         global $vgDB, $vgDBPrefix;

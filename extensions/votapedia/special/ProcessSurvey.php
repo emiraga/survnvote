@@ -239,7 +239,10 @@ class ProcessSurvey extends SpecialPage
             return;
         }
     }
-    
+    /**
+     * Get a link to be redirected to. It handles two cases of regular usage and liveshow.
+     * @return String
+     */
     function getRedirectLink()
     {
         global $wgRequest;
@@ -261,7 +264,9 @@ class ProcessSurvey extends SpecialPage
             return $title->getLocalURL();
         }
     }
-    
+    /**
+     * Redirect user to the URL given by $this->getRedirectLink()
+     */
     function redirect()
     {
         global $wgOut;

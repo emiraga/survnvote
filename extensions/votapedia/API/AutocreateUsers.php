@@ -22,7 +22,8 @@ if(class_exists('ApiBase'))
             return array( 'secretkey' => '','name' => '','password' => '','realname' => '','email' => '' );
         }
         /**
-         * Version.
+         * Get Version.
+         *
          * @return Integer
          */
         public function getVersion()
@@ -47,6 +48,9 @@ if(class_exists('ApiBase'))
             $apiResult = $this->getResult();
             $apiResult->addValue( array(), 'error', array('title' => 'Invalid secretkey') );
         }
+        /**
+         * From the API call, add user to the database.
+         */
         private function adduser()
         {
             $name     = $this->getParameter('name');
@@ -62,6 +66,16 @@ if(class_exists('ApiBase'))
             else
                 $apiResult->addValue( array(), 'error', array('title' => 'username null or user already exists') );
         }
+
+        /**
+         * Add new user to the mediawiki database.
+         *
+         * @param String $name
+         * @param String $password
+         * @param String $realname
+         * @param String $email
+         * @return Boolean true on success otherwise false
+         */
         static public function addToDatabase($name, $password, $realname, $email)
         {
             $u = User::newFromName( $name, 'creatable' );
@@ -96,8 +110,27 @@ if(class_exists('ApiBase'))
     }
 }//if class_exists('ApiBase')
 
+/**
+ * Class used for creating a new users.
+ * This class can be used in two scenarios:
+ *  1. From a mediawiki extension, in which case it will be directly added.
+ *  2. Can be used from a PHP files which is not an extension, in that case
+ *     HTTP subrequest will be made to the /api.php and that will perform
+ *     the operation of addition. This process is transparent to the caller.
+ *
+ * @package MediaWikiInterface
+ */
 class AutocreateUsers
 {
+    /**
+     * Add user.
+     *
+     * @param String $name
+     * @param String $password
+     * @param String $realname
+     * @param String $email
+     * @return Boolean true on success otherwise false
+     */
     static public function create($name, $password, $realname, $email)
     {
         global $wgAuth;
