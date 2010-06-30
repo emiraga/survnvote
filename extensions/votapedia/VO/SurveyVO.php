@@ -247,7 +247,7 @@ class SurveyVO
         {
             $xml=$xml."<choice>";
 
-            $xml=$xml."<value>".str_ireplace('+',' ',urldecode(htmlspecialchars($choice->getChoice())))."</value>";
+            $xml=$xml."<value>".str_ireplace('+',' ',urldecode(htmlspecialchars($choice->choice)))."</value>";
             /*
 			 if ($choice->getSMS()=="none" || is_null($choice->getSMS()))
 			 $xml=$xml."<sms></sms>";

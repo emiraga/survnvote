@@ -329,7 +329,7 @@ END_SCRIPT;
             {
                 /* @var $choice ChoiceVO */
                 $id = 'q'.$num."c".$cnum;
-                $choiceshtml .= sprintf($this->choice_t, $num, $id, $parser->run(trim($choice->getChoice()),false), urlencode($choice->getChoice()));
+                $choiceshtml .= sprintf($this->choice_t, $num, $id, $parser->run(trim($choice->choice),false), urlencode($choice->choice));
                 $cnum++;
             }
             $this->prev_num_ch .= 'numChoices['.$num.'] = '.$cnum.";\n";

@@ -163,9 +163,9 @@ class SurveyButtons
             }
 
             //Powerpoint button
-            if($this->show_liveshow && $this->page_status != 'ended')
+            if($this->show_liveshow)
             {
-                $output .='&nbsp;&nbsp;<input type="submit" name="wpSubmit" value="'
+                $output .='<br /><input type="submit" name="wpSubmit" value="'
                     .wfMsg('view-liveshow').'">';
             }
         }

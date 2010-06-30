@@ -31,7 +31,7 @@ class DebugADODB
     {
         if(startswith($sql, 'select'))
         {
-            if(strstr($sql, 'smsd.inbox'))
+            if(strstr($sql, 'smsd.inbox') || strstr($sql, 'smsd.outbox') || strstr($sql, 'smsd.sentitems'))
                 return;
             
             global $vgDBPrefix;
@@ -47,7 +47,11 @@ class DebugADODB
                  || $a['Extra'] == 'Impossible WHERE noticed after reading const tables'
                 )   continue;
                 
-                if($a['Extra'] == "Using where" || $a['Extra'] == 'Using where; Using index' || $a['Extra'] == 'Using where; Using join buffer')
+                if($a['Extra'] == "Using where" 
+                        || $a['Extra'] == 'Using where; Using index'
+                        || $a['Extra'] == 'Using where; Using join buffer'
+                        || $a['Extra'] == 'Using intersect(userID,surveyID); Using where'
+                        )
                 {
                     if($a['key'] == 'receivers_released' && startswith($sql, "select * from {$vgDBPrefix}page WHERE receivers_released = 0 AND endTime <="))
                         continue;
@@ -67,7 +71,7 @@ class DebugADODB
                     if( ($a['key'] == 'userID' || $a['key'] == 'surveyID') && startswith($sql, "select choiceID from {$vgDBPrefix}vote where userID = "))
                         continue;
 
-                    if( ($a['key'] == 'userID' || $a['key'] == 'surveyID') && startswith($sql, "select voteID, choiceID from {$vgDBPrefix}vote where userID ="))
+                    if( strlen($a['key']) > 1 && startswith($sql, "select voteID, choiceID from {$vgDBPrefix}vote where userID ="))
                         continue;
 
                     if($a['key'] == 'SMS' && startswith($sql, "SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}choice WHERE SMS ="))

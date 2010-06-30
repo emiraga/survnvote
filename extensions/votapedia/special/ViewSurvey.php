@@ -9,6 +9,7 @@ global $vgPath;
 require_once("$vgPath/misc/Common.php" );
 require_once("$vgPath/misc/UserPermissions.php");
 require_once("$vgPath/DAO/UserDAO.php" );
+require_once("$vgPath/survey/SurveyBody.php" );
 
 /**
  * Special page View Survey
@@ -88,8 +89,12 @@ class ViewSurvey extends SpecialPage
             {
                 $uservo = vfUser()->getUserVO();
             }
-            
-            $tag = new SurveyView($uservo, $page_id, $parser, $buttons);
+
+            $pagedao = new PageDAO();
+            $page =& $pagedao->findByPageID( $page_id );
+
+            $bodyfactory = new SurveyBodyFactory($page, $uservo, $parser);
+            $tag = new SurveyView($uservo, $page, $parser, $buttons, $bodyfactory->getBody());
             $buttons->setType($tag->getPage()->getTypeName());
             
             if($liveshow)

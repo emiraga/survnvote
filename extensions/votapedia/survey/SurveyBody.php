@@ -743,3 +743,36 @@ class QuizBody extends QuestionnaireBody
     }
 }
 
+
+class SurveyBodyFactory
+{
+    /* @var PageVO */ protected $page;
+    /* @var UserVO */ protected $user;
+    /* @var UserVO */ protected $parser;
+
+    public function __construct(PageVO &$page, UserVO &$user, MwParser &$parser)
+    {
+        $this->page =& $page;
+        $this->user =& $user;
+        $this->parser =& $parser;
+    }
+    function getBody()
+    {
+        switch($this->page->getType())
+        {
+            case vSIMPLE_SURVEY:
+                $body = new SurveyBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                break;
+            case vQUESTIONNAIRE:
+                $body = new QuestionnaireBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                break;
+            case vQUIZ:
+                $body = new QuizBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
+                break;
+            default:
+                throw new Exception('Unknown survey type');
+        }
+        return $body;
+    }
+}
+

@@ -25,7 +25,6 @@ class SurveyView
     /** @var MwParser */      protected $parser;
     /** @var PageVO */        protected $page;
     /** @var UserVO */        protected $user;
-    /** @var Integer */       protected $page_id;
     /** @var Title */         protected $wikititle;
     /** @var SurveyButtons */ protected $buttons;
     /** @var SurveyBody */    protected $body;
@@ -45,8 +44,17 @@ class SurveyView
         {
             $mwparser = new MwParser($parser);
             $mwparser->setTag();
+
+            if(! $page_id)
+                throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
+
+            $pagedao = new PageDAO();
+            $page =& $pagedao->findByPageID( $page_id );
+            $user =& vfUser()->getUserVO();
+
             $buttons = new SurveyButtons();
-            $tag = new SurveyView( vfUser()->getUserVO(), $page_id, $mwparser, $buttons);
+            $bodyfactory = new SurveyBodyFactory($page, $user, $mwparser);
+            $tag = new SurveyView($user, $page, $mwparser, $buttons, $bodyfactory->getBody());
             return $tag->getHTML();
         }
         catch(Exception $e)
@@ -70,27 +78,23 @@ class SurveyView
     /**
      *
      * @param UserVO $user
-     * @param Integer $page_id
+     * @param PageVO $page
      * @param MwParser $parser
      * @param SurveyButtons $surveybuttons
+     * @param SurveyBody $body
      */
-    function __construct(UserVO &$user, $page_id, MwParser &$parser, SurveyButtons &$surveybuttons)
+    function __construct(UserVO &$user, PageVO &$page, MwParser &$parser, SurveyButtons &$surveybuttons, SurveyBody &$body)
     {
         wfLoadExtensionMessages('Votapedia');
         global $wgOut, $wgTitle, $wgRequest;
 
         $this->user =& $user;
         $this->parser =& $parser;
-        $this->page_id=$page_id;
+        $this->page =& $page;
         $this->buttons =& $surveybuttons;
-
-        if(! $this->page_id)
-            throw new Exception( wfMsg('id-not-present', htmlspecialchars($page_id)) );
+        $this->body =& $body;
 
         $this->parser->disableCache(); // disable caching of pages with surveys
-
-        $pagedao = new PageDAO();
-        $this->page = $pagedao->findByPageID( $page_id );
 
         if($wgRequest->getVal('returnto'))
             $this->wikititle = Title::newFromText($wgRequest->getVal('returnto'));
@@ -108,29 +112,13 @@ class SurveyView
         //configure buttons
         $this->buttons->setPageAuthor($this->page->getAuthor());
         $this->buttons->setWikiTitle($this->wikititle->getFullText());
-        $this->buttons->setPageID($this->page_id);
+        $this->buttons->setPageID($this->page->getPageID());
         $this->buttons->setType($this->page->getTypeName());
         
         if($pagestatus == 'ended' )
         {
             //page is no longer cached, we can control the survey even when it is ended.
             $this->buttons->setRenewButton(true);
-        }
-        
-        //Configure body and buttons for different types
-        switch($this->page->getType())
-        {
-            case vSIMPLE_SURVEY:
-                $this->body = new SurveyBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
-                break;
-            case vQUESTIONNAIRE:
-                $this->body = new QuestionnaireBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
-                break;
-            case vQUIZ:
-                $this->body = new QuizBody($this->user, $this->page, $this->parser, $this->page->getCurrentPresentationID());
-                break;
-            default:
-                throw new Exception('Unknown survey type');
         }
         
         //has control?.
@@ -149,7 +137,7 @@ class SurveyView
     }
     /**
      * Get HTML of a one page of survey
-     *
+     * 
      * @param Boolean $show_details
      * @return String html code
      */
@@ -230,12 +218,12 @@ class SurveyView
         if($this->page->getCurrentPresentationID() == $presID)
         {
             $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
-                    .'<input type="hidden" name="id" value="'.$this->page_id.'">'
+                    .'<input type="hidden" name="id" value="'.$this->page->getPageID().'">'
                     .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
-            $output.= '<a name="survey_id_'.$this->page_id.'"></a>';
+            $output.= '<a name="survey_id_'.$this->page->getPageID().'"></a>';
             if($this->user->isTemporary)
             {
-                $output .= '<input type="hidden" name="liveshow" value="'.$this->user->getTemporaryKey($this->page_id).'" />';
+                $output .= '<input type="hidden" name="liveshow" value="'.$this->user->getTemporaryKey($this->page->getPageID()).'" />';
                 $output .= '<input type="hidden" name="userID" value="'.$this->user->userID.'" />';
             }
         }

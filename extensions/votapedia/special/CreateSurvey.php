@@ -454,12 +454,13 @@ class CreateSurvey
      */
     function fillValuesFromSurveys(&$surveys)
     {
-        $surchoice = $surveys[0]->getChoices();
+        $surchoices = $surveys[0]->getChoices();
         $choices='';
-        foreach($surchoice as &$ch)
+        foreach($surchoices as &$ch)
         {
+            /* @var $ch ChoiceVO */
             if($choices) $choices .= "\r";
-            $choices .= $ch->getChoice();
+            $choices .= $ch->choice;
         }
         $this->form->setValue('choices', $choices);
     }
