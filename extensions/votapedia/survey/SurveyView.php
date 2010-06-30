@@ -6,13 +6,13 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 require_once("$vgPath/survey/SurveyButtons.php");
 require_once("$vgPath/survey/SurveyBody.php");
 require_once("$vgPath/Graph/Graph.php");
-require_once("$vgPath/FormControl.php");
+require_once("$vgPath/misc/FormControl.php");
 require_once("$vgPath/DAO/PageDAO.php");
-require_once("$vgPath/UserPermissions.php");
+require_once("$vgPath/misc/UserPermissions.php");
 
 /**
  * Class used to display parts of HTML related to the viewing of survey.

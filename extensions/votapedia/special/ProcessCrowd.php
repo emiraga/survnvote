@@ -6,9 +6,9 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
-require_once("$vgPath/FormControl.php");
+require_once("$vgPath/misc/FormControl.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/Sms.php");
 

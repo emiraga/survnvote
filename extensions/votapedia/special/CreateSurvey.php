@@ -7,10 +7,10 @@ if (!defined('MEDIAWIKI')) die();
 /** Include dependencies */
 global $vgPath;
 require_once("$vgPath/Common.php" );
-require_once("$vgPath/FormControl.php");
+require_once("$vgPath/misc/FormControl.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
-require_once("$vgPath/UserPermissions.php");
+require_once("$vgPath/misc/UserPermissions.php");
 
 /**
  * @package MediaWikiInterface

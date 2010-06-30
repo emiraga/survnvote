@@ -19,7 +19,7 @@ $vgDBUserName = $wgDBadminuser; //Set this to database user that has priviledges
 $vgDBUserPassword = $wgDBadminpassword;
 
 /** Include dependencies */
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 $vgDB->debug = false;
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
@@ -27,7 +27,7 @@ require_once("$vgPath/DAO/UserphonesDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
 require_once("$vgPath/API/AutocreateUsers.php");
-require_once("$vgPath/UserPermissions.php");
+require_once("$vgPath/misc/UserPermissions.php");
 
 $vgDaemonDebug = false;
 

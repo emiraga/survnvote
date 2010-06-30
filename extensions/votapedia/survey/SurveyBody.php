@@ -6,12 +6,12 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 require_once("$vgPath/graph/Graph.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/Survey/SurveyTimer.php");
-require_once("$vgPath/StatsCalc.php");
+require_once("$vgPath/misc/StatsCalc.php");
 
 /**
  * SurveyBody shows the main part of the survey.

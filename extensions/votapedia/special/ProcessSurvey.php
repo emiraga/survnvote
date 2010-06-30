@@ -6,10 +6,9 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/MwAdapter.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/PageDAO.php");
-require_once("$vgPath/UserPermissions.php");
+require_once("$vgPath/misc/UserPermissions.php");
 
 /**
  * Special page Create Survey.

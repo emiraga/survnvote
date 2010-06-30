@@ -13,7 +13,7 @@ $vgDBUserPassword   = $wgDBadminpassword;
 $vgDBPrefix = '';
 
 echo "Starting unit testing.\n";
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 $vgDB->debug = false;
 require_once("$vgPath/../votapedia.setup.php");
 

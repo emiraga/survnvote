@@ -13,9 +13,9 @@ $wgExtensionMessagesFiles['Votapedia'] = "$vgPath/votapedia.i18n.php";
 $wgExtensionAliasesFiles['Votapedia'] = "$vgPath/votapedia.alias.php";
 
 //MediaWiki Adapter
-$wgAutoloadClasses['MwAdapter'] = "$vgPath/MwAdapter.php";
-$wgAutoloadClasses['MwParser'] = "$vgPath/MwAdapter.php";
-$wgAutoloadClasses['MwUser'] = "$vgPath/MwAdapter.php";
+$wgAutoloadClasses['MwAdapter'] = "$vgPath/misc/MwAdapter.php";
+$wgAutoloadClasses['MwParser'] = "$vgPath/misc/MwAdapter.php";
+$wgAutoloadClasses['MwUser'] = "$vgPath/misc/MwAdapter.php";
 
 //Special page CreateSurvey
 $wgAutoloadClasses['spCreateSurvey'] = "$vgPath/special/CreateSurvey.php";

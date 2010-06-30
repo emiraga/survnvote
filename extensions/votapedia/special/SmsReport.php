@@ -6,7 +6,7 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/graph/Graph.php");
 
@@ -78,7 +78,7 @@ class SmsReport extends SpecialPage
             $number = $sms['number'];
             $number = vfColorizePhone($number, false, !$admin);
             $out .= "|-\n";
-            $out .= "| Pending || $number || ". vfPrettyDate( $sms['date'] );
+            $out .= "| Pending || $number || ". $sms['date'] ;
             if($admin)
             {
                 $out.="|| ". substr( $sms['text'], 0, 60 );
@@ -99,7 +99,7 @@ class SmsReport extends SpecialPage
             $status = preg_replace("/OK/", 'OK, ', $status);
 
             $out .= "|-\n";
-            $out .= "| $statcolor $status || $number || ".vfPrettyDate( $sms['date'] );
+            $out .= "| $statcolor $status || $number || ". $sms['date'] ;
             if($admin)
             {
                 $out.="|| " . htmlspecialchars( substr( $sms['text'], 0, 60 ) );

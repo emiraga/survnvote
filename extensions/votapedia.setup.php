@@ -96,7 +96,7 @@ if(!defined('VOTAPEDIA_TEST'))
 function vfDoSetup($justprint = false)
 {
     global $vgPath, $vgDB, $vgDBPrefix, $wgDBTableOptions;
-    require_once("$vgPath/Common.php");
+    require_once("$vgPath/misc/Common.php");
 
     //which data type to use for specific fields
     //@todo optimize these values

@@ -6,7 +6,7 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php");
+require_once("$vgPath/misc/Common.php");
 require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/Survey/SurveyTimer.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
