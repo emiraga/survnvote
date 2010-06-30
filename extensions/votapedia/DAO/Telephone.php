@@ -218,9 +218,10 @@ class Telephone
             $surveyChoices =& $survey->getChoices();
             foreach($surveyChoices as &$surveyChoice)
             {
+                /* @var $surveyChoice ChoiceVO */
                 $receivers[] = array($results[$i]);
-                $surveyChoice->setReceiver($results[$i]);
-                $surveyChoice->setSMS(substr($results[$i], -$vgSmsChoiceLen));
+                $surveyChoice->receiver = $results[$i];
+                $surveyChoice->SMS = substr($results[$i], -$vgSmsChoiceLen);
                 $i++;
             }
             //Get rid of the occupied numbers from the availablePhones
@@ -257,14 +258,15 @@ class Telephone
             $surveyChoices =& $survey->getChoices();
             foreach($surveyChoices as &$surveyChoice)
             {
-                if($surveyChoice->getReceiver())
+                /* @var $surveyChoice ChoiceVO */
+                if($surveyChoice->receiver)
                 {
                     $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}used_receivers WHERE receiver = ?", array($surveyChoice->getReceiver()));
                     if(! $success)
                         throw new SurveyException("Failed to delete used receivers");
                 }
-                $surveyChoice->setReceiver(NULL);
-                $surveyChoice->setSMS(NULL);
+                $surveyChoice->receiver = NULL;
+                $surveyChoice->SMS = NULL;
             }
             $surveysid[] = array($survey->getSurveyID());
         }
@@ -285,7 +287,9 @@ class Telephone
         global $vgDB, $vgDBPrefix;
         $now = vfDate();
         $pagedao = new PageDAO();
-        $pages = $pagedao->getPages("WHERE endTime <= ? and receivers_released = 0", array($now));
+        // I am hoping that mysql will use index for this receivers_released,
+        // and second part of WHERE caluse should not take too long
+        $pages = $pagedao->getPages("WHERE receivers_released = 0 AND endTime <= ?", array($now));
         $ret = array();
         foreach ($pages as $page)
         {

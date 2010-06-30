@@ -35,7 +35,6 @@ class PageDAO
     {
         global $vgDB, $vgDBPrefix;
 
-        $vgDB->SetFetchMode(ADODB_FETCH_ASSOC);
         $sql ="select * from {$vgDBPrefix}page $where";
         $rs= &$vgDB->Execute($sql, $param);
         $pages = array();
@@ -307,20 +306,28 @@ class PageDAO
         }
         $presid = $page->getCurrentPresentationID();
 
+        global $vgPath;
+        require_once("$vgPath/DAO/VoteDAO.php");
         //Save history of survey runs
         $pres = new PresentationVO();
         $pres->setActive(false);
         $pres->setStartTime($page->getStartTime());
         $pres->setEndTime($page->getEndTime());
         $pres->setPageID($page->getPageID());
-        $pres->setName('Run # ' . $presid);
+        $pres->setName('Run#' . $presid);
         $pres->setPresentationID($presid);
-
+        $pres->numvotes = serialize( VoteDAO::getNumVotes($page, $presid) );
+        
         $page->addPresentation($pres);
         $page->setStartTime("2999-01-01 00:00:00");
         $page->setEndTime('2999-01-01 00:00:00');
         //update page information
         $this->updatePage($page, false, true);
+
+        //blank number of votes in 'choice' table
+        global $vgDB, $vgDBPrefix;
+        $r = $vgDB->Execute("UPDATE {$vgDBPrefix}choice set numvotes=0 where pageID=?",
+                array(intval($page->getPageID())));
     }
     /**
      * Update database and set new receivers and SMS from the PageVO object.
@@ -338,11 +345,12 @@ class PageDAO
             $surveyChoices =& $survey->getChoices();
             foreach($surveyChoices as &$surveyChoice)
             {
+                /* @var $surveyChoice ChoiceVO */
                 $param = array(
-                        $surveyChoice->getReceiver(),
-                        $surveyChoice->getSMS(),
-                        $surveyChoice->getSurveyID(),
-                        $surveyChoice->getChoiceID(),
+                        $surveyChoice->receiver,
+                        $surveyChoice->SMS,
+                        $surveyChoice->surveyID,
+                        $surveyChoice->choiceID,
                 );
                 $vgDB->Execute($resChoice, $param);
             }
@@ -355,7 +363,21 @@ class PageDAO
     public function getActiveSurveys()
     {
         $now = vfDate();
-        return $this->getPages("WHERE ? BETWEEN startTime and endTime ORDER BY startTime DESC", array($now), false, false);
+        $surveys =& $this->getPages("WHERE receivers_released = 0", false, false, false);
+        //WHERE $now BETWEEN startTime and endTime ORDER BY startTime DESC
+        $result = array();
+        $startime = array();
+        foreach ($surveys as &$survey)
+        {
+            /* @var $survey PageVO */
+            if($survey->getStartTime() <= $now && $survey->getEndTime() >= $now)
+            {
+                $result[] = $survey;
+                $startime[] = $survey->getStartTime();
+            }
+        }
+        array_multisort($startime, SORT_STRING, SORT_DESC, $result);
+        return $result;
     }
 }
 

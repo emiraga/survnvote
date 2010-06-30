@@ -80,7 +80,7 @@ class SurveyVO
         foreach($this->choices as &$choice)
         {
             /* @var $choice ChoiceVO */
-            if($answer == $choice->getChoice())
+            if($answer == $choice->choice)
             {
                 $this->answer = $choiceid;
                 return ;
@@ -109,9 +109,9 @@ class SurveyVO
      *
      * @param Array $choices of ChoiceVO
      */
-    function setChoices(array $choices)
+    function setChoices(array &$choices)
     {
-        $this->choices = $choices;
+        $this->choices =& $choices;
     }
     /**
      * Generate choices from the array of strings
@@ -129,10 +129,10 @@ class SurveyVO
             if(strlen($value)<1)
                 continue;
             $choice = new ChoiceVO();
-            $choice->setSurveyID( $this->getSurveyID() );
-            $choice->setPageID($this->getPageID());
-            $choice->setChoice($value);
-            $choice->setPoints(0);
+            $choice->surveyID = $this->getSurveyID();
+            $choice->pageID = $this->getPageID();
+            $choice->choice = $value;
+            $choice->points = 0;
             $choices[] = $choice;
         }
         $this->setChoices($choices);
@@ -221,8 +221,8 @@ class SurveyVO
     {
         foreach($this->choices as $choice )
         {
-            if ($choice->getReceiver() == $receiver)
-                return $choice->getChoiceID();
+            if ($choice->receiver == $receiver)
+                return $choice->choiceID;
         }
         return null;
     }*/

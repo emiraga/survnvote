@@ -151,6 +151,6 @@ $wgExtensionCredits['other'][] = array(
         'url' => 'http://www.votapedia.net/',
         'description' => 'Votapedia - Audience Response System',
         'descriptionmsg' => 'votapedia-desc',
-        'version' => '0.2.4',
+        'version' => '0.2.5',
 );
 

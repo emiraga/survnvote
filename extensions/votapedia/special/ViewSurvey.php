@@ -6,9 +6,9 @@ if (!defined('MEDIAWIKI')) die();
 
 /** Include dependencies */
 global $vgPath;
-require_once("$vgPath/Common.php" );
+require_once("$vgPath/misc/Common.php" );
+require_once("$vgPath/misc/UserPermissions.php");
 require_once("$vgPath/DAO/UserDAO.php" );
-require_once("$vgPath/UserPermissions.php" );
 
 /**
  * Special page View Survey

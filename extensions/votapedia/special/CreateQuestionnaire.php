@@ -298,7 +298,7 @@ END_SCRIPT;
                 $choice = urldecode($choice);
 
                 $chVO = new ChoiceVO();
-                $chVO->setChoice($choice);
+                $chVO->choice = $choice;
                 $choices[] = $chVO;
             }
 

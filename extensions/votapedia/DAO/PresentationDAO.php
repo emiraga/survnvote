@@ -25,14 +25,15 @@ class PresentationDAO
     {
         global $vgDB, $vgDBPrefix;
         $sql = "insert into {$vgDBPrefix}presentation(pageID, presentationID, ";
-        $sql .= "name, active, startTime, endTime ) values (?,?,?,?,?,?)";
+        $sql .= "name, active, startTime, endTime, numvotes ) values (?,?,?,?,?,?,?)";
         $vgDB->Execute($sql,array(
             intval($presentation->getPageID()),
             intval($presentation->getPresentationID()),
             $presentation->getName(),
             $presentation->getActive(),
             $presentation->getStartTime(),
-            $presentation->getEndTime()
+            $presentation->getEndTime(),
+            $presentation->numvotes
         ));
     }
     /**
@@ -44,11 +45,11 @@ class PresentationDAO
     static function &getFromPage($pageID)
     {
         global $vgDB, $vgDBPrefix;
-        $sql = "select * from {$vgDBPrefix}presentation where pageID = ? order by presentationID";
+        $sql = "select * from {$vgDBPrefix}presentation where pageID = ?";
         $rsPresentation = &$vgDB->Execute($sql, array(intval($pageID)));
 
         $presentations = array();
-
+        $ids = array();
         while(!$rsPresentation->EOF)
         {
             $pres = new PresentationVO();
@@ -58,12 +59,15 @@ class PresentationDAO
             $pres->setActive($rsPresentation->fields['active']);
             $pres->setStartTime($rsPresentation->fields['startTime']);
             $pres->setEndTime($rsPresentation->fields['endTime']);
+            $pres->numvotes = $rsPresentation->fields['numvotes'];
             
             $presentations[] = $pres;
+            $ids[] = intval($rsPresentation->fields['presentationID']);
             $rsPresentation->MoveNext();
         }
         $rsPresentation->Close();
 
+        array_multisort($ids, SORT_NUMERIC, SORT_ASC, $presentations );
         return $presentations;
     }
     /**

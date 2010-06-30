@@ -19,6 +19,9 @@ $vgDBUserPassword   = $wgDBpassword;
 $vgDBType           = $wgDBtype;
 $vgDBPrefix         = "v_";
 
+# set to debug mode, default is false
+$vgDebug = true;
+
 // Configure phone numbers of PBX
 #$vgNumberCallerID = '82315772';
 #$vgNumberUserPass = '81161899';

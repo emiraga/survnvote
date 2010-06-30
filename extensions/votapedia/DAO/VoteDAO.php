@@ -60,17 +60,23 @@ class VoteDAO
         global $vgDB, $vgDBPrefix;
 
         // Check if user has voted before
-        $sql ="select voteID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
+        $sql ="select voteID, choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
         $rs = $vgDB->Execute($sql, array($vote->getVoterID(), $vote->getSurveyID(), $vote->getPresentationID() ));
 
         if ($rs->RecordCount() >= $vote->getVotesAllowed() )
         {
             //user has more votes than allowed, remove previous vote
             $IDbyOldVote = $rs->fields['voteID'];
+            $oldChoiceID = $rs->fields['choiceID'];
+            
             $vgDB->Execute("update {$vgDBPrefix}vote set choiceID = ? where voteID = ?",
                     array($vote->getChoiceID(), $IDbyOldVote));
             $vgDB->Execute("update {$vgDBPrefix}vote_details set voteDate = ?, voteType = ? where voteID = ?",
                     array($vote->getVoteDate(), $vote->getVoteType(), $IDbyOldVote));
+            
+            //count down the choice.numvotes in previous choice
+            $vgDB->Execute("update {$vgDBPrefix}choice SET numvotes = numvotes-1 WHERE surveyID = ? AND choiceID = ?",
+                    array($vote->getSurveyID(), $oldChoiceID));
         }
         else
         {
@@ -82,6 +88,10 @@ class VoteDAO
             $vgDB->Execute("insert into {$vgDBPrefix}vote_details (voteID, voteDate, voteType, comments) values(?,?,?,?)",
                     array($voteid, $vote->getVoteDate(), $vote->getVoteType(), 'no comment'));
         }
+        //update choice.numvotes field
+        $vgDB->Execute("update {$vgDBPrefix}choice SET numvotes = numvotes+1 WHERE surveyID = ? AND choiceID = ?",
+                array($vote->getSurveyID(), $vote->getChoiceID()));
+        
         return true;
     }
     /**
@@ -95,9 +105,9 @@ class VoteDAO
     static function countNewVotes($page_id, $presentation_id, $last_voteID)
     {
         global $vgDB, $vgDBPrefix;
-        $r = $vgDB->GetAll("SELECT count(voteID) as count, max(voteID) as maxch FROM {$vgDBPrefix}vote WHERE pageID = ? "
-                ."AND presentationID = ? AND voteID > ?",
-                array($page_id, $presentation_id , $last_voteID));
+        $r = $vgDB->GetAll("SELECT count(voteID) as count, max(voteID) as maxch FROM {$vgDBPrefix}vote WHERE voteID > ? "
+                ." AND pageID = ? AND presentationID = ?",
+                array($last_voteID, $page_id, $presentation_id));
         $r = $r[0];
         return array($r['count'], $r['maxch']);
     }
@@ -107,24 +117,45 @@ class VoteDAO
      *
      *  $result[surveyID][choiceID] = num_of_votes
      *
-     * @param Integer $pageID
+     * @param PageVO $page
      * @param Integer $presentationID
      * @return VotesCount
      */
-    static function getNumVotes($pageID, $presentationID)
+    static function getNumVotes($page, $presentationID)
     {
         global $vgDB, $vgDBPrefix;
+        
+        if($page->getCurrentPresentationID() != $presentationID)
+        {
+            $result = unserialize( $page->getPresentationByNum($presentationID)->numvotes );
+            return $result;
+        }
+        
         $result = new VotesCount();
-        $records = $vgDB->GetAll("select surveyID, choiceID, count(voteID) as votes from {$vgDBPrefix}vote "
-                ."where pageID = ? and presentationID = ? group by surveyID, choiceID",
-                array(intval($pageID), $presentationID));
-        $votes = 0;
+        $records = $vgDB->GetAll("select numvotes,surveyID,choiceID FROM {$vgDBPrefix}choice"
+        ." LEFT JOIN {$vgDBPrefix}survey"
+        ." USING (surveyID) WHERE {$vgDBPrefix}survey.pageID = ?",
+                array(intval($page->getPageID())));
+
         foreach($records as $record)
         {
-            $result->set( $record['surveyID'], $record['choiceID'], $record['votes']);
-            $votes += $record['votes'];
+            $result->set( $record['surveyID'], $record['choiceID'], $record['numvotes']);
         }
         return $result;
+    }
+    /**
+     * Get previous choice/vote for this user.
+     * 
+     * @param Integer $userID
+     * @param Integer $surveyID
+     * @param Integer $presID
+     * @return Integer
+     */
+    static function getPrevVote($userID, $surveyID, $presID)
+    {
+        global $vgDB, $vgDBPrefix;
+        $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
+        return $vgDB->GetOne($sql, array($userID, $surveyID, $presID));
     }
 }
 

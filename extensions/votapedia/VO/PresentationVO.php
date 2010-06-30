@@ -17,6 +17,7 @@ class PresentationVO
     private $active = 0;
     private $startTime = "2999-01-01 00:00:00";
     private $endTime = "2999-01-01 00:00:00";
+    public $numvotes = 'i:0;';
     /**
      * set Page ID of presentation
      *

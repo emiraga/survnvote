@@ -205,6 +205,7 @@ function vfConnectDatabase()
     $cn = ADONewConnection($vgDBType);
     if (!$cn->Connect($vgDBserver, $vgDBUserName, $vgDBUserPassword, $vgDBName))
         throw new SurveyException("Could not connect to database", 400);
+    $cn->SetFetchMode(ADODB_FETCH_ASSOC);
     return $cn;
 }
 /**
@@ -277,13 +278,21 @@ function vfPrettyDate($date, $format = 'a')
 /**
  * @var $vgDB global variable ADOdb connection
  */
-global $vgDB;
-$vgDB = vfConnectDatabase();
-
-if(!isset($_GET['action']) || $_GET['action'] != 'ajax')
+global $vgDB, $vgDebug;
+if(! $vgDebug)
 {
-    # $vgDB->debug = true;
+    $vgDB = vfConnectDatabase();
 }
-
-# $vgDB->LogSQL(true);
+else
+{
+    require_once("$vgPath/misc/DebugDatabase.php");
+    $vgDB = vfConnectDebugDatabase();
+}
+if($vgDebug)
+{
+    if(!isset($_GET['action']) || $_GET['action'] != 'ajax')
+    {
+        $vgDB->enableOutput(true);
+    }
+}
 

@@ -45,7 +45,7 @@ class SurveyBody
         $this->parser =& $parser;
         $this->type = vSIMPLE_SURVEY;
         $this->presID = $presentationID;
-        $this->votescount = VoteDAO::getNumVotes($this->page->getPageID(), $this->presID);
+        $this->votescount = VoteDAO::getNumVotes($this->page, $this->presID);
     }
 
     /**
@@ -58,7 +58,7 @@ class SurveyBody
         if($presID != $this->presID)
         {
             $this->presID = $presID;
-            $this->votescount = VoteDAO::getNumVotes($this->page->getPageID(), $this->presID);
+            $this->votescount = VoteDAO::getNumVotes($this->page, $this->presID);
         }
     }
     /**
@@ -298,15 +298,14 @@ class SurveyBody
             foreach ($choices as &$choice)
             {
                 /* @var $choice ChoiceVO */
-                $name = $this->parser->run($choice->getChoice());
+                $name = $this->parser->run($choice->choice);
                 $output.=SurveyBody::getChoiceHTML($name, vfGetColor($colorindex) );
             }
         }
         elseif($this->pagestatus == 'active')
         {
-            global $vgDB, $vgDBPrefix;
-            $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
-            $prev_vote = $vgDB->GetOne($sql, array($this->user->userID, intval($survey->getSurveyID()), $this->presID ));
+            $prev_vote = VoteDAO::getPrevVote($this->user->userID, $survey->getSurveyID(), $this->presID );
+            
             if($prev_vote)
                 $this->userhasvoted=true;
 
@@ -314,20 +313,20 @@ class SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $name = $this->parser->run($choice->getChoice());
+                $name = $this->parser->run($choice->choice);
                 $extra='';
                 if($this->show_phones)
                 {
                     //background-color: #E9F3FE; 
                     $extra='<div style="text-align: right; color: black">'
                             //.'<font color="#AAAAAA">Phone number:</font> '
-                            .''.vfColorizePhone( $choice->getReceiver(), true ).''
+                            .''.vfColorizePhone( $choice->receiver, true ).''
                             .'</div>';
                 }
                 $vote = '';
                 $voteid = '';
 
-                if($prev_vote == $choice->getChoiceID())
+                if($prev_vote == $choice->choiceID)
                 {
                     $style = "border:1px dashed gray; background-color:#F5F5F5; padding-left: 9px;";
                     $checked = ' checked';
@@ -340,8 +339,8 @@ class SurveyBody
 
                 if($this->show_voting && $prev_vote == false)
                 {
-                    $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->getChoiceID()}";
-                    $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->getChoiceID()}\" $checked/>";
+                    $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->choiceID}";
+                    $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->choiceID}\" $checked/>";
                 }
                 $output.=SurveyBody::getChoiceHTML($name, $color, $extra, $vote, $voteid, $style);
             }
@@ -349,9 +348,7 @@ class SurveyBody
         }
         elseif($this->pagestatus == 'ended')
         {
-            global $vgDB, $vgDBPrefix;
-            $sql ="select choiceID from {$vgDBPrefix}vote where userID = ? and surveyID = ? and presentationID = ?";
-            $prev_vote = $vgDB->GetOne($sql, array($this->user->userID, intval($survey->getSurveyID()), $this->presID ));
+            $prev_vote = VoteDAO::getPrevVote($this->user->userID, $survey->getSurveyID(), $this->presID );
             if($prev_vote)
                 $this->userhasvoted=true;
 
@@ -359,7 +356,7 @@ class SurveyBody
             foreach ($choices as &$choice)
             {
                 /* @var $choice ChoiceVO */
-                $numvotes += $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $numvotes += $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
             }
             if($numvotes == 0)
                 $numvotes = 1;
@@ -370,17 +367,17 @@ class SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
                 $percent = substr(100.0 * $votes / $numvotes, 0, 5);
                 $width = 270.0 * $votes / $numvotes;
-                $name = $this->parser->run($choice->getChoice());
+                $name = $this->parser->run($choice->choice);
                 if($percent)
                     $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
                 else
                     $extra = '';
-                if($survey->getAnswer() == $choice->getChoiceID())
+                if($survey->getAnswer() == $choice->choiceID)
                 {
-                    /*if(! $prev_vote || $prev_vote == $choice->getChoiceID())
+                    /*if(! $prev_vote || $prev_vote == $choice->choiceID())
                         {
                             $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
                         }*/
@@ -389,7 +386,7 @@ class SurveyBody
                 }
                 else
                 {
-                    /*if($prev_vote == $choice->getChoiceID())
+                    /*if($prev_vote == $choice->choiceID)
                         {
                             $name .= " <img src='$vgScript/icons/wrong.png' />";
                             $style = "border:0px dashed gray; background-color:#FFCFCF; padding-left: 9px;";
@@ -450,7 +447,6 @@ class SurveyBody
         }
         var time$imgid = \"$lastchoiceid\";
         setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
-        /*alert(document.getElementById('$imgid').src);*/
         </script>";
         /*o.responseText*/
         $script = preg_replace('/^\s*/m', '', $script);
@@ -543,9 +539,9 @@ class SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+                $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
                 $totalvotes += $votes;
-                $graphseries->addItem(vfWikiToText($choice->getChoice()), $votes, $color);
+                $graphseries->addItem(vfWikiToText($choice->choice), $votes, $color);
             }
             if($this->page->getDisplayTop())
             {
@@ -580,8 +576,12 @@ class SurveyBody
      */
     static function ajaxgraph($last_choiceID, $colorindex, $presID, $page_id, $survey_id = null)
     {
-        list($newcount, $newchoiceid) = VoteDAO::countNewVotes($page_id, $presID, intval($last_choiceID));
-
+        $page_id = intval($page_id);
+        $presID = intval($presID);
+        $last_choiceID = intval($last_choiceID);
+        
+        list($newcount, $newchoiceid) = VoteDAO::countNewVotes($page_id, $presID, $last_choiceID);
+        
         if($newcount == 0)
             return ''; // there are no new votes
 
@@ -649,7 +649,7 @@ class SurveyBody
         foreach ($choices as &$choice)
         {
             /* @var $choice ChoiceVO */
-            $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+            $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
             $numvotes += $votes;
             $highest = max($highest, $votes);
 
@@ -667,17 +667,17 @@ class SurveyBody
         {
             /* @var $choice ChoiceVO */
             $color = vfGetColor($colorindex);
-            $votes = $this->votescount->get($survey->getSurveyID(), $choice->getChoiceID());
+            $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
             $percent = substr(100.0 * $votes / $numvotes, 0, 5);
             $width = 270.0 * $votes / $numvotes;
-            $name = $this->parser->run($choice->getChoice());
+            $name = $this->parser->run($choice->choice);
             $class = '';
             if($highest && $votes == $highest)
             {
                 $class .= 'votehighest';
             }
             $extra = '';
-            if($survey->getAnswer() == $choice->getChoiceID())
+            if($survey->getAnswer() == $choice->choiceID)
             {
                 $extra = "<td><img src='$vgScript/icons/correct.png' />";
             }

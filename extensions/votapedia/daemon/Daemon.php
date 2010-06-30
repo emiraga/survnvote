@@ -20,7 +20,12 @@ $vgDBUserPassword = $wgDBadminpassword;
 
 /** Include dependencies */
 require_once("$vgPath/misc/Common.php");
-$vgDB->debug = false;
+
+if($vgDebug)
+    $vgDB->enableOutput();
+else
+    $vgDB->debug = false;
+
 require_once("$vgPath/Sms.php");
 require_once("$vgPath/DAO/VoteDAO.php");
 require_once("$vgPath/DAO/UserphonesDAO.php");

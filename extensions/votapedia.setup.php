@@ -108,6 +108,7 @@ function vfDoSetup($justprint = false)
     $tVoteID = "INT unsigned";
     $tPhoneID = "INT unsigned";
     $tCrowdID = "INT unsigned";
+    $tNumVotes = "MEDIUMINT unsigned";
     
     //new data types
     $tBoolean = "tinyint(1) unsigned";
@@ -150,7 +151,8 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   receivers_released    $tBoolean    NOT NULL DEFAULT '0',
   bgimage               varchar(255) NOT NULL DEFAULT 'Defaultbg.jpg',
   crowdID               $tCrowdID    NOT NULL DEFAULT 0,
-  PRIMARY KEY (pageID)
+  PRIMARY KEY           (pageID),
+  KEY                   (receivers_released)
 ) $wgDBTableOptions;
 
 --
@@ -178,8 +180,11 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}choice (
   receiver    varchar(20)   DEFAULT NULL,
   SMS         varchar(20)   DEFAULT NULL,
   finished    $tBoolean     NOT NULL DEFAULT '0',
-  KEY pageID (pageID),
-  KEY surveyID (surveyID)
+  numvotes    $tNumVotes    NOT NULL DEFAULT '0',
+  KEY (pageID),
+  KEY (surveyID),
+  KEY (SMS),
+  KEY (receiver)
 ) $wgDBTableOptions;
 
 --
@@ -192,7 +197,8 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   startTime          datetime     NOT NULL,
   endTime            datetime     NOT NULL,
   active             $tBoolean    NOT NULL DEFAULT '0',
-  KEY(pageID)
+  numvotes           TEXT         NOT NULL,
+  KEY                (pageID)
 ) $wgDBTableOptions;
 
 --
@@ -257,7 +263,9 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}vote (
   surveyID       $tSurveyID     NOT NULL,
   presentationID $tPresID       NOT NULL,
   choiceID       $tChoiceID     NOT NULL,
-  PRIMARY KEY    (voteID)
+  PRIMARY KEY    (voteID),
+  KEY (userID),
+  KEY (surveyID)
 ) $wgDBTableOptions;
 
 --
@@ -291,7 +299,9 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}phone
   status       tinyint(4)    NOT NULL default 0,
   confirmcode  varchar(20),
   confirmsent  datetime,
-  PRIMARY KEY  (phoneID)
+  PRIMARY KEY  (phoneID),
+  KEY          (userID),
+  KEY          (phonenumber)
 ) $wgDBTableOptions;
 
 --

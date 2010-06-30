@@ -340,8 +340,6 @@ class FormControl
         $output = '';
         if($submit)
         {
-            global $vgPath;
-            require_once("$vgPath/MwAdapter.php");
             $token = vfUser()->editToken();
             $output .= "
             <table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>

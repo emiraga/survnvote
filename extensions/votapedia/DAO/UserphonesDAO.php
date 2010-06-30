@@ -79,9 +79,9 @@ class UserphonesDAO
     {
         global $vgDB, $vgDBPrefix;
         $yesterday = vfDate( time() - 24*60*60 );
-        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE userID = ? AND confirmsent > ?",
+        $c = $vgDB->GetOne("SELECT phoneID FROM {$vgDBPrefix}phone WHERE userID = ? AND confirmsent > ?",
                 array($this->user->userID, $yesterday));
-        return $c == 0;
+        return $c === false;
     }
     /**
      * Set the new confirmation code for user's phone
@@ -149,14 +149,8 @@ class UserphonesDAO
                 array($phoneid, $this->user->userID, $code, $yesterday, vPHONE_SENT_CODE));
         if(! $number)
             throw new Exception("Invalid confirmation code.");
-        $c = $vgDB->GetOne("SELECT count(phoneID) FROM {$vgDBPrefix}phone WHERE status=? AND phonenumber = ?",
-                array(vPHONE_VERIFIED, $number));
-        if($c)
-        {
-            throw new Exception("That phone has already been verified by other user.");
-        }
-        $vgDB->Execute("UPDATE {$vgDBPrefix}phone SET status = ?, confirmsent = NULL, confirmcode = NULL WHERE phoneID = ?",
-                array(vPHONE_VERIFIED, $phoneid));
+
+        $this->addVerifiedPhone($number);
         return true;
     }
     /**

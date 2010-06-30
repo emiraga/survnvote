@@ -11,10 +11,16 @@ $vgDBName = "unittest_setup";
 $vgDBUserName       = $wgDBadminuser;
 $vgDBUserPassword   = $wgDBadminpassword;
 $vgDBPrefix = '';
+$vgDebug = true;
 
 echo "Starting unit testing.\n";
 require_once("$vgPath/misc/Common.php");
-$vgDB->debug = false;
+
+if($vgDebug)
+    $vgDB->disableOutput();
+else
+    $vgDB->debug = false;
+
 require_once("$vgPath/../votapedia.setup.php");
 
 $a = microtime(true);
@@ -99,26 +105,29 @@ if(true) /* Test choiceVO */
     require_once("$vgPath/VO/ChoiceVO.php");
     $choice = new ChoiceVO();
 
-    assert(! $choice->getChoiceID() );
-    assert(! $choice->getChoice() );
-    assert(! $choice->getPoints() );
-    assert(! $choice->getReceiver() );
-    assert(! $choice->getSMS() );
-    assert(! $choice->getSurveyID() );
+    assert(! $choice->choiceID );
+    assert(! $choice->choice );
+    assert(! $choice->points );
+    assert(! $choice->receiver );
+    assert(! $choice->SMS );
+    assert(! $choice->surveyID );
+    assert( $choice->numvotes == 0 );
 
-    $choice->setChoice("Yes");
-    $choice->setChoiceID(5);
-    $choice->setSurveyID(6);
-    $choice->setReceiver("+060102999325");
-    $choice->setSMS("25");
-    $choice->setPoints(4);
+    $choice->choice = "Yes";
+    $choice->choiceID = 5;
+    $choice->surveyID = 6;
+    $choice->receiver = "+060102999325";
+    $choice->SMS = "25";
+    $choice->points = 4;
+    $choice->numvotes = 40;
 
-    assert( $choice->getChoice() == 'Yes' );
-    assert( $choice->getChoiceID() == 5 );
-    assert( $choice->getSurveyID() == 6 );
-    assert( $choice->getReceiver() == '+060102999325'  );
-    assert( $choice->getSMS() == '25' );
-    assert( $choice->getPoints() == 4  );
+    assert( $choice->choice == 'Yes' );
+    assert( $choice->choiceID == 5 );
+    assert( $choice->surveyID == 6 );
+    assert( $choice->receiver == '+060102999325'  );
+    assert( $choice->SMS == '25' );
+    assert( $choice->points == 4  );
+    assert( $choice->numvotes == 40 );
 }
 
 if(true) /* test SurveyVO */
@@ -216,11 +225,11 @@ if(true) /* test SurveyDAO */
 
     $choices = array();
     $choice = new ChoiceVO();
-    $choice->setChoice('AA');
+    $choice->choice = ('AA');
     $choices[] = $choice;
-    $choice->setChoice('BB');
+    $choice->choice = ('BB');
     $choices[] = $choice;
-    $choice->setChoice('CC');
+    $choice->choice = ('CC');
     $choices[] = $choice;
 
     $survey->setChoices( $choices );
@@ -231,15 +240,15 @@ if(true) /* test SurveyDAO */
 
     assert( $survey->getNumOfChoices() == 3 );
     $choices = $survey->getChoices();
-    assert($choices[2]->getChoice() == 'CC');
+    assert($choices[2]->choice == 'CC');
     assert( $survey->getChoiceByNum(3) == false);
     
-    assert( $choices[0]->getPoints() == 3 );
-    assert( $choices[0]->getChoiceID() == 1 );
-    assert( $choices[1]->getPoints() == 2 );
-    assert( $choices[1]->getChoiceID() == 2 );
-    assert( $choices[2]->getPoints() == 1 );
-    assert( $choices[2]->getChoiceID() == 3 );
+    assert( $choices[0]->points == 3 );
+    assert( $choices[0]->choiceID == 1 );
+    assert( $choices[1]->points == 2 );
+    assert( $choices[1]->choiceID == 2 );
+    assert( $choices[2]->points == 1 );
+    assert( $choices[2]->choiceID == 3 );
 }
 
 if( true ) /* test PageVO */
@@ -375,26 +384,28 @@ if( true ) /* testing Telephone */
     if(true)
     {
         $s1 = new SurveyVO();
-        $s1->setQuestion('How are you?');
+        $s1->setQuestion('How are you');
         $c1 = new ChoiceVO();
-        $c1->setChoice('good');
+        $c1->choice = ('good');
         $c2 = new ChoiceVO();
-        $c2->setChoice('bad');
-        $s1->setChoices(array($c1, $c2));
+        $c2->choice = ('bad');
+        $chs = array($c1, $c2);
+        $s1->setChoices($chs);
 
         $s2 = new SurveyVO();
-        $s2->setQuestion('What day is today?');
+        $s2->setQuestion('What day is today');
         $c1 = new ChoiceVO();
-        $c1->setChoice('mon');
+        $c1->choice = ('mon');
         $c2 = new ChoiceVO();
-        $c2->setChoice('tue');
+        $c2->choice = ('tue');
         $c3 = new ChoiceVO();
-        $c3->setChoice('wed');
+        $c3->choice = ('wed');
         $c4 = new ChoiceVO();
-        $c4->setChoice('thu');
+        $c4->choice = ('thu');
         $c5 = new ChoiceVO();
-        $c5->setChoice('fri');
-        $s2->setChoices(array($c1, $c2, $c3, $c4, $c5));
+        $c5->choice = ('fri');
+        $chs2 = array($c1, $c2, $c3, $c4, $c5);
+        $s2->setChoices($chs2);
 
         $p->setSurveys(array($s1, $s2));
     }
@@ -412,8 +423,8 @@ if( true ) /* testing Telephone */
     $c1 = $s[0]->getChoices();
     $c2 = $s[1]->getChoices();
     assert(count($c1) == 2 && count($c2) == 5);
-    assert($c1[0]->getChoiceID() == 1);
-    assert($c2[4]->getChoiceID() == 5);
+    assert($c1[0]->choiceID == 1);
+    assert($c2[4]->choiceID == 5);
 
     require_once("$vgPath/DAO/Telephone.php");
     $t = new Telephone();
@@ -495,7 +506,19 @@ if( true ) /* testing DAO/UserphonesDAO */
 
 if( true ) /* testing */
 {
-    ;
+    for($i = 0; $i< 100000;$i++)
+    {
+        $pa = new PageVO();
+        $pa->setTitle( rand() + 1 );
+        $pa->setStartTime( vfDate( time() + rand(0,5000) - 2500 ) );
+        $pa->setEndTime( vfDate( time() + rand(0,5000) - 2500 ) );
+        $pd = new PageDAO();
+        $pd->insertPage($pa);
+        if($i % 1000 == 0)
+        {
+            pointTime( 'insrt '.$pa->getPageID() );
+        }
+    }
 }
 
 if( true ) /* testing */
