@@ -29,10 +29,13 @@ class Sms
     /* Command to send by SMS to check validity of account. */
     static public $cmdConfirm = 'CONFIRM';
 
-    /*Do not show messages from these numbers, these are special numbers which
-     *are specific to mobile provider. */
+    /* Do not show messages from these numbers, these are special numbers which
+     * are specific to mobile provider.
+     * You should fill this list by yourself unless you are actually using CELCOM BLUE in Malaysia.
+     */
     static private $blackList = array('2888', '28882', 'CELCOM', '22990',
-        '23131', '29292', 'ChannelC', '63008', 'Channel X', '18888'); //In Malaysia I receive a lot of spam.
+        '23131', '29292', 'ChannelC', '63008', 'Channel X', 
+        '18888', '23456'); //yes, I receive a lot of spam.
 
     /* Number to send a message when requesting a balance report */
     static private $balanceNumber = '2888';
@@ -62,11 +65,13 @@ class Sms
         $list = array();
         foreach($new as $sms)
         {
-            if($sms['SenderNumber'] == Sms::$balanceNumber)
+            //If it is a balance report or some unknown spammer, don't delete just mark as processed
+            if($sms['SenderNumber'] == Sms::$balanceNumber || strlen($sms['SenderNumber']) < 7 )
             {
                 Sms::processed($sms['ID']);
                 continue;
             }
+            //Spammers, burn in hell!
             if(in_array($sms['SenderNumber'], Sms::$blackList))
             {
                 Sms::delete($sms['ID']);

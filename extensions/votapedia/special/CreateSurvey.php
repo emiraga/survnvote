@@ -96,7 +96,7 @@ class CreateSurvey
                         },
                         'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).' &amp;lt; &amp;gt;',
                         'learn_more' => 'Details of Editing Surveys',
-                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'SurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 5px;\\"></div>");</script>',
+                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'RealSurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 5px;\\"></div>");</script>',
                 ),
                 'category' => array(
                         'type' => 'select',
@@ -380,6 +380,8 @@ class CreateSurvey
      */
     function insertPage($values)
     {
+        wfProfileIn( __METHOD__ );
+        
         global $wgRequest;
         $author = vfUser()->getDisplayName();
         $wikititle = vfGetPageTitle($values['titleorquestion']);
@@ -394,6 +396,7 @@ class CreateSurvey
         {
             return '<li>'.$e->getMessage().'</li>';
         }
+
         $wikiText = '';
         $wikiText.='{{#'.$this->tagname.':'. $page->getPageID() .'}}';
         $wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
@@ -405,10 +408,12 @@ class CreateSurvey
         $wikititle = vfWikiToText($wikititle);
 
         $this->insertWikiPage($wikititle, $wikiText, true);
-
+        
         //Add an appropriate hidden category, don't show in recent changes
         $category = new CategoryPage( Title::newFromText(wfMsg('cat-survey-name', $page->getPageID())));
         $category->doEdit('__HIDDENCAT__','Hidden category.', EDIT_NEW | EDIT_SUPPRESS_RC);
+        
+        wfProfileOut( __METHOD__ );
     }
     /**
      * Insert wiki page, optionaly resolve duplicates

@@ -31,8 +31,8 @@ $wgSpecialPages['CreateQuiz'] = 'spCreateQuiz';
 
 //Special page ViewSurvey
 $wgAutoloadClasses['ViewSurvey'] = "$vgPath/special/ViewSurvey.php";
-$wgAutoloadClasses['SurveyButtons'] = "$vgPath/survey/SurveyButtons.php";
-$wgAutoloadClasses['SurveyBody'] = "$vgPath/survey/SurveyBody.php";
+$wgAutoloadClasses['SurveyButtons']  = "$vgPath/survey/SurveyButtons.php";
+$wgAutoloadClasses['RealSurveyBody'] = "$vgPath/survey/SurveyBody.php";
 $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 
 //Special page ProcessSurvey
@@ -68,8 +68,8 @@ $wgSpecialPages['ProcessCrowd'] = 'ProcessCrowd';
 $wgAutoloadClasses['SurveyView'] = "$vgPath/survey/SurveyView.php";
 
 $wgAjaxExportList[] = 'SurveyView::getChoice';
-$wgAjaxExportList[] = 'SurveyBody::getChoices';
-$wgAjaxExportList[] = 'SurveyBody::ajaxgraph';
+$wgAjaxExportList[] = 'RealSurveyBody::getChoices';
+$wgAjaxExportList[] = 'RealSurveyBody::ajaxgraph';
 
 $wgHooks['ParserFirstCallInit'][] = 'vfParserFirstCallInit';
 function vfParserFirstCallInit( &$parser )

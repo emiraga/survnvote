@@ -10,6 +10,7 @@ require_once("$vgPath/misc/Common.php" );
 require_once("$vgPath/misc/UserPermissions.php");
 require_once("$vgPath/DAO/UserDAO.php" );
 require_once("$vgPath/survey/SurveyBody.php" );
+require_once("$vgPath/survey/SurveyButtons.php" );
 
 /**
  * Special page View Survey
@@ -36,6 +37,8 @@ class ViewSurvey extends SpecialPage
      */
     function execute( $par = null )
     {
+        wfProfileIn( __METHOD__ );
+
         global $wgOut, $wgParser, $wgRequest;
         $wgOut->setPageTitle( wfMsg('title-view-survey') );
         $wgOut->setArticleFlag(false);
@@ -54,13 +57,12 @@ class ViewSurvey extends SpecialPage
         }
         
         $userdao = new UserDAO();
-        
         try
         {
             $page_id = intval($wgRequest->getVal('id'));
             $parser = new MwParser($wgParser, $wgOut->ParserOptions());
 
-            $buttons = new SurveyButtons();
+            $buttons = new RealSurveyButtons();
             $buttons->setDetailsButton(false);
 
             global $vgScript;
@@ -95,18 +97,16 @@ class ViewSurvey extends SpecialPage
 
             $bodyfactory = new SurveyBodyFactory($page, $uservo, $parser);
             $tag = new SurveyView($uservo, $page, $parser, $buttons, $bodyfactory->getBody());
-            $buttons->setType($tag->getPage()->getTypeName());
-            
+            $buttons->setType($page->getTypeName());
+
             if($liveshow)
             {
                 $wgOut->addHTML($tag->getHTML(false));
-                return;
             }
-            
-            if($wgRequest->getCheck('getliveshow'))
+            elseif($wgRequest->getCheck('getliveshow'))
             {
                 $userperm = new UserPermissions($uservo);
-                if($userperm->canControlSurvey($tag->getPage()))
+                if($userperm->canControlSurvey($page))
                 {
                     $wgOut->setPageTitle( 'Get Powerpoint link' );
                     $wgOut->addHTML('Use following link to embed this survey into a Powerpoint:');
@@ -122,27 +122,27 @@ class ViewSurvey extends SpecialPage
             else
             {
                 $wgOut->addHTML($tag->getHTML(true));
-
-                $userauthor = $userdao->findByID($tag->getPage()->getAuthor());
+                
+                $userauthor = $userdao->findByID($page->getAuthor());
                 $author = $userauthor->username;
                 $author = MwUser::convertDisplayName($author);
-
+                
                 $text = '';
                 $text .= "== More information ==\n";
                 $text .= "* Author: [[User:$author|$author]]\n";
-                $text .= "* Creation date: {$tag->getPage()->getCreateTime()}\n";
-                $text .= "* Status: {$tag->getPage()->getStatus( $tag->getPage()->getCurrentPresentationID() )}\n";
-                $text .= "* Type: {$tag->getPage()->getTypeName()}\n";
-                $text .= "* Privacy: {$tag->getPage()->getPrivacyByName()}\n";
-                $text .= "* Phone voting: {$tag->getPage()->getPhoneVoting()}\n";
-                $text .= "* Web voting: {$tag->getPage()->getWebVoting()}\n";
+                $text .= "* Creation date: {$page->getCreateTime()}\n";
+                $text .= "* Status: {$page->getStatus( $page->getCurrentPresentationID() )}\n";
+                $text .= "* Type: {$page->getTypeName()}\n";
+                $text .= "* Privacy: {$page->getPrivacyByName()}\n";
+                $text .= "* Phone voting: {$page->getPhoneVoting()}\n";
+                $text .= "* Web voting: {$page->getWebVoting()}\n";
                 $text .= "== Inclusion ==\n";
-                $text .= "* Use following text to include this {$tag->getPage()->getTypeName()} into a wiki page:\n";
-                $text .= " <code><nowiki>{{#{$tag->getPage()->getTypeName()}:$page_id}}</nowiki></code>\n";
+                $text .= "* Use following text to include this {$page->getTypeName()} into a wiki page:\n";
+                $text .= " <code><nowiki>{{#{$page->getTypeName()}:$page_id}}</nowiki></code>\n";
                 $text .= "\n== ".wfMsg('page-links')." ==\n";
                 $text .= wfMsg('pages-include')."\n";
                 $pages = vfAdapter()->getSubCategories( wfMsg('cat-survey-name', $page_id) );
-
+                
                 foreach($pages as $name)
                 {
                     $text.="* [[$name#survey_id_$page_id|$name]]\n";
@@ -154,6 +154,8 @@ class ViewSurvey extends SpecialPage
         {
             $wgOut->addHTML(vfErrorBox('Error: '.$e->getMessage()));
         }
+        
+        wfProfileOut( __METHOD__ );
     }
 }
 

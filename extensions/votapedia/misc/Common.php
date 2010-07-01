@@ -136,14 +136,14 @@ function &vfUser()
 function vfWikiToText($wiki)
 {
     $text = strip_tags($wiki);
+    //Remove bold markup
     $text = str_replace("'''",' ',$text);
+    //Remove italic markup
     $text = str_replace("''",' ',$text);
-    $text = preg_replace('/\s+/', ' ', $text); //@todo use mb_ereg_replace
-
     //http://en.wikipedia.org/wiki/Wikipedia%3ANaming_conventions_%28technical_restrictions%29
-    $invalidChars  = array('<','>','|','/',':', '#', '[',']', '|', '{' ,'}','.');
+    $invalidChars  = array('<','>','|','/',':', '#', '[',']', '|', '{' ,'}','.','&');
     $text = trim(str_replace($invalidChars, " ", $text));
-    $text = str_replace("  ", " ", $text);
+    $text = preg_replace('/\s+/', ' ', $text); //@todo use mb_ereg_replace
     return $text;
 }
 /**
@@ -251,8 +251,7 @@ function vfPrettyDate($date, $format = 'a')
     {
         $res = '1 week ago';
     } elseif($dayDiff < (7*6))
-    { // Modifications Start Here
-        // 6 weeks at most
+    {
         $res = ceil($dayDiff/7) . ' weeks ago';
     } elseif($dayDiff < 365)
     {
@@ -275,9 +274,7 @@ function vfPrettyDate($date, $format = 'a')
         return $res;
     }
 }
-/**
- * @var $vgDB global variable ADOdb connection
- */
+
 global $vgDB, $vgDebug;
 if(! $vgDebug)
 {
@@ -285,10 +282,14 @@ if(! $vgDebug)
 }
 else
 {
+    // In case we are debugging/profiling use the Facade design patern
     require_once("$vgPath/misc/DebugDatabase.php");
     $vgDB = vfConnectDebugDatabase();
 }
-if($vgDebug)
+
+global $vgDebugIPs;
+if($vgDebug && ( !isset($_SERVER['REMOTE_ADDR'])
+            || in_array($_SERVER['REMOTE_ADDR'], $vgDebugIPs) ))
 {
     if(!isset($_GET['action']) || $_GET['action'] != 'ajax')
     {

@@ -74,6 +74,9 @@ class DebugADODB
                     if( strlen($a['key']) > 1 && startswith($sql, "select voteID, choiceID from {$vgDBPrefix}vote where userID ="))
                         continue;
 
+                    if($a['key'] == 'phonenumber' && startswith($sql, "SELECT userID FROM {$vgDBPrefix}phone WHERE phonenumber"))
+                        continue;
+
                     if($a['key'] == 'SMS' && startswith($sql, "SELECT pageID, surveyID, choiceID FROM {$vgDBPrefix}choice WHERE SMS ="))
                         continue;
 

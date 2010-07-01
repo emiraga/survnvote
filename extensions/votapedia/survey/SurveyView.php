@@ -39,6 +39,9 @@ class SurveyView
      */
     static function executeTag( $input, $args, $parser, $frame = NULL )
     {
+        wfProfileIn( __METHOD__ );
+        
+        wfLoadExtensionMessages('Votapedia');
         $page_id = intval(trim($input));
         try
         {
@@ -52,13 +55,16 @@ class SurveyView
             $page =& $pagedao->findByPageID( $page_id );
             $user =& vfUser()->getUserVO();
 
-            $buttons = new SurveyButtons();
+            $buttons = new RealSurveyButtons();
             $bodyfactory = new SurveyBodyFactory($page, $user, $mwparser);
             $tag = new SurveyView($user, $page, $mwparser, $buttons, $bodyfactory->getBody());
+
+            wfProfileOut( __METHOD__ );
             return $tag->getHTML();
         }
         catch(Exception $e)
         {
+            wfProfileOut( __METHOD__ );
             return vfErrorBox($e->getMessage());
         }
     }
@@ -70,13 +76,18 @@ class SurveyView
      */
     static function executeMagic($parser, $page_id)
     {
+        wfProfileIn( __METHOD__ );
+        
         wfLoadExtensionMessages('Votapedia');
         $page_id = intval(trim($page_id));
         $output =  "<SurveyChoice>$page_id</SurveyChoice>[[".wfMsg('cat-survey-name',$page_id)."]]";
+
+        wfProfileOut( __METHOD__ );
         return array($output, 'noparse' => false);
     }
     /**
-     *
+     * Constructor for the SurveyView
+     * 
      * @param UserVO $user
      * @param PageVO $page
      * @param MwParser $parser
@@ -85,7 +96,8 @@ class SurveyView
      */
     function __construct(UserVO &$user, PageVO &$page, MwParser &$parser, SurveyButtons &$surveybuttons, SurveyBody &$body)
     {
-        wfLoadExtensionMessages('Votapedia');
+        wfProfileIn( __METHOD__ );
+        
         global $wgOut, $wgTitle, $wgRequest;
 
         $this->user =& $user;
@@ -110,8 +122,6 @@ class SurveyView
         $pagestatus = $this->page->getStatus( $this->page->getCurrentPresentationID() );
 
         //configure buttons
-        $this->buttons->setPageAuthor($this->page->getAuthor());
-        $this->buttons->setWikiTitle($this->wikititle->getFullText());
         $this->buttons->setPageID($this->page->getPageID());
         $this->buttons->setType($this->page->getTypeName());
         
@@ -134,6 +144,8 @@ class SurveyView
                 $this->body->setShowNumbers(true);
             }
         }
+
+        wfProfileOut( __METHOD__ );
     }
     /**
      * Get HTML of a one page of survey
@@ -143,6 +155,8 @@ class SurveyView
      */
     function getHTML($show_details = false)
     {
+        wfProfileIn( __METHOD__ );
+        
         $runs = $this->page->getCurrentPresentationID();
         if($runs == 1)
         {
@@ -186,6 +200,7 @@ class SurveyView
             }
             $output .= $form->EndFormLite();
         }
+        wfProfileOut( __METHOD__ );
         return $output;
     }
     /**
@@ -195,6 +210,8 @@ class SurveyView
      */
     function getHTMLOnePage($presID)
     {
+        wfProfileIn( __METHOD__ );
+        
         global $vgScript;
         $output = '';
         $pagestatus = $this->page->getStatus($presID);
@@ -256,6 +273,8 @@ class SurveyView
             $output .= '<p><b>Run started</b>: '. vfPrettyDate( $p->getStartTime() , 'l' ).'</p>';
             $output .= '<p><b>Run ended</b>: '. vfPrettyDate( $p->getEndTime() , 'l').'</p>';
         }
+
+        wfProfileOut( __METHOD__ );
         return $output;
     }
     /**
@@ -266,7 +285,10 @@ class SurveyView
      */
     private function getDetailsHTML($presID)
     {
-        return $this->body->getDetailsHTML($presID);
+        wfProfileIn( __METHOD__ );
+        $out = $this->body->getDetailsHTML($presID);
+        wfProfileOut( __METHOD__ );
+        return $out;
     }
     /**
      * AJAX call for choices preview
@@ -301,15 +323,6 @@ class SurveyView
         $pars = new Parser();
         $p = new MwParser($pars);
         return $p->run(trim($line), false);
-    }
-    /**
-     * Current PageVO object
-     *
-     * @return PageVO
-     */
-    function &getPage()
-    {
-        return $this->page;
     }
 }
 

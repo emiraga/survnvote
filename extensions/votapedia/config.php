@@ -19,8 +19,9 @@ $vgDBUserPassword   = $wgDBpassword;
 $vgDBType           = $wgDBtype;
 $vgDBPrefix         = "v_";
 
-# set to debug mode, default is false
-$vgDebug = true;
+// set to debug mode, default is false
+$vgDebug = false;
+$vgDebugIPs = array('10.101.97.20', '127.0.0.1'); //IP addresses to which it will show debug information
 
 // Configure phone numbers of PBX
 #$vgNumberCallerID = '82315772';
