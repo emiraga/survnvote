@@ -31,9 +31,12 @@ $wgSpecialPages['CreateQuiz'] = 'spCreateQuiz';
 
 //Special page ViewSurvey
 $wgAutoloadClasses['ViewSurvey'] = "$vgPath/special/ViewSurvey.php";
-$wgAutoloadClasses['SurveyButtons']  = "$vgPath/survey/SurveyButtons.php";
 $wgAutoloadClasses['RealSurveyBody'] = "$vgPath/survey/SurveyBody.php";
 $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
+
+//Special page CorrelateSurvey
+$wgAutoloadClasses['CorrelateSurvey'] = "$vgPath/special/CorrelateSurvey.php";
+$wgSpecialPages['CorrelateSurvey'] = 'CorrelateSurvey';
 
 //Special page ProcessSurvey
 $wgAutoloadClasses['ProcessSurvey'] = "$vgPath/special/ProcessSurvey.php";

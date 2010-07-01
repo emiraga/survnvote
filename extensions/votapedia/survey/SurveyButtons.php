@@ -23,6 +23,7 @@ abstract class SurveyButtons
      */
     public function setType($type)
     {
+        //messages in i18n are lower case
         $this->type = strtolower( $type );
     }
     /**
@@ -139,7 +140,7 @@ class RealSurveyButtons extends SurveyButtons
                   .'" onClick="return confirm(\'Are you sure you want to stop this '.$this->type
                         .'? This operation cannot be undone.\')" />';
             }
-            else // page is 'ended'
+            else // page_status is 'ended'
             {
                 if($this->show_renew)
                     $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('renew-'.$this->type).'" />';
@@ -155,7 +156,7 @@ class RealSurveyButtons extends SurveyButtons
         //$output.= '<div style="float: right;">';
         if($this->show_details)
         {
-            $output .='&nbsp;&nbsp;<input type="submit" name="wpSubmit" value="'
+            $output .='<input type="submit" name="wpSubmit" value="'
                 .wfMsg('view-details').'">';
         }
         //$output .='</div>';

@@ -5,9 +5,9 @@ if (!defined('MEDIAWIKI') ) die(); if (defined('VOTAPEDIA_TEST')) return;
  */
 
 /**
- * This is example class that provides SMS integration with external source.
+ * This is an example class that provides SMS integration with external source.
  *
- * This Sms Integration class implements a working interface to gammu-smsd
+ * This Sms Integration class implements an interface to gammu-smsd
  * link: http://www.gammu.org/wiki/index.php?title=Gammu:SMSD
  *
  * If you have another source of SMS, please modify this script accordingly
@@ -141,7 +141,7 @@ class Sms
     /**
      * function getPending()
      *
-     * @return Array a list of messages which are waiting to be send.
+     * @return Array with a list of messages which are waiting to be send.
      */
     static function getPending()
     {
@@ -225,7 +225,7 @@ class Sms
      * If you are lucky as me, you can try to configure this
      * balance checking to work.
      *
-     * Otherwise, delete Sms::sendSMS statement below.
+     * Otherwise, delete this Sms::sendSMS statement below.
      */
     static function requestCheckBalance()
     {

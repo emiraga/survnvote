@@ -111,6 +111,157 @@ abstract class SurveyBody
     abstract function getDetailsHTML();
 }
 
+class SurveyCorrelations extends SurveyBody
+{
+    public function __construct(UserVO $user, PageVO $page, MwParser $parser, $presentationID)
+    {
+        parent::__construct($user, $page, $parser, $presentationID);
+    }
+    public function getDetailsHTML()
+    {
+        return '';
+    }
+    public function getHTML()
+    {
+        $out =  '<br>';
+
+        global $vgDB, $vgDBPrefix;
+
+        //initialize correlation matrix [NxN]  N=number of choices
+        $numchoices = 0;
+        $mapchoices = array();
+        $namechoices = array();
+        $surveys =& $this->page->getSurveys();
+        $cntsur = 1;
+        foreach ($surveys as &$survey)
+        {
+            /* @var $survey SurveyVO */
+            $choices =& $survey->getChoices();
+            foreach ($choices as &$choice)
+            {
+                /* @var $choice ChoiceVO */
+                $mapchoices[ $survey->getSurveyID().'_'.$choice->choiceID ] = $numchoices;
+                $namechoices[ $numchoices ] = 
+                   '<abbr title="'.
+                    addslashes($survey->getQuestion())."   Answer:"
+                    .addslashes( $choice->choice )
+                      .'">&nbsp;'
+                    .''./*$cntsur.':'.*/$choice->choiceID
+                  .'&nbsp;</abbr>';
+                $numchoices++;
+            }
+            $cntsur++;
+        }
+        $corr = array_fill(0, $numchoices, array_fill(0, $numchoices, 0));
+
+        //get votes from user
+        $votes = $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
+                array( $this->page->getPageID(), $this->presID ));
+        $userv = array();
+        foreach($votes as $vote)
+        {
+            $userid = $vote['userID'];
+            if(!isset($userv[ $userid ]))
+                $userv[$userid] = array();
+            $userv[$userid][] = $mapchoices[ $vote['surveyID'].'_'.$vote['choiceID'] ];
+        }
+
+        foreach($userv as $user => $votes)
+        {
+            $nv = count($votes);
+            for($i=0;$i<$nv;$i++)
+            {
+                for($j=$i+1;$j<$nv;$j++)
+                {
+                    $corr[ $votes[$i] ][ $votes[$j] ]++;
+                    $corr[ $votes[$j] ][ $votes[$i] ]++;
+                }
+            }
+        }
+        $maxv = 0;
+        for($i=0;$i<$numchoices;$i++)
+        {
+            for($j=$i+1;$j<$numchoices;$j++)
+            {
+                $maxv = max($maxv, $corr[$i][$j]);
+            }
+        }
+        if($maxv == 0)
+            $maxv = 1;
+        
+        $out .= '<table class="wikitable" style="text-align: center">';
+        $out .= '<tr><th>';
+        $colorindex = 1;
+        for($i=0;$i<$numchoices;$i++)
+        {
+            $out .= '<td bgcolor="#'.vfGetColor($colorindex).'"><b>'.$namechoices[$i].'</b>';
+        }
+        $colorindex = 1;
+        for($i=0;$i<$numchoices;$i++)
+        {
+            $out .= '<tr>';
+            $out .= '<td bgcolor="#'.vfGetColor($colorindex).'"><b>'.$namechoices[$i].'</b>';
+            for($j=0;$j<$numchoices;$j++)
+            {
+                if($i >= $j)
+                {
+                    $out .= '<td>';
+                    continue;
+                }
+                $c = 55 + ($maxv - $corr[$i][$j]) * 200 / $maxv;
+                $color = sprintf("FF%02X%02X",$c,$c);
+                $out .= '<td bgcolor="#'.$color.'">'.$corr[$i][$j];
+            }
+            $out .= '</tr>';
+        }
+        $out .= '</table>';
+
+        $numusers = 0;
+        $mapusers = array();
+        $usernames = array();
+        $userdao = new UserDAO();
+        foreach($userv as $user=>$v)
+        {
+            $mapusers[$numusers] = $user;
+            $user = $userdao->findByID($user);
+            if($user)
+            {
+                $username = MwUser::convertDisplayName( $user->username );
+            }else
+            {
+                $username = 'Unknown user';
+            }
+            $usernames[$numusers] = htmlspecialchars($username);
+            $numusers++;
+        }
+        $maxv = count( $surveys );
+        $out .= '<h3>Correlation between voters</h3>';
+        $out .= '<table class="wikitable" style="text-align: center">';
+        $out .= '<tr><th>';
+        for($i=0;$i<$numusers;$i++)
+        {
+            $out .= '<th><abbr title="'.$usernames[$i].'">&nbsp;'.($i+1).'&nbsp;</abbr>';
+        }
+        for($i=0;$i<$numusers;$i++)
+        {
+            $out .= '<tr>';
+            $out .= '<th>'.$usernames[$i];
+            for($j=0;$j<$numusers;$j++)
+            {
+                $value = count(array_intersect( $userv[ $mapusers[$i] ], $userv[ $mapusers[$j] ] ));
+                $c = 55 + ($maxv - $value) * 200 / $maxv;
+                $color = sprintf("FF%02X%02X",$c,$c);
+                $out .= '<td bgcolor="#'.$color.'">';
+                $out .= $value;
+            }
+            $out .= '</tr>';
+        }
+        $out .= '</table>';
+
+        return $out;
+    }
+}
+
 /**
  * Implementation of abstract class SurveyBody.
  * Shows are real view of the survey with voting allowed,
@@ -482,7 +633,7 @@ class RealSurveyBody extends SurveyBody
         //@todo check permisions
         $pagedao = new PageDAO();
         $page = $pagedao->findByPageID($page_id);
-        $surveybody = new SurveyBody(vfUser()->getUserVO(), $page, new MwParser(new Parser()), $presID);
+        $surveybody = new RealSurveyBody(vfUser()->getUserVO(), $page, new MwParser(new Parser()), $presID);
 
         if($survey_id)
         {
@@ -700,7 +851,7 @@ class RealSurveyBody extends SurveyBody
         $script = "<script>
         function refresh$imgid()
         {
-            sajax_do_call('SurveyBody::ajaxgraph', [time$imgid, $colorindex, {$this->presID}, $page_id],function(o) {
+            sajax_do_call('RealSurveyBody::ajaxgraph', [time$imgid, $colorindex, {$this->presID}, $page_id],function(o) {
                 graph=document.getElementById('$imgid');
                 if(o.responseText.length)
                 {

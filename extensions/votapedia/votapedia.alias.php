@@ -9,6 +9,7 @@ $aliases['en'] = array(
         'CreateQuestionnaire' => array( 'CreateQuestionnaire' ),
         'CreateQuiz' => array( 'CreateQuiz' ),
         'ViewSurvey' => array( 'ViewSurvey' ),
+        'CorrelateSurvey' => array( 'CorrelateSurvey' ),
         'ProcessSurvey' => array( 'ProcessSurvey' ),
         'MyPhones' => array( 'MyPhones' ),
         'SmsReport' => array( 'SmsReport' ),

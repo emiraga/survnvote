@@ -256,7 +256,7 @@ class SurveyView
         }
         
         $output .= $this->body->getHTML();
-
+        
         if($this->page->getCurrentPresentationID() == $presID)
         {
             $output .= $this->buttons->getHTML($presID);

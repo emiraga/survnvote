@@ -126,7 +126,20 @@ class ViewSurvey extends SpecialPage
                 $userauthor = $userdao->findByID($page->getAuthor());
                 $author = $userauthor->username;
                 $author = MwUser::convertDisplayName($author);
-                
+
+                $t = Title::newFromText('Special:CorrelateSurvey');
+                if($wgRequest->getCheck('returnto'))
+                {
+                    $returnto = Title::newFromText($wgRequest->getVal('returnto'));
+                    $returnto = $returnto->getFullText();
+                }else
+                {
+                    $returnto = '';
+                }
+                $url = $t->getLocalURL('id='.$page_id.'&returnto='. $returnto );
+                $wgOut->addHTML('<h2>More statistics</h2>');
+                $wgOut->addHTML('<ul><li><a href="'.$url.'">Survey correlations</a></li></ul>');
+
                 $text = '';
                 $text .= "== More information ==\n";
                 $text .= "* Author: [[User:$author|$author]]\n";
