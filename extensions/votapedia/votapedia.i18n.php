@@ -21,6 +21,7 @@ $messages['en'] = array(
     'latestincoming' => 'Latest incoming SMS and calls',
     'surveyslist' => 'Surveys list',
     'correlatesurvey' => 'Correlate survey',
+    'exportsurvey' => 'Export survey',
 
     'surveynologin' => 'Not logged in',
     'surveynologin-desc' => 'You must be [[Special:UserLogin|logged in]] to create a survey',
@@ -67,7 +68,7 @@ $messages['en'] = array(
     
     'view-details' => 'View details',
     'view-liveshow' => 'Powerpoint',
-    'control-survey' => 'Control curvey',
+    'control-survey' => 'Control survey',
     'cat-survey-name' => 'Category:Pages with survey id $1',
     'mobile-phone' => 'Mobile phone:',
     

@@ -10,6 +10,7 @@ $aliases['en'] = array(
         'CreateQuiz' => array( 'CreateQuiz' ),
         'ViewSurvey' => array( 'ViewSurvey' ),
         'CorrelateSurvey' => array( 'CorrelateSurvey' ),
+        'ExportSurvey' => array( 'ExportSurvey' ),
         'ProcessSurvey' => array( 'ProcessSurvey' ),
         'MyPhones' => array( 'MyPhones' ),
         'SmsReport' => array( 'SmsReport' ),

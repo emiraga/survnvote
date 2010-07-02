@@ -1,12 +1,15 @@
-.votehighest
+
+.surveyoutMark
 {
     font-weight:bold;
     background-color: #EFEFEF;
 }
-.surtablestat {
+.surveyout {
     background-color: white;
     border:1px solid #AAAAAA;
     border-collapse:collapse;
     margin:1em 1em 1em 0;
+    
+    width: 100%;
 }
 

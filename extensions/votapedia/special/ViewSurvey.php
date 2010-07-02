@@ -127,18 +127,29 @@ class ViewSurvey extends SpecialPage
                 $author = $userauthor->username;
                 $author = MwUser::convertDisplayName($author);
 
-                $t = Title::newFromText('Special:CorrelateSurvey');
                 if($wgRequest->getCheck('returnto'))
                 {
-                    $returnto = Title::newFromText($wgRequest->getVal('returnto'));
-                    $returnto = $returnto->getFullText();
+                    $returnto = urlencode($wgRequest->getVal('returnto'));
                 }else
                 {
                     $returnto = '';
                 }
-                $url = $t->getLocalURL('id='.$page_id.'&returnto='. $returnto );
+                $url = Skin::makeSpecialUrl('CorrelateSurvey', 'id='.$page_id.'&returnto='. $returnto);
                 $wgOut->addHTML('<h2>More statistics</h2>');
-                $wgOut->addHTML('<ul><li><a href="'.$url.'">Survey correlations</a></li></ul>');
+                $wgOut->addHTML('<ul>');
+                $wgOut->addHTML('<li><a href="'.$url.'">Survey correlations</a></li>');
+                $wgOut->addHTML('</ul>');
+                global $vgScript;
+                $presentations =& $page->getPresentations();
+                $wgOut->addHTML('<h2>Export</h2>');
+                $wgOut->addHTML('<ul>');
+                foreach ($presentations as &$pres)
+                {
+                    /* @var $pres PresentationVO */
+                    $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$pres->getPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.$pres->getName().'</a></li>');
+                }
+                $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$page->getCurrentPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.'Current'.'</a></li>');
+                $wgOut->addHTML('</ul>');
 
                 $text = '';
                 $text .= "== More information ==\n";

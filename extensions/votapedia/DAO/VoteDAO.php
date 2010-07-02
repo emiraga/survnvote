@@ -119,7 +119,7 @@ class VoteDAO
      *
      * @param PageVO $page
      * @param Integer $presentationID
-     * @return VotesCount
+     * @return VotesCount or Boolean false on wrong presentation
      */
     static function getNumVotes($page, $presentationID)
     {
@@ -127,7 +127,10 @@ class VoteDAO
         
         if($page->getCurrentPresentationID() != $presentationID)
         {
-            $result = unserialize( $page->getPresentationByNum($presentationID)->numvotes );
+            $pres =& $page->getPresentationByNum($presentationID);
+            if(! $pres)
+                return false;
+            $result = unserialize( $pres->numvotes );
             return $result;
         }
         

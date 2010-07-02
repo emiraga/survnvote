@@ -11,6 +11,7 @@ require_once("$vgPath/misc/UserPermissions.php");
 require_once("$vgPath/DAO/UserDAO.php" );
 require_once("$vgPath/survey/SurveyBody.php" );
 require_once("$vgPath/survey/SurveyButtons.php" );
+require_once("$vgPath/misc/DataWriter.php" );
 
 /**
  * Special page View Survey
@@ -52,17 +53,32 @@ class CorrelateSurvey extends SpecialPage
             $user = vfUser()->getUserVO();
             $pagedao = new PageDAO();
             $page =& $pagedao->findByPageID( $page_id );
-            $buttons = new SurveyNoButtons();
-            $body = new SurveyCorrelations($user, $page, $parser, $page->getCurrentPresentationID());
-            $tag = new SurveyView($user, $page, $parser, $buttons, $body);
-            $buttons->setType($page->getTypeName());
-            $wgOut->addHTML($tag->getHTML(true));
-            $wgOut->returnToMain();
+            if($par == 'xls')
+            {
+                $presID = intval($wgRequest->getVal('presid',0));
+                $writer = new ExcelWrite('votapedia_corr_'.$page_id.'_pres_'.$presID.'.xls');
+                $data = new SurveyCorrelateData($page, $presID);
+                $writer->addSource($data);
+                $data = new UsersCorrelateData($page, $presID);
+                $writer->addSource($data);
+                $writer->write();
+                $wgOut->disable();
+            }
+            else
+            {
+                $buttons = new SurveyNoButtons();
+                $body = new SurveyCorrelations($user, $page, $parser, $page->getCurrentPresentationID());
+                $tag = new SurveyView($user, $page, $parser, $buttons, $body);
+                $buttons->setType($page->getTypeName());
+                $wgOut->addHTML('<i>Note</i>: <a href="http://en.wikipedia.org/wiki/Correlation_does_not_imply_causation">Correlation does not imply causation.</a>');
+                $wgOut->addHTML($tag->getHTML(true));
+            }
         }
         catch(Exception $e)
         {
             $wgOut->addHTML(vfErrorBox('Error: '.$e->getMessage()));
         }
+        $wgOut->returnToMain();
         wfProfileOut( __METHOD__ );
     }
 }

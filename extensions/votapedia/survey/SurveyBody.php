@@ -123,141 +123,20 @@ class SurveyCorrelations extends SurveyBody
     }
     public function getHTML()
     {
-        $out =  '<br>';
+        global $vgPath, $vgScript;
+        require_once("$vgPath/misc/DataWriter.php");
+        $out =  '';
+        $writer = new HtmlWrite();
+        $writer->setStyle('wikitable');
 
-        global $vgDB, $vgDBPrefix;
+        $data = new SurveyCorrelateData($this->page, $this->presID);
+        $writer->addSource($data);
+        $data2= new UsersCorrelateData($this->page, $this->presID);
+        $writer->addSource($data2);
 
-        //initialize correlation matrix [NxN]  N=number of choices
-        $numchoices = 0;
-        $mapchoices = array();
-        $namechoices = array();
-        $surveys =& $this->page->getSurveys();
-        $cntsur = 1;
-        foreach ($surveys as &$survey)
-        {
-            /* @var $survey SurveyVO */
-            $choices =& $survey->getChoices();
-            foreach ($choices as &$choice)
-            {
-                /* @var $choice ChoiceVO */
-                $mapchoices[ $survey->getSurveyID().'_'.$choice->choiceID ] = $numchoices;
-                $namechoices[ $numchoices ] = 
-                   '<abbr title="'.
-                    addslashes($survey->getQuestion())."   Answer:"
-                    .addslashes( $choice->choice )
-                      .'">&nbsp;'
-                    .''./*$cntsur.':'.*/$choice->choiceID
-                  .'&nbsp;</abbr>';
-                $numchoices++;
-            }
-            $cntsur++;
-        }
-        $corr = array_fill(0, $numchoices, array_fill(0, $numchoices, 0));
-
-        //get votes from user
-        $votes = $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
-                array( $this->page->getPageID(), $this->presID ));
-        $userv = array();
-        foreach($votes as $vote)
-        {
-            $userid = $vote['userID'];
-            if(!isset($userv[ $userid ]))
-                $userv[$userid] = array();
-            $userv[$userid][] = $mapchoices[ $vote['surveyID'].'_'.$vote['choiceID'] ];
-        }
-
-        foreach($userv as $user => $votes)
-        {
-            $nv = count($votes);
-            for($i=0;$i<$nv;$i++)
-            {
-                for($j=$i+1;$j<$nv;$j++)
-                {
-                    $corr[ $votes[$i] ][ $votes[$j] ]++;
-                    $corr[ $votes[$j] ][ $votes[$i] ]++;
-                }
-            }
-        }
-        $maxv = 0;
-        for($i=0;$i<$numchoices;$i++)
-        {
-            for($j=$i+1;$j<$numchoices;$j++)
-            {
-                $maxv = max($maxv, $corr[$i][$j]);
-            }
-        }
-        if($maxv == 0)
-            $maxv = 1;
-        
-        $out .= '<table class="wikitable" style="text-align: center">';
-        $out .= '<tr><th>';
-        $colorindex = 1;
-        for($i=0;$i<$numchoices;$i++)
-        {
-            $out .= '<td bgcolor="#'.vfGetColor($colorindex).'"><b>'.$namechoices[$i].'</b>';
-        }
-        $colorindex = 1;
-        for($i=0;$i<$numchoices;$i++)
-        {
-            $out .= '<tr>';
-            $out .= '<td bgcolor="#'.vfGetColor($colorindex).'"><b>'.$namechoices[$i].'</b>';
-            for($j=0;$j<$numchoices;$j++)
-            {
-                if($i >= $j)
-                {
-                    $out .= '<td>';
-                    continue;
-                }
-                $c = 55 + ($maxv - $corr[$i][$j]) * 200 / $maxv;
-                $color = sprintf("FF%02X%02X",$c,$c);
-                $out .= '<td bgcolor="#'.$color.'">'.$corr[$i][$j];
-            }
-            $out .= '</tr>';
-        }
-        $out .= '</table>';
-
-        $numusers = 0;
-        $mapusers = array();
-        $usernames = array();
-        $userdao = new UserDAO();
-        foreach($userv as $user=>$v)
-        {
-            $mapusers[$numusers] = $user;
-            $user = $userdao->findByID($user);
-            if($user)
-            {
-                $username = MwUser::convertDisplayName( $user->username );
-            }else
-            {
-                $username = 'Unknown user';
-            }
-            $usernames[$numusers] = htmlspecialchars($username);
-            $numusers++;
-        }
-        $maxv = count( $surveys );
-        $out .= '<h3>Correlation between voters</h3>';
-        $out .= '<table class="wikitable" style="text-align: center">';
-        $out .= '<tr><th>';
-        for($i=0;$i<$numusers;$i++)
-        {
-            $out .= '<th><abbr title="'.$usernames[$i].'">&nbsp;'.($i+1).'&nbsp;</abbr>';
-        }
-        for($i=0;$i<$numusers;$i++)
-        {
-            $out .= '<tr>';
-            $out .= '<th>'.$usernames[$i];
-            for($j=0;$j<$numusers;$j++)
-            {
-                $value = count(array_intersect( $userv[ $mapusers[$i] ], $userv[ $mapusers[$j] ] ));
-                $c = 55 + ($maxv - $value) * 200 / $maxv;
-                $color = sprintf("FF%02X%02X",$c,$c);
-                $out .= '<td bgcolor="#'.$color.'">';
-                $out .= $value;
-            }
-            $out .= '</tr>';
-        }
-        $out .= '</table>';
-
+        $out .= $writer->write();
+        $out .= '<br>';
+        $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CorrelateSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
         return $out;
     }
 }
@@ -327,7 +206,7 @@ class RealSurveyBody extends SurveyBody
         {
             $output .= $this->slideSurveysBottom( $divid, count($surveys) );
         }
-
+        
         //Show help message, only to creator
         if($this->pagestatus == 'active' && $this->has_control)
         {
@@ -437,73 +316,47 @@ class RealSurveyBody extends SurveyBody
         return $output;
     }
     /**
-     *
+     * 
      * @param SurveyVO $survey
      * @param Integer $colorindex
      * @return <type>
      */
     function getSurveyStats(SurveyVO &$survey, &$colorindex)
     {
-        $choices = $survey->getChoices();
-        $output = '';
+        $out = '';
+        global $vgPath;
+        require_once("$vgPath/misc/DataWriter.php");
+        $data = new SurveyVotesData($survey, $this->votescount, $this->parser, $colorindex);
+        $writer = new HtmlWrite();
+        $writer->addSource($data);
+        $out .=  $writer->write();
+
+        global $vgScript;
+        $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&surveyid='.$survey->getSurveyID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
 
         $statscals = new StatsCalc();
-        $numvotes = 0;
-        $highest = -1;
         $chnum = 1;
+        $choices =& $survey->getChoices();
         foreach ($choices as &$choice)
         {
             /* @var $choice ChoiceVO */
             $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
-            $numvotes += $votes;
-            $highest = max($highest, $votes);
-
             //add the choice number and number of votes to the statistics calculator
             $statscals->add($chnum, $votes);
             $chnum++;
         }
-        if($numvotes == 0)
-            $numvotes = 1;
-        $output .= '<table width=100% class="sortable surtablestat" style="text-align:center; background-color: white">';
-        $output .= "<tr><th width=\"35px\">#<th class=unsortable>Choice<th>Votes<th class=unsortable>%</tr>";
-        global $vgScript;
-        $chnum = 1;
-        foreach ($choices as &$choice)
+        if(true)
         {
-            /* @var $choice ChoiceVO */
-            $color = vfGetColor($colorindex);
-            $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
-            $percent = substr(100.0 * $votes / $numvotes, 0, 5);
-            $width = 270.0 * $votes / $numvotes;
-            $name = $this->parser->run($choice->choice);
-            $class = '';
-            if($highest && $votes == $highest)
-            {
-                $class .= 'votehighest';
-            }
-            $extra = '';
-            if($survey->getAnswer() == $choice->choiceID)
-            {
-                $extra = "<td><img src='$vgScript/icons/correct.png' />";
-            }
-            $colorpatch = "<div style=\"width: 25px; background-color: #$color\">$chnum</div>";
-            $output .= "<tr class=\"$class\"><td>$colorpatch<td align=left> &nbsp; $name<td>$votes<td>$percent%$extra</tr>";
-            $chnum++;
-        }
-        $output .= '</table>';
-        if($highest)
-        {
-            $output .= '<table class="wikitable">';
-            $output .= sprintf("<tr><td width=\"200px\">Sample size<td>%d</tr>", $statscals->getNum());
-            $output .= sprintf("<tr><td width=\"200px\">Mean<td>%.3f</tr>", $statscals->getAverage());
+            $out .= '<table class="wikitable">';
+            $out .= sprintf("<tr><td width=\"140px\">Sample size<td>%d</tr>", $statscals->getNum());
+            $out .= sprintf("<tr><td>Mean<td>%.3f</tr>", $statscals->getAverage());
             list($clow, $chigh) = $statscals->getConfidence95();
-            $output .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$statscals->getNum());
-            $output .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $statscals->getStdDev());
-            $output .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $statscals->getStdError());
-            $output .= '</table>';
+            $out .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$statscals->getNum());
+            $out .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $statscals->getStdDev());
+            $out .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $statscals->getStdError());
+            $out .= '</table>';
         }
-
-        return $output;
+        return $out;
     }
     /**
      * Parse multiline wiki code

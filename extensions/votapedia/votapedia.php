@@ -38,6 +38,10 @@ $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 $wgAutoloadClasses['CorrelateSurvey'] = "$vgPath/special/CorrelateSurvey.php";
 $wgSpecialPages['CorrelateSurvey'] = 'CorrelateSurvey';
 
+//Special page ExportSurvey
+$wgAutoloadClasses['ExportSurvey'] = "$vgPath/special/ExportSurvey.php";
+$wgSpecialPages['ExportSurvey'] = 'ExportSurvey';
+
 //Special page ProcessSurvey
 $wgAutoloadClasses['ProcessSurvey'] = "$vgPath/special/ProcessSurvey.php";
 $wgSpecialPages['ProcessSurvey'] = 'ProcessSurvey';
