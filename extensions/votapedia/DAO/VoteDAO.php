@@ -46,7 +46,6 @@ class VoteDAO
         $vote->setVoterID($this->userID);
         $vote->setVoteDate(vfDate());
         $vote->setVoteType( $type );
-        $vote->setVotesAllowed( $this->page->getVotesAllowed() );
         return $vote;
     }
     /**

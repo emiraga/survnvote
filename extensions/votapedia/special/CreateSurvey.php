@@ -151,7 +151,7 @@ class CreateSurvey
                         {
                             if($js) return "";
                             $v=intval($v);
-                            return $v > 0 && $v < 11*60;
+                            return $v > 0;
                         },
                         'explanation' => 'Once you start the survey, it will run for this amount of time and stop automatically.',
                         //'learn_more' => 'Details of Duration',
@@ -248,6 +248,24 @@ class CreateSurvey
                         'explanation' => 'If you decide to change the Title or question of this survey, it is recommended that you Rename/Move the corresponding wiki page in order to prevent any confusion.',
                         'learn_more' => 'Changing Title of a survey',
                 ),
+                'surveysperslide' => array(
+                        'type' => 'input',
+                        'name' => 'Surveys per slide',
+                        'default' => '1',
+                        'width' => '10',
+                        'valid' => function($v,$i,$js)
+                        {
+                            if($js) return "";
+                            $v=intval($v);
+                            return $v > 0 && $v < 100;
+                        },
+                        'explanation' => 'Once you start the survey, you and other users can press the "collapse" button which will display only certain number of questions per one slide.',
+                        'process' => function($v)
+                        {
+                            return intval($v);
+                        },
+                        'icon' => $vgScript.'/icons/collapse.png',
+                ),
         );
         //Fill the list of subcategories
         $subcat = vfAdapter()->getSubCategories('Category:Survey Categories');
@@ -267,7 +285,7 @@ class CreateSurvey
         $this->formpages = array(
                 0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
                 1=>array('title'=>'Voting options','items'=>array('privacy', 'crowdID', 'duration', 'phonevoting','webvoting' )),
-                2=>array('title'=>'Graph settings','items'=>array('showresultsend', 'showtop', 'bgimage')),
+                2=>array('title'=>'Display settings','items'=>array('showresultsend', 'showtop', 'bgimage','surveysperslide')),
         );
     }
     /**
@@ -306,24 +324,34 @@ class CreateSurvey
     protected function generatePageVO($values)
     {
         $page = new PageVO();
-        $this->setPageVOvalues($page, $values);
 
+        //First we must set the surveys
         $page->setSurveys( $this->generateSurveysArray($values) );
+
+        //Because here we are doing a check for the maximum number of choices.
+        $error = $this->setPageVOvalues($page, $values);
+        
+        if($error)
+        {
+            throw new SurveyException($error);
+        }
         return $page;
     }
     /**
-     *
+     * 
      * @param PageVO $page
      * @param Array $values
+     * @return String error if any
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
+        $errors = '';
         $author = vfUser()->userID();
 
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
-        $page->setVotesAllowed(1);
+        $page->setSurveysPerSlide(1);
         $page->setSMSRequired(false); //@todo SMS sending to the users
         $page->setPrivacyByName($values['privacy']);
         $page->setPhoneVoting($values['phonevoting']);
@@ -334,11 +362,12 @@ class CreateSurvey
         else
             $page->crowdID = 0;
 
-        $this->setPageVOvaluesSmall($page, $values);
+        $errors .= $this->setPageVOvaluesSmall($page, $values);
+        return $errors;
     }
     /**
      * Only set values for things related to graphing
-     *
+     * 
      * @param PageVO $page
      * @param Array $values
      * @param Boolean $surveyended did this survey end?
@@ -354,14 +383,50 @@ class CreateSurvey
         }
         $page->setDisplayTop($values['showtop']);
         if(isset($values['showresultsend']) && $values['showresultsend'])
+        {
             $page->setShowGraphEnd(true);
+        }
         else
+        {
             $page->setShowGraphEnd(false);
+        }
         $page->bgimage = $values['bgimage'];
+        $page->setSurveysPerSlide($values['surveysperslide']);
+        
+        //check allowed duration of phone voting
+        if($page->getPhoneVoting() != 'no')
+        {
+            global $vgLimitPhoneVotingDuration;
+            if($page->getDuration() > $vgLimitPhoneVotingDuration)
+            {
+                $errors .= "<li>Phone voting is limited to $vgLimitPhoneVotingDuration minutes.</li>";
+            }
+        }
+        
+        //check allowed duration of web voting
+        if($page->getWebVoting() != 'no')
+        {
+            global $vgLimitWebVotingDuration;
+            if($page->getDuration() > $vgLimitWebVotingDuration)
+            {
+                $errors .= "<li>Web voting is limited to $vgLimitWebVotingDuration minutes.</li>";
+            }
+        }
+        
+        //check max allowed choices
+        if($page->getPhoneVoting() != 'no')
+        {
+            global $vgMaxChoicesInPhoneVoting;
+            if($page->getNumOfChoices() > $vgMaxChoicesInPhoneVoting)
+            {
+                $errors .= "<li>With Phone voting enabled, you are allowed to have a maximum of $vgMaxChoicesInPhoneVoting choices/answers.</li>";
+            }
+        }
+        
         return $errors;
     }
     /**
-     *
+     * 
      * @param Array $values associative array
      * @return Array array of SurveyVO
      */
@@ -394,13 +459,15 @@ class CreateSurvey
         }
         catch( Exception $e )
         {
-            return '<li>'.$e->getMessage().'</li>';
+            if( substr($e->getMessage(), 0, 4) != '<li>' )
+                return '<li>'.$e->getMessage().'</li>';
+            return $e->getMessage();
         }
 
         $wikiText = '';
         $wikiText.='{{#'.$this->tagname.':'. $page->getPageID() .'}}';
-        $wikiText.="\n*Created by ~~~~\n[[Category:Surveys]]\n";
-        $wikiText.="[[Category:Surveys by $author]]\n[[Category:Simple Surveys]]\n";
+        $wikiText.="\n*Created by ~~~~\n[[Category:All Surveys]]\n";
+        $wikiText.="[[Category:Surveys by $author]]\n[[Category:{$page->getTypeCategory()}]]\n";
 
         if(strlen($values['category']) > 5)
             $wikiText.="[[".htmlspecialchars($values['category'])."]]\n";
@@ -438,10 +505,13 @@ class CreateSurvey
             }
             return;
         }
-
-##echo $newtitle;
-
-        $article = new Article( Title::newFromText( $newtitle ) );
+        
+        $mwtitle = Title::newFromText( $newtitle );
+        if(! $mwtitle)
+        {
+            $mwtitle = Title::newFromText( 'Title_' + rand(1000*1000, 1000*1000*1000) );
+        }
+        $article = new Article( $mwtitle );
         $status = $article->doEdit($wikiText,'Creating a new simple survey', EDIT_NEW);
         if($status->hasMessage('edit-already-exists'))
         {
@@ -483,6 +553,7 @@ class CreateSurvey
         $this->form->setValue('phonevoting', $page->getPhoneVoting());
         $this->form->setValue('webvoting', $page->getWebVoting());
         $this->form->setValue('bgimage', $page->bgimage);
+        $this->form->setValue('surveysperslide', $page->getSurveysPerSlide());
         $this->form->setValue('crowdID', $page->crowdID);
         $this->fillValuesFromSurveys($page->getSurveys());
     }
@@ -613,7 +684,7 @@ class CreateSurvey
         {
             $smallupdate = false;
         }
-
+        
         if(! $error)
         {
             try
@@ -636,8 +707,7 @@ class CreateSurvey
             }
             catch(SurveyException $e)
             {
-                $wgOut->addWikiText( vfErrorBox( $e->getMessage() ) );
-                return;
+                $error = $e->getMessage();
             }
             if(! $error)
             {
@@ -727,7 +797,9 @@ class CreateSurvey
         if($wgRequest->getCheck('phonevoting'))
         {
             if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
+            {
                 $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
+            }
         }
         if($wgRequest->getCheck('privacy'))
         {

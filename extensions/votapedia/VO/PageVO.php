@@ -30,7 +30,7 @@ class PageVO
     private $showGraphEnd = true;
     private $surveyType = 1;
     private $displayTop = 0;
-    private $votesAllowed = 1;
+    private $surveysPerSlide = 1;
     private $subtractWrong = 0;
     private $privacy = 1;
     private $phonevoting = 'anon';
@@ -150,9 +150,9 @@ class PageVO
      * Set how many times of multi-votes
      * @param Integer $times
      */
-    function setVotesAllowed($times)
+    function setSurveysPerSlide($times)
     {
-        $this->votesAllowed = $times;
+        $this->surveysPerSlide = $times;
     }
     /**
      * set type of Survey
@@ -312,7 +312,7 @@ class PageVO
         return $this->surveyType;
     }
     /**
-     * @return Integer $type Type of survey
+     * @return String Type of survey
      */
     function getTypeName()
     {
@@ -327,6 +327,21 @@ class PageVO
         throw new SurveyException("Unknown survey type");
     }
     /**
+     * @return String Type of survey category
+     */
+    function getTypeCategory()
+    {
+        switch($this->surveyType)
+        {
+            case vSIMPLE_SURVEY:      return vcatSIMPLE_SURVEY;
+            case vQUESTIONNAIRE:      return vcatQUESTIONNAIRE;
+            case vQUIZ:               return vcatQUIZ;
+            case vRANK_EXPOSITIONS:   return vcatRANK_EXPOSITIONS;
+            case vTEXT_RESPONSE:      return vcatTEXT_RESPONSE;
+        }
+        throw new SurveyException("Unknown survey type");
+    }
+    /**
      * Get how many top presentations would be displayed
      * @return Integer $displayTop
      */
@@ -335,12 +350,13 @@ class PageVO
         return $this->displayTop;
     }
     /**
-     * get how many times of multi-votes
+     * Get how many times of multi-votes
+     * 
      * @return Integer $times
      */
-    function getVotesAllowed()
+    function getSurveysPerSlide()
     {
-        return $this->votesAllowed;
+        return $this->surveysPerSlide;
     }
     /**
      * Get privacy level of this Page
@@ -401,7 +417,23 @@ class PageVO
         return count($this->surveys);
     }
     /**
-     * get one survey by its surveyID
+     * Total number of choices in all surveys.
+     * 
+     * @return Integer
+     */
+    function getNumOfChoices()
+    {
+        $count = 0;
+        foreach ($this->surveys as &$survey)
+        {
+            /* @var $survey SurveyVO */
+            $count += $survey->getNumOfChoices();
+        }
+        return $count;
+    }
+    /**
+     * Get one survey by its surveyID.
+     * 
      * @param Integer $id id of the survey
      * @return SurveyVO $surveyVO
      */
@@ -415,7 +447,8 @@ class PageVO
         throw new Exception("No such survey by ID");
     }
     /**
-     * Validate whether matchs the requried data format
+     * Validate whether matchs the requried data format.
+     *
      * @param String $date date
      * @return String date if true, tigger a error if false
      */
@@ -427,7 +460,7 @@ class PageVO
             throw new SurveyException("Date/Time must follow yyyy-mm-dd hh:mm:ss format!",100);
     }
     /**
-     * Get the status of the survey/page
+     * Get the status of the survey/page.
      *
      * @param Integer $presID for which presentation are you asking for status?
      * @return String values of 'ready', 'active' or 'ended'

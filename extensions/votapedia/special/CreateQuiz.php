@@ -98,16 +98,19 @@ class CreateQuiz extends CreateQuestionnaire
      * Specify values for PageVO, specific for Quiz.
      *
      * @param PageVO $page
-     * @param Array $values
+     * @param Array $val
+     * @return String error if any
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
-        parent::setPageVOvalues($page, $values);
+        $error = parent::setPageVOvalues($page, $values);
         $page->setType(vQUIZ);
         if(isset($values['subtractwrong']) && $values['subtractwrong'])
             $page->setSubtractWrong( true );
         else
             $page->setSubtractWrong( false );
+
+        return $error;
     }
     /**
      * Check if user input is correct.

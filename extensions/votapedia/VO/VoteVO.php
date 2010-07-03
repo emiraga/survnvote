@@ -18,7 +18,6 @@ class VoteVO
     private $voterID;
     private $voteDate;
     private $voteType;
-    private $votesAllowed = 1;
     /**
      * @return Integer survey ID
      */
@@ -75,7 +74,7 @@ class VoteVO
      */
     public function getVotesAllowed()
     {
-        return $this->votesAllowed;
+        return 1;
     }
     /**
      * @param Integer $pageid
@@ -134,16 +133,7 @@ class VoteVO
         else
             throw new SurveyException("Invalid vote type", 400);
     }
-    /**
-     * Set number of allowed votes per user
-     * @param Integer $numvotes
-     */
-    public function setVotesAllowed($numvotes)
-    {
-        $this->votesAllowed = $numvotes;
-    }
 }
-
 
 /**
  * Class which holds number of votes in a specific page

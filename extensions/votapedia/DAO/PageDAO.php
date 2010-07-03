@@ -50,7 +50,7 @@ class PageDAO
             $page->setCreateTime($rs->fields['createTime']);
             $page->setShowGraphEnd($rs->fields['showGraphEnd']);
             $page->setDisplayTop($rs->fields['displayTop']);
-            $page->setVotesAllowed($rs->fields['votesAllowed']);
+            $page->setSurveysPerSlide($rs->fields['surveysPerSlide']);
             $page->setType($rs->fields['surveyType']);
             $page->setSubtractWrong($rs->fields['subtractWrong']);
             $page->setSMSRequired( $rs->fields['smsRequired'] );
@@ -131,9 +131,9 @@ class PageDAO
         $vgDB->StartTrans();
 
         $sql = "insert into {$vgDBPrefix}page (title,author,startTime,duration,endTime,"
-                ."smsRequired,showGraphEnd,surveyType,"
-                ."displayTop,subtractWrong,privacy,phonevoting,webvoting,bgimage,crowdID)values"
-                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                ."smsRequired,showGraphEnd,surveyType,displayTop,subtractWrong,"
+                ."privacy,phonevoting,webvoting,bgimage,surveysPerSlide,crowdID)values"
+                ."(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         //@todo some fields from page are missing
         $resPage = $vgDB->Prepare($sql);
         $param = array( $pageVO->getTitle(),
@@ -150,6 +150,7 @@ class PageDAO
                 $pageVO->getPhoneVoting(),
                 $pageVO->getWebVoting(),
                 $pageVO->bgimage,
+                $pageVO->getSurveysPerSlide(),
                 intval($pageVO->crowdID),
         );
         $vgDB->Execute($resPage,$param);
@@ -200,7 +201,7 @@ class PageDAO
         $vgDB->StartTrans();
         $sql = "update {$vgDBPrefix}page set title=?,startTime=?,duration=?,endTime=?,"
                 . " smsRequired=?,"
-                . " showGraphEnd=?,surveyType=?,displayTop=?,votesallowed=?,"
+                . " showGraphEnd=?,surveyType=?,displayTop=?,surveysPerSlide=?,"
                 . " subtractWrong=?,privacy=?, phonevoting=?, webvoting=?, bgimage=?, crowdID=?"
                 . " where pageID = ?";
         $resPage = $vgDB->Prepare($sql);
@@ -213,7 +214,7 @@ class PageDAO
                 $pageVO->getShowGraphEnd(),
                 $pageVO->getType(),
                 $pageVO->getDisplayTop(),
-                $pageVO->getVotesAllowed(),
+                $pageVO->getSurveysPerSlide(),
                 $pageVO->getSubtractWrong(),
                 $pageVO->getPrivacy(),
                 $pageVO->getPhoneVoting(),

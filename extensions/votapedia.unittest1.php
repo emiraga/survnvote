@@ -282,7 +282,7 @@ if( true ) /* test PageVO */
     $page->setPageID(45);
     $page->setAuthor('Admin');
     $page->setDisplayTop(14);
-    $page->setVotesAllowed(7);
+    $page->setSurveysPerSlide(7);
     $page->setSMSRequired(true);
     $page->setShowGraphEnd(false);
     $page->setSubtractWrong(true);
@@ -356,7 +356,7 @@ if(true) /* test VoteVO */
     $vote->setVoteDate('2001');
     $vote->setVoteType('WEB');
     $vote->setVoterID(3);
-    $vote->setVotesAllowed(6);
+    $vote->setSurveysPerSlide(6);
 
     assert( 34 == $vote->getChoiceID() );
     assert( 34 == $vote->getPresentationID() );

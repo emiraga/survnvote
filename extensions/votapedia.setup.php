@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}page (
   showGraphEnd          $tBoolean    NOT NULL DEFAULT '0',
   displayTop            tinyint(4)   NOT NULL DEFAULT '0',
   surveyType            tinyint(4)   NOT NULL DEFAULT '1',
-  votesAllowed          tinyint(8)   NOT NULL DEFAULT '1',
+  surveysPerSlide       tinyint(8)   NOT NULL DEFAULT '1',
   subtractWrong         $tBoolean    NOT NULL DEFAULT '0',
   privacy               tinyint(4)   NOT NULL DEFAULT '1',
   phonevoting           varchar(5)   NOT NULL DEFAULT 'anon',

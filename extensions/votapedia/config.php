@@ -60,6 +60,15 @@ $vgAllowedTags = '<math><code><b><u><i>';
 // Allow anonymous users to create surveys
 $vgAnonSurveyCreation = true;
 
+// Phone voting will have limited duration
+$vgLimitPhoneVotingDuration = 60*5;
+
+// Phone voting will have limited duration
+$vgLimitWebVotingDuration = 60*60*24*5;
+
+// Limit number of choices (receivers in phone voting)
+$vgMaxChoicesInPhoneVoting = 10;
+
 // Interval after which images will be refreshed, set 0 to disable
 $vgImageRefresh = 10; //@todo increase this value
 

@@ -248,11 +248,14 @@ END_SCRIPT;
      * 
      * @param PageVO $page
      * @param Array $values
+     * @return String error if any
      */
     protected function setPageVOvalues(PageVO &$page, &$values)
     {
-        parent::setPageVOvalues($page, $values);
+        $error = parent::setPageVOvalues($page, $values);
         $page->setType(vQUESTIONNAIRE);
+
+        return $error;
     }
     /**
      * Check if user input is correct.

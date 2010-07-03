@@ -101,12 +101,19 @@ function vfGetSmsNumber($parser = null)
 $wgAPIModules['vpAutoUser'] = 'vpAutocreateUsers';
 $wgAutoloadClasses['vpAutocreateUsers'] = "$vgPath/API/AutocreateUsers.php";
 
-//Magic words (tags)
+// Magic words (tags)
 define('vtagSIMPLE_SURVEY',    'Survey');
 define('vtagQUIZ',             'Quiz');
 define('vtagRANK_EXPOSITIONS', 'Rankexpo');
 define('vtagQUESTIONNAIRE',    'Questionnaire');
 define('vtagTEXT_RESPONSE',    'TextResponse');
+
+// Category names for surveys
+define('vcatSIMPLE_SURVEY',    'Simple surveys');
+define('vcatQUIZ',             'Quizzes');
+define('vcatRANK_EXPOSITIONS', 'Rank expositions');
+define('vcatQUESTIONNAIRE',    'Questionnaires');
+define('vcatTEXT_RESPONSE',    'Text Responses');
 
 $wgHooks['LanguageGetMagic'][]       = 'vfLanguageGetMagic';
 function vfLanguageGetMagic(&$magicWords, $langCode)
