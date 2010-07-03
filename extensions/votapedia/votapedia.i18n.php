@@ -21,6 +21,7 @@ $messages['en'] = array(
     'latestincoming' => 'Latest incoming SMS and calls',
     'surveyslist' => 'Surveys list',
     'correlatesurvey' => 'Correlate survey',
+    'crosstabsurvey' => 'Cross Tabulate survey',
     'exportsurvey' => 'Export survey',
 
     'surveynologin' => 'Not logged in',
@@ -80,6 +81,7 @@ $messages['en'] = array(
     'title-new-quiz' => 'Create new quiz',
     'title-edit-quiz' => 'Edit quiz',
     'title-correlate-survey' => 'Survey correlations',
+    'title-crosstab-survey' => 'Survey cross tabulation',
 
     'pages-include' => 'Following pages include this survey:',
     'page-links' => 'Page links',

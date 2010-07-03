@@ -35,8 +35,12 @@ $wgAutoloadClasses['RealSurveyBody'] = "$vgPath/survey/SurveyBody.php";
 $wgSpecialPages['ViewSurvey'] = 'ViewSurvey';
 
 //Special page CorrelateSurvey
-$wgAutoloadClasses['CorrelateSurvey'] = "$vgPath/special/CorrelateSurvey.php";
+$wgAutoloadClasses['CorrelateSurvey'] = "$vgPath/special/StatsSurvey.php";
 $wgSpecialPages['CorrelateSurvey'] = 'CorrelateSurvey';
+
+//Special page CrossTabSurvey
+$wgAutoloadClasses['CrossTabSurvey'] = "$vgPath/special/StatsSurvey.php";
+$wgSpecialPages['CrossTabSurvey'] = 'CrossTabSurvey';
 
 //Special page ExportSurvey
 $wgAutoloadClasses['ExportSurvey'] = "$vgPath/special/ExportSurvey.php";

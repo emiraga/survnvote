@@ -23,7 +23,7 @@ class SurveyVotesData extends DataSource
     protected $numvotes;
     protected $highest;
 
-    public function __construct(SurveyVO $survey, VotesCount $votescount, MwParser $parser, &$colorindex)
+    public function __construct(SurveyVO $survey, VotesCount &$votescount, MwParser &$parser, &$colorindex)
     {
         $this->survey =& $survey;
         $this->votescount =& $votescount;
@@ -125,18 +125,122 @@ class SurveyVotesData extends DataSource
     }
 }
 
-/***********/
-
-class CrossTabGenerate
+class CrossTabData extends DataSource
 {
-    protected $writer;
-    public function __construct(DataWriter &$writer)
+    static function generate(PageVO $page, $presID)
     {
-        $this->writer =& $writer;
+        //Get votes from users
+        global $vgDB, $vgDBPrefix;
+        $votes =& $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
+                array( $page->getPageID(), $presID ));
+        //Record votes
+        $userv = array();
+        foreach($votes as &$vote)
+        {
+            $userid = $vote['userID'];
+            if(!isset($userv[ $userid ]))
+                $userv[$userid] = array();
+            $userv[$userid][] = array($vote['surveyID'],$vote['choiceID']);
+        }
+        $surveys = &$page->getSurveys();
+        $numsur = count($surveys);
+        $sources = array();
+        $mapsurveys = array();
+        
+        for($i=0;$i<$numsur;$i++)
+        {
+            $mapsurveys[ $surveys[$i]->getSurveyID() ] = $i;
+            $sources[$i] = array();
+            for($j=$i+1;$j<$numsur;$j++)
+            {
+                $sources[$i][$j] = new CrossTabData($surveys[$i], $surveys[$j]);
+            }
+        }
+        
+        //Update correlation table
+        foreach($userv as $user => &$votes)
+        {
+            $nv = count($votes);
+            for($i=0;$i<$nv;$i++)
+            {
+                for($j=$i+1;$j<$nv;$j++)
+                {
+                    list($sur1, $choice1) = $votes[$i];
+                    list($sur2, $choice2) = $votes[$j];
+                    $sources[ $mapsurveys[$sur1] ][ $mapsurveys[$sur2] ]->increaseValue($choice1, $choice2);
+                }
+            }
+        }
+        $result = array();
+        for($i=0;$i<$numsur;$i++)
+        {
+            for($j=$i+1;$j<$numsur;$j++)
+            {
+                $result[] =& $sources[$i][$j];
+            }
+        }
+        return $result;
+    }
+
+    protected $rows;
+    protected $cols;
+    protected $data;
+    protected $title;
+    protected $xaxis=array();
+    protected $yaxis=array();
+
+    private function __construct(SurveyVO &$survey1, SurveyVO &$survey2)
+    {
+        $this->rows = $survey1->getNumOfChoices();
+        $this->cols = $survey2->getNumOfChoices();
+        $this->data = array_fill(0, $this->rows+1, array_fill(0, $this->cols+1, 0));
+        $this->title = '"'.$survey1->getQuestion().'" and "'.$survey2->getQuestion().'"';
+        $ch1 =& $survey1->getChoices();
+        foreach ($ch1 as &$choice)
+            $this->xaxis[] = $choice->choice;
+        $this->xaxis[] = 'Total';
+        $ch2 =& $survey2->getChoices();
+        foreach ($ch2 as &$choice)
+            $this->yaxis[] = $choice->choice;
+        $this->yaxis[] = 'Total';
+    }
+    public function numCols()
+    {
+        return $this->cols+2;
+    }
+    public function numRows()
+    {
+        return $this->rows+2;
+    }
+    public function getText($row, $col)
+    {
+        if($row + $col < 3)return '';
+        if($row == 1)
+        {
+            return $this->yaxis[$col-2];
+        }
+        if($col == 1)
+        {
+            return $this->xaxis[$row-2];
+        }
+        return $this->data[$row-2][$col-2];
+    }
+    private function increaseValue($i, $j)
+    {
+        $this->data[$i-1][$j-1]++;
+        $this->data[$this->rows][$j-1       ]++;
+        $this->data[$i-1       ][$this->cols]++;
+        $this->data[$this->rows][$this->cols]++;
+    }
+    public function getTitle()
+    {
+        return $this->title;
+    }
+    public function headerCell($row, $col)
+    {
+        return $row == 1 || $col == 1;
     }
 }
-
-/*********/
 
 class SurveyCorrelateData extends DataSource
 {
@@ -180,11 +284,11 @@ class SurveyCorrelateData extends DataSource
 
         //Get votes from users
         global $vgDB, $vgDBPrefix;
-        $votes = $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
+        $votes =& $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
                 array( $this->page->getPageID(), $presID ));
         //Record votes
         $userv = array();
-        foreach($votes as $vote)
+        foreach($votes as &$vote)
         {
             $userid = $vote['userID'];
             if(!isset($userv[ $userid ]))
@@ -192,7 +296,7 @@ class SurveyCorrelateData extends DataSource
             $userv[$userid][] = $mapchoices[ $vote['surveyID'].'_'.$vote['choiceID'] ];
         }
         //Update correlation table
-        foreach($userv as $user => $votes)
+        foreach($userv as $user => &$votes)
         {
             $nv = count($votes);
             for($i=0;$i<$nv;$i++)
@@ -297,12 +401,12 @@ class UsersCorrelateData extends DataSource
         
         //Get votes from users
         global $vgDB, $vgDBPrefix;
-        $votes = $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
+        $votes =& $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
                 array( $this->page->getPageID(), $presID ));
 
         //Record votes
         $userv = array();
-        foreach($votes as $vote)
+        foreach($votes as &$vote)
         {
             $userid = $vote['userID'];
             if(!isset($userv[ $userid ]))
@@ -411,7 +515,7 @@ abstract class DataWriter
         return $out;
     }
     abstract protected function start();
-    abstract protected function writeSource(DataSource $source);
+    abstract protected function writeSource(DataSource &$source);
     abstract protected function finalize();
 }
 
@@ -433,7 +537,7 @@ class ExcelWrite extends DataWriter
         $this->excel->send($this->filename);
         return '';
     }
-    protected function writeSource(DataSource $source)
+    protected function writeSource(DataSource &$source)
     {
         $sheet =& $this->excel->addWorksheet();
         $header =& $this->excel->addFormat();
@@ -477,10 +581,12 @@ class HtmlWrite extends DataWriter
     {
         return '';
     }
-    protected function writeSource(DataSource $source)
+    protected function writeSource(DataSource &$source)
     {
         $out = '';
+        $out .= '<h3>'.$source->getTitle().'</h3>';
         $out .= '<table class="'.$this->style.'" style="text-align:center;">';
+
         $rows = $source->numRows();
         $cols = $source->numCols();
         for($i=1;$i<=$rows;$i++)

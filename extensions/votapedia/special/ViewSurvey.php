@@ -134,10 +134,12 @@ class ViewSurvey extends SpecialPage
                 {
                     $returnto = '';
                 }
-                $url = Skin::makeSpecialUrl('CorrelateSurvey', 'id='.$page_id.'&returnto='. $returnto);
+                $url1 = Skin::makeSpecialUrl('CorrelateSurvey', 'id='.$page_id.'&returnto='. $returnto);
+                $url2 = Skin::makeSpecialUrl('CrossTabSurvey', 'id='.$page_id.'&returnto='. $returnto);
                 $wgOut->addHTML('<h2>More statistics</h2>');
                 $wgOut->addHTML('<ul>');
-                $wgOut->addHTML('<li><a href="'.$url.'">Survey correlations</a></li>');
+                $wgOut->addHTML('<li><a href="'.$url1.'">Survey correlations</a></li>');
+                $wgOut->addHTML('<li><a href="'.$url2.'">Survey cross tabulation</a></li>');
                 $wgOut->addHTML('</ul>');
                 global $vgScript;
                 $presentations =& $page->getPresentations();

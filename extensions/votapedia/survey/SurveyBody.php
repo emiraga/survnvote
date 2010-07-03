@@ -141,6 +141,36 @@ class SurveyCorrelations extends SurveyBody
     }
 }
 
+class SurveyCrossTab extends SurveyBody
+{
+    public function __construct(UserVO $user, PageVO $page, MwParser $parser, $presentationID)
+    {
+        parent::__construct($user, $page, $parser, $presentationID);
+    }
+    public function getDetailsHTML()
+    {
+        return '';
+    }
+    public function getHTML()
+    {
+        global $vgPath, $vgScript;
+        require_once("$vgPath/misc/DataWriter.php");
+        $out =  '';
+        $writer = new HtmlWrite();
+        $writer->setStyle('wikitable');
+
+        $data = CrossTabData::generate($this->page, $this->presID);
+        foreach ($data as $source)
+        {
+            $writer->addSource($source);
+        }
+        $out .= $writer->write();
+        $out .= '<br>';
+        $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CrossTabSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
+        return $out;
+    }
+}
+
 /**
  * Implementation of abstract class SurveyBody.
  * Shows are real view of the survey with voting allowed,
