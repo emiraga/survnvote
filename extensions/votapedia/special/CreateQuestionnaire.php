@@ -222,28 +222,6 @@ class CreateQuestionnaire extends CreateSurvey
 END_SCRIPT;
     }
     /**
-     * Generate array of SurveyVO based on the values provided.
-     * 
-     * @param Array $values
-     * @return Array of SurveyVO
-     */
-    function generateSurveysArray($values)
-    {
-        global $wgRequest;
-        $surveys = array();
-        foreach($wgRequest->getIntArray('orderNum', array()) as $index)
-        {
-            $question = urldecode( $wgRequest->getVal("q{$index}name") );
-            $choices = $wgRequest->getArray("q{$index}choices");
-            $surveyVO = new SurveyVO();
-            $surveyVO->generateChoices($choices, true);
-            $surveyVO->setQuestion($question);
-            $surveyVO->setPoints(0);
-            $surveys[] = $surveyVO;
-        }
-        return $surveys;
-    }
-    /**
      * Specify values for PageVO, specific for Questionnaire.
      * 
      * @param PageVO $page
@@ -281,32 +259,24 @@ END_SCRIPT;
         return $error;
     }
     /**
-     * Generate array of SurveyVO based on the $wgRequest values
+     * Generate array of SurveyVO based on the values provided.
      *
+     * @param Array $values
      * @return Array of SurveyVO
      */
-    function makeSurveysFromRequest()
+    protected function generateSurveysArray($values)
     {
         global $wgRequest;
         $surveys = array();
         foreach($wgRequest->getIntArray('orderNum', array()) as $index)
         {
-            $question = urldecode($wgRequest->getVal("q{$index}name"));
-            $strchoices = $wgRequest->getArray("q{$index}choices", array());
-            $survey = new SurveyVO();
-            $survey->setQuestion($question);
-            $choices = array();
-            foreach($strchoices as $choice)
-            {
-                $choice = urldecode($choice);
-
-                $chVO = new ChoiceVO();
-                $chVO->choice = $choice;
-                $choices[] = $chVO;
-            }
-
-            $survey->setChoices($choices);
-            $surveys[] = $survey;
+            $question = urldecode( $wgRequest->getVal("q{$index}name") );
+            $choices = $wgRequest->getArray("q{$index}choices", array());
+            $surveyVO = new SurveyVO();
+            $surveyVO->generateChoices($choices, true);
+            $surveyVO->setQuestion($question);
+            $surveyVO->setPoints(0);
+            $surveys[] = $surveyVO;
         }
         return $surveys;
     }
@@ -332,12 +302,21 @@ END_SCRIPT;
             {
                 /* @var $choice ChoiceVO */
                 $id = 'q'.$num."c".$cnum;
-                $choiceshtml .= sprintf($this->choice_t, $num, $id, $parser->run(trim($choice->choice),false), urlencode($choice->choice));
+                $choiceshtml .= sprintf($this->choice_t,
+                        $num,
+                        $id,
+                        $parser->run(trim($choice->choice),false),
+                        urlencode($choice->choice)
+                    );
                 $cnum++;
             }
             $this->prev_num_ch .= 'numChoices['.$num.'] = '.$cnum.";\n";
-            $questionhtml = sprintf($this->question_t, $num , $parser->run(trim($question), false),
-                    urlencode($question), urlencode($survey->getPoints()) );
+            $questionhtml = sprintf($this->question_t, 
+                    $num ,
+                    $parser->run(trim($question), false),
+                    urlencode($question), 
+                    urlencode($survey->getPoints())
+               );
             $questionhtml = str_replace('<!--PREV_CHOICES-->',  $choiceshtml, $questionhtml);
             $this->prev_questions .= $questionhtml;
             $num++;
@@ -359,7 +338,7 @@ END_SCRIPT;
      */
     function processNewSurveySubmit()
     {
-        $this->generatePrevQuestions($this->makeSurveysFromRequest());
+        $this->generatePrevQuestions($this->generateSurveysArray($this->form->getValuesArray()));
 
         parent::processNewSurveySubmit();
     }
@@ -384,7 +363,7 @@ END_SCRIPT;
      */
     public function processEditSurveySubmit()
     {
-        $this->generatePrevQuestions($this->makeSurveysFromRequest());
+        $this->generatePrevQuestions($this->generateSurveysArray($this->form->getValuesArray()));
 
         parent::processEditSurveySubmit();
     }

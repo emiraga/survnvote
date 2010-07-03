@@ -52,7 +52,11 @@ class ExportSurvey extends SpecialPage
 
             $pagedao = new PageDAO();
             $page =& $pagedao->findByPageID( $page_id );
-            
+
+            if($page->getStatus($presID) != 'ended')
+            {
+                throw new Exception('Results are available only for finished surveys');
+            }
             if($par == 'xls')
             {
                 $question = '';

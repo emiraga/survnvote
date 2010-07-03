@@ -76,25 +76,6 @@ class CreateQuiz extends CreateQuestionnaire
         $this->formpages[0]['items'][] = 'subtractwrong';
     }
     /**
-     * Generate array of SurveyVO based on the values provided.
-     *
-     * @param Array $values
-     * @return Array of SurveyVO
-     */
-    function generateSurveysArray($values)
-    {
-        $surveys =& parent::generateSurveysArray($values);
-        $i = 0;
-        global $wgRequest;
-        foreach($wgRequest->getIntArray('orderNum', array()) as $index)
-        {
-            $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
-            $surveys[$i]->setAnswerByChoice( urldecode(  $wgRequest->getVal("q{$index}correct",'') ) );
-            $i++;
-        }
-        return $surveys;
-    }
-    /**
      * Specify values for PageVO, specific for Quiz.
      *
      * @param PageVO $page
@@ -105,11 +86,7 @@ class CreateQuiz extends CreateQuestionnaire
     {
         $error = parent::setPageVOvalues($page, $values);
         $page->setType(vQUIZ);
-        if(isset($values['subtractwrong']) && $values['subtractwrong'])
-            $page->setSubtractWrong( true );
-        else
-            $page->setSubtractWrong( false );
-
+        $page->setSubtractWrong( isset($values['subtractwrong']) && (bool)$values['subtractwrong'] );
         return $error;
     }
     /**
@@ -140,21 +117,25 @@ class CreateQuiz extends CreateQuestionnaire
         return $error;
     }
     /**
-     * Generate array of SurveyVO based on the $wgRequest values
+     * Generate array of SurveyVO based on the values provided.
      *
+     * @param Array $values
      * @return Array of SurveyVO
      */
-    function makeSurveysFromRequest()
+    function generateSurveysArray($values)
     {
-        $surveys =& parent::makeSurveysFromRequest();
-        $i=0;
+        $surveys =& parent::generateSurveysArray($values);
+        $i = 0;
         global $wgRequest;
         foreach($wgRequest->getIntArray('orderNum', array()) as $index)
         {
+            if($wgRequest->getCheck("q{$index}points"))
+            {
+                $surveys[$i]->setPoints($wgRequest->getInt("q{$index}points"));
+            }
             if($wgRequest->getCheck("q{$index}correct"))
             {
-                $surveys[$i]->setAnswerByChoice( urldecode( $wgRequest->getVal("q{$index}correct") ));
-                $surveys[$i]->setPoints($wgRequest->getVal("q{$index}points"));
+                $surveys[$i]->setAnswerByChoice( urldecode(  $wgRequest->getVal("q{$index}correct",'') ) );
             }
             $i++;
         }
@@ -187,24 +168,6 @@ class CreateQuiz extends CreateQuestionnaire
         parent::fillFormValuesFromPage($page);
         $this->form->setValue('subtractwrong', $page->getSubtractWrong());
     }
-/*
-    function processNewSurveySubmit()
-    {
-        parent::processNewSurveySubmit();
-    }
-    function processNewSurvey()
-    {
-        parent::processNewSurvey(); //there are not previous questions
-    }
-    public function processEditSurvey()
-    {
-        parent::processEditSurvey(); //this method will call generatePrevQuestions
-    }
-    public function processEditSurveySubmit()
-    {
-        parent::processEditSurveySubmit();
-    }*/
-    
     /**
      *
      * @param String $par

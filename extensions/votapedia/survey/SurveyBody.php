@@ -123,6 +123,10 @@ class SurveyCorrelations extends SurveyBody
     }
     public function getHTML()
     {
+        if($this->page->getStatus($this->presID) != 'ended')
+        {
+            return '<p>Results are available only for finished surveys.</p>';
+        }
         global $vgPath, $vgScript;
         require_once("$vgPath/misc/DataWriter.php");
         $out =  '';
@@ -136,6 +140,7 @@ class SurveyCorrelations extends SurveyBody
 
         $out .= $writer->write();
         $out .= '<br>';
+        
         $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CorrelateSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
         return $out;
     }
@@ -153,6 +158,10 @@ class SurveyCrossTab extends SurveyBody
     }
     public function getHTML()
     {
+        if($this->page->getStatus($this->presID) != 'ended')
+        {
+            return '<p>Results are available only for finished surveys</p>';
+        }
         global $vgPath, $vgScript;
         require_once("$vgPath/misc/DataWriter.php");
         $out =  '';
@@ -379,7 +388,10 @@ class RealSurveyBody extends SurveyBody
         $out .=  $writer->write();
 
         global $vgScript;
-        $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&surveyid='.$survey->getSurveyID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
+        if($this->page->getStatus($this->presID) == 'ended')
+        {
+            $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&surveyid='.$survey->getSurveyID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
+        }
 
         $statscals = new StatsCalc();
         $chnum = 1;

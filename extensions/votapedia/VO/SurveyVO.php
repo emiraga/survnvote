@@ -109,16 +109,16 @@ class SurveyVO
      *
      * @param Array $choices of ChoiceVO
      */
-    function setChoices(array &$choices)
+    function setChoices(array $choices)
     {
-        $this->choices =& $choices;
+        $this->choices = $choices;
     }
     /**
      * Generate choices from the array of strings
      *
      * @param Array $values of strings
      */
-    function generateChoices(array $values, $urldecode = false)
+    function generateChoices(array &$values, $urldecode = false)
     {
         $choices = array();
         foreach($values as $value)

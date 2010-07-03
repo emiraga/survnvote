@@ -327,7 +327,7 @@ class CreateSurvey
 
         //First we must set the surveys
         $page->setSurveys( $this->generateSurveysArray($values) );
-
+        
         //Because here we are doing a check for the maximum number of choices.
         $error = $this->setPageVOvalues($page, $values);
         

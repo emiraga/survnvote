@@ -148,9 +148,15 @@ class ViewSurvey extends SpecialPage
                 foreach ($presentations as &$pres)
                 {
                     /* @var $pres PresentationVO */
-                    $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$pres->getPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.$pres->getName().'</a></li>');
+                    if($page->getStatus($pres->getPresentationID()) == 'ended')
+                    {
+                        $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$pres->getPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.$pres->getName().'</a></li>');
+                    }
                 }
-                $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$page->getCurrentPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.'Current'.'</a></li>');
+                if($page->getStatus($page->getCurrentPresentationID()) == 'ended')
+                {
+                    $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$page->getCurrentPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.'Current'.'</a></li>');
+                }
                 $wgOut->addHTML('</ul>');
 
                 $text = '';

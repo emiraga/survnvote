@@ -24,12 +24,18 @@ class StatsCalc
     }
     function getAverage()
     {
-        return $this->sum / $this->num;
+        if($this->num)
+            return $this->sum / $this->num;
+        else
+            return 0;
     }
     function getVariance()
     {
         $n = $this->num;
-        return ( $this->sumSq - (( $this->sum * $this->sum) / $n) ) / $n;
+        if($n)
+            return ( $this->sumSq - (( $this->sum * $this->sum) / $n) ) / $n;
+        else
+            return 0;
     }
     function getStdDev()
     {
@@ -37,7 +43,10 @@ class StatsCalc
     }
     function getStdError()
     {
-        return $this->getStdDev() / sqrt( $this->num );
+        if($this->num)
+            return $this->getStdDev() / sqrt( $this->num );
+        else
+            return 0;
     }
     function getConfidence95()
     {

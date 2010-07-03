@@ -53,9 +53,14 @@ class CorrelateSurvey extends SpecialPage
             $user = vfUser()->getUserVO();
             $pagedao = new PageDAO();
             $page =& $pagedao->findByPageID( $page_id );
+            
             if($par == 'xls')
             {
                 $presID = intval($wgRequest->getVal('presid',0));
+                if($page->getStatus($presID) != 'ended')
+                {
+                    throw new Exception('Results are available only for finished surveys');
+                }
                 $writer = new ExcelWrite('votapedia_corr_'.$page_id.'_pres_'.$presID.'.xls');
                 $data = new SurveyCorrelateData($page, $presID);
                 $writer->addSource($data);
@@ -123,9 +128,17 @@ class CrossTabSurvey extends SpecialPage
             $user = vfUser()->getUserVO();
             $pagedao = new PageDAO();
             $page =& $pagedao->findByPageID( $page_id );
+
+           
             if($par == 'xls')
             {
                 $presID = intval($wgRequest->getVal('presid',0));
+                
+                if($page->getStatus($presID) != 'ended')
+                {
+                    throw new Exception('Results are available only for finished surveys');
+                }
+                
                 $writer = new ExcelWrite('votapedia_crosstab_'.$page_id.'_pres_'.$presID.'.xls');
                 $data = CrossTabData::generate($page, $presID);
                 foreach ($data as $source)
