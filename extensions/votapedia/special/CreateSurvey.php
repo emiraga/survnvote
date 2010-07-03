@@ -250,7 +250,7 @@ class CreateSurvey
                 ),
                 'surveysperslide' => array(
                         'type' => 'input',
-                        'name' => 'Surveys per slide',
+                        'name' => 'Questions per slide',
                         'default' => '1',
                         'width' => '10',
                         'valid' => function($v,$i,$js)
@@ -351,22 +351,33 @@ class CreateSurvey
         $page->setType(vSIMPLE_SURVEY);
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
-        $page->setSurveysPerSlide(1);
         $page->setSMSRequired(false); //@todo SMS sending to the users
-        $page->setPrivacyByName($values['privacy']);
         $page->setPhoneVoting($values['phonevoting']);
         $page->setWebVoting($values['webvoting']);
         $page->setDuration( $values['duration'] );
-        if(isset($values['crowdID']))
-            $page->crowdID = $values['crowdID' ];
-        else
-            $page->crowdID = 0;
-
+        
+        $errors .= $this->setPageVOafterRenew($page, $values);
         $errors .= $this->setPageVOvaluesSmall($page, $values);
         return $errors;
     }
     /**
-     * Only set values for things related to graphing
+     * 
+     * @param PageVO $page
+     * @param Array $values
+     * @return String errors if any
+     */
+    protected function setPageVOafterRenew(PageVO &$page, &$values)
+    {
+        $errors = '';
+        $page->setPrivacyByName($values['privacy']);
+        if(isset($values['crowdID']))
+            $page->crowdID = $values['crowdID' ];
+        else
+            $page->crowdID = 0;
+        return $errors;
+    }
+    /**
+     * Only set values for things related to graphing.
      * 
      * @param PageVO $page
      * @param Array $values
@@ -382,14 +393,7 @@ class CreateSurvey
                 $errors .= '<li>Value of set in the "Duration" field will cause this survey to stop.</li>';
         }
         $page->setDisplayTop($values['showtop']);
-        if(isset($values['showresultsend']) && $values['showresultsend'])
-        {
-            $page->setShowGraphEnd(true);
-        }
-        else
-        {
-            $page->setShowGraphEnd(false);
-        }
+        $page->setShowGraphEnd( isset($values['showresultsend']) && (bool)$values['showresultsend'] );
         $page->bgimage = $values['bgimage'];
         $page->setSurveysPerSlide($values['surveysperslide']);
         
@@ -509,6 +513,7 @@ class CreateSurvey
         $mwtitle = Title::newFromText( $newtitle );
         if(! $mwtitle)
         {
+            // Fail-safe in case mediawiki does not want to accept this title.
             $mwtitle = Title::newFromText( 'Title_' + rand(1000*1000, 1000*1000*1000) );
         }
         $article = new Article( $mwtitle );
@@ -617,8 +622,10 @@ class CreateSurvey
         
         if(! $page->isEditable( $page->getCurrentPresentationID() ))
         {
-            $surveyended = $page->getStatus( $page->getCurrentPresentationID() ) == 'ended';
-            $this->setLimitedFormPages( $surveyended );
+            $pagestatus = $page->getStatus( $page->getCurrentPresentationID() );
+            $surveyended = $pagestatus == 'ended';
+            $renewed = $pagestatus == 'ready';
+            $this->setLimitedFormPages( $surveyended, $renewed );
         }
         $this->fillFormValuesFromPage($page);
         //draw form
@@ -631,13 +638,21 @@ class CreateSurvey
      *
      * @param Boolean $finished is survey finished
      */
-    function setLimitedFormPages($finished)
+    function setLimitedFormPages($finished, $renewed)
     {
         unset($this->formpages[0]);
         if($finished)
+        {
             unset($this->formpages[1]);
+        }
+        elseif($renewed)
+        {
+            $this->formpages[1]['items'] = array('privacy', 'crowdID', 'duration');
+        }
         else
+        {
             $this->formpages[1]['items'] = array('duration');
+        }
     }
     /**
      * Process Edit Survey Submit
@@ -676,8 +691,11 @@ class CreateSurvey
         
         if(! $this->page->isEditable( $this->page->getCurrentPresentationID() ))
         {
-            $surveyended = $this->page->getStatus( $this->page->getCurrentPresentationID() ) == 'ended';
-            $this->setLimitedFormPages( $surveyended );
+            $pagestatus = $this->page->getStatus( $this->page->getCurrentPresentationID() );
+            $surveyended = $pagestatus == 'ended';
+            $renewed = $pagestatus == 'ready';
+
+            $this->setLimitedFormPages( $surveyended, $renewed );
             $smallupdate = true;
         }
         else
@@ -693,6 +711,10 @@ class CreateSurvey
                 {
                     $page =& $this->page;
                     $error .= $this->setPageVOvaluesSmall($page, $this->form->getValuesArray(), $surveyended);
+                    if($renewed)
+                    {
+                        $error .= $this->setPageVOafterRenew($page, $this->form->getValuesArray());
+                    }
                     if(! $error)
                     {
                         $pagedao->updatePage($page, false, false);
@@ -707,7 +729,10 @@ class CreateSurvey
             }
             catch(SurveyException $e)
             {
-                $error = $e->getMessage();
+                if( substr($e->getMessage(), 0, 4) != '<li>' )
+                    $error .= '<li>'.$e->getMessage().'</li>';
+                else
+                    $error .= $e->getMessage();
             }
             if(! $error)
             {

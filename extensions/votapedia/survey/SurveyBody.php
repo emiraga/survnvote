@@ -216,25 +216,42 @@ class RealSurveyBody extends SurveyBody
         $this->pagestatus = $this->page->getStatus($this->presID);
 
         $colorindex = 1;
-        $numsurvey = 1;
+        $numsurvey = 0;
         //expand/collapse buttons
         $divid = 'div'.rand().'Q';
         if($this->pagestatus == 'active')
         {
-            $output .= $this->slideSurveys( $divid, count($surveys) );
+            $numslides = ceil( count($surveys) / $this->page->getSurveysPerSlide() );
+            $output .= $this->slideSurveysAbove( $divid, $numslides );
         }
+        
         //Surround each question with div, so that we can hide/show them.
         foreach ($surveys as &$survey)
         {
-            $output .= '<div id="'.$divid.$numsurvey.'">';
+            //Open group of questions
+            if($numsurvey % $this->page->getSurveysPerSlide() == 0)
+            {
+                $num = 1 + floor( $numsurvey / $this->page->getSurveysPerSlide() );
+                $output .= '<div id="'.$divid.$num.'">';
+            }
+            //Actual contents of a question/survey
             $output .= $this->getOneSurvey($survey, $colorindex);
-            $output .= '</div>';
+
+            //Close group of questions
+            if($numsurvey % $this->page->getSurveysPerSlide() == $this->page->getSurveysPerSlide() - 1)
+            {
+                $output .= '</div>';
+            }
             $numsurvey++;
+        }
+        if($numsurvey % $this->page->getSurveysPerSlide() != 0)
+        {
+            $output .= '</div>';
         }
         //expand/collapse buttons
         if($this->pagestatus == 'active')
         {
-            $output .= $this->slideSurveysBottom( $divid, count($surveys) );
+            $output .= $this->slideSurveysBelow( $divid, $numslides );
         }
         
         //Show help message, only to creator
@@ -535,7 +552,7 @@ class RealSurveyBody extends SurveyBody
      * @param Integer $num number of questions
      * @return String HTML code
      */
-    function slideSurveys( $id, $num)
+    function slideSurveysAbove( $id, $num)
     {
         if($num < 2)
             return '';
@@ -560,7 +577,7 @@ class RealSurveyBody extends SurveyBody
      * @param Integer $num number of questions
      * @return String HTML code
      */
-    function slideSurveysBottom( $id, $num)
+    function slideSurveysBelow( $id, $num)
     {
         if($num < 2)
             return '';

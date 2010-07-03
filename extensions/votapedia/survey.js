@@ -86,6 +86,7 @@ function htmlspecialchars(str) {
 	}
 	return str;
 }
+
 function rhtmlspecialchars(str) {
 	if (typeof(str) == "string") {
 		str = str.replace(/&gt;/ig, ">");

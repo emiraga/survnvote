@@ -470,6 +470,15 @@ class PageVO
         if( $this->getCurrentPresentationID() != $presID )
             return 'ended';
         
+        return $this->getStatusReal();
+    }
+    /**
+     * Get status of page in for the current presentation.
+     * 
+     * @return String values of 'ready', 'active' or 'ended'
+     */
+    private function getStatusReal()
+    {
         $starttime = strtotime ($this->getStartTime());
         $endtime = strtotime ($this->getEndTime());
         $now = time();
