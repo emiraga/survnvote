@@ -580,6 +580,9 @@ class CreateSurvey
             $error = $this->insertPage($this->form->getValuesArray());
             if(! $error)
             {
+                // Update statistics
+                VotapediaStatsUpdate::addPage();
+                // Redirect to the page
                 $titleObj = Title::newFromText( $this->wikiPageTitle );
                 $wgOut->redirect($titleObj->getLocalURL(), 302);
                 return;
@@ -738,7 +741,7 @@ class CreateSurvey
             {
                 //Purge all pages that have this survey included.
                 vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $page_id));
-
+                // redirect to the page
                 $title = Title::newFromText($this->returnTo);
                 $wgOut->redirect($title->escapeLocalURL(), 302);
                 return;

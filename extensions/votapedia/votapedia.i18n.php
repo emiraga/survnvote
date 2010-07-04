@@ -19,6 +19,7 @@ $messages['en'] = array(
     'crowd' => 'Crowd',
     'processcrowd' => 'Process crowd',
     'latestincoming' => 'Latest incoming SMS and calls',
+    'votapediastats' => 'Votapedia Statistics',
     'surveyslist' => 'Surveys list',
     'correlatesurvey' => 'Correlate survey',
     'crosstabsurvey' => 'Cross Tabulate survey',

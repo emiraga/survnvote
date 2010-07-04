@@ -127,6 +127,7 @@ DROP TABLE IF EXISTS {$vgDBPrefix}crowd_member;
 DROP TABLE IF EXISTS {$vgDBPrefix}crowd_log;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote;
 DROP TABLE IF EXISTS {$vgDBPrefix}vote_details;
+DROP TABLE IF EXISTS {$vgDBPrefix}stats;
 
 --
 -- Table structure for table page
@@ -314,6 +315,18 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}names
   taken   $tBoolean    NOT NULL default 0,
   UNIQUE(name)
 ) $wgDBTableOptions;
+
+CREATE TABLE IF NOT EXISTS {$vgDBPrefix}stats
+(
+  pages       INT     NOT NULL default 0,
+  crowds      INT     NOT NULL default 0,
+  votes_sms   INT     NOT NULL default 0,
+  votes_web   INT     NOT NULL default 0,
+  votes_call  INT     NOT NULL default 0,
+  surveyruns  INT     NOT NULL default 0
+) $wgDBTableOptions;
+
+INSERT INTO {$vgDBPrefix}stats () VALUES ();
 
 END_SQL;
 

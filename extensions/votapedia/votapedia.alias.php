@@ -18,6 +18,7 @@ $aliases['en'] = array(
         'Crowd' => array( 'Crowd' ),
         'ProcessCrowd' => array( 'ProcessCrowd' ),
         'LatestIncoming' => array( 'LatestIncoming' ),
+        'VotapediaStats' => array( 'VotapediaStats' ),
         'SurveysList' => array( 'SurveysList' ),
 );
 

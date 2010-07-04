@@ -33,6 +33,7 @@ require_once("$vgPath/DAO/PageDAO.php");
 require_once("$vgPath/DAO/UserDAO.php");
 require_once("$vgPath/API/AutocreateUsers.php");
 require_once("$vgPath/misc/UserPermissions.php");
+require_once("$vgPath/special/VotapediaStats.php");
 
 $vgDaemonDebug = false;
 
@@ -184,6 +185,8 @@ function vfVoteFromDaemon($choice, UserVO &$user)
         $votedao = new VoteDAO($page, $user->userID);
         $votevo = $votedao->newFromPage('SMS', $pageid, $surveyid, $choiceid, $page->getCurrentPresentationID() );
         $votedao->vote($votevo);
+        //update statistics
+        VotapediaStatsUpdate::addSmsVote();
     }
 }
 

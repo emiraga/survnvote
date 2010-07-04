@@ -86,11 +86,13 @@ class ProcessCrowd extends SpecialPage
                     $cr->name = $name;
                     $cr->description = $wgRequest->getVal( 'description' );
                     $cr->ownerID = vfUser()->userID();
-                    $cr->no_members = 1;
+                    $cr->no_members = 0;
                     $dao->insert($cr);
                     
                     $dao->addUserToCrowd($cr->crowdID, vfUser()->userID(), true, false);
-
+                    //update statistics
+                    VotapediaStatsUpdate::addCrowd();
+                    //redirect to the crowd page
                     $title = Skin::makeSpecialUrlSubpage('Crowd', $name);
                     $wgOut->redirect($title, 302);
                     return;

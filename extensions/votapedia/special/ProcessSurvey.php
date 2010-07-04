@@ -104,6 +104,9 @@ class ProcessSurvey extends SpecialPage
                         $pagedao->updateReceiversSMS($page);
                     }
                     $pagedao->startPageSurvey($page);
+                    //update statistics
+                    VotapediaStatsUpdate::addSurveyRun();
+                    //purge cache of list of active surveys
                     SurveysList::purgeCache();
                 }
                 catch(Exception $e)
@@ -206,6 +209,8 @@ class ProcessSurvey extends SpecialPage
                         $votevo = $votedao->newFromPage('WEB', $this->page_id, $surveyid,
                                 $choiceid, $page->getCurrentPresentationID() );
                         $votedao->vote($votevo);
+                        //update statistics
+                        VotapediaStatsUpdate::addWebVote();
                     }
                 }
                 $this->redirect();

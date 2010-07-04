@@ -62,6 +62,11 @@ $wgSpecialPages['SmsReport'] = 'SmsReport';
 $wgAutoloadClasses['LatestIncoming'] = "$vgPath/special/LatestIncoming.php";
 $wgSpecialPages['LatestIncoming'] = 'LatestIncoming';
 
+//Special page LatestIncoming
+$wgAutoloadClasses['VotapediaStats'] = "$vgPath/special/VotapediaStats.php";
+$wgAutoloadClasses['VotapediaStatsUpdate'] = "$vgPath/special/VotapediaStats.php";
+$wgSpecialPages['VotapediaStats'] = 'VotapediaStats';
+
 //Special page SmsReport
 $wgAutoloadClasses['SurveysList'] = "$vgPath/special/SurveysList.php";
 $wgSpecialPages['SurveysList'] = 'SurveysList';
