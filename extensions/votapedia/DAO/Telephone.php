@@ -261,7 +261,7 @@ class Telephone
                 /* @var $surveyChoice ChoiceVO */
                 if($surveyChoice->receiver)
                 {
-                    $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}used_receivers WHERE receiver = ?", array($surveyChoice->getReceiver()));
+                    $success = $vgDB->Execute("DELETE FROM {$vgDBPrefix}used_receivers WHERE receiver = ?", array($surveyChoice->receiver));
                     if(! $success)
                         throw new SurveyException("Failed to delete used receivers");
                 }

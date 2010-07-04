@@ -214,19 +214,6 @@ class SurveyVO
             return false;
     }
     /**
-     * @param String $receiver telephone number of the receiver
-     * @return Integer choiceID
-     */
-    /*function getChoiceIDByReceiver($receiver)
-    {
-        foreach($this->choices as $choice )
-        {
-            if ($choice->receiver == $receiver)
-                return $choice->choiceID;
-        }
-        return null;
-    }*/
-    /**
      * Convert to XML.
      * 
      * @return String
@@ -254,11 +241,11 @@ class SurveyVO
 			 else
 			 $xml=$xml."<sms>$choice->getSMS()</sms>";
             */
-            $xml=$xml."<receiver>".$choice->getReceiver()."</receiver>";
+            $xml=$xml."<receiver>".$choice->receiver."</receiver>";
             if ($votes == 0)
-                $xml=$xml."<vote>".$choice->getVote()."</vote>";
+                $xml=$xml."<vote>".$choice->numvotes."</vote>";
             else
-                $xml=$xml."<vote>".round($choice->getVote()/$votes,2)."</vote>";
+                $xml=$xml."<vote>".round($choice->numvotes/$votes,2)."</vote>";
             $xml=$xml."</choice>";
         }
         $xml=$xml."</choices>";
