@@ -310,7 +310,7 @@ class SurveyCorrelateData extends DataSource
         }
 
         //Compute maximum element
-        $maxv = 0;
+        $maxv = 2;
         for($i=0;$i<$numchoices;$i++)
         {
             for($j=$i+1;$j<$numchoices;$j++)
@@ -493,6 +493,165 @@ class UsersCorrelateData extends DataSource
     public function headerCell($row, $col)
     {
         return $row == 1 || $col == 1;
+    }
+}
+
+class QuizResultsData extends DataSource
+{
+    /* @var PageVO */ protected $page;
+    protected $numusers;
+    protected $numquestions;
+    protected $usernames = array();
+    protected $points = array();
+    # protected $questions = array();
+    protected $questionnames = array();
+
+    public function __construct(PageVO &$page, $presID)
+    {
+        $this->page =& $page;
+
+        //initialize, maping for the choices and conpute number of choices
+        $numquestions = 0;
+        $surveys =& $this->page->getSurveys();
+        $correct = array();
+        $points = array();
+        $negpoints = array();
+        $mapquestions = array();
+        foreach ($surveys as &$survey)
+        {
+            /* @var $survey SurveyVO */
+            $mapquestions[ $survey->getSurveyID() ] = $numquestions;
+            # $this->questions[ $numquestions ] = $survey->getQuestion();
+            $this->questionnames[ $numquestions ] = 
+               '<abbr title="'.
+                addslashes($survey->getQuestion()) . ' ('.$survey->getPoints().' points)'
+                  .'">&nbsp;'
+                .''.($numquestions+1)
+              .'&nbsp;</abbr>';
+            $correct[ $numquestions ] = $survey->getAnswer();
+            $points[ $numquestions ] = $survey->getPoints();
+            if( $page->getSubtractWrong() )
+            {
+                $negpoints[ $numquestions ] =  - $survey->getPoints() / $survey->getNumOfChoices();
+            }
+            else
+            {
+                $negpoints[ $numquestions ] = 0;
+            }
+            $numquestions++;
+        }
+        
+        //Get votes from users
+        global $vgDB, $vgDBPrefix;
+        $votes =& $vgDB->GetAll("SELECT userID, surveyID, choiceID FROM {$vgDBPrefix}vote WHERE pageID=? AND presentationID=?",
+                array( $this->page->getPageID(), $presID ));
+
+        //Record votes
+        $userv = array();
+        foreach($votes as &$vote)
+        {
+            $userid = $vote['userID'];
+            if(!isset($userv[ $userid ]))
+                $userv[$userid] = array();
+            $userv[$userid][] = array( $mapquestions[ $vote['surveyID'] ], $vote['choiceID'] );
+        }
+        
+        $numusers = 0;
+        $mapusers = array();
+        $userdao = new UserDAO();
+        foreach($userv as $user => &$votes)
+        {
+            $mapusers[$numusers] = $user;
+            $user = $userdao->findByID($user);
+            if($user)
+            {
+                $username = MwUser::convertDisplayName( $user->username );
+            }
+            else
+            {
+                $username = 'Unknown user';
+            }
+            $this->usernames[$numusers] = $username;
+            $this->points[ $numusers ] = array_fill(0, $numquestions+1, 0);
+            foreach ($votes as $vote)
+            {
+                list($surveyID, $choiceID) = $vote;
+                //
+                if( $choiceID == $correct[ $surveyID ] )
+                {
+                    $this->points[ $numusers ][ $surveyID ] += $points[ $surveyID ];
+                    $this->points[ $numusers ][ $numquestions ] += $points[ $surveyID ];
+                }
+                else
+                {
+                    $this->points[ $numusers ][ $surveyID ] += $negpoints[ $surveyID ];
+                    $this->points[ $numusers ][ $numquestions ] += $negpoints[ $surveyID ];
+                }
+            }
+            $numusers++;
+        }
+        $this->maxv = $this->page->getNumOfSurveys();
+        $this->numusers = $numusers;
+        $this->numquestions = $numquestions;
+    }
+    function getStatsCalc()
+    {
+        global $vgPath;
+        require_once("$vgPath/misc/StatsCalc.php");
+        $s = new StatsCalc();
+        for($i=0; $i<$this->numusers; $i++)
+        {
+            $s->add($this->points[ $i ][ $this->numquestions ]);
+        }
+        return $s;
+    }
+    public function getTitle()
+    {
+        return 'Number of points';
+    }
+    public function numCols()
+    {
+        return 2 + $this->numquestions;
+    }
+    public function numRows()
+    {
+        return 1 + $this->numusers;
+    }
+    public function getText($row, $col)
+    {
+        if($row + $col < 3)
+            return 'Voter';
+        if($row == 1 )
+        {
+            if($col - 2 == $this->numquestions)
+                return 'Total';
+            return 'Question '.($col - 1);
+        }
+        if($col == 1)
+        {
+            return $this->usernames[ $row - 2 ];
+        }
+        return $this->points[$row-2][$col-2];
+    }
+    public function headerCell($row, $col)
+    {
+        return $row == 1;
+    }
+    public function sortableCell($row, $col)
+    {
+        return $row == 1;
+    }
+    public function markRow($row)
+    {
+        return false;
+    }
+  public function htmlEquiv($row, $col)
+    {
+        if($row == 1 && $col > 1 && $col-2 < $this->numquestions)
+        {
+            return $this->questionnames[$col-2];
+        }
+        return false;
     }
 }
 

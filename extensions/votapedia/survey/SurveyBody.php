@@ -404,17 +404,7 @@ class RealSurveyBody extends SurveyBody
             $statscals->add($chnum, $votes);
             $chnum++;
         }
-        if(true)
-        {
-            $out .= '<table class="wikitable">';
-            $out .= sprintf("<tr><td width=\"140px\">Sample size<td>%d</tr>", $statscals->getNum());
-            $out .= sprintf("<tr><td>Mean<td>%.3f</tr>", $statscals->getAverage());
-            list($clow, $chigh) = $statscals->getConfidence95();
-            $out .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$statscals->getNum());
-            $out .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $statscals->getStdDev());
-            $out .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $statscals->getStdError());
-            $out .= '</table>';
-        }
+        $out .= $statscals->getHTML('Likert scale (1, 2, ...)');
         return $out;
     }
     /**
@@ -824,6 +814,27 @@ class RealQuizBody extends RealQuestionnaireBody
     {
         parent::__construct($user, $page, $parser, $presentationID);
         $this->type = vQUIZ;
+    }
+    public function getDetailsHTML()
+    {
+        $out = '';
+        if($this->page->getStatus($this->presID) == 'ended')
+        {
+            global $vgPath, $vgScript;
+            require_once("$vgPath/misc/DataWriter.php");
+            $out =  '';
+            $writer = new HtmlWrite();
+            $writer->setStyle('wikitable sortable maxwidth');
+            
+            $data = new QuizResultsData($this->page, $this->presID);
+            $writer->addSource($data);
+            $out .= "<h1>Quiz results</h1>";
+            $out .= $writer->write();
+            $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'&quiz=1"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
+            $out .= $data->getStatsCalc()->getHTML('Total Points');
+        }
+        $out .= parent::getDetailsHTML();
+        return $out;
     }
 }
 

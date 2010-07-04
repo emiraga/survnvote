@@ -59,22 +59,38 @@ class ExportSurvey extends SpecialPage
             }
             if($par == 'xls')
             {
-                $question = '';
+                $extra = '';
                 if($surveyid)
-                    $question = 'q_'.$surveyid;
-                $writer = new ExcelWrite('votapedia_'.$page->getTypeName().'_'.$page_id.'_pres_'.$presID.$question.'.xls');
-                $surveys =& $page->getSurveys();
-                $colorindex = 1;
-                foreach ($surveys as $survey)
                 {
-                    /* @var $survey SurveyVO */
-                    if($surveyid && $surveyid != $survey->getSurveyID())
-                        continue;
-                    $votescount = VoteDAO::getNumVotes($page, $presID);
-                    if(!$votescount)
-                        throw new Exception('Invalid presentation ID');
-                    $data = new SurveyVotesData($survey, $votescount, $parser, $colorindex);
+                    $extra = 'q_'.$surveyid;
+                }
+                if($wgRequest->getCheck('quiz'))
+                {
+                    $extra = '_quiz';
+                }
+
+                $writer = new ExcelWrite('votapedia_'.$page->getTypeName().'_'.$page_id.'_pres_'.$presID.$extra.'.xls');
+
+                if($wgRequest->getCheck('quiz'))
+                {
+                    $data = new QuizResultsData($page, $presID);
                     $writer->addSource($data);
+                }
+                else
+                {
+                    $surveys =& $page->getSurveys();
+                    $colorindex = 1;
+                    foreach ($surveys as $survey)
+                    {
+                        /* @var $survey SurveyVO */
+                        if($surveyid && $surveyid != $survey->getSurveyID())
+                            continue;
+                        $votescount = VoteDAO::getNumVotes($page, $presID);
+                        if(!$votescount)
+                            throw new Exception('Invalid presentation ID');
+                        $data = new SurveyVotesData($survey, $votescount, $parser, $colorindex);
+                        $writer->addSource($data);
+                    }
                 }
                 $writer->write();
                 $wgOut->disable();

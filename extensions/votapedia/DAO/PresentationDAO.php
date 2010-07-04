@@ -25,7 +25,7 @@ class PresentationDAO
     {
         global $vgDB, $vgDBPrefix;
         $sql = "insert into {$vgDBPrefix}presentation(pageID, presentationID, ";
-        $sql .= "name, active, startTime, endTime, numvotes ) values (?,?,?,?,?,?,?)";
+        $sql .= "name, active, startTime, endTime, numvotes, crowdID ) values (?,?,?,?,?,?,?,?)";
         $vgDB->Execute($sql,array(
             intval($presentation->getPageID()),
             intval($presentation->getPresentationID()),
@@ -33,7 +33,8 @@ class PresentationDAO
             $presentation->getActive(),
             $presentation->getStartTime(),
             $presentation->getEndTime(),
-            $presentation->numvotes
+            $presentation->numvotes,
+            $presentation->crowdID
         ));
     }
     /**
@@ -60,7 +61,7 @@ class PresentationDAO
             $pres->setStartTime($rsPresentation->fields['startTime']);
             $pres->setEndTime($rsPresentation->fields['endTime']);
             $pres->numvotes = $rsPresentation->fields['numvotes'];
-            
+            $pres->crowdID = $rsPresentation->fields['crowdID'];
             $presentations[] = $pres;
             $ids[] = intval($rsPresentation->fields['presentationID']);
             $rsPresentation->MoveNext();

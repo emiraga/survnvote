@@ -1,4 +1,3 @@
-
 .surveyoutMark
 {
     font-weight:bold;
@@ -12,4 +11,7 @@
     
     width: 100%;
 }
-
+.maxwidth
+{
+    width: 100%;
+}

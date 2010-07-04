@@ -33,7 +33,7 @@ class StatsCalc
     {
         $n = $this->num;
         if($n)
-            return ( $this->sumSq - (( $this->sum * $this->sum) / $n) ) / $n;
+            return ( $this->sumSq - (( $this->sum * $this->sum) / $n) ) / ($n - 1);
         else
             return 0;
     }
@@ -53,6 +53,21 @@ class StatsCalc
         $a = $this->getAverage();
         $e = $this->getStdError();
         return array($a - 1.96 * $e, $a + 1.96 * $e);
+    }
+    function getHTML($title)
+    {
+        if($this->getNum() < 2)
+            return '';
+        $out = '<table class="wikitable">';
+        $out .= '<caption>'.$title.'</caption>';
+        $out .= sprintf("<tr><td width=\"140px\">Sample size<td>%d</tr>", $this->getNum());
+        $out .= sprintf("<tr><td>Mean<td>%.3f</tr>", $this->getAverage());
+        list($clow, $chigh) = $this->getConfidence95();
+        $out .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$this->getNum());
+        $out .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $this->getStdDev());
+        $out .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $this->getStdError());
+        $out .= '</table>';
+        return $out;
     }
 }
 

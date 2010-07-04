@@ -318,14 +318,15 @@ class PageDAO
         $pres->setName('Run#' . $presid);
         $pres->setPresentationID($presid);
         $pres->numvotes = serialize( VoteDAO::getNumVotes($page, $presid) );
-        
+        $pres->crowdID = $page->crowdID;
+
         $page->addPresentation($pres);
         $page->setStartTime("2999-01-01 00:00:00");
         $page->setEndTime('2999-01-01 00:00:00');
         //update page information
         $this->updatePage($page, false, true);
 
-        //blank number of votes in 'choice' table
+        //Blank number of votes in the 'choice' table
         global $vgDB, $vgDBPrefix;
         $r = $vgDB->Execute("UPDATE {$vgDBPrefix}choice set numvotes=0 where pageID=?",
                 array(intval($page->getPageID())));

@@ -218,5 +218,24 @@ class CrowdDAO
         }
         return $result;
     }
+    /**
+     *
+     * @param Integer $crowdID
+     * @return String HTML code for link to crowd
+     */
+    function makeLink($crowdID)
+    {
+        if($crowdID == 0)
+        {
+            return 'Everyone';
+        }
+        $crowd = $this->findByID($crowdID);
+        if($crowd === false)
+        {
+            return 'Unknown crowd';
+        }
+        $showname = str_replace('_', ' ', $crowd->name);
+        return '<a href="'.Skin::makeSpecialUrlSubpage('Crowd', $crowd->name).'">'.$showname.'</a>';
+    }
 }
 

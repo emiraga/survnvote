@@ -198,6 +198,7 @@ CREATE TABLE IF NOT EXISTS {$vgDBPrefix}presentation (
   endTime            datetime     NOT NULL,
   active             $tBoolean    NOT NULL DEFAULT '0',
   numvotes           TEXT         NOT NULL,
+  crowdID            $tCrowdID    NOT NULL DEFAULT 0,
   KEY                (pageID)
 ) $wgDBTableOptions;
 

@@ -263,18 +263,28 @@ class SurveyView
             $output .= '</form>';
             if($pagestatus == 'ended')
             {
-                $output .= '<p><b>Run started</b>: '.vfPrettyDate( $this->page->getStartTime() , 'l').'</p>';
-                $output .= '<p><b>Run ended</b>: '.vfPrettyDate( $this->page->getEndTime() , 'l').'</p>';
+                $output .= $this->showRunInformation($this->page->getStartTime(),  $this->page->getEndTime(), $this->page->crowdID);
             }
         }
         else
         {
             $p =& $this->page->getPresentationByNum($presID);
-            $output .= '<p><b>Run started</b>: '. vfPrettyDate( $p->getStartTime() , 'l' ).'</p>';
-            $output .= '<p><b>Run ended</b>: '. vfPrettyDate( $p->getEndTime() , 'l').'</p>';
+            $output .= $this->showRunInformation($p->getStartTime(), $p->getEndTime(), $p->crowdID);
         }
 
         wfProfileOut( __METHOD__ );
+        return $output;
+    }
+    private function showRunInformation($start, $end, $crowdID)
+    {
+        $output = '';
+        $output .= '<p><b>Run started</b>: '. vfPrettyDate( $start , 'l').'</p>';
+        $output .= '<p><b>Run ended</b>: '. vfPrettyDate( $end , 'l').'</p>';
+        if($crowdID)
+        {
+            $crdao = new CrowdDAO();
+            $output .= '<p><b>Crowd</b>: '. $crdao->makeLink($crowdID).'</p>';
+        }
         return $output;
     }
     /**

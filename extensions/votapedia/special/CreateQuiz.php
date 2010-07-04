@@ -97,7 +97,9 @@ class CreateQuiz extends CreateQuestionnaire
     function Validate()
     {
         $error = parent::Validate();
-        if(!isset($this->page) || $this->page->getStatus( $this->page->getCurrentPresentationID() ) == 'ready')
+
+        //getStatus(1) because we only allow changing before the first run
+        if(!isset($this->page) || $this->page->getStatus( 1 ) == 'ready')
         {
             global $wgRequest;
             $ordernum = $wgRequest->getIntArray('orderNum', array());
@@ -107,11 +109,11 @@ class CreateQuiz extends CreateQuestionnaire
                 {
                     $error .= "<li>You must provide correct answer to question.</li>";
                 }
-            }
-            $points = intval($wgRequest->getVal("q{$index}points"));
-            if($points <= 0)
-            {
-                $error .= "<li>Number ov points for question must be positive.</li>";
+                $points = $wgRequest->getInt("q{$index}points");
+                if($points <= 0)
+                {
+                    $error .= "<li>Number of points for question must be positive.</li>";
+                }
             }
         }
         return $error;

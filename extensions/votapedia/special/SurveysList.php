@@ -115,19 +115,11 @@ class SurveysList extends SpecialPage
             $out .= '<a href="'.$wikipage.'">'. $p->run($page->getTitle(), false) .'</a> ';
             $out .= '<br>('.vfPrettyDate($page->getStartTime()).')';
 
-            if($page->crowdID == 0)
-            {
-                # $out .= 'Everyone';
-            }
-            else
+            if($page->crowdID != 0)
             {
                 $crdao = new CrowdDAO();
-                $crowd = $crdao->findByID($page->crowdID);
-
-                $showname = str_replace('_', ' ', $crowd->name);
-                $out .= '<br>For: <a href="'.Skin::makeSpecialUrlSubpage('Crowd', $crowd->name).'">'.$showname.'</a>';
+                $out .= '<br>For: '.$crdao->makeLink($page->crowdID);
             }
-            # $out .= '<td>';
 
             $out .= '<td>';
             $timeleft = strtotime($page->getEndTime()) - time();
