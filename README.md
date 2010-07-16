@@ -1,8 +1,5 @@
-Survey n' Vote (survnvote)
-==========================
-
-Info
-----
+Survey n' Vote
+==============
 
 Survey n' Vote is a free Audience Response System that uses mobile phones instead of clickers.
 
