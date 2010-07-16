@@ -6,14 +6,14 @@ Info
 
 Survey n' Vote is a free Audience Response System that uses mobile phones instead of clickers.
 
-It is a MediaWiki extension, originally developed by [CSIRO](http://www.ict.csiro.au/downloads.php) by name "VotApedia".
+It is a MediaWiki extension, originally developed by [CSIRO](http://www.ict.csiro.au/downloads.php) by the name "VotApedia".
 
 INTEG has forked this project in 2010, and continued development as a separate project.
 
 Contributions
 -------------
 
-The survnvote extension was contributed by:
+This extension was contributed by:
 
 *   Emir Habul
 *   Ken Taylor
@@ -25,6 +25,7 @@ Thanks
 ------
 
 Special thanks to:
+
 *   Teddy Mantoro
 *   Media Ayu 
 
