@@ -49,7 +49,9 @@ $messages['en'] = array(
     'edit-quiz' => 'Edit quiz',
 
     'survey-question' => 'Question: $1',
+    'survey-question-num' => 'Question $1: $2',
     'survey-question-p' => 'Question: $1 ($2 points)',
+    'survey-question-p-num' => 'Question $1: $2 ($3 points)',
     'survey-caption' => 'Title: $1',
 
     'start-survey' => 'Start survey',

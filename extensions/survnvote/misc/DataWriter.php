@@ -631,7 +631,7 @@ class QuizResultsData extends DataSource
         {
             return $this->usernames[ $row - 2 ];
         }
-        return $this->points[$row-2][$col-2];
+        return sprintf("%.2f",$this->points[$row-2][$col-2]);
     }
     public function headerCell($row, $col)
     {

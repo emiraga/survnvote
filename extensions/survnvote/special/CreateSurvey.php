@@ -138,7 +138,7 @@ class CreateSurvey
                         'name' => 'Crowd',
                         'default' => 'Everyone',
                         'options' => array('Everyone'=>'0'),
-                        'explanation' => 'This option is effective only when Survey Privacy is set to "High"',
+                        'explanation' => 'You can create a new crowd by following <a target="_blank" href="'.Skin::makeSpecialUrl('Crowd').'">this link.</a>',
                         'html' => '<script>if(plow.checked)plow.onchange();</script>',
                 ),
                 'duration' => array(

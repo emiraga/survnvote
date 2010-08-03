@@ -23,25 +23,25 @@ class Sms
     static public $msgCreateUser = 'Thank for participating in Survey \'n Vote. You can login to www.survnvote.net, Username:%s Password:%s';
     /* Message used when user is using survnvote for the first time */
     static public $msgCreateUserNoPass = 'Thank for participating in Survey \'n Vote. You can login to www.survnvote.net, Username:%s';
-
+	
     /* Command to send by SMS to check validity of account. */
     static public $cmdCheck = 'CHECK';
     /* Command to send by SMS to check validity of account. */
     static public $cmdConfirm = 'CONFIRM';
-
+	
     /* Do not show messages from these numbers, these are special numbers which
      * are specific to mobile provider.
      * You should fill this list by yourself unless you are actually using CELCOM BLUE in Malaysia.
      */
     static private $blackList = array('2888', '28882', 'CELCOM', '22990',
         '23131', '29292', 'ChannelC', '63008', 'Channel X', 
-        '18888', '23456'); //yes, I receive a lot of spam.
-
+        '18888', '23456', 'Celcom Blue'); //yes, we receive a lot of spam.
+	
     /* Number to send a message when requesting a balance report */
     static private $balanceNumber = '2888';
     /* Text message to send when requesting a balance report */
     static private $balanceMessage = 'BAL';
-
+	
     /**
      * function getNewSms()
      * 

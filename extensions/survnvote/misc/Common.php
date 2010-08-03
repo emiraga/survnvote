@@ -297,6 +297,13 @@ if($vgDebug && ( !isset($_SERVER['REMOTE_ADDR'])
     }
 }
 
+function vfGetABC($a)
+{
+    if($a < 26)
+        return chr(ord('a')+$a);
+    else
+        return vfGetABC($a / 26).vfGetABC($a % 26);
+}
 
 require_once "Net/GeoIP.php";
 

@@ -283,7 +283,11 @@ class SurveyView
         if($crowdID)
         {
             $crdao = new CrowdDAO();
-            $output .= '<p><b>Crowd</b>: '. $crdao->makeLink($crowdID).'</p>';
+            $output .= '<p><b>Crowd</b>: '. $crdao->makeLink($crowdID).'.</p>';
+        }
+        else
+        {
+            $output .= '<p><b>Survey run for everyone.</b></p>';
         }
         return $output;
     }

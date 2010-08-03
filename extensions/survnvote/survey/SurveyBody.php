@@ -244,7 +244,7 @@ class RealSurveyBody extends SurveyBody
                 $output .= '<div id="'.$divid.$num.'">';
             }
             //Actual contents of a question/survey
-            $output .= $this->getOneSurvey($survey, $colorindex);
+            $output .= $this->getOneSurvey($survey, $colorindex, $numsurvey + 1);
 
             //Close group of questions
             if($numsurvey % $this->page->getSurveysPerSlide() == $this->page->getSurveysPerSlide() - 1)
@@ -561,8 +561,8 @@ class RealSurveyBody extends SurveyBody
         global $wgOut, $vgScript;
 
         $out = '<div>';
-        $out .= "<div id=\"btn_collapse\" style=\"display:none\"><img src='$vgScript/icons/collapse.png' /> <a href=\"#\" onclick=\"sur_collapse('$id',$num);return false;\">collapse</a> </div>";
-        $out .= "<div id=\"btn_expand\" style=\"display:none\"><img src='$vgScript/icons/expand.png' /> <a href=\"#\" onclick=\"sur_expand('$id',$num);return false;\">expand</a> </div>";
+        $out .= "<div id=\"btn_collapse\" style=\"display:none\"><a href=\"#\" onclick=\"sur_collapse('$id',$num);return false;\"><img src='$vgScript/icons/collapse.png' />collapse</a> </div>";
+        $out .= "<div id=\"btn_expand\" style=\"display:none\"><a href=\"#\" onclick=\"sur_expand('$id',$num);return false;\"><img src='$vgScript/icons/expand.png' />expand</a> </div>";
         $out .= '</div>';
 
         vfAdapter()->addScript($vgScript. '/survey.js');
@@ -596,7 +596,7 @@ class RealSurveyBody extends SurveyBody
      * @param SurveyVO $survey
      * @param Integer $colorindex
      */
-    function getOneSurvey(SurveyVO &$survey, &$colorindex)
+    function getOneSurvey(SurveyVO &$survey, &$colorindex, $question_num)
     {
         $choices = $survey->getChoices();
         $output = '';
@@ -605,13 +605,15 @@ class RealSurveyBody extends SurveyBody
         {
             if($survey->getPoints())
             {
-                $output .= '<h5>'. wfMsg('survey-question-p',
-                        $this->parser->run( $survey->getQuestion() ), $survey->getPoints() ).'</h5>';
+                $output .= '<h5>'. wfMsg('survey-question-p-num', $question_num,
+                        $this->parser->run( $survey->getQuestion() ),
+                        $survey->getPoints() ).'</h5>';
             }
             else
             {
-                $output .= '<h5>'. wfMsg('survey-question',
-                        $this->parser->run( $survey->getQuestion() ) ).'</h5>';
+                $output .= '<h5>'. wfMsg('survey-question-num', $question_num,
+                        $this->parser->run( $survey->getQuestion() )
+                   ).'</h5>';
             }
         }
 
@@ -631,12 +633,12 @@ class RealSurveyBody extends SurveyBody
 
             if($prev_vote)
                 $this->userhasvoted=true;
-
+            
             foreach ($choices as &$choice)
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $name = $this->parser->run($choice->choice);
+                $name = vfGetABC($choice->choiceID-1).') '. $this->parser->run($choice->choice);
                 $extra='';
                 if($this->show_phones)
                 {
@@ -693,7 +695,7 @@ class RealSurveyBody extends SurveyBody
                 $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
                 $percent = substr(100.0 * $votes / $numvotes, 0, 5);
                 $width = 270.0 * $votes / $numvotes;
-                $name = $this->parser->run($choice->choice);
+                $name = vfGetABC($choice->choiceID-1).') '. $this->parser->run($choice->choice);
                 if($percent)
                     $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
                 else

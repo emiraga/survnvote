@@ -63,7 +63,7 @@ $vgAnonSurveyCreation = true;
 // Phone voting will have limited duration
 $vgLimitPhoneVotingDuration = 60*5;
 
-// Phone voting will have limited duration
+// Web voting will have limited duration
 $vgLimitWebVotingDuration = 60*60*24*5;
 
 // Limit number of choices (receivers in phone voting)
