@@ -638,7 +638,7 @@ class RealSurveyBody extends SurveyBody
             {
                 /* @var $choice ChoiceVO */
                 $color = vfGetColor($colorindex);
-                $name = vfGetABC($choice->choiceID-1).') '. $this->parser->run($choice->choice);
+                $name = /*vfGetABC($choice->choiceID-1).') '.*/ $this->parser->run($choice->choice);
                 $extra='';
                 if($this->show_phones)
                 {
@@ -695,7 +695,7 @@ class RealSurveyBody extends SurveyBody
                 $votes = $this->votescount->get($survey->getSurveyID(), $choice->choiceID);
                 $percent = substr(100.0 * $votes / $numvotes, 0, 5);
                 $width = 270.0 * $votes / $numvotes;
-                $name = vfGetABC($choice->choiceID-1).') '. $this->parser->run($choice->choice);
+                $name = /*vfGetABC($choice->choiceID-1).') '.*/ $this->parser->run($choice->choice);
                 if($percent)
                     $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
                 else

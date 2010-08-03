@@ -167,7 +167,13 @@ class CrossTabData extends DataSource
                 {
                     list($sur1, $choice1) = $votes[$i];
                     list($sur2, $choice2) = $votes[$j];
-                    $sources[ $mapsurveys[$sur1] ][ $mapsurveys[$sur2] ]->increaseValue($choice1, $choice2);
+                    $map1 = $mapsurveys[$sur1];
+                    $map2 = $mapsurveys[$sur2];
+                    if($map1 > $map2)
+                    {
+                        list($map1,$map2)=array($map2, $map1);
+                    }
+                    $sources[ $map1 ][ $map2 ]->increaseValue($choice1, $choice2);
                 }
             }
         }

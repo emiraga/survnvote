@@ -232,18 +232,17 @@ class SurveyView
         
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         
-        if($this->page->getCurrentPresentationID() == $presID)
+        //if($this->page->getCurrentPresentationID() == $presID){
+        $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
+                .'<input type="hidden" name="id" value="'.$this->page->getPageID().'">'
+                .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
+        $output.= '<a name="survey_id_'.$this->page->getPageID().'"></a>';
+        if($this->user->isTemporary)
         {
-            $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
-                    .'<input type="hidden" name="id" value="'.$this->page->getPageID().'">'
-                    .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
-            $output.= '<a name="survey_id_'.$this->page->getPageID().'"></a>';
-            if($this->user->isTemporary)
-            {
-                $output .= '<input type="hidden" name="liveshow" value="'.$this->user->getTemporaryKey($this->page->getPageID()).'" />';
-                $output .= '<input type="hidden" name="userID" value="'.$this->user->userID.'" />';
-            }
+            $output .= '<input type="hidden" name="liveshow" value="'.$this->user->getTemporaryKey($this->page->getPageID()).'" />';
+            $output .= '<input type="hidden" name="userID" value="'.$this->user->userID.'" />';
         }
+        //}
         
         $output.= '<font size="4" class="vpTitle">'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
         
@@ -257,10 +256,12 @@ class SurveyView
         
         $output .= $this->body->getHTML();
         
+        //show buttons
+        $output .= $this->buttons->getHTML($presID);
+        $output .= '</form>';
+        
         if($this->page->getCurrentPresentationID() == $presID)
         {
-            $output .= $this->buttons->getHTML($presID);
-            $output .= '</form>';
             if($pagestatus == 'ended')
             {
                 $output .= $this->showRunInformation($this->page->getStartTime(),  $this->page->getEndTime(), $this->page->crowdID);
