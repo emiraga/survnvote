@@ -243,7 +243,9 @@ class FormControl
         if($item['name'])
             $item['name'] .= ':';
 
-        $label = 	Xml::label( $item['name'], $id );
+        $label = $item['name'];
+        //$label = Xml::label( $item['name'], $id );
+        
         if(isset($item['icon']))
             $label = "<img src='$item[icon]' alt='icon' /> ".$label;
 

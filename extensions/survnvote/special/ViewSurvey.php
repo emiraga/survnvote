@@ -134,8 +134,8 @@ class ViewSurvey extends SpecialPage
                 {
                     $returnto = '';
                 }
-                $url1 = Skin::makeSpecialUrl('CorrelateSurvey', 'id='.$page_id.'&returnto='. $returnto);
-                $url2 = Skin::makeSpecialUrl('CrossTabSurvey', 'id='.$page_id.'&returnto='. $returnto);
+                $url1 = vfPrintLink(Skin::makeSpecialUrl('CorrelateSurvey', 'id='.$page_id.'&returnto='. $returnto) );
+                $url2 = vfPrintLink(Skin::makeSpecialUrl('CrossTabSurvey', 'id='.$page_id.'&returnto='. $returnto) );
                 $wgOut->addHTML('<h2>More statistics</h2>');
                 $wgOut->addHTML('<ul>');
                 $wgOut->addHTML('<li><a href="'.$url1.'">Survey correlations</a></li>');
@@ -150,12 +150,12 @@ class ViewSurvey extends SpecialPage
                     /* @var $pres PresentationVO */
                     if($page->getStatus($pres->getPresentationID()) == 'ended')
                     {
-                        $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$pres->getPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.$pres->getName().'</a></li>');
+                        $wgOut->addHTML('<li><a href="'. vfPrintLink (Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$pres->getPresentationID())).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="16" height="16" /> All questions to excel, '.$pres->getName().'</a></li>');
                     }
                 }
                 if($page->getStatus($page->getCurrentPresentationID()) == 'ended')
                 {
-                    $wgOut->addHTML('<li><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$page->getCurrentPresentationID()).'"><img src="'.$vgScript.'/icons/excel.png" width=16 height=16 /> All questions to excel, '.'Current'.'</a></li>');
+                    $wgOut->addHTML('<li><a href="'. vfPrintLink (Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$page->getPageID().'&presid='.$page->getCurrentPresentationID())).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="16" height="16" /> All questions to excel, '.'Current'.'</a></li>');
                 }
                 $wgOut->addHTML('</ul>');
 

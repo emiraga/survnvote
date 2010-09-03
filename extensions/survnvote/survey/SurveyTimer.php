@@ -34,8 +34,7 @@ class SurveyTimer
             $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
         $output= "<span id=\"$id\">".$timeleftstr.'</span>';
         $script=
-                "<script type=\"text/javascript\">
-            var vTimeleft$id=$timeleft;
+           "var vTimeleft$id=$timeleft;
             function updateTimeLeft$id(){
                 if(vTimeleft$id<=0)";
 
@@ -52,9 +51,9 @@ class SurveyTimer
                 vTimeleft$id--;
             };
             updateTimeLeft$id();
-            </script>";
+        //]]></script>";
         $script = preg_replace('/^\s+/m', '', $script);
-        $output.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
+        $output.= "<script type=\"text/javascript\">//<![CDATA[\n" . str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         return $output;
     }
 }

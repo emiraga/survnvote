@@ -120,46 +120,46 @@ class RealSurveyButtons extends SurveyButtons
         //Edit button
         if($this->has_control && $this->show_edit)
         {
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-'.$this->type).'" />'."\n";
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('edit-'.$this->type).'" />';
         }
 
         if($this->show_vote)
         {
-            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-'.$this->type).'" />'."\n";
+            $output .='<input type="submit" name="wpSubmit" value="'.wfMsg('vote-'.$this->type).'" />';
         }
 
         if($this->has_control)
         {
             if($this->page_status == 'ready')
             {
-                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-'.$this->type).'" />'."\n";
+                $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('start-'.$this->type).'" />';
             }
             elseif($this->page_status == 'active')
             {
                 $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('stop-'.$this->type)
                   .'" onclick="return confirm(\'Are you sure you want to stop this '.$this->type
-                        .'? This operation cannot be undone.\')" />'."\n";
+                        .'? This operation cannot be undone.\')" />';
             }
             else // page_status is 'ended'
             {
                 if($this->show_renew)
-                    $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('renew-'.$this->type).'" />'."\n";
+                    $output.='<input type="submit" name="wpSubmit" value="'.wfMsg('renew-'.$this->type).'" />';
             }
 
             //Powerpoint button
             if($this->show_liveshow)
             {
                 $output .='<br /><input type="submit" name="wpSubmit" value="'
-                    .wfMsg('view-liveshow').'" />'."\n";
+                    .wfMsg('view-liveshow').'" />';
             }
         }
         //$output.= '<div style="float: right;">';
         if($this->show_details)
         {
             $output .='<input type="submit" name="wpSubmit" value="'
-                .wfMsg('view-details').'" />'."\n";
+                .wfMsg('view-details').'" />';
         }
-        $output .="</div>\n";
+        $output .="</div>";
         return $output;
     }
 }

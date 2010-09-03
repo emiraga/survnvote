@@ -113,9 +113,13 @@ class SurveyVotesData extends DataSource
             if($this->survey->getAnswer() == $this->survey->getChoiceByNum($row-1)->choiceID)
             {
                 global $vgScript;
-                return "<td><img src='$vgScript/icons/correct.png' alt='correct' />";
+                return "<img src='$vgScript/icons/correct.png' alt='correct' />";
             }
             return '';
+        }
+        if($col == 2 && $row > 1)
+        {
+            return $this->parser->run($this->survey->getChoiceByNum($row-2)->choice);
         }
         return false;
     }
@@ -774,15 +778,21 @@ class HtmlWrite extends DataWriter
                         $out .= "<th$extra>";
                     else
                         $out .= "<th class='unsortable'$extra>";
+                    $tagend = '</th>';
                 }
                 else
+                {
                     $out .= "<td$extra>";
+                    $tagend = '</td>';
+                }
 
                 $html = $source->htmlEquiv($i, $j);
                 if($html !== false)
                     $out .= $html;
                 else
                     $out .= $source->getText($i, $j);
+                
+                $out .= $tagend;
             }
             $out .= '</tr>';
         }

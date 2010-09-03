@@ -305,6 +305,11 @@ function vfGetABC($a)
         return vfGetABC($a / 26).vfGetABC($a % 26);
 }
 
+function vfPrintLink($link)
+{
+    return str_replace('&', '&amp;', $link );
+}
+
 require_once "Net/GeoIP.php";
 
 $geoip = Net_GeoIP::getInstance("c:/bin/GeoIP.dat");

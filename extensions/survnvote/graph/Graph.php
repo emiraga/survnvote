@@ -66,7 +66,7 @@ abstract class Graph
         {
             $link .= "chf=bg,s,FFFFFF44&";
         }
-        return $link.$this->getImageParams();
+        return vfPrintLink($link . $this->getImageParams());
     }
     /**
      * Get image parameters

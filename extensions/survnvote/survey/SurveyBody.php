@@ -141,7 +141,7 @@ class SurveyCorrelations extends SurveyBody
         $out .= $writer->write();
         $out .= '<br/>';
         
-        $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CorrelateSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
+        $out .= '<a href="'. vfPrintLink( Skin::makeSpecialUrlSubpage('CorrelateSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID)).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="24" height="24" /> Export to excel</a>';
         return $out;
     }
 }
@@ -175,7 +175,7 @@ class SurveyCrossTab extends SurveyBody
         }
         $out .= $writer->write();
         $out .= '<br/>';
-        $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CrossTabSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
+        $out .= '<a href="'. vfPrintLink( Skin::makeSpecialUrlSubpage('CrossTabSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID) ).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="24" height="24" /> Export to excel</a>';
         return $out;
     }
 }
@@ -398,7 +398,7 @@ class RealSurveyBody extends SurveyBody
         global $vgScript;
         if($this->page->getStatus($this->presID) == 'ended')
         {
-            $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&surveyid='.$survey->getSurveyID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
+            $out .= '<div style="float: right"><a href="'. vfPrintLink( Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&surveyid='.$survey->getSurveyID().'&presid='.$this->presID)).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="24" height="24" /> Export to excel</a></div>';
         }
 
         $statscals = new StatsCalc();
@@ -575,7 +575,8 @@ class RealSurveyBody extends SurveyBody
 
         vfAdapter()->addScript($vgScript. '/survey.js');
 
-        $script = "<script type=\"text/javascript\">document.getElementById('btn_collapse').style.display = 'inline';</script>";
+        $script = "<script type=\"text/javascript\"><![CDATA[
+document.getElementById('btn_collapse').style.display = 'inline';//]]></script>";
         $script = preg_replace('/^\s+/m', '', $script);
         $out.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         return $out;
@@ -770,7 +771,7 @@ class RealSurveyBody extends SurveyBody
 
         $lastchoiceid = 0; //@todo get proper value here
 
-        $script = "<script type=\"text/javascript\">
+        $script = "
         function refresh$imgid()
         {
             sajax_do_call('RealSurveyBody::ajaxgraph', [time$imgid, $colorindex, {$this->presID}, $page_id],function(o) {
@@ -790,9 +791,9 @@ class RealSurveyBody extends SurveyBody
         }
         var time$imgid = \"$lastchoiceid\";
         setTimeout(\"refresh$imgid()\",$vgImageRefresh*1000);
-        </script>";
+        //]]></script>";
         $script = preg_replace('/^\s*/m', '', $script);
-        return str_replace("\n", "", $script);
+        return "<script type=\"text/javascript\">//<![CDATA[\n" . str_replace("\n", "", $script);
     }
 }
 
@@ -850,7 +851,7 @@ class RealQuizBody extends RealQuestionnaireBody
             $writer->addSource($data);
             $out .= "<h1>Quiz results</h1>";
             $out .= $writer->write();
-            $out .= '<div style="float: right"><a href="'.Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'&quiz=1"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a></div>';
+            $out .= '<div style="float: right"><a href="'. vfPrintLink( Skin::makeSpecialUrlSubpage('ExportSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID.'&quiz=1')).'"><img src="'.$vgScript.'/icons/excel.png" alt="excel" width="24" height="24" /> Export to excel</a></div>';
             $out .= $data->getStatsCalc()->getHTML('Total Points');
         }
         $out .= parent::getDetailsHTML();

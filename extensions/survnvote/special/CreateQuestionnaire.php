@@ -73,7 +73,8 @@ class CreateQuestionnaire extends CreateSurvey
         $this->formitems['titleorquestion']['name'] = 'Title';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire.';
         $this->formitems['choices']['type'] = 'html';
-        $this->formitems['choices']['code'] = '<script type="text/javascript">writeHTML()</script>';
+        $this->formitems['choices']['code'] = '<script type="text/javascript">//<![CDATA[
+writeHTML()//]]></script>';
         $this->formitems['choices']['name'] = 'Questions';
 
         $this->formitems['choices']['valid'] = function($v,$i,$js)
@@ -141,7 +142,6 @@ class CreateQuestionnaire extends CreateSurvey
     function generateScript()
     {
         $this->script = <<<END_SCRIPT
-<script type="text/javascript">
 	var numQuestions = {$this->prev_num_q};
 	var numChoices = new Array();
                 {$this->prev_num_ch}
@@ -217,7 +217,7 @@ class CreateQuestionnaire extends CreateSurvey
 	function writeHTML()
 	{
 		document.write('{$this->main_t}');
-	}
+	}//]]>
 </script>
 END_SCRIPT;
     }
@@ -383,7 +383,7 @@ END_SCRIPT;
         parent::execute($par);
 
         $script = str_replace("<!--PREV_QUESTIONS-->", addslashes( $this->prev_questions ), $this->script);
-        $script = str_replace("\n",'',$script);
+        $script = "<script type=\"text/javascript\">//<![CDATA[\n" . str_replace("\n",'',$script);
         $wgOut->prependHTML($script);
     }
     /**

@@ -141,7 +141,8 @@ plow=document.getElementById("privacy-low"); plow.onchange = '
                         'default' => 'Everyone',
                         'options' => array('Everyone'=>'0'),
                         'explanation' => 'You can create a new crowd by following <a target="_blank" href="'.Skin::makeSpecialUrl('Crowd').'">this link.</a>',
-                        'html' => '<script type="text/javascript">if(plow.checked)plow.onchange();</script>',
+                        'html' => '<script type="text/javascript">//<![CDATA[
+if(plow.checked)plow.onchange();//]]></script>',
                 ),
                 'duration' => array(
                         'type' => 'input',
@@ -457,7 +458,7 @@ document.write("&nbsp;&nbsp; <a href=\'\' onclick=\'d = document.getElementById(
     {
         $surveyVO = new SurveyVO();
         $surveyVO->generateChoices( preg_split("/\n/", $values['choices']) );
-        $surveyVO->setQuestion('#see page title');
+        $surveyVO->setQuestion($values['titleorquestion']);
         $surveyVO->setPoints(0);
         return array($surveyVO);
     }
