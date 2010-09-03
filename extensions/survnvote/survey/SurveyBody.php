@@ -272,7 +272,11 @@ class RealSurveyBody extends SurveyBody
                     ."In order to vote: <ul>";
             if($this->page->getPhoneVoting() != 'no')
             {
-                $output .= "<li><img src=\"$vgScript/icons/phone.png\"> Ring a <u>number above</u>; (you will hear a busy tone).</li>";
+                global $vgEnablePhoneVoting;
+                if($vgEnablePhoneVoting)
+                {
+                    $output .= "<li><img src=\"$vgScript/icons/phone.png\"> Ring a <u>number above</u>; (you will hear a busy tone).</li>";
+                }
                 global $vgEnableSMS;
                 if($vgEnableSMS)
                 {

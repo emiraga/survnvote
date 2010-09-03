@@ -284,9 +284,15 @@ class CreateSurvey
         //List of pages
         $this->formpages = array(
                 0=>array('title'=>'New Survey', 'items' => array('titleorquestion', 'choices', 'category')),
-                1=>array('title'=>'Voting options','items'=>array('privacy', 'crowdID', 'duration', 'phonevoting','webvoting' )),
+                1=>array('title'=>'Voting options','items'=>array('privacy', 'crowdID', 'duration')),
                 2=>array('title'=>'Display settings','items'=>array('showresultsend', 'showtop', 'bgimage','surveysperslide')),
         );
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        if($vgEnablePhoneVoting || $vgEnableSMS)
+        {
+            $this->formpages[1]['items'][] = 'phonevoting';
+        }
+        $this->formpages[1]['items'][] = 'webvoting';
     }
     /**
      * Remove prefix and suffix from category list
@@ -352,7 +358,15 @@ class CreateSurvey
         $page->setTitle($values['titleorquestion']);
         $page->setAuthor($author);
         $page->setSMSRequired(false); //@todo SMS sending to the users
-        $page->setPhoneVoting($values['phonevoting']);
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        if($vgEnablePhoneVoting || $vgEnableSMS)
+        {
+            $page->setPhoneVoting($values['phonevoting']);
+        }
+        else
+        {
+            $page->setPhoneVoting('no');
+        }
         $page->setWebVoting($values['webvoting']);
         $page->setDuration( $values['duration'] );
         
@@ -398,7 +412,8 @@ class CreateSurvey
         $page->setSurveysPerSlide($values['surveysperslide']);
         
         //check allowed duration of phone voting
-        if($page->getPhoneVoting() != 'no')
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        if( ($vgEnablePhoneVoting || $vgEnableSMS) && $page->getPhoneVoting() != 'no')
         {
             global $vgLimitPhoneVotingDuration;
             if($page->getDuration() > $vgLimitPhoneVotingDuration)
@@ -418,7 +433,8 @@ class CreateSurvey
         }
         
         //check max allowed choices
-        if($page->getPhoneVoting() != 'no')
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        if( ($vgEnablePhoneVoting || $vgEnableSMS) && $page->getPhoneVoting() != 'no')
         {
             global $vgMaxChoicesInPhoneVoting;
             if($page->getNumOfChoices() > $vgMaxChoicesInPhoneVoting)
@@ -555,7 +571,15 @@ class CreateSurvey
         $this->form->setValue('showresultsend', $page->getShowGraphEnd());
         $this->form->setValue('showtop', $page->getDisplayTop());
         $this->form->setValue('privacy', $page->getPrivacyByName());
-        $this->form->setValue('phonevoting', $page->getPhoneVoting());
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        if($vgEnablePhoneVoting || $vgEnableSMS)
+        {
+            $this->form->setValue('phonevoting', $page->getPhoneVoting());
+        }
+        else
+        {
+            $this->form->setValue('phonevoting', 'no');
+        }
         $this->form->setValue('webvoting', $page->getWebVoting());
         $this->form->setValue('bgimage', $page->bgimage);
         $this->form->setValue('surveysperslide', $page->getSurveysPerSlide());
@@ -822,9 +846,14 @@ class CreateSurvey
     {
         $error = $this->form->Validate();
         global $wgRequest;
-        if($wgRequest->getCheck('phonevoting'))
+        global $vgEnablePhoneVoting, $vgEnableSMS;
+        
+        if($wgRequest->getCheck('webvoting'))
         {
-            if($this->form->getValue('phonevoting') == 'no' && $this->form->getValue('webvoting') == 'no')
+            if( (!$vgEnableSMS || !$vgEnablePhoneVoting
+                    || $this->form->getValue('phonevoting', 'no') == 'no'
+                )
+                  && $this->form->getValue('webvoting', 'no') == 'no')
             {
                 $error .= '<li>Users cannot vote, enable either web or phone voting</li>';
             }

@@ -94,27 +94,31 @@ class ProcessSurvey extends SpecialPage
                 {
                     throw new SurveyException('Survey is either running or finished and cannot be started');
                 }
-                $tel = new Telephone();
-                try
+                global $vgEnablePhoneVoting, $vgEnableSMS;
+                if($vgEnablePhoneVoting || $vgEnableSMS)
                 {
-                    if($page->getPhoneVoting() != 'no')
+                    $tel = new Telephone();
+                    try
                     {
-                        //Setup receivers
-                        $tel->setupReceivers($page);
-                        $pagedao->updateReceiversSMS($page);
+                        if($page->getPhoneVoting() != 'no')
+                        {
+                            //Setup receivers
+                            $tel->setupReceivers($page);
+                            $pagedao->updateReceiversSMS($page);
+                        }
                     }
-                    $pagedao->startPageSurvey($page);
-                    //update statistics
-                    SurvnvoteStatsUpdate::addSurveyRun();
-                    //purge cache of list of active surveys
-                    SurveysList::purgeCache();
+                    catch(Exception $e)
+                    {
+                        // in case of an error
+                        $tel->deleteReceivers($page);
+                        throw $e; //continue throwing
+                    }
                 }
-                catch(Exception $e)
-                {
-                    // in case of an error
-                    $tel->deleteReceivers($page);
-                    throw $e; //continue throwing
-                }
+                $pagedao->startPageSurvey($page);
+                //Update statistics
+                SurvnvoteStatsUpdate::addSurveyRun();
+                //Purge cache of list of active surveys
+                SurveysList::purgeCache();
                 //Redirect to the previous page
                 $this->redirect();
                 return;
@@ -137,15 +141,17 @@ class ProcessSurvey extends SpecialPage
                 {
                     throw new SurveyException('Survey is not finished and cannot be renewed.');
                 }
-                
-                if(true)
+
+                global $vgEnablePhoneVoting, $vgEnableSMS;
+                if($vgEnablePhoneVoting || $vgEnableSMS)
                 {
                     $tel = new Telephone();
                     $tel->releaseReceivers(); //in case this survey has unreleased receivers
-                    
+                }
+                if(true)
+                {
                     $pagedao->renewPageSurvey($page);
                     SurveysList::purgeCache();
-                    
                     //Purge all pages that have this survey included.
                     vfAdapter()->purgeCategoryMembers(wfMsg('cat-survey-name', $this->page_id));
                     //Redirect to the previous page

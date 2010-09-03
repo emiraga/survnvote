@@ -50,14 +50,14 @@ class LatestIncoming extends SpecialPage
         }
     }
     /**
-     * Get the list of incoming calls.
+     * Get the list of incoming calls / SMS.
      *
      * @param Boolean $long output long or short list
      * @return String HTML Code
      */
     private function &getContents($long)
     {
-        global $vgEnableSMS;
+        global $vgEnableSMS, $vgEnablePhoneVoting;
         if($long)
         {
             $isadmin = vfUser()->isAdmin();
@@ -67,9 +67,9 @@ class LatestIncoming extends SpecialPage
         # $wgOut->addHTML('<caption>'.wfMsg('latestincoming').'</caption>');
         $out .= '<tr><th>Type<th>From<th></tr>';
 
-        if($vgEnableSMS)
+        if($vgEnablePhoneVoting || $vgEnableSMS)
         {
-            $in = Sms::getIncoming($long?30:7);
+            $in = Sms::getIncoming($long?30:5);
             foreach($in as $sms)
             {
                 $out .= '<tr><td align=center>SMS<td>'.

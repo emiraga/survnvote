@@ -23,15 +23,19 @@ $vgDBPrefix         = "v_";
 $vgDebug = false;
 $vgDebugIPs = array('10.101.97.20', '127.0.0.1'); //IP addresses to which it will show debug information
 
-// Configure phone numbers of PBX
-#$vgNumberCallerID = '82315772';
-#$vgNumberUserPass = '81161899';
-#$vgNumberPBX = '8116';
 $vgCountry = 'Malaysia';
 $vgCountryCode = '60';
 
-$vgEnableSMS = true;
+$vgEnablePhoneVoting = false;
+if($vgEnablePhoneVoting)
+{
+    // Configure phone numbers of PBX
+    #$vgNumberCallerID = '82315772';
+    #$vgNumberUserPass = '81161899';
+    #$vgNumberPBX = '8116';
+}
 
+$vgEnableSMS = true;
 if($vgEnableSMS)
 {
     /* Prefix for table names that hold sms messages.
@@ -47,6 +51,25 @@ if($vgEnableSMS)
     $vgSmsNumber = '+60132156758';
 }
 
+/**
+ * @return Array containing all phone numbers / SMS destinations that can be dialed for voting
+ */
+function vfGetAllNumbers()
+{
+    $out = array();
+    for($i=0;$i<=99;$i++)
+    {
+        $out[] = '' . sprintf("%02d", $i);
+    }
+    return $out;
+}
+
+// Phone voting will have limited duration
+$vgLimitPhoneVotingDuration = 60*5;
+
+// Limit number of choices (receivers in phone voting)
+$vgMaxChoicesInPhoneVoting = 10;
+
 // Length of confirm field
 $vgConfirmCodeLen = 6; 
 
@@ -60,30 +83,12 @@ $vgAllowedTags = '<math><code><b><u><i>';
 // Allow anonymous users to create surveys
 $vgAnonSurveyCreation = true;
 
-// Phone voting will have limited duration
-$vgLimitPhoneVotingDuration = 60*5;
-
 // Web voting will have limited duration
 $vgLimitWebVotingDuration = 60*60*24*5;
-
-// Limit number of choices (receivers in phone voting)
-$vgMaxChoicesInPhoneVoting = 10;
 
 // Interval after which images will be refreshed, set 0 to disable
 $vgImageRefresh = 10; //@todo increase this value
 
-/**
- * @return Array containing all phone numbers that can be dialed for voting
- */
-function vfGetAllNumbers()
-{
-    $out = array();
-    for($i=0;$i<=99;$i++)
-    {
-        $out[] = '+603619699' . sprintf("%02d",$i);
-    }
-    return $out;
-}
 /**
  * @param String $number input number from user
  * @return String processed number

@@ -138,12 +138,12 @@ class FormControl
      * @param String $name the key
      * @return String values[$name] or Boolean false if it is not defined.
      */
-    public function getValue($name)
+    public function getValue($name, $default = false)
     {
         if(isset($this->values[$name]))
             return $this->values[$name];
         else
-            return false;
+            return $default;
     }
     /**
      * Returns an entire associative array of form values

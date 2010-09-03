@@ -127,7 +127,7 @@ class MyPhones extends SpecialPage
                 $phone = vfProcessNumber( $wgRequest->getVal('newnumber') );
                 $id = $this->dao->addNewPhone($phone);
                 global $vgEnableSMS;
-                if($vgEnableSMS == false)
+                if(!$vgEnableSMS)
                 {
                     //SMS is disabled, we have to assume that number is correct
                     $code = $this->dao->getConfirmCode($id);

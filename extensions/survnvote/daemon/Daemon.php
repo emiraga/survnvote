@@ -81,7 +81,7 @@ function vfDaemonSmsAction()
 {
     global $vgSmsChoiceLen, $vgDB, $vgDBPrefix, $vgEnableSMS, $vgDaemonDebug;
 
-    if(! $vgEnableSMS)
+    if(!$vgEnableSMS)
         return;
 
     $new = Sms::getNewSms();
@@ -200,16 +200,20 @@ if(!isset($args[1]) || $args[1] == 'debug' || $args[1] == 'daemon')
         $vgDaemonDebug = true;
         echo "Debug enabled\n";
     }
-    
+    global $vgEnablePhoneVoting, $vgEnableSMS;
+
     /* Run as a daemon */
     while(1)
     {
         if($vgDaemonDebug)
             echo ".";
-        $tel = new Telephone();
         try
         {
-            $tel->releaseReceivers();
+            if($vgEnablePhoneVoting || $vgEnableSMS)
+            {
+                $tel = new Telephone();
+                $tel->releaseReceivers();
+            }
             if($vgEnableSMS)
             {
                 vfDaemonSmsAction();
@@ -230,8 +234,12 @@ else if($args[1] == 'help')
 else if($args[1] == 'fakevote') /*used for testing*/
 {
     $vgDaemonDebug = true;
-    $tel = new Telephone();
-    $tel->releaseReceivers();
+    global $vgEnablePhoneVoting, $vgEnableSMS;
+    if($vgEnablePhoneVoting || $vgEnableSMS)
+    {
+        $tel = new Telephone();
+        $tel->releaseReceivers();
+    }
 
     global $vgSmsChoiceLen;
     $userID = 1000 * 1000 + rand();

@@ -12,7 +12,7 @@ require_once("$vgPath/Survey/SurveyTimer.php");
 require_once("$vgPath/DAO/CrowdDAO.php");
 
 /**
- * Special page Latest incoming SMS and phone calls
+ * Special page for the List of runing surveys
  *
  * @author Emir Habul
  * @package SmsIntegration
@@ -67,7 +67,7 @@ class SurveysList extends SpecialPage
      */
     private function &getFrontpage()
     {
-        global $vgScript, $vgEnableSMS;
+        global $vgScript;
         
         $out = '';
         
@@ -76,7 +76,7 @@ class SurveysList extends SpecialPage
 
         if(count($surveys)==0)
         {
-            //$out .= 'There are no active surveys at the moment.';
+            $out .= 'There are no active surveys at the moment.';
             return $out;
         }
         
@@ -99,7 +99,7 @@ class SurveysList extends SpecialPage
                 $wikipage = Skin::makeUrl($wikipage[0]); // Show only first wiki page containing the survey
 
             $out .= '<tr>';
-            $out .= '<td>';
+            $out .= '<td width="30px" align="center">';
             if($page->getPhoneVoting() != 'no')
             {
                 $out .= "<img class='surlistIcon' heigth=16 width=16 src=\"$vgScript/icons/phone.png\" title=\"Phone voting enabled\"/> ";

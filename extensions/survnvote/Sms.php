@@ -35,7 +35,7 @@ class Sms
      */
     static private $blackList = array('2888', '28882', 'CELCOM', '22990',
         '23131', '29292', 'ChannelC', '63008', 'Channel X', 
-        '18888', '23456', 'Celcom Blue'); //yes, we receive a lot of spam.
+        '18888', '23456', 'Celcom Blue', 'Celcom0019'); //yes, we receive a lot of spam.
 	
     /* Number to send a message when requesting a balance report */
     static private $balanceNumber = '2888';
@@ -74,7 +74,7 @@ class Sms
             //Spammers, burn in hell!
             if(in_array($sms['SenderNumber'], Sms::$blackList))
             {
-                Sms::delete($sms['ID']);
+                Sms::processed($sms['ID']); // change this to delete
                 continue;
             }
             

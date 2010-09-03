@@ -180,6 +180,10 @@ class Crowd extends SpecialPage
                     $this->iamamanager = true;
                 }
             }
+            else
+            {
+                $out .= "Member";
+            }
             $out .= "\n";
         }
         $out .= '|}';

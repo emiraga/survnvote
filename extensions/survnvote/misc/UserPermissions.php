@@ -70,7 +70,10 @@ class UserPermissions
         else
         {
             //phone voting
-            if( $page->getPhoneVoting() == 'no' || $this->user->isAnon && $page->getPhoneVoting() != 'anon')
+            global $vgEnablePhoneVoting, $vgEnableSMS;
+            if( ($vgEnablePhoneVoting == false && $vgEnableSMS == false)
+                    || $page->getPhoneVoting() == 'no'
+                    || $this->user->isAnon && $page->getPhoneVoting() != 'anon')
                 return false;
         }
         $crdao = new CrowdDAO();

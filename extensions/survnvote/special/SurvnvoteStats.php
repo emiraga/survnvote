@@ -60,7 +60,7 @@ if(class_exists('SpecialPage'))
         {
             global $vgScript;
 
-            $out = '<table><td>';
+            $out = '<table width="100%"><td>';
             $out .= 'Articles: '.SiteStats::articles().'<br>';
             $out .= 'Pages: '.SiteStats::pages().'<br>';
             $out .= 'Page edits: '.SiteStats::edits().'<br>';
