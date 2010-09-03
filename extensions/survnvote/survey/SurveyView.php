@@ -233,8 +233,8 @@ class SurveyView
         $this->prosurv = Title::newFromText('Special:ProcessSurvey');
         
         //if($this->page->getCurrentPresentationID() == $presID){
-        $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="POST">'
-                .'<input type="hidden" name="id" value="'.$this->page->getPageID().'">'
+        $output .='<form action="'.$this->prosurv->escapeLocalURL().'" method="post">'
+                .'<input type="hidden" name="id" value="'.$this->page->getPageID().'" />'
                 .'<input type="hidden" name="returnto" value="'.htmlspecialchars($this->wikititle->getFullText()).'" />';
         $output.= '<a name="survey_id_'.$this->page->getPageID().'"></a>';
         if($this->user->isTemporary)
@@ -246,12 +246,12 @@ class SurveyView
         
         $output.= '<font size="4" class="vpTitle">'.$this->parser->run( wfMsg('survey-caption',  $this->page->getTitle() ) ).'</font>';
         
-        $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">';
+        $output .='<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'" />';
         if($this->user->isTemporary)
         {
-            $output .='<input type="hidden" name="userID" value="'. $this->user->userID .'">';
-            $output .='<input type="hidden" name="presID" value="'. $presID .'">';
-            $output .='<input type="hidden" name="tempKey" value="'. $this->user->getTemporaryKey($this->page->getPageID().'_'.$presID) .'">';
+            $output .='<input type="hidden" name="userID" value="'. $this->user->userID .'" />';
+            $output .='<input type="hidden" name="presID" value="'. $presID .'" />';
+            $output .='<input type="hidden" name="tempKey" value="'. $this->user->getTemporaryKey($this->page->getPageID().'_'.$presID) .'" />';
         }
         
         $output .= $this->body->getHTML();

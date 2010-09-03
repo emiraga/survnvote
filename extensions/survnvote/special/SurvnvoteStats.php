@@ -60,24 +60,26 @@ if(class_exists('SpecialPage'))
         {
             global $vgScript;
 
-            $out = '<table width="100%"><td>';
-            $out .= 'Articles: '.SiteStats::articles().'<br>';
-            $out .= 'Pages: '.SiteStats::pages().'<br>';
-            $out .= 'Page edits: '.SiteStats::edits().'<br>';
-            $out .= 'Registered users: '.SiteStats::users().'<br>';
-            $out .= 'Active users: '.SiteStats::activeUsers().'<br>';
-            $out .= 'Admins: '.SiteStats::numberingroup('sysop').'<br>';
-
+            $out = '<table width="100%"><tr><td>';
+            $out .= 'Articles: '.SiteStats::articles().'<br/>';
+            $out .= 'Pages: '.SiteStats::pages().'<br/>';
+            $out .= 'Page edits: '.SiteStats::edits().'<br/>';
+            $out .= 'Registered users: '.SiteStats::users().'<br/>';
+            $out .= 'Active users: '.SiteStats::activeUsers().'<br/>';
+            $out .= 'Admins: '.SiteStats::numberingroup('sysop');
+            $out .= '</td>';
             global $vgDB, $vgDBPrefix;
             $s = $vgDB->Execute("SELECT * FROM {$vgDBPrefix}stats");
-            $out .= '<td>&nbsp;<td>';
-            $out .= 'Surveys: '.$s->fields['pages'].'<br>';
-            $out .= 'Survey runs: '.$s->fields['surveyruns'].'<br>';
-            $out .= 'Crowds: '.$s->fields['crowds'].'<br>';
-            $out .= 'Votes by SMS: '.$s->fields['votes_sms'].'<br>';
-            $out .= 'Votes by phone: '.$s->fields['votes_call'].'<br>';
-            $out .= 'Votes by web: '.$s->fields['votes_web'].'<br>';
-            $out .= '</table>';
+            $out .= '<td>&nbsp;</td>';
+            $out .= '<td>';
+            $out .= 'Surveys: '.$s->fields['pages'].'<br/>';
+            $out .= 'Survey runs: '.$s->fields['surveyruns'].'<br/>';
+            $out .= 'Crowds: '.$s->fields['crowds'].'<br/>';
+            $out .= 'Votes by SMS: '.$s->fields['votes_sms'].'<br/>';
+            $out .= 'Votes by phone: '.$s->fields['votes_call'].'<br/>';
+            $out .= 'Votes by web: '.$s->fields['votes_web'];
+            $out .= '</td>';
+            $out .= '</tr></table>';
             return $out;
         }
     }

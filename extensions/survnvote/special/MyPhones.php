@@ -49,7 +49,7 @@ class MyPhones extends SpecialPage
                         'name' => 'Add phone number',
                         'explanation' => 'Mobile phone number with country prefix, for example: +60172318195.',
                         'learn_more' => 'Details of Phone numbers',
-                        'code' => "<form action=\"{$this->target}\" method=\"POST\">"
+                        'code' => "<form action=\"{$this->target}\" method=\"post\">"
                                 ."<input type=\"input\" name=\"newnumber\">"
                                 ."<input type=\"submit\" name=\"wpSubmit\" value=\"".wfMsg('add-number')."\">"
                                 .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
@@ -61,7 +61,7 @@ class MyPhones extends SpecialPage
                         'name' => 'NUMBER GOES HERE',
                         'explanation' => 'This number has not been verified. You can request confirmation code.',
                         'learn_more' => 'Details of Phone confirmation',
-                        'code' => "Phone number needs confirmation.<form action=\"{$this->target}\" method=\"POST\">"
+                        'code' => "Phone number needs confirmation.<form action=\"{$this->target}\" method=\"post\">"
                                 ."<input type=\"hidden\" name=\"id\" value=\"{ID}\">"
                                 ."<input type=\"submit\" name=\"wpSubmit\" value=\"".wfMsg('request-code')."\">"
                                 .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'
@@ -73,7 +73,7 @@ class MyPhones extends SpecialPage
                         'name' => 'NUMBER GOES HERE',
                         'explanation' => 'Confirm your phone number by entering confirmation code.',
                         'learn_more' => 'Details of Phone confirmation',
-                        'code' => "<form action=\"{$this->target}\" method=\"POST\">"
+                        'code' => "<form action=\"{$this->target}\" method=\"post\">"
                                 ."Code: <input type=\"input\" name=\"code\">"
                                 ."<input type=\"hidden\" name=\"id\" value=\"{ID}\">"
                                 ."<input type=\"submit\" name=\"wpSubmit\" value=\"".wfMsg('submit-code')."\">"
@@ -86,7 +86,7 @@ class MyPhones extends SpecialPage
                         'name' => 'NUMBER GOES HERE',
                         //'explanation' => 'Confirm your phone number by entering confirmation code.',
                         //'learn_more' => 'Details of Phone confirmation',
-                        'code' => vfSuccessBox('<img src="'.$vgScript.'/icons/correct.png" /> Number {NUMBER} has been verified.'),
+                        'code' => vfSuccessBox('<img src="'.$vgScript.'/icons/correct.png" alt="correct" /> Number {NUMBER} has been verified.'),
                         'icon' => $vgScript.'/icons/mobile.png',
                 ),
                 'deleted' => array(
@@ -247,7 +247,7 @@ class MyPhones extends SpecialPage
             if($phone['status'] != vPHONE_DELETED && $phone['status'] != vPHONE_VERIFIED)
             {
 
-                $this->items[ $id ]['afterall'] = "<form style=\"text-align:center;\"action=\"{$this->target}\" method=\"POST\">"
+                $this->items[ $id ]['afterall'] = "<form style=\"text-align:center;\" action=\"{$this->target}\" method=\"post\">"
                         ."<input type=\"hidden\" name=\"id\" value=\"$id\">"
                         ."<input onclick=\"return confirm('Are you sure you want to delete this number?');\" title=\"Delete this number\" type=\"image\" src=\"$vgScript/icons/file_delete.png\" name=\"wpSubmit\" value=\"".wfMsg('delete-number')."\">"
                         .'<input type="hidden" name="wpEditToken" value="'. vfUser()->editToken() .'">'

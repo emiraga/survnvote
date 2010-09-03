@@ -65,20 +65,23 @@ class LatestIncoming extends SpecialPage
         $out = '';
         $out .= '<table style="width: 100%; margin: 0;" class="wikitable">';
         # $wgOut->addHTML('<caption>'.wfMsg('latestincoming').'</caption>');
-        $out .= '<tr><th>Type<th>From<th></tr>';
+        $out .= '<tr><th>Type</th><th>From</th><th></th></tr>';
 
         if($vgEnablePhoneVoting || $vgEnableSMS)
         {
             $in = Sms::getIncoming($long?30:5);
             foreach($in as $sms)
             {
-                $out .= '<tr><td align=center>SMS<td>'.
-                        vfColorizePhone($sms['number'], false, !$long || !$isadmin)
-                        .'<td align=center>'
-                        .vfPrettyDate($sms['date']);
+                $out .= '<tr><td>SMS</td>'
+                    .'<td>'
+                    .vfColorizePhone($sms['number'], false, !$long || !$isadmin)
+                    .'</td>'
+                    .'<td>'
+                    .vfPrettyDate($sms['date'])
+                    .'</td>';
                 if($long && $isadmin)
                 {
-                    $out .= '<td width=500px>'.htmlspecialchars( $sms['text'] );
+                    $out .= '<td width=500px>'.htmlspecialchars( $sms['text'] ).'</td>';
                 }
                 $out .= '</tr>';
             }

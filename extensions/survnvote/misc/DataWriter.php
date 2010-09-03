@@ -113,7 +113,7 @@ class SurveyVotesData extends DataSource
             if($this->survey->getAnswer() == $this->survey->getChoiceByNum($row-1)->choiceID)
             {
                 global $vgScript;
-                return "<td><img src='$vgScript/icons/correct.png' />";
+                return "<td><img src='$vgScript/icons/correct.png' alt='correct' />";
             }
             return '';
         }

@@ -311,5 +311,5 @@ $geoip = Net_GeoIP::getInstance("c:/bin/GeoIP.dat");
 
 
 //try {
-    //echo $geoip->lookupCountryCode('210.48.222.71').'<br>';
+    //echo $geoip->lookupCountryCode('210.48.222.71').'<br/>';
 //}

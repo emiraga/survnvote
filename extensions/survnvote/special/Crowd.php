@@ -167,7 +167,7 @@ class Crowd extends SpecialPage
             $phonelist = $phdao->getList();
             foreach($phonelist as $phone)
             {
-                $out .= vfColorizePhone($phone['number'],false, true ) . "<br>";
+                $out .= vfColorizePhone($phone['number'],false, true ) . "<br/>";
             }
             $out .= " || ";
             $out .= " $member->date_added || ";
@@ -193,7 +193,7 @@ class Crowd extends SpecialPage
             global $vgScript;
             $wgOut->addHTML('<h4><img src="'.$vgScript.'/icons/print.png" /> '
                     .'<a href="'.Skin::makeSpecialUrlSubpage('Crowd', $this->crowd->name, 'showlog=true&printable=true')
-                    .'" target=_blank>Print handouts</a></h4>');
+                    .'" target="_blank">Print handouts</a></h4>');
         }
     }
     /**
@@ -216,7 +216,7 @@ class Crowd extends SpecialPage
         );
         $wgOut->addWikiText("== New Crowd ==");
         $form = new FormControl($items);
-        $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrl('ProcessCrowd'), '', false));
+        $wgOut->addHTML($form->StartForm(Skin::makeSpecialUrl('ProcessCrowd'), 'formProcessCrowd', false));
         $wgOut->addHTML($form->AddPage('Crowd information', array('name','description')));
         $wgOut->addHTML($form->EndForm(wfMsg('create-crowd'), false));
     }
@@ -308,7 +308,7 @@ class Crowd extends SpecialPage
         $logs =& $this->crowddao->getLogs($this->crowd->crowdID, true);
         foreach ($logs as &$log)
         {
-            $text = str_replace('!!', '<br>', $log->log);
+            $text = str_replace('!!', '<br/>', $log->log);
             $out .= "|-\n";
             $out .= "| {$text}\n";
             $out .= "|-\n";

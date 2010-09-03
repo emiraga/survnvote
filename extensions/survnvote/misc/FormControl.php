@@ -234,7 +234,7 @@ class FormControl
         if(isset($item['learn_more']))
         {
             $item['explanation'] .=' &nbsp; <span>'
-                    .'<a href="'.Skin::makeUrl($item['learn_more']).'"><img src="'.$vgScript.'/icons/info.png"> Learn more</a></span>';
+                    .'<a href="'.Skin::makeUrl($item['learn_more']).'"><img src="'.$vgScript.'/icons/info.png" alt="icon" /> Learn more</a></span>';
         }
 
         if($item['type'] == 'infobox')
@@ -245,7 +245,7 @@ class FormControl
 
         $label = 	Xml::label( $item['name'], $id );
         if(isset($item['icon']))
-            $label = "<img src='$item[icon]'> ".$label;
+            $label = "<img src='$item[icon]' alt='icon' /> ".$label;
 
         if(isset($item['aftername']))
             $label .= $item['aftername'];
@@ -263,7 +263,7 @@ class FormControl
                 isset($item['afterall'])?$item['afterall']:null
         );
         if(isset($item['html']))
-            $output .= '<tr><td colspan=2>'. $item['html'] .'</tr>';
+            $output .= '<tr><td colspan="2">'. $item['html'] .'</td></tr>';
         return $output;
     }
     /**
@@ -290,7 +290,8 @@ class FormControl
      */
     public function pageContents($title, $contents)
     {
-        $output = Xml::fieldset( $title );
+        $output = str_replace("\n", '', Xml::fieldset( $title ) );
+        //echo '<pre>'.htmlspecialchars($output).'</pre>';
         $output .= $contents;
         $output .= Xml::closeElement( 'fieldset' );
         return $output;
@@ -343,7 +344,7 @@ class FormControl
             $token = vfUser()->editToken();
             $output .= "
             <table id='prefsubmit' cellpadding='0' width='100%' style='background:none;'><tr>
-                    <td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onClick='{$this->onFormSubmit}' />
+                    <td><input type='submit' name='wpSubmit' class='btnSavePrefs' value=\"{$submit}\" onclick='{$this->onFormSubmit}' />
                     </td>
                     <td></td>
             </tr></table>
@@ -361,7 +362,7 @@ class FormControl
      */
     public function EndFormLite()
     {
-        return '</div></div></form>';
+        return '</div></div>';
     }
     /**
      * Adds needed scripts to the OutputPage $wgOut

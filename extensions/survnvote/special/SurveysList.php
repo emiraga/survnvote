@@ -86,7 +86,7 @@ class SurveysList extends SpecialPage
 
         $out .= '<table style="width: 100%; margin: 0; background-color: rgb(245, 255, 250);" class="wikitable">';
         #$out .= '<caption>'.'Active surveys'.'</caption>';
-        $out .= '<tr><th>Type<th>Title or question<th>Time left</tr>';
+        $out .= '<tr><th>Type</th><th>Title or question</th><th>Time left</th></tr>';
 
         foreach($surveys as $page)
         {
@@ -102,34 +102,35 @@ class SurveysList extends SpecialPage
             $out .= '<td width="30px" align="center">';
             if($page->getPhoneVoting() != 'no')
             {
-                $out .= "<img class='surlistIcon' heigth=16 width=16 src=\"$vgScript/icons/phone.png\" title=\"Phone voting enabled\"/> ";
+                $out .= "<img class='surlistIcon' height='16' width='16' src=\"$vgScript/icons/phone.png\" title=\"Phone voting enabled\" alt=\"phone\" /> ";
             }
-            # $out .= '<br><br>';
+            # $out .= '<br/><br/>';
             if($page->getWebVoting() != 'no')
             {
-                $out .= "<img class='surlistIcon' heigth=16 width=16 src=\"$vgScript/icons/laptop.png\" title=\"Web voting enabled\"/>";
+                $out .= "<img class='surlistIcon' height='16' width='16' src=\"$vgScript/icons/laptop.png\" title=\"Web voting enabled\" alt=\"comp\" />";
             }
-            # $out .= '<br>' . $page->getTypeName();
+            # $out .= '<br/>' . $page->getTypeName();
+            $out .= '</td>';
             $out .= '<td>';
 
             $out .= '<a href="'.$wikipage.'">'. $p->run($page->getTitle(), false) .'</a> ';
-            $out .= '<br>('.vfPrettyDate($page->getStartTime()).')';
+            $out .= '<br/>('.vfPrettyDate($page->getStartTime()).')';
 
             if($page->crowdID != 0)
             {
                 $crdao = new CrowdDAO();
-                $out .= '<br>For: '.$crdao->makeLink($page->crowdID);
+                $out .= '<br/>For: '.$crdao->makeLink($page->crowdID);
             }
-
+            $out .= '</td>';
             $out .= '<td>';
             $timeleft = strtotime($page->getEndTime()) - time();
             $id='tl_'.$page->getPageID().'_'.rand();
             $out .= ''.$timer->getJavascript($timeleft, $id);
-
+            $out .= '</td>';
             $out .= '</tr>';
         }
 
-        $out .= '</table><br>';
+        $out .= '</table><br/>';
         return $out;
     }
 }

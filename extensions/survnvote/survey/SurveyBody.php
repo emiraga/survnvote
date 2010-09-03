@@ -139,7 +139,7 @@ class SurveyCorrelations extends SurveyBody
         $writer->addSource($data2);
 
         $out .= $writer->write();
-        $out .= '<br>';
+        $out .= '<br/>';
         
         $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CorrelateSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
         return $out;
@@ -174,7 +174,7 @@ class SurveyCrossTab extends SurveyBody
             $writer->addSource($source);
         }
         $out .= $writer->write();
-        $out .= '<br>';
+        $out .= '<br/>';
         $out .= '<a href="'.Skin::makeSpecialUrlSubpage('CrossTabSurvey', 'xls', 'id='.$this->page->getPageID().'&presid='.$this->presID).'"><img src="'.$vgScript.'/icons/excel.png" width=24 height=24 /> Export to excel</a>';
         return $out;
     }
@@ -201,16 +201,20 @@ class RealSurveyBody extends SurveyBody
      */
     static protected function getChoiceHTML($choice, $color, $addtext='', $vote='', $voteid='', $style='')
     {
-        $output = "<div class='surChoice' style=\"display: block; $style\">";
-
+        //$output = "display: block; \">";
+        $output = "<li class='surChoice' style=\"list-style: square inside none; color: #$color; $style\">";
         if($vote)
-            $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">$vote";
-        else
-            $output .= "<li STYLE=\"list-style: square inside none; color: #$color\">";
+            $output .= $vote;
 
-        $output .= "<label style=\"color: black\" for=\"$voteid\">$choice $addtext</label></li>";
+        if($voteid) $voteid = "for=\"$voteid\"";
+        
+        $output .= "<label style=\"color: black\" $voteid>";
+        $output .= "$choice $addtext";
+        $output .= "</label>";
 
-        return $output.'</div>';
+        $output .= "</li>";
+
+        return $output;
     }
     /**
      * Get Body HTML
@@ -292,7 +296,7 @@ class RealSurveyBody extends SurveyBody
         }
         else
         {
-            $output .= '<br>';
+            $output .= '<br/>';
         }
 
         //Display how much time has left
@@ -507,7 +511,7 @@ class RealSurveyBody extends SurveyBody
         if($imgid)
         {
             $out = $graph->getHTMLImage($imgid);
-            $out .= "<br>Number of votes: <span id='totalvotes$imgid'>$totalvotes</span>";
+            $out .= "<br/>Number of votes: <span id='totalvotes$imgid'>$totalvotes</span>";
             return $out;
         }
         else
@@ -571,7 +575,7 @@ class RealSurveyBody extends SurveyBody
 
         vfAdapter()->addScript($vgScript. '/survey.js');
 
-        $script = "<script>document.getElementById('btn_collapse').style.display = 'inline';</script>";
+        $script = "<script type=\"text/javascript\">document.getElementById('btn_collapse').style.display = 'inline';</script>";
         $script = preg_replace('/^\s+/m', '', $script);
         $out.= str_replace("\n", "", $script); //Mediawiki will otherwise ruin this script
         return $out;
@@ -679,11 +683,10 @@ class RealSurveyBody extends SurveyBody
                 if($this->show_voting && $prev_vote == false)
                 {
                     $voteid = "q{$this->page->getPageID()}-{$survey->getSurveyID()}-{$choice->choiceID}";
-                    $vote = "<input id=\"$voteid\" type=radio name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->choiceID}\" $checked/>";
+                    $vote = "<input id=\"$voteid\" type=\"radio\" name=\"survey{$survey->getSurveyID()}\" value=\"{$choice->choiceID}\" $checked/>";
                 }
                 $output.=RealSurveyBody::getChoiceHTML($name, $color, $extra, $vote, $voteid, $style);
             }
-            $output.="<input type=hidden name='surveylist[]' value='{$survey->getSurveyID()}' />";
         }
         elseif($this->pagestatus == 'ended')
         {
@@ -711,16 +714,16 @@ class RealSurveyBody extends SurveyBody
                 $width = 270.0 * $votes / $numvotes;
                 $name = /*vfGetABC($choice->choiceID-1).') '.*/ $this->parser->run($choice->choice);
                 if($percent)
-                    $extra = "<br><div style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </div> $percent% ({$votes})";
+                    $extra = "<br/><span style=\"background-color:#$color; width: {$width}px; height: 10px; display:inline-block\"> </span> $percent% ({$votes})";
                 else
                     $extra = '';
                 if($survey->getAnswer() == $choice->choiceID)
                 {
                     /*if(! $prev_vote || $prev_vote == $choice->choiceID())
                         {
-                            $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
+                            $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' alt='correct' />";
                         }*/
-                    $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' />";
+                    $name = "<u>" . $name . "</u> <img src='$vgScript/icons/correct.png' alt='correct' />";
                     $style = "border:0px dashed gray; background-color:#CFFFCF; padding-left: 9px;";
                 }
                 else
@@ -744,7 +747,8 @@ class RealSurveyBody extends SurveyBody
             $output .= join('',$choicesout);
         }
         $output.='</ul>';
-
+        $output.="<input type='hidden' name='surveylist[]' value='{$survey->getSurveyID()}' />";
+        
         return $output;
     }
     /**
@@ -766,7 +770,7 @@ class RealSurveyBody extends SurveyBody
 
         $lastchoiceid = 0; //@todo get proper value here
 
-        $script = "<script>
+        $script = "<script type=\"text/javascript\">
         function refresh$imgid()
         {
             sajax_do_call('RealSurveyBody::ajaxgraph', [time$imgid, $colorindex, {$this->presID}, $page_id],function(o) {

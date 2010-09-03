@@ -34,7 +34,7 @@ class SurveyTimer
             $timeleftstr = intval($timeleft/60) . ' minutes '.$timeleftstr;
         $output= "<span id=\"$id\">".$timeleftstr.'</span>';
         $script=
-                "<script>
+                "<script type=\"text/javascript\">
             var vTimeleft$id=$timeleft;
             function updateTimeLeft$id(){
                 if(vTimeleft$id<=0)";

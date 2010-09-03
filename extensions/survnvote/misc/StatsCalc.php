@@ -63,7 +63,7 @@ class StatsCalc
         $out .= sprintf("<tr><td width=\"140px\">Sample size<td>%d</tr>", $this->getNum());
         $out .= sprintf("<tr><td>Mean<td>%.3f</tr>", $this->getAverage());
         list($clow, $chigh) = $this->getConfidence95();
-        $out .= sprintf("<tr><td>Confidence Interval<br>@ 95%%<td>[%.3f - %.3f]<br>n=%d</tr>", $clow, $chigh,$this->getNum());
+        $out .= sprintf("<tr><td>Confidence Interval<br/>@ 95%%<td>[%.3f - %.3f]<br/>n=%d</tr>", $clow, $chigh,$this->getNum());
         $out .= sprintf("<tr><td>Standard Deviation<td>%.3f</tr>", $this->getStdDev());
         $out .= sprintf("<tr><td>Standard Error<td>%.3f</tr>", $this->getStdError());
         $out .= '</table>';

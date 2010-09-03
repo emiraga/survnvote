@@ -96,7 +96,8 @@ class CreateSurvey
                         },
                         'explanation' => 'Choices can contain wiki markup language and following tags: '.htmlspecialchars($vgAllowedTags).' &amp;lt; &amp;gt;',
                         'learn_more' => 'Details of Editing Surveys',
-                        'textafter' => '<script>document.write("<b><a href=\'\' onClick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'RealSurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 5px;\\"></div>");</script>',
+                        'textafter' => '<script type="text/javascript">//<![CDATA[
+document.write("<b><a href=\'\' onclick=\\" previewdiv=$(\'#previewChoices\'); previewdiv.html(\'Loading...\'); sajax_do_call( \'RealSurveyBody::getChoices\', [document.getElementById(\'choices\').value, document.getElementById(\'titleorquestion\').value], function(o) { previewdiv.html(o.responseText); previewdiv.show(); });return false;\\"><img src=\\"'.$vgScript.'/icons/magnify.png\\" alt="m" /> Preview choices</a></b><div id=previewChoices class=pBody style=\\"display: none; padding-left: 5px;\\"></div>");//]]></script>',
                 ),
                 'category' => array(
                         'type' => 'select',
@@ -128,10 +129,11 @@ class CreateSurvey
                         'explanation' => 'This option determines who will be able to participate in your survey.',
                         'learn_more' => 'Details of Survey Privacy',
                         'icon' => $vgScript.'/icons/lock.png',
-                        'html' => '<script>plow=document.getElementById("privacy-low"); plow.onchange = '
-                                .'function(){cid=document.getElementById("crowdID");cid.value=\'0\';cid.disabled=true};'
-                                .'phigh=document.getElementById("privacy-high");phigh.onchange = '
-                                .'function() { cid=document.getElementById("crowdID");cid.disabled=false; }</script>',
+                        'html' => '<script type="text/javascript">//<![CDATA[
+plow=document.getElementById("privacy-low"); plow.onchange = '
+.'function(){cid=document.getElementById("crowdID");cid.value=\'0\';cid.disabled=true};'
+.'phigh=document.getElementById("privacy-high");phigh.onchange = '
+.'function() { cid=document.getElementById("crowdID");cid.disabled=false; }//]]></script>',
                 ),
                 'crowdID' => array(
                         'type' => 'select',
@@ -139,14 +141,15 @@ class CreateSurvey
                         'default' => 'Everyone',
                         'options' => array('Everyone'=>'0'),
                         'explanation' => 'You can create a new crowd by following <a target="_blank" href="'.Skin::makeSpecialUrl('Crowd').'">this link.</a>',
-                        'html' => '<script>if(plow.checked)plow.onchange();</script>',
+                        'html' => '<script type="text/javascript">if(plow.checked)plow.onchange();</script>',
                 ),
                 'duration' => array(
                         'type' => 'input',
                         'name' => 'Duration',
                         'default' => '60',
                         'width' => '10',
-                        'textafter' => ' minutes. <script>document.write("&nbsp;&nbsp; <a href=\'\' onClick=\'d = document.getElementById(\"duration\");d.value = parseInt(d.value) + 5;d.focus();return false;\'>Add five more minutes.</a>")</script>',
+                        'textafter' => ' minutes. <script type="text/javascript">//<![CDATA[
+document.write("&nbsp;&nbsp; <a href=\'\' onclick=\'d = document.getElementById(\"duration\");d.value = parseInt(d.value) + 5;d.focus();return false;\'>Add five more minutes.</a>")//]]></script>',
                         'valid' => function($v,$i,$js)
                         {
                             if($js) return "";
@@ -239,7 +242,7 @@ class CreateSurvey
                             if($js) return "";
                             return true;
                         },
-                        'explanation' => 'Leave this value blank for no image. Otherwise, <a href="'.Skin::makeSpecialUrl('Upload').'" target=_blank>upload an image</a> and write it\'s file name in the box above, for example: <code>Defaultbg.jpg</code>',
+                        'explanation' => 'Leave this value blank for no image. Otherwise, <a href="'.Skin::makeSpecialUrl('Upload').'" target="_blank">upload an image</a> and write it\'s file name in the box above, for example: <code>Defaultbg.jpg</code>',
                         #'learn_more' => 'Details of Title or Survey Question',
                         'icon' => $vgScript.'/icons/image.png',
                 ),
@@ -904,7 +907,7 @@ class CreateSurvey
         {
             $output .= $this->form->AddPage($fpage['title'], $fpage['items']);
         }
-        $output .= '<input type="hidden" name="vpAction" value="createnew">';
+        $output .= '<input type="hidden" name="vpAction" value="createnew" />';
         $this->formButton = wfMsg('create-survey');
 
         $wgOut->addHTML($output);
@@ -924,8 +927,8 @@ class CreateSurvey
         $wgOut->setPageTitle(wfMsg('title-edit-survey'));
 
         $output = '';
-        $output .= '<input type="hidden" name="id" value="'.$page_id.'">';
-        $output .= '<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'">';
+        $output .= '<input type="hidden" name="id" value="'.$page_id.'" />';
+        $output .= '<input type="hidden" name="returnto" value="'.htmlspecialchars($this->returnTo).'" />';
 
         if(isset($this->formpages[0]))
         {
@@ -938,7 +941,7 @@ class CreateSurvey
         {
             $output .= $this->form->AddPage($fpage['title'], $fpage['items']);
         }
-        $output .= '<input type="hidden" name="vpAction" value="editcontinue">';
+        $output .= '<input type="hidden" name="vpAction" value="editcontinue" />';
         $this->formButton = wfMsg('edit-survey');
 
         $wgOut->addHTML($output);

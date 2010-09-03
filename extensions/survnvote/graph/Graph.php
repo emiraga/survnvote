@@ -81,8 +81,8 @@ abstract class Graph
     public function getHTMLImage($imgid)
     {
         $out = '';
-        $out = "<img class=\"vpGraph\" id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
-                ."src=\"{$this->getImageLink()}\">";
+        $out = "<img alt=\"graph\" class=\"vpGraph\" id=\"$imgid\" width=\"{$this->width}\" height=\"{$this->height}\" "
+                ."src=\"{$this->getImageLink()}\" />";
         if($this->bgimage)
         {
             $out = "<div style='z-index: -1; position: absolute'><img src='".$this->bgimage

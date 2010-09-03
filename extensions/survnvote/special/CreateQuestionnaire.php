@@ -73,7 +73,7 @@ class CreateQuestionnaire extends CreateSurvey
         $this->formitems['titleorquestion']['name'] = 'Title';
         $this->formitems['titleorquestion']['explanation'] = 'This will be the title of your Questionnaire.';
         $this->formitems['choices']['type'] = 'html';
-        $this->formitems['choices']['code'] = '<script>writeHTML()</script>';
+        $this->formitems['choices']['code'] = '<script type="text/javascript">writeHTML()</script>';
         $this->formitems['choices']['name'] = 'Questions';
 
         $this->formitems['choices']['valid'] = function($v,$i,$js)
@@ -95,11 +95,11 @@ class CreateQuestionnaire extends CreateSurvey
                 . '<fieldset id="questions" style="float: none; margin: 0em;">'
                 . '<legend id="lq%1$slegend">Question:</legend>'
                 . '<div style="float: right; top: -23px; position: relative;">'
-                . '<input type="image" title="Move up question" src="'.$vgScript.'/icons/arrow_up.png" onClick="return moveQuestionUp(this);" value="Up">'
+                . '<input type="image" title="Move up question" src="'.$vgScript.'/icons/arrow_up.png" onclick="return moveQuestionUp(this);" value="Up">'
                 . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
-                . '<input type="image" title="Move down question" src="'.$vgScript.'/icons/arrow_down.png"  onClick="return moveQuestionDown(this);" value="Down">'
+                . '<input type="image" title="Move down question" src="'.$vgScript.'/icons/arrow_down.png"  onclick="return moveQuestionDown(this);" value="Down">'
                 . '<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
-                . '<input type="image" title="Delete question" src="'.$vgScript.'/icons/file_delete.png" onClick="return deleteQuestion(this);" value="Delete">'
+                . '<input type="image" title="Delete question" src="'.$vgScript.'/icons/file_delete.png" onclick="return deleteQuestion(this);" value="Delete">'
                 . '</div>'
                 . '<div id="q%1$slegend">%2$s</div>'
                 . '<input id="orderNum" type="hidden" name="orderNum[]" value="%1$s">'
@@ -112,27 +112,27 @@ class CreateQuestionnaire extends CreateSurvey
                 . '<div class="prefsectiontip" style="padding: 0">Choices:</div>'
                 . '<div id="q%1$schoices" style="padding-right: 30px;"><!--PREV_CHOICES--></div>'
                 . '<div><input type=text id="choice" size="50" onkeypress="if((event.keyCode||event.which)==13) return addChoice(this, %1$s);" />'
-                . '<input type=button onClick="return addChoice(this, %1$s);" value="Add choice" class="btnAddChoice"></div>'
+                . '<input type=button onclick="return addChoice(this, %1$s);" value="Add choice" class="btnAddChoice"></div>'
                 .'</fieldset></div>';
         //Arguments: num , htmlspecialchars(question), escape(question), escape(points)
 
         $this->choice_t = '<div class="choiceItem" id="%2$sdiv">'
                 .($this->isQuiz?'<input type="radio" name="q%1$scorrect" id="%2$s" value="%4$s">':'&bull; ')
                 .'<label for="%2$s" id="label%2$s">%3$s</label>'
-                .'<input type=hidden name="q%1$schoices[]" value="%4$s" />'
+                .'<input type="hidden" name="q%1$schoices[]" value="%4$s" />'
                 .'<div style="float: right;">'
-                .'<input type="image" title="Move up choice" src="'.$vgScript.'/icons/arrow_up.png" onClick="return moveChoiceUp(this);" />'
+                .'<input type="image" title="Move up choice" src="'.$vgScript.'/icons/arrow_up.png" onclick="return moveChoiceUp(this);" />'
                 .'<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
-                .'<input type="image" title="Move down choice" src="'.$vgScript.'/icons/arrow_down.png" onClick="return moveChoiceDown(this);" />'
+                .'<input type="image" title="Move down choice" src="'.$vgScript.'/icons/arrow_down.png" onclick="return moveChoiceDown(this);" />'
                 .'<img src="'.$vgScript.'/icons/spacer.gif" width="10px" />'
-                .'<input type="image" title="Delete choice" src="'.$vgScript.'/icons/comment_delete.png" onClick="return deleteChoice(this);" value="Delete" />'
+                .'<input type="image" title="Delete choice" src="'.$vgScript.'/icons/comment_delete.png" onclick="return deleteChoice(this);" value="Delete" />'
                 .'</div>'
                 .'</div>';
         //Arguments: num, id, htmlspecialchars(choice.val()), escape(choice.val())
 
         $this->main_t = '<div id="questions"><!--PREV_QUESTIONS--></div>'
                 .'<div><input type="text" name="newQuestion" id="newQuestion" size="50" onkeypress="if((event.keyCode||event.which)==13) return addQuestion();" />'
-                .'<input type="button" id="btnAddQuestion" value="Add question" onClick="return addQuestion();" />'
+                .'<input type="button" id="btnAddQuestion" value="Add question" onclick="return addQuestion();" />'
                 .'</div>';
     }
     /**
