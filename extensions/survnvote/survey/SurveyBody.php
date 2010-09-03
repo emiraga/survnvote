@@ -646,11 +646,21 @@ class RealSurveyBody extends SurveyBody
                 $extra='';
                 if($this->show_phones)
                 {
-                    //background-color: #E9F3FE;
-                    $extra='<div style="text-align: right; color: black">'
-                            //.'<font color="#AAAAAA">Phone number:</font> '
-                            .''.vfColorizePhone( $choice->receiver, true ).''
-                            .'</div>';
+                    global $vgEnablePhoneVoting, $vgEnableSMS;
+                    if($vgEnablePhoneVoting)
+                    {
+                        //background-color: #E9F3FE;
+                        $extra='<div style="text-align: right; color: black">'
+                                //.'<font color="#AAAAAA">Phone number:</font> '
+                                .''.vfColorizePhone( $choice->receiver, true ).''
+                                .'</div>';
+                    } else if($vgEnableSMS)
+                    {
+                        $extra='('
+                                //.'<font color="#AAAAAA">Phone number:</font> '
+                                .''.vfColorizePhone( $choice->receiver, true ).''
+                                .')';
+                    }
                 }
                 $vote = '';
                 $voteid = '';

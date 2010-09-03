@@ -57,7 +57,7 @@ if($vgEnableSMS)
 function vfGetAllNumbers()
 {
     $out = array();
-    for($i=0;$i<=99;$i++)
+    for($i=1; $i<=99; $i++)
     {
         $out[] = '' . sprintf("%02d", $i);
     }
